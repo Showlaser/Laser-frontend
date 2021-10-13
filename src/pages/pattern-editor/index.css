@@ -1,0 +1,18 @@
+#patterns-wrapper {
+  padding-bottom: 5px;
+}
+
+#patterns-preview {
+  margin-left: 25px;
+  border: solid 1px #7a7a7a;
+  display: inline-block;
+  height: 400px;
+  width: 400px;
+}
+
+#patterns-form-wrapper {
+  min-width: 40%;
+  display: inline-block;
+  overflow-y: auto;
+  height: 400px;
+}
