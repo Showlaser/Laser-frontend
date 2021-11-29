@@ -41,8 +41,7 @@ export default function Dashboard() {
     },
     paper: {
       padding: theme.spacing(2),
-      textAlign: "center",
-      color: theme.palette.text.secondary,
+      textAlign: "left",
     },
   }));
 
@@ -60,7 +59,11 @@ export default function Dashboard() {
               <p>
                 {laser?.connected ? (
                   <div>
-                    <span style={{ color: "green" }}>Connected</span>
+                    Connected{" "}
+                    <span style={{ color: "#3f51b5", fontSize: "130%" }}>
+                      {" "}
+                      &#x25cf;
+                    </span>
                     <hr />
                     <b>Temperature</b>
                     <br />
@@ -144,7 +147,7 @@ export default function Dashboard() {
                 <ListItem>
                   <ListItemText
                     primary="Overheating"
-                    secondary="Galvo reached 60 degrees"
+                    secondary="Galvo reached 60 degrees 29-11-2021 17:00"
                   />
                 </ListItem>
                 <Divider component="li" />
@@ -155,7 +158,7 @@ export default function Dashboard() {
                 <ListItem>
                   <ListItemText
                     primary="Laser not connected"
-                    secondary="The laser is not connected to the computer"
+                    secondary="The laser is not connected to the computer 29-11-2021 16:50"
                   />
                 </ListItem>
                 <Divider component="li" />

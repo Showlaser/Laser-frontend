@@ -21,3 +21,6 @@ export const capitalizeFirstLetter = (string) =>
 
 export const convertToMilliWatts = (maxPower, currentValue) =>
   Math.round((maxPower / 511) * currentValue);
+
+export const valueIsWithinBoundaries = (value, min, max) =>
+  value <= max && value >= min;

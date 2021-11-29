@@ -5,14 +5,20 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Snackbar,
   TextField,
 } from "@material-ui/core";
 import Slider from "@material-ui/core/Slider";
 import React, { useEffect } from "react";
-import { convertToMilliWatts, mapNumber } from "services/shared/math";
+import {
+  convertToMilliWatts,
+  mapNumber,
+  valueIsWithinBoundaries,
+} from "services/shared/math";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddIcon from "@material-ui/icons/Add";
 import "./index.css";
+import { showError, toastSubject } from "services/shared/toast-messages";
 
 export default function Zones(props) {
   const [selectedZone, setSelectedZone] = React.useState(0);
@@ -72,6 +78,11 @@ export default function Zones(props) {
   };
 
   const updateZone = (index, value, axle) => {
+    if (!valueIsWithinBoundaries(value, -4000, 4000)) {
+      showError(toastSubject.BoundaryError);
+      return;
+    }
+
     let updatedZones = props?.zones;
     updatedZones[selectedZone].points[index][axle] = value;
     props.callback(updatedZones, "zones");
@@ -116,8 +127,9 @@ export default function Zones(props) {
           <InputLabel id="demo-simple-select-label">Select zone</InputLabel>
           <Select
             onChange={(e) => {
-              setSelectedZone(e.target.value);
-              drawZone(props?.zones[e.target.value]);
+              const data = e.target.value;
+              setSelectedZone(data);
+              drawZone(props?.zones[data]);
             }}
             value={selectedZone ?? " "}
             labelId="demo-simple-select-label"

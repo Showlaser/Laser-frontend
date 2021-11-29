@@ -3,8 +3,8 @@ import "./App.css";
 import { createTheme, ThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Routes from "./routes/Routes";
-import { Provider, KeepAlive } from "react-keep-alive";
-import LaserCommunicator from "services/shared/laser-communicator";
+import { Slide, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const theme = React.useMemo(() =>
@@ -17,6 +17,12 @@ function App() {
 
   return (
     <div className="App">
+      <ToastContainer
+        autoClose={6000}
+        position="bottom-center"
+        transition={Slide}
+        theme="dark"
+      />
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Routes />

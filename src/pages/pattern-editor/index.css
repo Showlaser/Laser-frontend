@@ -15,4 +15,5 @@
   display: inline-block;
   overflow-y: auto;
   height: 400px;
+  padding: 20px;
 }

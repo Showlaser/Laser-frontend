@@ -6,6 +6,7 @@ import {
   Menu,
   MenuItem,
   Select,
+  Slider,
   TextField,
 } from "@material-ui/core";
 import React, { useEffect } from "react";
@@ -16,11 +17,12 @@ import SideNav from "components/sidenav";
 import "./index.css";
 
 export default function PatternEditor() {
-  const [selectedPattern, setSelectedPattern] = React.useState(0);
+  const [selectedPatternId, setSelectedPatternId] = React.useState(0);
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
 
   const patternPlaceholder = {
+    scale: 1,
     points: [
       {
         uuid: createGuid(),
@@ -70,7 +72,7 @@ export default function PatternEditor() {
       });
     }
 
-    return { points };
+    return { points, scale: 1 };
   };
 
   const sideNavSettings = {
@@ -78,32 +80,33 @@ export default function PatternEditor() {
   };
 
   useEffect(() => {
-    drawPattern(patterns[selectedPattern]);
+    drawPattern(patterns[selectedPatternId]);
   }, []);
 
-  const drawLine = (ctx, point, i) => {
+  const drawLine = (ctx, point, scale) => {
     ctx.moveTo(
-      mapNumber(point?.x, 4000, -4000, 400, 0),
-      mapNumber(point?.y, 4000, -4000, 0, 400)
+      mapNumber(point?.x * scale, 4000, -4000, 400, 0),
+      mapNumber(point?.y * scale, 4000, -4000, 0, 400)
     );
 
-    const pointTo = patterns[selectedPattern]?.points?.find(
+    const pointTo = patterns[selectedPatternId]?.points?.find(
       (p) => p.uuid === point?.connectedToUuid
     );
+
     if (pointTo === undefined) {
       return;
     }
 
     ctx.lineTo(
-      mapNumber(pointTo?.x, 4000, -4000, 400, 0),
-      mapNumber(pointTo?.y, 4000, -4000, 0, 400)
+      mapNumber(pointTo?.x * scale, 4000, -4000, 400, 0),
+      mapNumber(pointTo?.y * scale, 4000, -4000, 0, 400)
     );
   };
 
-  const drawDot = (ctx, point) => {
+  const drawDot = (ctx, point, scale) => {
     ctx.fillRect(
-      mapNumber(point?.x, 4000, -4000, 398, 0),
-      mapNumber(point?.y, 4000, -4000, 0, 398),
+      mapNumber(point?.x * scale, 4000, -4000, 398, 0),
+      mapNumber(point?.y * scale, 4000, -4000, 0, 398),
       2,
       2
     );
@@ -125,29 +128,34 @@ export default function PatternEditor() {
     ctx.stroke();
 
     const length = pattern?.points?.length;
+    const scale = pattern?.scale ?? 1;
+
     for (let i = 0; i < length; i++) {
       const point = pattern?.points[i];
 
       point?.connectedToUuid !== null
-        ? drawLine(ctx, point, i)
-        : drawDot(ctx, point);
+        ? drawLine(ctx, point, scale)
+        : drawDot(ctx, point, scale);
     }
     ctx.stroke();
   };
 
-  const updatePattern = (index, value, axle) => {
+  const updatePatternPoint = (index, value, axle) => {
     let updatedPatterns = patterns;
-    updatedPatterns[selectedPattern].points[index][axle] = value;
-    setPatterns(updatedPatterns, drawPattern(updatedPatterns[selectedPattern]));
+    updatedPatterns[selectedPatternId].points[index][axle] = value;
+    setPatterns(
+      updatedPatterns,
+      drawPattern(updatedPatterns[selectedPatternId])
+    );
   };
 
   const onPatternUpdate = () => {
-    drawPattern(patterns[selectedPattern]);
+    drawPattern(patterns[selectedPatternId]);
     forceUpdate();
   };
 
   const onConnect = (uuid, connectedToUuid) => {
-    let updatedPattern = patterns[selectedPattern];
+    let updatedPattern = patterns[selectedPatternId];
     if (connectedToUuid !== " ") {
       let updatedPoint = updatedPattern.points.find((p) => p.uuid === uuid);
       updatedPoint.connectedToUuid = connectedToUuid;
@@ -162,19 +170,19 @@ export default function PatternEditor() {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = (templateName) => {
+  const onTemplateMenuClose = (templateName) => {
     setAnchorEl(null);
     if (templateName === "circle") {
       const circle = getCircleTemplate();
       let patternsToUpdate = patterns;
       patternsToUpdate.push(circle);
       setPatterns(patternsToUpdate, drawPattern(circle));
-      setSelectedPattern(patternsToUpdate.length - 1);
+      setSelectedPatternId(patternsToUpdate.length - 1);
     }
   };
 
   const deletePoint = (point) => {
-    let patternToUpdate = patterns[selectedPattern];
+    let patternToUpdate = patterns[selectedPatternId];
     const pointIndex = patternToUpdate?.points?.findIndex(
       (p) => p?.uuid === point?.uuid
     );
@@ -192,7 +200,7 @@ export default function PatternEditor() {
   };
 
   const getPatternsForm = () => {
-    const form = patterns[selectedPattern]?.points?.map((point, index) => (
+    const form = patterns[selectedPatternId]?.points?.map((point, index) => (
       <div key={`${index}-pattern-point`}>
         <small>Point {index}</small>
         <br />
@@ -206,7 +214,7 @@ export default function PatternEditor() {
           type="number"
           label="X"
           defaultValue={point.x}
-          onChange={(e) => updatePattern(index, e.target.value, "x")}
+          onChange={(e) => updatePatternPoint(index, e.target.value, "x")}
         />
         <TextField
           key={createGuid()}
@@ -217,7 +225,7 @@ export default function PatternEditor() {
           type="number"
           label="Y"
           defaultValue={point.y}
-          onChange={(e) => updatePattern(index, e.target.value, "y")}
+          onChange={(e) => updatePatternPoint(index, e.target.value, "y")}
         />
         <Button
           onClick={() => deletePoint(point)}
@@ -234,7 +242,7 @@ export default function PatternEditor() {
           value={point?.connectedToUuid ?? " "}
         >
           <MenuItem value={" "}>None</MenuItem>
-          {patterns[selectedPattern]?.points?.map((p, i) =>
+          {patterns[selectedPatternId]?.points?.map((p, i) =>
             i !== index ? <MenuItem value={p?.uuid}>point {i}</MenuItem> : null
           )}
         </Select>
@@ -246,7 +254,7 @@ export default function PatternEditor() {
         {form}
         <Button
           onClick={() => {
-            let patternToUpdate = patterns[selectedPattern];
+            let patternToUpdate = patterns[selectedPatternId];
             patternToUpdate?.points.push({
               uuid: createGuid(),
               x: 0,
@@ -275,13 +283,32 @@ export default function PatternEditor() {
         <h2>Patterns</h2>
         <p>Patterns can be used on the animation page</p>
         <div id="patterns-form-wrapper">
+          <small>Scale</small>
+          <br />
+          <Slider
+            style={{ width: "94%" }}
+            onChange={(e, value) => {
+              let updatedPatterns = patterns;
+              let patternToUpdate = updatedPatterns[selectedPatternId];
+              patternToUpdate.scale = value;
+
+              setPatterns(updatedPatterns);
+              drawPattern(patternToUpdate);
+            }}
+            defaultValue={1}
+            min={0.1}
+            max={1}
+            aria-labelledby="continuous-slider"
+            valueLabelDisplay="auto"
+            step={0.1}
+          />
           <InputLabel id="demo-simple-select-label">Select pattern</InputLabel>
           <Select
             onChange={(e) => {
-              setSelectedPattern(e.target.value);
+              setSelectedPatternId(e.target.value);
               drawPattern(patterns[e.target.value]);
             }}
-            value={selectedPattern}
+            value={selectedPatternId}
             labelId="demo-simple-select"
             id="demo-simple-select"
           >
@@ -295,7 +322,7 @@ export default function PatternEditor() {
             onClick={() => {
               let updatedPatterns = patterns;
               updatedPatterns.push(patternPlaceholder);
-              setSelectedPattern(updatedPatterns.length - 1);
+              setSelectedPatternId(updatedPatterns.length - 1);
               drawPattern(patterns[updatedPatterns.length - 1]);
             }}
             style={{ marginLeft: "5px" }}
@@ -308,10 +335,10 @@ export default function PatternEditor() {
           </Button>
           <Button
             onClick={() => {
-              let updatedZones = patterns;
-              updatedZones.splice(selectedPattern, 1);
-              setSelectedPattern(updatedZones.length - 1);
-              drawPattern(patterns[updatedZones.length - 1]);
+              let updatedPatterns = patterns;
+              updatedPatterns.splice(selectedPatternId, 1);
+              setSelectedPatternId(updatedPatterns.length - 1);
+              drawPattern(patterns[updatedPatterns.length - 1]);
               forceUpdate();
             }}
             style={{ marginLeft: "5px" }}
@@ -337,9 +364,11 @@ export default function PatternEditor() {
             anchorEl={anchorEl}
             keepMounted
             open={Boolean(anchorEl)}
-            onClose={handleClose}
+            onClose={onTemplateMenuClose}
           >
-            <MenuItem onClick={() => handleClose("circle")}>Circle</MenuItem>
+            <MenuItem onClick={() => onTemplateMenuClose("circle")}>
+              Circle
+            </MenuItem>
           </Menu>
           <Divider style={{ marginTop: "5px" }} />
           {items}
