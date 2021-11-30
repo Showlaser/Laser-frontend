@@ -1,8 +1,9 @@
-import { Divider } from "@material-ui/core";
+import { Button, Divider, makeStyles } from "@material-ui/core";
 import SideNav from "components/sidenav";
 import React, { useState } from "react";
 import Zones from "components/laser-settings/zones";
 import TemperatureSettings from "components/laser-settings/temperature";
+import LaserNetworkSettings from "components/laser-settings/network-settings";
 
 export default function LaserSettings() {
   const [laser, setLaser] = useState({
@@ -42,6 +43,15 @@ export default function LaserSettings() {
     },
   });
 
+  const useStyles = makeStyles((theme) => ({
+    saveButton: {
+      marginTop: "15px",
+      width: "20%",
+    },
+  }));
+
+  const classes = useStyles();
+
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
 
@@ -58,12 +68,22 @@ export default function LaserSettings() {
 
   const content = (
     <div>
+      <LaserNetworkSettings network={laser?.network} callback={updateLaser} />
+      <Divider />
       <Zones zones={laser?.zones} callback={updateLaser} />
       <Divider />
       <TemperatureSettings
         temperatures={laser?.temperatures}
         callback={updateLaser}
       />
+      <Divider />
+      <Button
+        variant="contained"
+        color="primary"
+        className={classes.saveButton}
+      >
+        Save settings
+      </Button>
     </div>
   );
 

@@ -112,21 +112,33 @@ export default function Dashboard() {
               <hr />
               <b>Max power</b>
               <List className={classes.root}>
-                <ListItem>
-                  <ListItemText primary="Combined" secondary="5000mW (100%)" />
-                </ListItem>
-                <Divider component="li" />
-                <ListItem>
-                  <ListItemText primary="Red" secondary="1000mW (100%)" />
-                </ListItem>
-                <Divider component="li" />
-                <ListItem>
-                  <ListItemText primary="Green" secondary="1000mW (100%)" />
-                </ListItem>
-                <Divider component="li" />
-                <ListItem>
-                  <ListItemText primary="Blue" secondary="3000mW (100%)" />
-                </ListItem>
+                <small>Total {100}%</small>
+                <LinearProgress
+                  color="primary"
+                  variant="determinate"
+                  value={100}
+                />
+                <br />
+                <small>Red {100}%</small>
+                <LinearProgress
+                  color="primary"
+                  variant="determinate"
+                  value={100}
+                />
+                <br />
+                <small>Green {100}%</small>
+                <LinearProgress
+                  color="primary"
+                  variant="determinate"
+                  value={100}
+                />
+                <br />
+                <small>Blue {100}%</small>
+                <LinearProgress
+                  color="primary"
+                  variant="determinate"
+                  value={100}
+                />
               </List>
               <hr />
               <b>Other</b>

@@ -6,6 +6,7 @@ export default function TemperatureSettings(props) {
     updatedTemperatures[propName].maxTemp = maxTemp;
     props.callback(updatedTemperatures, "temperatures");
   };
+
   return (
     <div>
       <h2>Max temperatures</h2>
@@ -20,7 +21,7 @@ export default function TemperatureSettings(props) {
         onChange={(e, value) => changeMaxTemperature(value, "galvo")}
         value={props?.temperatures?.galvo?.maxTemp}
         min={40}
-        max={70}
+        max={55}
         aria-labelledby="continuous-slider"
         valueLabelDisplay="auto"
       />
@@ -31,7 +32,7 @@ export default function TemperatureSettings(props) {
         onChange={(e, value) => changeMaxTemperature(value, "basePlate")}
         value={props?.temperatures?.basePlate?.maxTemp}
         min={40}
-        max={70}
+        max={55}
         aria-labelledby="continuous-slider"
         valueLabelDisplay="auto"
       />
