@@ -2,6 +2,7 @@ import SideNav from "components/sidenav";
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
+import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -10,13 +11,18 @@ import Divider from "@material-ui/core/Divider";
 import { LinearProgress } from "@material-ui/core";
 import { normalise } from "services/shared/math";
 import LaserCommunicator from "services/shared/laser-communicator";
+import {
+  showInfo,
+  showWarning,
+  toastSubject,
+} from "services/shared/toast-messages";
 
 export default function Dashboard() {
   const [laser, setLaser] = useState({});
 
   useEffect(() => {
     LaserCommunicator();
-    setLaser({
+    const laserTelemetry = {
       connected: true,
       temperatures: {
         galvo: {
@@ -28,8 +34,43 @@ export default function Dashboard() {
           maxTemp: 50,
         },
       },
-    });
+      logs: {
+        errors: [
+          {
+            title: "Overheating",
+            message: "Galvo reached 60 degrees",
+            dateTime: "29-11-2021 17:00",
+          },
+        ],
+        warnings: [
+          {
+            title: "Laser not connected",
+            message: "The laser is not connected to the computer",
+            dateTime: "29-11-2021 16:50",
+          },
+        ],
+      },
+      settings: {
+        development: {
+          developmentModeEnabled: true,
+        },
+      },
+    };
+
+    setLaser(laserTelemetry);
+
+    const { logs, settings } = laserTelemetry;
+    if (logs?.errors?.includes || logs?.warnings?.includes) {
+      showWarning(toastSubject.LogsNotEmpty);
+    }
+    if (settings?.development?.developmentModeEnabled) {
+      showInfo(toastSubject.developmentModeActive);
+    }
   }, []);
+
+  const clearLogs = () => {
+    alert("Not implemented yet!");
+  };
 
   const sideNavSettings = {
     pageName: "Dashboard",
@@ -42,6 +83,9 @@ export default function Dashboard() {
     paper: {
       padding: theme.spacing(2),
       textAlign: "left",
+    },
+    statusDot: {
+      fontSize: "130%",
     },
   }));
 
@@ -60,7 +104,10 @@ export default function Dashboard() {
                 {laser?.connected ? (
                   <div>
                     Connected{" "}
-                    <span style={{ color: "#3f51b5", fontSize: "130%" }}>
+                    <span
+                      className={classes.statusDot}
+                      style={{ color: laser?.connected ? "green" : "red" }}
+                    >
                       {" "}
                       &#x25cf;
                     </span>
@@ -110,43 +157,20 @@ export default function Dashboard() {
             <Paper className={classes.paper}>
               <h1>Laser settings</h1>
               <hr />
-              <b>Max power</b>
+              <b>Zones</b>
               <List className={classes.root}>
-                <small>Total {100}%</small>
-                <LinearProgress
-                  color="primary"
-                  variant="determinate"
-                  value={100}
-                />
-                <br />
-                <small>Red {100}%</small>
-                <LinearProgress
-                  color="primary"
-                  variant="determinate"
-                  value={100}
-                />
-                <br />
-                <small>Green {100}%</small>
-                <LinearProgress
-                  color="primary"
-                  variant="determinate"
-                  value={100}
-                />
-                <br />
-                <small>Blue {100}%</small>
-                <LinearProgress
-                  color="primary"
-                  variant="determinate"
-                  value={100}
-                />
+                <text>Total: 2</text>
               </List>
               <hr />
-              <b>Other</b>
+              <b>Development</b>
               <List className={classes.root}>
-                <ListItem>
-                  <ListItemText primary="Zones" secondary="Configured" />
-                </ListItem>
-                <Divider component="li" />
+                <text>
+                  Development mode enabled{" "}
+                  <span style={{ color: "green", fontSize: "130%" }}>
+                    {" "}
+                    &#x25cf;
+                  </span>
+                </text>
               </List>
             </Paper>
           </Grid>
@@ -157,10 +181,12 @@ export default function Dashboard() {
               <b>Error</b>
               <List className={classes.root}>
                 <ListItem>
-                  <ListItemText
-                    primary="Overheating"
-                    secondary="Galvo reached 60 degrees 29-11-2021 17:00"
-                  />
+                  {laser?.logs?.errors?.map((error) => (
+                    <ListItemText
+                      primary={error?.title}
+                      secondary={`${error?.message} ${error?.dateTime}`}
+                    />
+                  ))}
                 </ListItem>
                 <Divider component="li" />
               </List>
@@ -168,13 +194,18 @@ export default function Dashboard() {
               <b>Warnings</b>
               <List className={classes.root}>
                 <ListItem>
-                  <ListItemText
-                    primary="Laser not connected"
-                    secondary="The laser is not connected to the computer 29-11-2021 16:50"
-                  />
+                  {laser?.logs?.warnings?.map((warning) => (
+                    <ListItemText
+                      primary={warning?.title}
+                      secondary={`${warning?.message} ${warning?.dateTime}`}
+                    />
+                  ))}
                 </ListItem>
                 <Divider component="li" />
               </List>
+              <Button variant="text" onClick={() => clearLogs()}>
+                X Clear logs
+              </Button>
             </Paper>
           </Grid>
           <Grid item xs={12}>

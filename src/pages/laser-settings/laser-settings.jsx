@@ -2,8 +2,8 @@ import { Button, Divider, makeStyles } from "@material-ui/core";
 import SideNav from "components/sidenav";
 import React, { useState } from "react";
 import Zones from "components/laser-settings/zones";
-import TemperatureSettings from "components/laser-settings/temperature";
 import LaserNetworkSettings from "components/laser-settings/network-settings";
+import DevelopmentSettings from "components/laser-settings/development-settings";
 
 export default function LaserSettings() {
   const [laser, setLaser] = useState({
@@ -31,15 +31,8 @@ export default function LaserSettings() {
         maxPowerPwm: 3,
       },
     ],
-    temperatures: {
-      galvo: {
-        currentTemp: 50,
-        maxTemp: 60,
-      },
-      basePlate: {
-        currentTemp: 35,
-        maxTemp: 50,
-      },
+    development: {
+      developmentModeEnabled: false,
     },
   });
 
@@ -72,8 +65,9 @@ export default function LaserSettings() {
       <Divider />
       <Zones zones={laser?.zones} callback={updateLaser} />
       <Divider />
-      <TemperatureSettings
-        temperatures={laser?.temperatures}
+      <Divider />
+      <DevelopmentSettings
+        development={laser?.development}
         callback={updateLaser}
       />
       <Divider />
