@@ -16,26 +16,31 @@ export const toastSubject = {
   },
 };
 
+const calculateAutoCloseTime = (text) => {
+  const autoCloseTime = text.length * 100;
+  return autoCloseTime > 3000 ? autoCloseTime : 3000;
+};
+
 export const showError = (subject) => {
   const { message, id } = subject;
-  const time = message.length * 100;
+  const time = calculateAutoCloseTime(message);
   toast.error(message, { toastId: id, autoClose: time });
 };
 
 export const showSuccess = (subject) => {
   const { message, id } = subject;
-  const time = message.length * 100;
+  const time = calculateAutoCloseTime(message);
   toast.success(message, { toastId: id, autoClose: time });
 };
 
 export const showWarning = (subject) => {
   const { message, id } = subject;
-  const time = message.length * 100;
+  const time = calculateAutoCloseTime(message);
   toast.warning(message, { toastId: id, autoClose: time });
 };
 
 export const showInfo = (subject) => {
   const { message, id } = subject;
-  const time = message.length * 100;
+  const time = calculateAutoCloseTime(message);
   toast.info(message, { toastId: id, autoClose: time });
 };
