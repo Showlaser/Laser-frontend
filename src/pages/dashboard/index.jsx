@@ -161,7 +161,7 @@ export default function Dashboard() {
               <List className={classes.root}>
                 <text>Total: 2</text>
               </List>
-              <hr />
+              <Divider />
               <b>Development</b>
               <List className={classes.root}>
                 <text>
