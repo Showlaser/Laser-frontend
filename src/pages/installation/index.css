@@ -1,0 +1,22 @@
+.installation-card {
+  margin: 5px;
+  cursor: pointer;
+  width: 20%;
+  min-width: 30vh;
+  height: 10%;
+  opacity: 85%;
+}
+
+#installation {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  text-align: center;
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    352deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(19, 19, 149, 1) 18%,
+    rgba(50, 23, 23, 1) 100%
+  );
+}

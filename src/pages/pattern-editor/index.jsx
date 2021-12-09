@@ -316,7 +316,9 @@ export default function PatternEditor() {
               </Select>
             </MenuItem>
           </Select>
-          <text style={{ float: "right" }}>Changes not saved</text>
+          <text style={{ float: "right", color: "red" }}>
+            Changes not saved
+          </text>
           <Divider style={{ marginTop: "5px" }} />
           {items}
         </div>
