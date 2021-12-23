@@ -1,11 +1,11 @@
 import { toast } from "react-toastify";
 
 export const toastSubject = {
-  BoundaryError: {
+  boundaryError: {
     message: "Select a value between or equal to -4000 and 4000",
     id: 0,
   },
-  LogsNotEmpty: {
+  logsNotEmpty: {
     message: "An error or warning has occurred, check logs",
     id: 1,
   },
@@ -13,6 +13,30 @@ export const toastSubject = {
     message:
       "Development mode active. Laser power limited to safe level without eye protection",
     id: 2,
+  },
+  apiBadRequest: {
+    message: "The server could not process the send data",
+    id: 3,
+  },
+  apiNotFound: {
+    message: "The resource was not found",
+    id: 4,
+  },
+  apiDuplication: {
+    message: "An item with the same key already exists",
+    id: 5,
+  },
+  apiException: {
+    message: "An exception has occured on the API",
+    id: 6,
+  },
+  apiNotModified: {
+    message: "Data was not modified",
+    id: 7,
+  },
+  notImplemented: {
+    message: "This is not implemented yet",
+    id: 8,
   },
 };
 

@@ -61,7 +61,7 @@ export default function Dashboard() {
 
     const { logs, settings } = laserTelemetry;
     if (logs?.errors?.includes || logs?.warnings?.includes) {
-      showWarning(toastSubject.LogsNotEmpty);
+      showWarning(toastSubject.logsNotEmpty);
     }
     if (settings?.development?.developmentModeEnabled) {
       showInfo(toastSubject.developmentModeActive);
@@ -204,7 +204,7 @@ export default function Dashboard() {
                 <Divider component="li" />
               </List>
               <Button variant="text" onClick={() => clearLogs()}>
-                X Clear logs
+                X Clear warnings
               </Button>
             </Paper>
           </Grid>

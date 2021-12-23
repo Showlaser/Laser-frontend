@@ -1,3 +1,6 @@
+import { Get } from "services/shared/api/api-actions";
+import { sendRequest } from "services/shared/api/api-middleware";
+import apiEndpoints from "services/shared/api/api-urls";
 import { createGuid } from "services/shared/math";
 
 export const getCircleTemplate = () => {
@@ -52,4 +55,10 @@ export const patternPlaceHolders = {
       },
     ],
   },
+};
+
+export const getPatterns = () => {
+  return sendRequest(() => Get(apiEndpoints.pattern), [200]).then((value) =>
+    value.json()
+  );
 };

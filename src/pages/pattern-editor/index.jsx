@@ -21,22 +21,32 @@ import SaveAltIcon from "@material-ui/icons/SaveAlt";
 import SideNav from "components/sidenav";
 import "./index.css";
 import { showError, toastSubject } from "services/shared/toast-messages";
-import { getCircleTemplate, patternPlaceHolders } from "./logic";
+import {
+  getCircleTemplate,
+  getPatterns,
+  patternPlaceHolders,
+} from "services/logic";
 
 export default function PatternEditor() {
   const [selectedPatternId, setSelectedPatternId] = React.useState(0);
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
 
-  const [patterns, setPatterns] = React.useState([patternPlaceHolders.Circle]);
+  const [patterns, setPatterns] = React.useState([]);
 
   const sideNavSettings = {
     pageName: "Pattern editor",
   };
 
   useEffect(() => {
+    if (patterns.length === 0) {
+      getPatterns().then((value) => {
+        setPatterns(value);
+      });
+    }
+
     drawPattern(patterns[selectedPatternId]);
-  }, []);
+  }, [patterns]);
 
   const drawLine = (ctx, point, selectedId) => {
     if (selectedId === undefined) {
@@ -99,7 +109,7 @@ export default function PatternEditor() {
 
   const updatePatternPoint = (index, value, axle) => {
     if (!valueIsWithinBoundaries(value, -4000, 4000)) {
-      showError(toastSubject.BoundaryError);
+      showError(toastSubject.boundaryError);
       return;
     }
 
