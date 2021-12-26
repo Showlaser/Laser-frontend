@@ -38,6 +38,10 @@ export const toastSubject = {
     message: "This is not implemented yet",
     id: 8,
   },
+  changesSaved: {
+    message: "Changes saved",
+    id: 9,
+  },
 };
 
 const calculateAutoCloseTime = (text) => {

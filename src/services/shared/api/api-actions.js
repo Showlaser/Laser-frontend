@@ -19,6 +19,9 @@ export const Post = async (endpoint, data = null) => {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
+      headers: {
+        "Content-Type": "application/json",
+      },
       credentials: "same-origin",
       redirect: "follow",
       referrerPolicy: "no-referrer",
@@ -35,6 +38,9 @@ export const Put = async (endpoint, data = null) => {
       method: "PUT",
       mode: "cors",
       cache: "no-cache",
+      headers: {
+        "Content-Type": "application/json",
+      },
       credentials: "same-origin",
       redirect: "follow",
       referrerPolicy: "no-referrer",

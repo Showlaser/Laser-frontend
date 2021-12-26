@@ -7,7 +7,7 @@ import {
   Slider,
 } from "@material-ui/core";
 import SideNav from "components/sidenav";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./index.css";
 import AddIcon from "@material-ui/icons/Add";
 import { createGuid } from "services/shared/math";

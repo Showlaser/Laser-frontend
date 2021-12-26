@@ -12,6 +12,7 @@ import {
 import React, { useEffect } from "react";
 import {
   createGuid,
+  emptyGuid,
   mapNumber,
   valueIsWithinBoundaries,
 } from "services/shared/math";
@@ -25,14 +26,30 @@ import {
   getCircleTemplate,
   getPatterns,
   patternPlaceHolders,
+  removePattern,
+  savePattern,
 } from "services/logic";
+import DeleteModal from "components/modal";
 
 export default function PatternEditor() {
   const [selectedPatternId, setSelectedPatternId] = React.useState(0);
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
-
   const [patterns, setPatterns] = React.useState([]);
+  const [changesSaved, setChangesSaved] = React.useState(true);
+  const [modalOptions, setModalOptions] = React.useState({
+    title: "Delete pattern?",
+    show: false,
+    onOkClick: null,
+    onCancelClick: () => closeModal(),
+  });
+
+  const closeModal = () => {
+    let modal = modalOptions;
+    modal.show = false;
+    setModalOptions(modal);
+    forceUpdate();
+  };
 
   const sideNavSettings = {
     pageName: "Pattern editor",
@@ -46,7 +63,22 @@ export default function PatternEditor() {
     }
 
     drawPattern(patterns[selectedPatternId]);
-  }, [patterns]);
+  }, [patterns, selectedPatternId]);
+
+  const deletePattern = () => {
+    let updatedPatterns = patterns;
+    const patternUuid = updatedPatterns[selectedPatternId]?.uuid;
+    updatedPatterns.splice(selectedPatternId, 1);
+    removePattern(patternUuid);
+
+    if (updatedPatterns.length === 0) {
+      loadTemplate(() => patternPlaceHolders.New);
+      return;
+    }
+
+    setSelectedPatternId(updatedPatterns.length - 1);
+    drawPattern(patterns[updatedPatterns.length - 1]);
+  };
 
   const drawLine = (ctx, point, selectedId) => {
     if (selectedId === undefined) {
@@ -100,7 +132,7 @@ export default function PatternEditor() {
     for (let i = 0; i < length; i++) {
       const point = pattern?.points[i];
 
-      point?.connectedToUuid !== null
+      point?.connectedToUuid !== emptyGuid()
         ? drawLine(ctx, point, selectedId)
         : drawDot(ctx, point);
     }
@@ -138,14 +170,14 @@ export default function PatternEditor() {
     setPatterns(patterns, onPatternUpdate());
   };
 
-  const onTemplateMenuClose = (templateName) => {
-    if (templateName === "circle") {
-      const circle = getCircleTemplate();
-      let patternsToUpdate = patterns;
-      patternsToUpdate.push(circle);
-      setPatterns(patternsToUpdate, drawPattern(circle));
-      setSelectedPatternId(patternsToUpdate.length - 1);
-    }
+  const loadTemplate = (templateFunction) => {
+    setChangesSaved(false);
+    const template = templateFunction();
+    let patternsToUpdate = patterns;
+    patternsToUpdate.push(template);
+    setPatterns(patternsToUpdate, drawPattern(template));
+    setSelectedPatternId(patternsToUpdate.length - 1);
+    forceUpdate();
   };
 
   const deletePoint = (point) => {
@@ -173,7 +205,6 @@ export default function PatternEditor() {
         <br />
         <TextField
           key={createGuid()}
-          autoFocus
           name={`x${index}`}
           size="small"
           style={{ margin: "2px" }}
@@ -181,9 +212,10 @@ export default function PatternEditor() {
           type="number"
           label="X"
           defaultValue={point.x}
-          onChange={(e) =>
-            updatePatternPoint(index, Number(e.target.value), "x")
-          }
+          onChange={(e) => {
+            setChangesSaved(false);
+            updatePatternPoint(index, Number(e.target.value), "x");
+          }}
         />
         <TextField
           key={createGuid()}
@@ -194,9 +226,10 @@ export default function PatternEditor() {
           type="number"
           label="Y"
           defaultValue={point.y}
-          onChange={(e) =>
-            updatePatternPoint(index, Number(e.target.value), "y")
-          }
+          onChange={(e) => {
+            setChangesSaved(false);
+            updatePatternPoint(index, Number(e.target.value), "y");
+          }}
         />
         <Button
           onClick={() => deletePoint(point)}
@@ -222,6 +255,21 @@ export default function PatternEditor() {
 
     return (
       <div>
+        <small>Pattern name</small>
+        <br />
+        <TextField
+          key={createGuid()}
+          defaultValue={patterns[selectedPatternId]?.name}
+          placeholder="Pattern name"
+          autoFocus
+          onChange={(e) => {
+            let patternToUpdate = patterns[selectedPatternId];
+            patternToUpdate.name = e.target.value;
+            setPatterns(patterns);
+            setChangesSaved(false);
+          }}
+        />
+        <br />
         {form}
         <Button
           onClick={() => {
@@ -251,6 +299,7 @@ export default function PatternEditor() {
 
     return (
       <div id="patterns-wrapper">
+        <DeleteModal modal={modalOptions} />
         <h2>Patterns</h2>
         <p>Patterns can be used on the animation page</p>
         <div id="patterns-form-wrapper">
@@ -278,7 +327,10 @@ export default function PatternEditor() {
             <MenuItem
               value={0}
               key="patterns-select-save"
-              onClick={() => alert("Not implemented")}
+              onClick={() => {
+                setChangesSaved(true);
+                savePattern(patterns[selectedPatternId]);
+              }}
             >
               <ListItemIcon>
                 <SaveAltIcon />
@@ -289,8 +341,9 @@ export default function PatternEditor() {
               value={1}
               key="patterns-select-add"
               onClick={() => {
+                setChangesSaved(false);
                 let updatedPatterns = patterns;
-                updatedPatterns.push(patternPlaceHolders.Circle);
+                updatedPatterns.push(patternPlaceHolders.New);
                 setSelectedPatternId(updatedPatterns.length - 1);
                 drawPattern(patterns[updatedPatterns.length - 1]);
               }}
@@ -304,10 +357,14 @@ export default function PatternEditor() {
               value={2}
               key="patterns-select-delete"
               onClick={() => {
-                let updatedPatterns = patterns;
-                updatedPatterns.splice(selectedPatternId, 1);
-                setSelectedPatternId(updatedPatterns.length - 1);
-                drawPattern(patterns[updatedPatterns.length - 1]);
+                let modal = modalOptions;
+                modal.show = true;
+                modal.onOkClick = () => {
+                  deletePattern();
+                  closeModal();
+                };
+                setModalOptions(modal);
+                forceUpdate();
               }}
             >
               <ListItemIcon>
@@ -320,15 +377,19 @@ export default function PatternEditor() {
                 <MenuItem value={-1}>
                   <em>Use template</em>
                 </MenuItem>
-                <MenuItem onClick={() => onTemplateMenuClose("circle")}>
+                <MenuItem onClick={() => loadTemplate(getCircleTemplate)}>
                   Circle
                 </MenuItem>
               </Select>
             </MenuItem>
           </Select>
-          <text style={{ float: "right", color: "red" }}>
-            Changes not saved
-          </text>
+          <div style={{ float: "right" }}>
+            {changesSaved ? (
+              <text>Changes saved</text>
+            ) : (
+              <text style={{ color: "red" }}>Changes not saved</text>
+            )}
+          </div>
           <Divider style={{ marginTop: "5px" }} />
           {items}
         </div>

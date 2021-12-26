@@ -45,7 +45,7 @@ export default function Zones(props) {
 
   useEffect(() => {
     drawZone(props.zones[selectedZone]);
-  }, []);
+  }, [props?.zones, selectedZone]);
 
   const drawZone = (zone) => {
     let c = document.getElementById("zones-canvas");

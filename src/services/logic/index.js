@@ -1,7 +1,8 @@
-import { Get } from "services/shared/api/api-actions";
+import { Get, Post, Delete } from "services/shared/api/api-actions";
 import { sendRequest } from "services/shared/api/api-middleware";
 import apiEndpoints from "services/shared/api/api-urls";
-import { createGuid } from "services/shared/math";
+import { createGuid, emptyGuid } from "services/shared/math";
+import { toastSubject } from "services/shared/toast-messages";
 
 export const getCircleTemplate = () => {
   const dotsPerCircle = 30;
@@ -9,6 +10,7 @@ export const getCircleTemplate = () => {
   const radius = 4000;
 
   let points = [];
+  const uuid = createGuid();
 
   for (let i = dotsPerCircle; i > 0; i--) {
     const desiredRadianAngleOnCircle = interval * i;
@@ -16,42 +18,29 @@ export const getCircleTemplate = () => {
     const y = Math.round(radius * Math.sin(desiredRadianAngleOnCircle));
     points.push({
       uuid: createGuid(),
+      patternUuid: uuid,
       x,
       y,
-      connectedToUuid: null,
+      connectedToUuid: emptyGuid(),
     });
   }
 
-  return { points, scale: 1 };
+  return { points, scale: 1, name: "Circle", uuid };
 };
 
+const uuid = createGuid();
 export const patternPlaceHolders = {
-  Circle: {
+  New: {
     scale: 1,
+    name: null,
+    uuid,
     points: [
       {
         uuid: createGuid(),
-        x: -4000,
-        y: 4000,
-        connectedToUuid: null,
-      },
-      {
-        uuid: createGuid(),
-        x: 4000,
-        y: 4000,
-        connectedToUuid: null,
-      },
-      {
-        uuid: createGuid(),
-        x: 4000,
-        y: -4000,
-        connectedToUuid: null,
-      },
-      {
-        uuid: createGuid(),
-        x: -4000,
-        y: -4000,
-        connectedToUuid: null,
+        patternUuid: uuid,
+        x: null,
+        y: null,
+        connectedToUuid: emptyGuid(),
       },
     ],
   },
@@ -60,5 +49,21 @@ export const patternPlaceHolders = {
 export const getPatterns = () => {
   return sendRequest(() => Get(apiEndpoints.pattern), [200]).then((value) =>
     value.json()
+  );
+};
+
+export const savePattern = (pattern) => {
+  return sendRequest(
+    () => Post(apiEndpoints.pattern, pattern),
+    [],
+    toastSubject.changesSaved
+  );
+};
+
+export const removePattern = (uuid) => {
+  return sendRequest(
+    () => Delete(apiEndpoints.pattern + uuid),
+    [],
+    toastSubject.changesSaved
   );
 };

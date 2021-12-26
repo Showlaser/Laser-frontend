@@ -16,6 +16,8 @@ export const createGuid = () => {
   });
 };
 
+export const emptyGuid = () => "00000000-0000-0000-0000-000000000000";
+
 export const capitalizeFirstLetter = (string) =>
   string.charAt(0).toUpperCase() + string.slice(1);
 

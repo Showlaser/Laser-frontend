@@ -1,4 +1,4 @@
-import { showError, toastSubject } from "../toast-messages";
+import { showError, toastSubject, showSuccess } from "../toast-messages";
 
 const handleErrorMessages = (statusCode, ignoredStatusCodes) => {
   if (ignoredStatusCodes.includes(statusCode)) {
@@ -16,8 +16,18 @@ const handleErrorMessages = (statusCode, ignoredStatusCodes) => {
   showError(subject !== undefined ? subject : toastSubject.notImplemented);
 };
 
-export async function sendRequest(requestFunction, ignoredStatusCodes) {
+export async function sendRequest(
+  requestFunction,
+  ignoredStatusCodes,
+  onSuccessToastSubject
+) {
   const response = await requestFunction();
-  handleErrorMessages(response.status, ignoredStatusCodes);
+  if (response.status !== 200) {
+    handleErrorMessages(response.status, ignoredStatusCodes);
+    return response;
+  }
+  if (onSuccessToastSubject !== undefined) {
+    showSuccess(onSuccessToastSubject);
+  }
   return response;
 }
