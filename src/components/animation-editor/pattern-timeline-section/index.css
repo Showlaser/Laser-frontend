@@ -1,0 +1,28 @@
+#pattern-timeline-section {
+  width: 93.5%;
+  bottom: 0;
+  position: fixed;
+  display: flex;
+  border: whitesmoke solid 1px;
+}
+
+#pattern-selector {
+  border: whitesmoke solid 1px;
+  height: 100%;
+  width: 20%;
+  overflow: hidden;
+}
+
+#timeline {
+  height: 100%;
+  width: 80%;
+}
+
+.timeline-channel {
+  border: rgb(112, 112, 112) solid 1px;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+}
