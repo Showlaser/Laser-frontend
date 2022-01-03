@@ -1,6 +1,6 @@
 import { showError, toastSubject, showSuccess } from "../toast-messages";
 
-const handleErrorMessages = (statusCode, ignoredStatusCodes) => {
+const handleErrorMessage = (statusCode, ignoredStatusCodes) => {
   if (ignoredStatusCodes.includes(statusCode)) {
     return;
   }
@@ -23,7 +23,7 @@ export async function sendRequest(
 ) {
   const response = await requestFunction();
   if (response.status !== 200) {
-    handleErrorMessages(response.status, ignoredStatusCodes);
+    handleErrorMessage(response.status, ignoredStatusCodes);
     return response;
   }
   if (onSuccessToastSubject !== undefined) {

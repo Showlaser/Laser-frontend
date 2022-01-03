@@ -1,0 +1,20 @@
+#animation-section {
+  width: 100%;
+  display: flex;
+  border: whitesmoke solid 1px;
+}
+
+#animation-settings {
+  border: whitesmoke solid 1px;
+  width: 16%;
+  max-width: 150px;
+  height: 100%;
+  padding-top: 25px;
+}
+
+#animation-timeline {
+  border: whitesmoke solid 1px;
+  width: 40%;
+  height: 100%;
+  padding: 6px 20px 15px 20px;
+}

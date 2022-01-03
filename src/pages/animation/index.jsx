@@ -7,8 +7,8 @@ import {
   Slider,
 } from "@material-ui/core";
 import SideNav from "components/sidenav";
-import "./index.css";
 import PatternTimelineSection from "components/animation-editor/pattern-timeline-section";
+import AnimationSection from "components/animation-editor/animation-section";
 
 export default function AnimationEditor() {
   const sideNavSettings = {
@@ -17,6 +17,7 @@ export default function AnimationEditor() {
 
   const content = (
     <div>
+      <AnimationSection />
       <PatternTimelineSection />
     </div>
   );

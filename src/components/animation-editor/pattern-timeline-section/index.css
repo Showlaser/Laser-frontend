@@ -1,14 +1,11 @@
 #pattern-timeline-section {
-  width: 93.5%;
-  bottom: 0;
-  position: fixed;
   display: flex;
   border: whitesmoke solid 1px;
+  margin-top: 20px;
 }
 
 #pattern-selector {
   border: whitesmoke solid 1px;
-  height: 100%;
   width: 20%;
   overflow: hidden;
 }
