@@ -2,9 +2,6 @@ import {
   Box,
   Button,
   Divider,
-  InputLabel,
-  ListItemIcon,
-  ListItemText,
   MenuItem,
   Select,
   TextField,
@@ -18,7 +15,6 @@ import {
 } from "services/shared/math";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddIcon from "@material-ui/icons/Add";
-import SaveAltIcon from "@material-ui/icons/SaveAlt";
 import SideNav from "components/sidenav";
 import "./index.css";
 import { showError, toastSubject } from "services/shared/toast-messages";
@@ -28,8 +24,9 @@ import {
   patternPlaceHolders,
   removePattern,
   savePattern,
-} from "services/logic";
+} from "services/logic/pattern-logic";
 import DeleteModal from "components/modal";
+import CrudComponent from "components/shared/crud-component";
 
 export default function PatternEditor() {
   const [selectedPatternId, setSelectedPatternId] = React.useState(0);
@@ -44,6 +41,16 @@ export default function PatternEditor() {
     onCancelClick: () => closeModal(),
   });
 
+  useEffect(() => {
+    if (patterns.length === 0) {
+      getPatterns().then((value) => {
+        setPatterns(value);
+      });
+    }
+
+    drawPattern(patterns[selectedPatternId]);
+  }, [patterns, selectedPatternId]);
+
   const closeModal = () => {
     let modal = modalOptions;
     modal.show = false;
@@ -54,16 +61,6 @@ export default function PatternEditor() {
   const sideNavSettings = {
     pageName: "Pattern editor",
   };
-
-  useEffect(() => {
-    if (patterns.length === 0) {
-      getPatterns().then((value) => {
-        setPatterns(value);
-      });
-    }
-
-    drawPattern(patterns[selectedPatternId]);
-  }, [patterns, selectedPatternId]);
 
   const deletePattern = () => {
     let updatedPatterns = patterns;
@@ -294,69 +291,36 @@ export default function PatternEditor() {
     );
   };
 
-  const renderPatterns = () => {
-    const items = getPatternsForm();
-
-    return (
+  const content = (
+    <div>
       <div id="patterns-wrapper">
         <DeleteModal modal={modalOptions} />
         <h2>Patterns</h2>
         <p>Patterns can be used on the animation page</p>
         <div id="patterns-form-wrapper">
-          <InputLabel id="demo-simple-select-label">Select pattern</InputLabel>
-          <Select
-            onChange={(e) => {
-              const selectedId = e.target.value;
-              setSelectedPatternId(selectedId);
-              drawPattern(patterns[selectedId], selectedId);
+          <CrudComponent
+            selectOptions={{
+              selectText: "Select pattern",
+              onChange: (selectedId) => {
+                setSelectedPatternId(selectedId);
+                drawPattern(patterns[selectedId], selectedId);
+              },
+              selectedValue: selectedPatternId,
             }}
-            value={selectedPatternId}
-            labelId="demo-simple-select"
-            id="demo-simple-select"
-          >
-            {patterns?.map((pattern, index) => (
-              <MenuItem key={`${index}-pattern`} value={index}>
-                {index}
-              </MenuItem>
-            ))}
-          </Select>
-          <Select value={-1} style={{ marginLeft: "5px" }}>
-            <MenuItem value={-1}>
-              <em>Actions</em>
-            </MenuItem>
-            <MenuItem
-              value={0}
-              key="patterns-select-save"
-              onClick={() => {
+            itemsArray={patterns}
+            actions={{
+              onSave: () => {
                 setChangesSaved(true);
                 savePattern(patterns[selectedPatternId]);
-              }}
-            >
-              <ListItemIcon>
-                <SaveAltIcon />
-              </ListItemIcon>
-              <ListItemText>Save</ListItemText>
-            </MenuItem>
-            <MenuItem
-              value={1}
-              key="patterns-select-add"
-              onClick={() => {
+              },
+              onAdd: () => {
                 setChangesSaved(false);
                 let updatedPatterns = patterns;
                 updatedPatterns.push(patternPlaceHolders.New);
                 setSelectedPatternId(updatedPatterns.length - 1);
                 drawPattern(patterns[updatedPatterns.length - 1]);
-              }}
-            >
-              <ListItemIcon>
-                <AddIcon />
-              </ListItemIcon>
-              <ListItemText>Add</ListItemText>
-            </MenuItem>
-            <MenuItem
-              value={2}
-              key="patterns-select-delete"
-              onClick={() => {
+              },
+              onDelete: () => {
                 let modal = modalOptions;
                 modal.show = true;
                 modal.onOkClick = () => {
@@ -365,43 +329,26 @@ export default function PatternEditor() {
                 };
                 setModalOptions(modal);
                 forceUpdate();
-              }}
-            >
-              <ListItemIcon>
-                <DeleteIcon />
-              </ListItemIcon>
-              <ListItemText>Delete</ListItemText>
-            </MenuItem>
-            <MenuItem>
-              <Select value={-1}>
-                <MenuItem value={-1}>
-                  <em>Use template</em>
-                </MenuItem>
-                <MenuItem onClick={() => loadTemplate(getCircleTemplate)}>
-                  Circle
-                </MenuItem>
-              </Select>
-            </MenuItem>
-          </Select>
-          <div style={{ float: "right" }}>
-            {changesSaved ? (
-              <text>Changes saved</text>
-            ) : (
-              <text style={{ color: "red" }}>Changes not saved</text>
-            )}
-          </div>
+              },
+              templates: [
+                {
+                  name: "Circle",
+                  getTemplate: () => loadTemplate(getCircleTemplate),
+                },
+              ],
+            }}
+            changesSaved={changesSaved}
+          />
           <Divider style={{ marginTop: "5px" }} />
-          {items}
+          {getPatternsForm()}
         </div>
 
         <Box id="zones-preview" component="div" display="inline-block">
           <canvas height="400px" width="400px" id="pattern-canvas" />
         </Box>
       </div>
-    );
-  };
-
-  const content = <div>{renderPatterns()}</div>;
+    </div>
+  );
 
   return (
     <div>

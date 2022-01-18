@@ -44,7 +44,7 @@ export default function AnimationTimeline(params) {
 
   return (
     <div id="animation-timeline">
-      <ButtonGroup fullWidth>
+      <ButtonGroup fullwidth>
         <small>Time ms</small>
         <Slider
           onChange={(e, value) => onTimelineSliderChange(value)}

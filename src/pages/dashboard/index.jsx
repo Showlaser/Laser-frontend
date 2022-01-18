@@ -8,9 +8,6 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
-import { LinearProgress } from "@material-ui/core";
-import { normalise } from "services/shared/math";
-import LaserCommunicator from "services/shared/laser-communicator";
 import {
   showInfo,
   showWarning,
@@ -21,7 +18,6 @@ export default function Dashboard() {
   const [laser, setLaser] = useState({});
 
   useEffect(() => {
-    LaserCommunicator();
     const laserTelemetry = {
       connected: true,
       temperatures: {
@@ -111,39 +107,6 @@ export default function Dashboard() {
                       {" "}
                       &#x25cf;
                     </span>
-                    <hr />
-                    <b>Temperature</b>
-                    <br />
-                    <small>
-                      Galvo {laser?.temperatures?.galvo?.currentTemp}°
-                    </small>
-                    <LinearProgress
-                      color={setTempColor(
-                        laser?.temperatures?.galvo?.currentTemp,
-                        laser?.temperatures?.galvo?.maxTemp
-                      )}
-                      variant="determinate"
-                      value={normalise(
-                        laser?.temperatures?.galvo?.currentTemp,
-                        0,
-                        laser?.temperatures?.galvo?.maxTemp
-                      )}
-                    />
-                    <small>
-                      Base plate {laser?.temperatures?.basePlate?.currentTemp}°
-                    </small>
-                    <LinearProgress
-                      color={setTempColor(
-                        laser?.temperatures?.basePlate?.currentTemp,
-                        laser?.temperatures?.basePlate?.maxTemp
-                      )}
-                      variant="determinate"
-                      value={normalise(
-                        laser?.temperatures?.basePlate?.currentTemp,
-                        0,
-                        laser?.temperatures?.basePlate?.maxTemp
-                      )}
-                    />
                   </div>
                 ) : (
                   <div>
@@ -159,18 +122,18 @@ export default function Dashboard() {
               <hr />
               <b>Zones</b>
               <List className={classes.root}>
-                <text>Total: 2</text>
+                <p>Total: 2</p>
               </List>
               <Divider />
               <b>Development</b>
               <List className={classes.root}>
-                <text>
+                <p>
                   Development mode enabled{" "}
                   <span style={{ color: "green", fontSize: "130%" }}>
                     {" "}
                     &#x25cf;
                   </span>
-                </text>
+                </p>
               </List>
             </Paper>
           </Grid>

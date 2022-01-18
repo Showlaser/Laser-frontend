@@ -5,15 +5,20 @@ import {
   Select,
   TextField,
 } from "@material-ui/core";
+import { useEffect } from "react";
 
 export default function AnimationSettings(props) {
+  const selectedPattern = props?.selectedPattern;
+  useEffect(() => {}, [props]);
+  console.log();
+
   return (
     <div id="animation-settings">
-      <text>{props?.pattern?.name}</text>
+      <p>{selectedPattern?.name}</p>
 
-      <TextField fullWidth label="Start time ms" />
-      <TextField fullWidth label="Duration time ms" />
-      <FormControl fullWidth>
+      <TextField fullwidth label="Start time ms" />
+      <TextField fullwidth label="Duration time ms" />
+      <FormControl fullwidth>
         <InputLabel>Timeline</InputLabel>
         <Select>
           <MenuItem value="0">0</MenuItem>
@@ -22,7 +27,7 @@ export default function AnimationSettings(props) {
         </Select>
       </FormControl>
       <TextField
-        fullWidth
+        fullwidth
         label="Scale"
         type="number"
         inputProps={{
@@ -31,7 +36,7 @@ export default function AnimationSettings(props) {
           max: 1,
         }}
       />
-      <FormControl fullWidth>
+      <FormControl fullwidth>
         <TextField
           label="X position"
           type="number"

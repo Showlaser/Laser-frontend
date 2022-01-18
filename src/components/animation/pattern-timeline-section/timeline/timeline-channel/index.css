@@ -1,0 +1,12 @@
+.timeline-channel-item {
+  padding: 16px;
+  margin-left: 1px;
+  border-radius: 2px;
+  background-color: white;
+  color: black;
+  cursor: pointer;
+}
+
+.timeline-identifier {
+  margin-right: 15px;
+}
