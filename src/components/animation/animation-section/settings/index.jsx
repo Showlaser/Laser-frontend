@@ -18,7 +18,7 @@ export default function AnimationSettings(props) {
 
       <TextField fullwidth label="Start time ms" />
       <TextField fullwidth label="Duration time ms" />
-      <FormControl fullwidth>
+      <FormControl>
         <InputLabel>Timeline</InputLabel>
         <Select>
           <MenuItem value="0">0</MenuItem>
@@ -26,6 +26,7 @@ export default function AnimationSettings(props) {
           <MenuItem value="2">2</MenuItem>
         </Select>
       </FormControl>
+      <br />
       <TextField
         fullwidth
         label="Scale"
