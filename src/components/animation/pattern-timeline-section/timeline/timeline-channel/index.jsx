@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createGuid } from "services/shared/math";
 import "./index.css";
 
 export default function TimeLineChannel(props) {
@@ -14,6 +15,7 @@ export default function TimeLineChannel(props) {
       <div className="timeline-content">
         {data?.items?.map((item) => (
           <span
+            key={createGuid()}
             onClick={() => props.onTimelineChannelItemClick(item.pattern)}
             className="timeline-channel-item"
           >

@@ -1,6 +1,5 @@
 import { createGuid } from "services/shared/math";
 import {
-  Divider,
   InputLabel,
   ListItemIcon,
   ListItemText,
@@ -21,18 +20,20 @@ export default function CrudComponent(props) {
       </InputLabel>
       <Select
         onChange={(e) => selectOptions.onChange(e.target.value)}
-        value={selectOptions.selectedValue}
+        value={selectOptions?.selectedValue}
         labelId="demo-simple-select"
         id="demo-simple-select"
       >
-        {itemsArray?.map((item, index) => (
-          <MenuItem
-            key={`${index}-crud-component${createGuid()}`}
-            value={index}
-          >
-            {index}
-          </MenuItem>
-        ))}
+        {itemsArray.length > 0
+          ? itemsArray?.map((item, index) => (
+              <MenuItem
+                key={`${index}-crud-component${createGuid()}`}
+                value={index}
+              >
+                {index}
+              </MenuItem>
+            ))
+          : null}
       </Select>
       <Select value={-1} style={{ marginLeft: "5px" }}>
         <MenuItem value={-1}>
@@ -68,18 +69,20 @@ export default function CrudComponent(props) {
           </ListItemIcon>
           <ListItemText>Delete</ListItemText>
         </MenuItem>
-        <MenuItem>
-          <Select value={-1}>
-            <MenuItem value={-1}>
-              <em>Use template</em>
-            </MenuItem>
-            {actions?.templates?.map((template) => (
-              <MenuItem onClick={() => template.getTemplate()}>
-                {template?.name}
+        {actions?.template !== undefined ? (
+          <MenuItem>
+            <Select value={-1}>
+              <MenuItem value={-1}>
+                <em>Use template</em>
               </MenuItem>
-            ))}
-          </Select>
-        </MenuItem>
+              {actions?.templates?.map((template) => (
+                <MenuItem onClick={() => template.getTemplate()}>
+                  {template?.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </MenuItem>
+        ) : null}
       </Select>
       <div style={{ float: "right" }}>
         {changesSaved ? (

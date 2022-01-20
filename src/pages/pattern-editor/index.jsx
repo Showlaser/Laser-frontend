@@ -197,7 +197,7 @@ export default function PatternEditor() {
 
   const getPatternsForm = () => {
     const form = patterns[selectedPatternId]?.points?.map((point, index) => (
-      <div key={`${index}-pattern-point`}>
+      <div key={createGuid()}>
         <small>Point {index}</small>
         <br />
         <TextField

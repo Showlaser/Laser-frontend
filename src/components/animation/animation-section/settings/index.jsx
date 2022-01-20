@@ -16,8 +16,8 @@ export default function AnimationSettings(props) {
     <div id="animation-settings">
       <p>{selectedPattern?.name}</p>
 
-      <TextField fullwidth label="Start time ms" />
-      <TextField fullwidth label="Duration time ms" />
+      <TextField label="Start time ms" />
+      <TextField label="Duration time ms" />
       <FormControl>
         <InputLabel>Timeline</InputLabel>
         <Select>
@@ -28,7 +28,6 @@ export default function AnimationSettings(props) {
       </FormControl>
       <br />
       <TextField
-        fullwidth
         label="Scale"
         type="number"
         inputProps={{
@@ -37,7 +36,7 @@ export default function AnimationSettings(props) {
           max: 1,
         }}
       />
-      <FormControl fullwidth>
+      <FormControl>
         <TextField
           label="X position"
           type="number"
