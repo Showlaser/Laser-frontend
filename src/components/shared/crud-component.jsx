@@ -26,11 +26,8 @@ export default function CrudComponent(props) {
       >
         {itemsArray.length > 0
           ? itemsArray?.map((item, index) => (
-              <MenuItem
-                key={`${index}-crud-component${createGuid()}`}
-                value={index}
-              >
-                {index}
+              <MenuItem key={"options" + item.uuid + index} value={index}>
+                {item?.name}
               </MenuItem>
             ))
           : null}
@@ -69,14 +66,17 @@ export default function CrudComponent(props) {
           </ListItemIcon>
           <ListItemText>Delete</ListItemText>
         </MenuItem>
-        {actions?.template !== undefined ? (
+        {actions?.templates !== undefined ? (
           <MenuItem>
             <Select value={-1}>
               <MenuItem value={-1}>
                 <em>Use template</em>
               </MenuItem>
-              {actions?.templates?.map((template) => (
-                <MenuItem onClick={() => template.getTemplate()}>
+              {actions?.templates?.map((template, index) => (
+                <MenuItem
+                  key={"templates" + template.name + index}
+                  onClick={() => template.getTemplate()}
+                >
                   {template?.name}
                 </MenuItem>
               ))}

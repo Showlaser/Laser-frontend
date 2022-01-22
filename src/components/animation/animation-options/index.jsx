@@ -11,7 +11,6 @@ import "./index.css";
 export default function AnimationOptions(props) {
   const [animations, setAnimations] = useState([]);
   const [selectedAnimationId, setSelectedAnimationId] = useState();
-  const [changesSaved, setChangesSaved] = useState(true);
   const [modalOptions, setModalOptions] = useState({
     title: "Delete pattern?",
     show: false,
@@ -49,14 +48,14 @@ export default function AnimationOptions(props) {
         itemsArray={animations}
         actions={{
           onSave: () => {
-            setChangesSaved(true);
+            props?.setChangesSaved(true);
             saveAnimation(animations[selectedAnimationId]);
           },
           onAdd: () => {
-            setChangesSaved(false);
+            props?.setChangesSaved(false);
             let updatedAnimations = animations;
-            //updatedAnimations.push(patternPlaceHolders.New);
             setSelectedAnimationId(updatedAnimations.length - 1);
+            props?.setChangesSaved(false);
           },
           onDelete: () => {
             let modal = modalOptions;
@@ -66,9 +65,10 @@ export default function AnimationOptions(props) {
               closeModal();
             };
             setModalOptions(modal);
+            props?.setChangesSaved(false);
           },
         }}
-        changesSaved={changesSaved}
+        changesSaved={props?.changesSaved}
       />
       <br />
       <Divider />

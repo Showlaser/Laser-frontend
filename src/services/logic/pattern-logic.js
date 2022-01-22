@@ -1,7 +1,7 @@
 import { Get, Post, Delete } from "services/shared/api/api-actions";
 import { sendRequest } from "services/shared/api/api-middleware";
 import apiEndpoints from "services/shared/api/api-urls";
-import { createGuid, emptyGuid } from "services/shared/math";
+import { createGuid } from "services/shared/math";
 import { toastSubject } from "services/shared/toast-messages";
 
 export const getCircleTemplate = () => {
@@ -21,7 +21,6 @@ export const getCircleTemplate = () => {
       patternUuid: uuid,
       x,
       y,
-      connectedToUuid: emptyGuid(),
     });
   }
 
@@ -40,7 +39,6 @@ export const patternPlaceHolders = {
         patternUuid: uuid,
         x: null,
         y: null,
-        connectedToUuid: emptyGuid(),
       },
     ],
   },

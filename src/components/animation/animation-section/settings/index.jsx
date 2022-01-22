@@ -9,14 +9,16 @@ import { useEffect } from "react";
 
 export default function AnimationSettings(props) {
   const selectedPattern = props?.selectedPattern;
-  useEffect(() => {}, [props]);
-  console.log();
+  useEffect(() => [props]);
 
   return (
     <div id="animation-settings">
       <p>{selectedPattern?.name}</p>
 
-      <TextField label="Start time ms" />
+      <TextField
+        defaultValue={selectedPattern?.patternAnimation}
+        label="Start time ms"
+      />
       <TextField label="Duration time ms" />
       <FormControl>
         <InputLabel>Timeline</InputLabel>
