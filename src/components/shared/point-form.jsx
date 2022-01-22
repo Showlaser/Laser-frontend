@@ -1,6 +1,6 @@
 import { valueIsWithinBoundaries } from "services/shared/math";
 import { showError, toastSubject } from "services/shared/toast-messages";
-import { Button, MenuItem, Select, TextField } from "@material-ui/core";
+import { Button, TextField } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddIcon from "@material-ui/icons/Add";
 
@@ -18,17 +18,6 @@ export default function PointsForm(props) {
 
   return (
     <div>
-      {item?.name !== undefined ? (
-        <div>
-          <TextField
-            key={"name" + item.uuid}
-            label={props?.namePlaceholder}
-            defaultValue={item?.name}
-            onChange={(e) => props?.onNameChange(e.target.value)}
-          />
-          <br />
-        </div>
-      ) : null}
       {item?.points?.map((point, index) => (
         <div key={"form" + item.uuid + index}>
           <small>Point {index}</small>

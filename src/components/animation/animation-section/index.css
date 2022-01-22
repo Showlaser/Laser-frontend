@@ -6,10 +6,10 @@
 
 #animation-settings {
   border: whitesmoke solid 1px;
-  width: 16%;
-  max-width: 150px;
-  height: 100%;
+  width: 30vh;
+  height: 50vh;
   padding-top: 25px;
+  overflow-y: scroll;
 }
 
 #animation-timeline {

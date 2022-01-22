@@ -1,30 +1,37 @@
 import PatternSelector from "./pattern-selector";
-import { getPatterns } from "services/logic/pattern-logic";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./index.css";
 import Timeline from "./timeline";
+import { getAnimationTimelinePlaceholder } from "services/logic/animation-logic";
 
 export default function PatternTimelineSection(props) {
-  const [patterns, setPatterns] = useState([]);
-  const [patternsInTimeline, setPatternsInTimeline] = useState([]);
+  const { patterns, animations, selectedPatternId, selectedAnimationId } =
+    props;
 
-  useEffect(() => {
-    getPatterns().then((value) => setPatterns(value));
-  }, [patternsInTimeline, props]);
+  const selectedAnimation = animations[selectedAnimationId];
 
   const onPatternSelect = (selectedPatternName) => {
-    const selectedPattern = patterns.find(
+    const selectedPatternIndex = patterns.findIndex(
       (p) => p.name === selectedPatternName
     );
 
-    props.onPatternSelect(selectedPattern);
-    let newPatternsInTimeline = patternsInTimeline;
-    newPatternsInTimeline.push({
-      pattern: selectedPattern,
-      timeLineId: 1,
-    });
+    if (selectedPatternIndex === -1) {
+      return;
+    }
 
-    setPatternsInTimeline(newPatternsInTimeline);
+    props.onPatternSelect(selectedPatternIndex);
+
+    let updatedAnimations = [...animations];
+    let updatedAnimation = updatedAnimations[selectedAnimationId];
+
+    updatedAnimation?.animationTimeline?.push(
+      getAnimationTimelinePlaceholder(
+        patterns[selectedPatternIndex],
+        updatedAnimation
+      )
+    );
+
+    props?.setAnimation(updatedAnimations);
   };
 
   return (
@@ -40,7 +47,7 @@ export default function PatternTimelineSection(props) {
       <div id="timeline">
         <Timeline
           onTimelineChannelItemClick={props.onPatternSelect}
-          patternsInTimeline={patternsInTimeline}
+          patternsInTimeline={selectedAnimation?.animationTimeline}
         />
       </div>
     </div>

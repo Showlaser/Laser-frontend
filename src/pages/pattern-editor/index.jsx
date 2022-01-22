@@ -1,4 +1,4 @@
-import { Box, Divider } from "@material-ui/core";
+import { Box, Divider, TextField } from "@material-ui/core";
 import React, { useEffect } from "react";
 import { createGuid, mapNumber } from "services/shared/math";
 import SideNav from "components/sidenav";
@@ -62,10 +62,10 @@ export default function PatternEditor() {
 
   const drawDot = (ctx, point) => {
     ctx.fillRect(
-      mapNumber(point?.x, 4000, -4000, 398, 0),
-      mapNumber(point?.y, 4000, -4000, 0, 398),
-      2,
-      2
+      mapNumber(point?.x, 4000, -4000, 395, 0),
+      mapNumber(point?.y, 4000, -4000, 0, 395),
+      3,
+      3
     );
   };
 
@@ -199,10 +199,14 @@ export default function PatternEditor() {
           changesSaved={changesSaved}
         />
         <Divider style={{ marginTop: "5px" }} />
+        <TextField
+          label="Pattern name"
+          value={patterns[selectedPatternId]?.name ?? ""}
+          onChange={(e) => updatePatternProperty("name", e.target.value)}
+        />
         <PointsForm
           namePlaceHolder="Pattern name"
           item={patterns[selectedPatternId]}
-          onNameChange={(name) => updatePatternProperty("name", name)}
           addPoint={addPoint}
           onPointUpdate={updatePatternPoint}
           onDelete={deletePoint}

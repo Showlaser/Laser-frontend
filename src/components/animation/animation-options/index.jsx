@@ -1,15 +1,11 @@
 import { Divider, TextField } from "@material-ui/core";
 import CrudComponent from "components/shared/crud-component";
-import { useEffect, useState, React } from "react";
-import {
-  getAnimations,
-  removeAnimation,
-  saveAnimation,
-} from "services/logic/animation-logic";
+import { useState, React } from "react";
+import { removeAnimation, saveAnimation } from "services/logic/animation-logic";
 import "./index.css";
 
 export default function AnimationOptions(props) {
-  const [animations, setAnimations] = useState([]);
+  const { animations } = props;
   const [selectedAnimationId, setSelectedAnimationId] = useState();
   const [modalOptions, setModalOptions] = useState({
     title: "Delete pattern?",
@@ -23,10 +19,6 @@ export default function AnimationOptions(props) {
     modal.show = false;
     setModalOptions(modal);
   };
-
-  useEffect(() => {
-    getAnimations().then((value) => setAnimations(value));
-  }, [modalOptions]);
 
   const deleteAnimation = () => {
     let updatedAnimations = animations;
