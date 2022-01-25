@@ -4,12 +4,18 @@ import AnimationTimeline from "./animation-timeline";
 import { useEffect } from "react";
 
 export default function AnimationSection(props) {
+  const { selectedPattern, patterns, setPatterns } = props;
+
   useEffect(() => [props]);
 
   return (
     <div id="animation-section">
-      <AnimationSettings selectedPattern={props.selectedPattern} />
-      <AnimationTimeline selectedPattern={props.selectedPattern} />
+      <AnimationSettings
+        patterns={patterns}
+        setPatterns={setPatterns}
+        selectedPattern={selectedPattern}
+      />
+      <AnimationTimeline selectedPattern={selectedPattern} />
     </div>
   );
 }

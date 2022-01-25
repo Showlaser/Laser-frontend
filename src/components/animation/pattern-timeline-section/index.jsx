@@ -1,37 +1,39 @@
 import PatternSelector from "./pattern-selector";
-import React from "react";
+import React, { useEffect } from "react";
 import "./index.css";
 import Timeline from "./timeline";
 import { getAnimationTimelinePlaceholder } from "services/logic/animation-logic";
 
 export default function PatternTimelineSection(props) {
-  const { patterns, animations, selectedPatternId, selectedAnimationId } =
-    props;
+  const { patterns, animations, selectedAnimationUuid } = props;
 
-  const selectedAnimation = animations[selectedAnimationId];
+  useEffect(() => [patterns, animations]);
+
+  const selectedAnimation = animations.find(
+    (a) => a.uuid === selectedAnimationUuid
+  );
 
   const onPatternSelect = (selectedPatternName) => {
-    const selectedPatternIndex = patterns.findIndex(
+    const selectedPattern = patterns.find(
       (p) => p.name === selectedPatternName
     );
 
-    if (selectedPatternIndex === -1) {
+    if (selectedPattern === undefined) {
       return;
     }
 
-    props.onPatternSelect(selectedPatternIndex);
+    props.onPatternSelect(selectedPattern.uuid);
 
     let updatedAnimations = [...animations];
-    let updatedAnimation = updatedAnimations[selectedAnimationId];
-
-    updatedAnimation?.animationTimeline?.push(
-      getAnimationTimelinePlaceholder(
-        patterns[selectedPatternIndex],
-        updatedAnimation
-      )
+    let updatedAnimation = updatedAnimations.find(
+      (a) => a.uuid === selectedAnimationUuid
     );
 
-    props?.setAnimation(updatedAnimations);
+    updatedAnimation?.patternAnimations?.push(
+      getAnimationTimelinePlaceholder(selectedPattern, updatedAnimation)
+    );
+
+    props?.setAnimations(updatedAnimations);
   };
 
   return (
@@ -47,7 +49,7 @@ export default function PatternTimelineSection(props) {
       <div id="timeline">
         <Timeline
           onTimelineChannelItemClick={props.onPatternSelect}
-          patternsInTimeline={selectedAnimation?.animationTimeline}
+          patternsInTimeline={selectedAnimation?.patternAnimations}
         />
       </div>
     </div>

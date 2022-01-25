@@ -5,7 +5,9 @@ import { createGuid } from "services/shared/math";
 import { toastSubject } from "services/shared/toast-messages";
 
 export function getAnimations() {
-  return sendRequest(() => Get(apiEndpoints.animation), []);
+  return sendRequest(() => Get(apiEndpoints.animation), []).then((value) =>
+    value.json()
+  );
 }
 
 export const saveAnimation = (animation) => {
@@ -28,7 +30,7 @@ export const getAnimationTimelinePlaceholder = (
   selectedPattern,
   selectedAnimation
 ) => {
-  const animationTimelineUuid = createGuid();
+  const patternAnimationsUuid = createGuid();
   const timelineSettingsUuid = createGuid();
   const points = selectedPattern?.points?.map((p) => ({
     uuid: p.uuid,
@@ -38,16 +40,18 @@ export const getAnimationTimelinePlaceholder = (
   }));
 
   return {
-    uuid: animationTimelineUuid,
+    uuid: patternAnimationsUuid,
     animationUuid: selectedAnimation?.uuid,
     settings: {
       uuid: timelineSettingsUuid,
-      animationTimelineUuid: animationTimelineUuid,
+      patternAnimationsUuid: patternAnimationsUuid,
       scale: 0.5,
       centerX: 0,
       centerY: 0,
       points,
       startTime: 0,
+      name: selectedPattern.name,
     },
+    timelineId: 1,
   };
 };

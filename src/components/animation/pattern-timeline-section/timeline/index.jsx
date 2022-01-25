@@ -17,10 +17,10 @@ export default function Timeline(props) {
   ]);
 
   useEffect(() => {
-    let newTimeLines = timelines;
+    let newTimeLines = [...timelines];
     newTimeLines.forEach((tl, index) => {
       tl.items = props?.patternsInTimeline?.filter(
-        (p) => p.timeLineId === index
+        (p) => p.timelineId === index
       );
     });
 

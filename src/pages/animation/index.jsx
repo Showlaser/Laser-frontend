@@ -6,15 +6,18 @@ import AnimationOptions from "components/animation/animation-options";
 import "./index.css";
 import { getAnimations } from "services/logic/animation-logic";
 import { getPatterns } from "services/logic/pattern-logic";
+import { emptyGuid } from "services/shared/math";
 
 export default function AnimationEditor() {
-  const [selectedAnimationId, setSelectedAnimationId] = useState(0);
-  const [selectedPatternId, setSelectedPatternId] = useState(0);
+  const [selectedAnimationUuid, setSelectedAnimationUuid] = useState(
+    emptyGuid()
+  );
+  const [selectedPatternUuid, setSelectedPatternUuid] = useState(emptyGuid());
   const [animations, setAnimations] = useState([]);
   const [patterns, setPatterns] = useState([]);
   const [changesSaved, setChangesSaved] = useState(true);
 
-  const selectedAnimation = animations[selectedAnimationId];
+  const selectedPattern = patterns;
 
   useEffect(() => {
     getAnimations().then((value) => setAnimations(value));
@@ -31,7 +34,7 @@ export default function AnimationEditor() {
     }
 
     let updatedAnimations = [...animations];
-    updatedAnimations[selectedAnimationId][property] = value;
+    updatedAnimations[selectedAnimationUuid][property] = value;
     setAnimations(updatedAnimations);
   };
 
@@ -39,25 +42,32 @@ export default function AnimationEditor() {
     <div id="animation">
       <AnimationOptions
         setAnimations={setAnimations}
+        setSelectedAnimationUuid={setSelectedAnimationUuid}
         animations={animations}
         setChangesSaved={setChangesSaved}
         changesSaved={changesSaved}
       />
-      <AnimationSection
-        animations={animations}
-        selectedPatternId={selectedAnimationId}
-      />
-      <PatternTimelineSection
-        animations={animations}
-        patterns={patterns}
-        selectedPatternId={selectedPatternId}
-        selectedAnimationId={selectedAnimationId}
-        setAnimations={setAnimations}
-        onPatternSelect={(patternId) => {
-          setChangesSaved(false);
-          setSelectedPatternId(patternId);
-        }}
-      />
+      {animations.length > 0 ? (
+        <div>
+          <AnimationSection
+            animations={animations}
+            patterns={patterns}
+            setPatterns={setPatterns}
+            selectedPattern={selectedPattern}
+          />
+          <PatternTimelineSection
+            animations={animations}
+            patterns={patterns}
+            selectedPatternUuid={selectedPatternUuid}
+            selectedAnimationUuid={selectedAnimationUuid}
+            setAnimations={setAnimations}
+            onPatternSelect={(uuid) => {
+              setChangesSaved(false);
+              setSelectedPatternUuid(uuid);
+            }}
+          />
+        </div>
+      ) : null}
     </div>
   );
 

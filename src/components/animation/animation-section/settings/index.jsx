@@ -1,6 +1,5 @@
 import {
   Button,
-  FormControl,
   InputLabel,
   MenuItem,
   Select,
@@ -10,7 +9,7 @@ import PointsForm from "components/shared/point-form";
 import { useEffect } from "react";
 
 export default function AnimationSettings(props) {
-  const selectedPattern = props?.selectedPattern;
+  const { selectedPattern } = props;
   useEffect(() => [props]);
 
   return (
@@ -27,7 +26,7 @@ export default function AnimationSettings(props) {
       <TextField label="Duration time ms" />
       <br />
       <InputLabel>Timeline</InputLabel>
-      <Select value={selectedPattern?.patternAnimation?.timeLineId ?? 1}>
+      <Select value={selectedPattern?.patternAnimation?.timelineId ?? 1}>
         <MenuItem value="0">0</MenuItem>
         <MenuItem value="1">1</MenuItem>
         <MenuItem value="2">2</MenuItem>

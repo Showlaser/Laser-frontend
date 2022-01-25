@@ -5,7 +5,7 @@ import "./index.css";
 export default function TimeLineChannel(props) {
   const data = props?.data;
 
-  useEffect(() => {}, [props]);
+  useEffect(() => [props]);
 
   return (
     <div className="timeline-channel">
@@ -16,10 +16,10 @@ export default function TimeLineChannel(props) {
         {data?.items?.map((item) => (
           <span
             key={createGuid()}
-            onClick={() => props.onTimelineChannelItemClick(item.pattern)}
+            onClick={() => props.onTimelineChannelItemClick(item.uuid)}
             className="timeline-channel-item"
           >
-            {item.pattern.name}
+            {item.settings.name}
           </span>
         ))}
       </div>

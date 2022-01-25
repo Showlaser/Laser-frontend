@@ -2,11 +2,11 @@ import { Divider, TextField } from "@material-ui/core";
 import CrudComponent from "components/shared/crud-component";
 import { useState, React } from "react";
 import { removeAnimation, saveAnimation } from "services/logic/animation-logic";
+import { createGuid } from "services/shared/math";
 import "./index.css";
 
 export default function AnimationOptions(props) {
-  const { animations } = props;
-  const [selectedAnimationId, setSelectedAnimationId] = useState();
+  const { animations, selectedAnimationUuid } = props;
   const [modalOptions, setModalOptions] = useState({
     title: "Delete pattern?",
     show: false,
@@ -22,11 +22,11 @@ export default function AnimationOptions(props) {
 
   const deleteAnimation = () => {
     let updatedAnimations = animations;
-    const animationUuid = updatedAnimations[selectedAnimationId]?.uuid;
-    updatedAnimations.splice(selectedAnimationId, 1);
+    const animationUuid = updatedAnimations[selectedAnimationUuid]?.uuid;
+    updatedAnimations.splice(selectedAnimationUuid, 1);
     removeAnimation(animationUuid);
 
-    setSelectedAnimationId(updatedAnimations.length - 1);
+    props?.setSelectedAnimationId(updatedAnimations.length - 1);
   };
 
   return (
@@ -34,19 +34,27 @@ export default function AnimationOptions(props) {
       <CrudComponent
         selectOption={{
           selectText: "Select animation",
-          onChange: (selectedId) => setSelectedAnimationId(selectedId),
-          selectedValue: selectedAnimationId,
+          onChange: (selectedId) => props?.setSelectedAnimationId(selectedId),
+          selectedValue: selectedAnimationUuid,
         }}
         itemsArray={animations}
         actions={{
           onSave: () => {
             props?.setChangesSaved(true);
-            saveAnimation(animations[selectedAnimationId]);
+            saveAnimation(animations[selectedAnimationUuid]);
           },
           onAdd: () => {
             props?.setChangesSaved(false);
-            let updatedAnimations = animations;
-            setSelectedAnimationId(updatedAnimations.length - 1);
+            let updatedAnimations = [...animations];
+            const uuid = createGuid();
+
+            updatedAnimations.push({
+              uuid,
+              name: "New",
+              patternAnimations: [],
+            });
+            props?.setSelectedAnimationUuid(uuid);
+            props.setAnimations(updatedAnimations);
             props?.setChangesSaved(false);
           },
           onDelete: () => {
