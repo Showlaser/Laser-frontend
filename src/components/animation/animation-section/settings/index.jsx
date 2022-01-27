@@ -8,8 +8,8 @@ export default function AnimationSettings(props) {
     updateAnimationSettings,
     selectedPatternAnimation,
     timeLineCurrentMs,
-    setTimeLineCurrentMs,
     updatePatternAnimation,
+    deletePatternAnimation,
   } = props;
   const settings =
     selectedPatternAnimation !== undefined
@@ -49,7 +49,9 @@ export default function AnimationSettings(props) {
         <MenuItem value="2">2</MenuItem>
       </Select>
       <br />
-      <Button>Delete</Button>
+      <Button onClick={() => deletePatternAnimation(settings?.uuid)}>
+        Delete
+      </Button>
       <hr />
       <label>Animation points</label>
       <br />
@@ -85,7 +87,7 @@ export default function AnimationSettings(props) {
       <br />
       <PointsForm
         namePlaceHolder="Animation name"
-        item={selectedPatternAnimation}
+        item={settings}
         addPoint={() =>
           updateAnimationSettings(
             "points",

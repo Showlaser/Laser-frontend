@@ -39,7 +39,10 @@ export default function AnimationEditor() {
     }
 
     let updatedAnimations = [...animations];
-    updatedAnimations[selectedAnimationUuid][property] = value;
+    let animationToUpdate = updatedAnimations.find(
+      (ua) => ua.uuid === selectedAnimationUuid
+    );
+    animationToUpdate[property] = value;
     setAnimations(updatedAnimations);
   };
 
@@ -51,6 +54,7 @@ export default function AnimationEditor() {
         animations={animations}
         setChangesSaved={setChangesSaved}
         changesSaved={changesSaved}
+        updateAnimationProperty={updateAnimationProperty}
       />
       {animations?.length > 0 ? (
         <div>

@@ -6,7 +6,7 @@ import { createGuid } from "services/shared/math";
 import "./index.css";
 
 export default function AnimationOptions(props) {
-  const { animations, selectedAnimationUuid } = props;
+  const { animations, selectedAnimationUuid, updateAnimationProperty } = props;
   const [modalOptions, setModalOptions] = useState({
     title: "Delete pattern?",
     show: false,
@@ -72,7 +72,10 @@ export default function AnimationOptions(props) {
       />
       <br />
       <Divider />
-      <TextField label="Animation name" />
+      <TextField
+        label="Animation name"
+        onChange={(e) => updateAnimationProperty("name", e.target.value)}
+      />
     </div>
   );
 }

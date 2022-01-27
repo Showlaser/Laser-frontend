@@ -44,6 +44,23 @@ export default function AnimationSection(props) {
     setAnimations(updatedAnimations);
   };
 
+  const deletePatternAnimation = (uuid) => {
+    let animationsToUpdate = [...animations];
+    let animationToUpdate = animationsToUpdate.find(
+      (ato) => ato.uuid === selectedAnimationUuid
+    );
+    let indexToDelete = animationToUpdate.patternAnimations.findIndex(
+      (pa) => pa.uuid === selectedPatternAnimationUuid
+    );
+
+    if (animationToUpdate === undefined || indexToDelete === -1) {
+      return;
+    }
+
+    animationToUpdate.patternAnimations.splice(indexToDelete, 1);
+    setAnimations(animationsToUpdate);
+  };
+
   const updatePatternAnimation = (property, value) => {
     if (typeof property !== "string" || stringIsEmpty(property)) {
       return;
@@ -70,6 +87,7 @@ export default function AnimationSection(props) {
         updateAnimationSettings={updateAnimationSettings}
         updatePatternAnimation={updatePatternAnimation}
         timeLineCurrentMs={timeLineCurrentMs}
+        deletePatternAnimation={deletePatternAnimation}
       />
       <AnimationTimeline
         setTimeLineCurrentMs={setTimeLineCurrentMs}
