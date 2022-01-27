@@ -15,13 +15,12 @@ export default function Timeline(props) {
       index: 2,
     },
   ]);
+  const { patternsInTimeline } = props;
 
   useEffect(() => {
     let newTimeLines = [...timelines];
     newTimeLines.forEach((tl, index) => {
-      tl.items = props?.patternsInTimeline?.filter(
-        (p) => p.timelineId === index
-      );
+      tl.items = patternsInTimeline?.filter((p) => p.timelineId === index);
     });
 
     setTimelines(newTimeLines);

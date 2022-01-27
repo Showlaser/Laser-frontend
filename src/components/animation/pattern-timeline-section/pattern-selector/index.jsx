@@ -4,12 +4,13 @@ import { useState } from "react";
 
 export default function PatternSelector(props) {
   const [selectedPatternName, setSelectedPatternUuid] = useState();
+  const { options } = props;
 
-  return (
+  return options?.length > 0 ? (
     <div>
       <Autocomplete
         onChange={(e, patternName) => setSelectedPatternUuid(patternName)}
-        options={props.data.options}
+        options={options}
         renderInput={(params) => (
           <TextField {...params} label="Select pattern" />
         )}
@@ -20,11 +21,13 @@ export default function PatternSelector(props) {
           variant="contained"
           color="primary"
           size="small"
-          onClick={() => props.data.callback(selectedPatternName)}
+          onClick={() => props.callback(selectedPatternName)}
         >
           Place on timeline
         </Button>
       </div>
     </div>
+  ) : (
+    <p>No patterns available add them on the patterns page</p>
   );
 }

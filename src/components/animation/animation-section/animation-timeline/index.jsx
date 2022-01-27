@@ -3,9 +3,11 @@ import { useState } from "react";
 import RemoveIcon from "@material-ui/icons/Remove";
 import AddIcon from "@material-ui/icons/Add";
 
-export default function AnimationTimeline(params) {
+export default function AnimationTimeline(props) {
   const [sliderMaxValue, setSliderMaxValue] = useState(100);
   const [sliderMinValue, setSliderMinValue] = useState(0);
+
+  const { animationPatterns, setTimeLineCurrentMs } = props;
 
   const onTimelineSliderChange = (value) => {};
 
@@ -29,6 +31,7 @@ export default function AnimationTimeline(params) {
       setSliderMaxValue(newSliderMaxValue);
       setSliderMinValue(newSliderMinValue);
     }
+    setTimeLineCurrentMs(value);
   };
 
   const timelineSliderMarks = [

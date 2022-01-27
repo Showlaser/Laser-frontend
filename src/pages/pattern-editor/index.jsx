@@ -1,6 +1,6 @@
 import { Box, Divider, TextField } from "@material-ui/core";
 import React, { useEffect } from "react";
-import { createGuid, mapNumber } from "services/shared/math";
+import { mapNumber } from "services/shared/math";
 import SideNav from "components/sidenav";
 import "./index.css";
 import {
@@ -13,6 +13,8 @@ import {
 import DeleteModal from "components/modal";
 import CrudComponent from "components/shared/crud-component";
 import PointsForm from "components/shared/point-form";
+import { getPointsPlaceHolder } from "services/shared/points";
+import { stringIsEmpty } from "services/shared/general";
 
 export default function PatternEditor() {
   const [selectedPatternId, setSelectedPatternId] = React.useState(0);
@@ -127,7 +129,7 @@ export default function PatternEditor() {
   };
 
   const updatePatternProperty = (property, value) => {
-    if (typeof property !== "string") {
+    if (typeof property !== "string" || stringIsEmpty(property)) {
       return;
     }
 
@@ -140,12 +142,7 @@ export default function PatternEditor() {
   const addPoint = () => {
     const pattern = patterns[selectedPatternId];
     let points = [...pattern.points];
-    points.push({
-      uuid: createGuid(),
-      patternUuid: pattern.uuid,
-      x: 0,
-      y: 0,
-    });
+    points.push(getPointsPlaceHolder(pattern.uuid));
 
     updatePatternProperty("points", points);
   };

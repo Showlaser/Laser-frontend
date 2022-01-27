@@ -26,7 +26,7 @@ export const removeAnimation = (uuid) => {
   );
 };
 
-export const getAnimationTimelinePlaceholder = (
+export const getPatternAnimationPlaceholder = (
   selectedPattern,
   selectedAnimation
 ) => {
@@ -39,19 +39,28 @@ export const getAnimationTimelinePlaceholder = (
     y: p.x,
   }));
 
+  let startTime = 0;
+  selectedAnimation.patternAnimations.forEach((setting) => {
+    if (setting.startTime === startTime) {
+      startTime++;
+    }
+  });
+
   return {
     uuid: patternAnimationsUuid,
     animationUuid: selectedAnimation?.uuid,
-    settings: {
-      uuid: timelineSettingsUuid,
-      patternAnimationsUuid: patternAnimationsUuid,
-      scale: 0.5,
-      centerX: 0,
-      centerY: 0,
-      points,
-      startTime: 0,
-      name: selectedPattern.name,
-    },
+    name: selectedPattern.name,
+    animationSettings: [
+      {
+        uuid: timelineSettingsUuid,
+        patternAnimationsUuid: patternAnimationsUuid,
+        scale: 0.5,
+        centerX: 0,
+        centerY: 0,
+        points,
+        startTime,
+      },
+    ],
     timelineId: 1,
   };
 };

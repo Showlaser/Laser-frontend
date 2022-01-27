@@ -16,10 +16,12 @@ export default function TimeLineChannel(props) {
         {data?.items?.map((item) => (
           <span
             key={createGuid()}
-            onClick={() => props.onTimelineChannelItemClick(item.uuid)}
+            onClick={() => {
+              props.onTimelineChannelItemClick(item.uuid);
+            }}
             className="timeline-channel-item"
           >
-            {item.settings.name}
+            {item.name}
           </span>
         ))}
       </div>

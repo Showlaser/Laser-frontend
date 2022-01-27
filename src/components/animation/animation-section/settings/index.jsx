@@ -1,32 +1,49 @@
-import {
-  Button,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-} from "@material-ui/core";
+import { Button, MenuItem, Select, TextField } from "@material-ui/core";
 import PointsForm from "components/shared/point-form";
 import { useEffect } from "react";
+import { getPointsPlaceHolder } from "services/shared/points";
 
 export default function AnimationSettings(props) {
-  const { selectedPattern } = props;
-  useEffect(() => [props]);
+  const {
+    updateAnimationSettings,
+    selectedPatternAnimation,
+    timeLineCurrentMs,
+    setTimeLineCurrentMs,
+    updatePatternAnimation,
+  } = props;
+  const settings =
+    selectedPatternAnimation !== undefined
+      ? selectedPatternAnimation.animationSettings.find(
+          (ase) => ase.startTime === timeLineCurrentMs
+        )
+      : undefined;
+  useEffect(() => [selectedPatternAnimation]);
+  const duration =
+    selectedPatternAnimation?.animationSettings?.at(-1)?.startTime -
+    selectedPatternAnimation?.animationSettings[0]?.startTime;
 
   return (
-    <div id="animation-settings">
+    <div
+      id="animation-settings"
+      key={selectedPatternAnimation.uuid + "settings"}
+    >
       <TextField
         label="Pattern animation name"
-        value={selectedPattern?.name ?? ""}
-        onChange={(e) => {}}
+        defaultValue={selectedPatternAnimation?.name ?? ""}
+        onChange={(e) => updatePatternAnimation("name", e.target.value)}
       />
       <TextField
-        defaultValue={selectedPattern?.patternAnimation?.startTimeMs ?? 0}
+        defaultValue={settings?.startTimeMs ?? 0}
         label="Start time ms"
       />
-      <TextField label="Duration time ms" />
       <br />
-      <InputLabel>Timeline</InputLabel>
-      <Select value={selectedPattern?.patternAnimation?.timelineId ?? 1}>
+      <label>Duration time ms</label>
+      <br />
+      {duration}
+      <br />
+      Timeline
+      <br />
+      <Select value={selectedPatternAnimation?.timelineId ?? 1}>
         <MenuItem value="0">0</MenuItem>
         <MenuItem value="1">1</MenuItem>
         <MenuItem value="2">2</MenuItem>
@@ -37,7 +54,7 @@ export default function AnimationSettings(props) {
       <label>Animation points</label>
       <br />
       <TextField
-        defaultValue={selectedPattern?.patternAnimation?.scale}
+        defaultValue={settings?.scale}
         label="Scale"
         type="number"
         inputProps={{
@@ -54,6 +71,7 @@ export default function AnimationSettings(props) {
           min: -4000,
           max: 4000,
         }}
+        defaultValue={settings?.centerX}
       />
       <TextField
         label="Y position"
@@ -62,13 +80,20 @@ export default function AnimationSettings(props) {
           min: -4000,
           max: 4000,
         }}
+        defaultValue={settings?.centerY}
       />
       <br />
       <PointsForm
         namePlaceHolder="Animation name"
-        item={selectedPattern}
-        onNameChange={(name) => {}}
-        addPoint={() => {}}
+        item={selectedPatternAnimation}
+        addPoint={() =>
+          updateAnimationSettings(
+            "points",
+            [...settings.points].push(
+              getPointsPlaceHolder(selectedPatternAnimation.uuid)
+            )
+          )
+        }
         onPointUpdate={() => {}}
         onDelete={() => {}}
       />
