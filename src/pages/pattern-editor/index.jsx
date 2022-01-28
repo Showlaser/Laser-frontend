@@ -1,6 +1,6 @@
-import { Box, Divider, TextField } from "@material-ui/core";
-import React, { useEffect } from "react";
-import { mapNumber } from "services/shared/math";
+import { Divider, TextField } from "@material-ui/core";
+import React, { useCallback, useEffect, useState } from "react";
+import { emptyGuid } from "services/shared/math";
 import SideNav from "components/sidenav";
 import "./index.css";
 import {
@@ -13,26 +13,28 @@ import {
 import DeleteModal from "components/modal";
 import CrudComponent from "components/shared/crud-component";
 import PointsForm from "components/shared/point-form";
-import { getPointsPlaceHolder } from "services/shared/points";
 import { stringIsEmpty } from "services/shared/general";
+import PointsDrawer from "components/shared/points-drawer";
 
 export default function PatternEditor() {
-  const [selectedPatternId, setSelectedPatternId] = React.useState(0);
-  const [patterns, setPatterns] = React.useState([]);
-  const [, updateState] = React.useState();
-  const forceUpdate = React.useCallback(() => updateState({}), []);
-  const [changesSaved, setChangesSaved] = React.useState(true);
-  const [modalOptions, setModalOptions] = React.useState({
+  const [selectedPatternUuid, setSelectedPatternUuid] = useState(emptyGuid());
+  const [patterns, setPatterns] = useState([]);
+  const [, updateState] = useState();
+  const forceUpdate = useCallback(() => updateState({}), []);
+  const [changesSaved, setChangesSaved] = useState(true);
+  const [modalOptions, setModalOptions] = useState({
     title: "Delete pattern?",
     show: false,
     onOkClick: null,
     onCancelClick: () => closeModal(),
   });
+  const selectedPattern =
+    patterns.find((p) => p?.uuid === selectedPatternUuid) ?? patterns?.at(-1);
 
   useEffect(() => {
     getPatterns().then((p) => {
+      setSelectedPatternUuid(p?.at(0)?.uuid);
       setPatterns(p);
-      drawPattern(p[selectedPatternId]);
     });
   }, []);
 
@@ -48,59 +50,18 @@ export default function PatternEditor() {
   };
 
   const deletePattern = () => {
-    let updatedPatterns = [...patterns];
-    const patternUuid = updatedPatterns[selectedPatternId]?.uuid;
-    updatedPatterns.splice(selectedPatternId, 1);
-    removePattern(patternUuid);
+    let updatedPatterns = [...patterns].filter(
+      (p) => p?.uuid !== selectedPatternUuid
+    );
+    removePattern(selectedPatternUuid);
 
     if (updatedPatterns.length === 0) {
       loadTemplate(() => patternPlaceHolders.New);
       return;
     }
 
-    setSelectedPatternId(updatedPatterns.length - 1);
-    drawPattern(updatedPatterns[updatedPatterns.length - 1]);
-  };
-
-  const drawDot = (ctx, point) => {
-    ctx.fillRect(
-      mapNumber(point?.x, 4000, -4000, 395, 0),
-      mapNumber(point?.y, 4000, -4000, 0, 395),
-      3,
-      3
-    );
-  };
-
-  const drawPattern = (pattern) => {
-    if (pattern === undefined) {
-      return;
-    }
-
-    let c = document.getElementById("pattern-canvas");
-    let ctx = c.getContext("2d");
-    ctx.beginPath();
-
-    ctx.clearRect(0, 0, c.width, c.height);
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = "#ff0000";
-    ctx.fillStyle = "#ff0000";
-    ctx.stroke();
-
-    const length = pattern?.points?.length;
-    for (let i = 0; i < length; i++) {
-      const point = pattern?.points[i];
-      drawDot(ctx, point);
-    }
-    ctx.stroke();
-  };
-
-  const updatePatternPoint = (index, value, axle) => {
-    let updatedPatterns = [...patterns];
-    let updatedPattern = updatedPatterns[selectedPatternId];
-
-    updatedPattern.points[index][axle] = value;
-    setPatterns(updatedPatterns);
-    drawPattern(updatedPatterns[selectedPatternId]);
+    const lastItem = updatedPatterns.at(-1);
+    setSelectedPatternUuid(lastItem?.uuid);
   };
 
   const loadTemplate = (templateFunction) => {
@@ -109,23 +70,9 @@ export default function PatternEditor() {
     let patternsToUpdate = [...patterns];
     patternsToUpdate.push(template);
     setPatterns(patternsToUpdate);
-    setSelectedPatternId(patternsToUpdate.length - 1);
-    drawPattern(patternsToUpdate[patternsToUpdate.length - 1]);
-  };
 
-  const deletePoint = (point) => {
-    let patternsToUpdate = [...patterns];
-    let patternToUpdate = patternsToUpdate[selectedPatternId];
-    const pointIndex = patternToUpdate?.points?.findIndex(
-      (p) => p?.uuid === point?.uuid
-    );
-    if (pointIndex === -1) {
-      return;
-    }
-
-    patternToUpdate?.points?.splice(pointIndex, 1);
-    setPatterns(patternsToUpdate);
-    drawPattern(patternsToUpdate[selectedPatternId]);
+    const lastItem = patternsToUpdate.at(-1);
+    setSelectedPatternUuid(lastItem?.uuid);
   };
 
   const updatePatternProperty = (property, value) => {
@@ -134,17 +81,11 @@ export default function PatternEditor() {
     }
 
     let updatedPatterns = [...patterns];
-    updatedPatterns[selectedPatternId][property] = value;
+    let patternToUpdate = updatedPatterns.find(
+      (up) => up?.uuid === selectedPatternUuid
+    );
+    patternToUpdate[property] = value;
     setPatterns(updatedPatterns);
-    drawPattern(updatedPatterns[selectedPatternId]);
-  };
-
-  const addPoint = () => {
-    const pattern = patterns[selectedPatternId];
-    let points = [...pattern.points];
-    points.push(getPointsPlaceHolder(pattern.uuid));
-
-    updatePatternProperty("points", points);
   };
 
   const content = (
@@ -156,25 +97,26 @@ export default function PatternEditor() {
         <CrudComponent
           selectOptions={{
             selectText: "Select pattern",
-            onChange: (selectedId) => {
-              setSelectedPatternId(selectedId);
-              drawPattern(patterns[selectedId]);
+            onChange: (selectedUuid) => {
+              setSelectedPatternUuid(selectedUuid);
             },
-            selectedValue: selectedPatternId,
+            selectedValue: selectedPatternUuid,
           }}
           itemsArray={patterns}
           actions={{
             onSave: () => {
               setChangesSaved(true);
-              savePattern(patterns[selectedPatternId]);
+              savePattern(
+                patterns.find((p) => p?.uuid === selectedPatternUuid)
+              );
             },
             onAdd: () => {
               setChangesSaved(false);
               let updatedPatterns = [...patterns];
-              updatedPatterns.push(patternPlaceHolders.New);
+              const placeHolder = patternPlaceHolders.New;
+              updatedPatterns.push(placeHolder);
               setPatterns(updatedPatterns);
-              setSelectedPatternId(updatedPatterns.length - 1);
-              drawPattern(updatedPatterns[updatedPatterns.length - 1]);
+              setSelectedPatternUuid(placeHolder.uuid);
             },
             onDelete: () => {
               let modal = modalOptions;
@@ -198,21 +140,17 @@ export default function PatternEditor() {
         <Divider style={{ marginTop: "5px" }} />
         <TextField
           label="Pattern name"
-          value={patterns[selectedPatternId]?.name ?? ""}
+          value={selectedPattern?.name ?? ""}
           onChange={(e) => updatePatternProperty("name", e.target.value)}
         />
         <PointsForm
           namePlaceHolder="Pattern name"
-          item={patterns[selectedPatternId]}
-          addPoint={addPoint}
-          onPointUpdate={updatePatternPoint}
-          onDelete={deletePoint}
+          item={selectedPattern}
+          onChange={(newPoints) => updatePatternProperty("points", newPoints)}
         />
       </div>
 
-      <Box id="zones-preview" component="div" display="inline-block">
-        <canvas height="400px" width="400px" id="pattern-canvas" />
-      </Box>
+      <PointsDrawer points={selectedPattern?.points} />
     </div>
   );
 

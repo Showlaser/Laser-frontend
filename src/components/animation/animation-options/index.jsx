@@ -6,7 +6,15 @@ import { createGuid } from "services/shared/math";
 import "./index.css";
 
 export default function AnimationOptions(props) {
-  const { animations, selectedAnimationUuid, updateAnimationProperty } = props;
+  const {
+    animations,
+    selectedAnimationUuid,
+    changesSaved,
+    updateAnimationProperty,
+    setSelectedAnimationUuid,
+    setChangesSaved,
+    setAnimations,
+  } = props;
   const [modalOptions, setModalOptions] = useState({
     title: "Delete pattern?",
     show: false,
@@ -32,19 +40,21 @@ export default function AnimationOptions(props) {
   return (
     <div id="animation-options">
       <CrudComponent
-        selectOption={{
+        selectOptions={{
           selectText: "Select animation",
-          onChange: (selectedId) => props?.setSelectedAnimationId(selectedId),
+          onChange: (selectedUuid) => {
+            setSelectedAnimationUuid(selectedUuid);
+          },
           selectedValue: selectedAnimationUuid,
         }}
         itemsArray={animations}
         actions={{
           onSave: () => {
-            props?.setChangesSaved(true);
+            setChangesSaved(true);
             saveAnimation(animations[selectedAnimationUuid]);
           },
           onAdd: () => {
-            props?.setChangesSaved(false);
+            setChangesSaved(false);
             let updatedAnimations = [...animations];
             const uuid = createGuid();
 
@@ -53,9 +63,9 @@ export default function AnimationOptions(props) {
               name: "New",
               patternAnimations: [],
             });
-            props?.setSelectedAnimationUuid(uuid);
-            props.setAnimations(updatedAnimations);
-            props?.setChangesSaved(false);
+            setSelectedAnimationUuid(uuid);
+            setAnimations(updatedAnimations);
+            setChangesSaved(false);
           },
           onDelete: () => {
             let modal = modalOptions;
@@ -65,10 +75,10 @@ export default function AnimationOptions(props) {
               closeModal();
             };
             setModalOptions(modal);
-            props?.setChangesSaved(false);
+            setChangesSaved(false);
           },
         }}
-        changesSaved={props?.changesSaved}
+        changesSaved={changesSaved}
       />
       <br />
       <Divider />

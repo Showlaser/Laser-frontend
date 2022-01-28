@@ -12,20 +12,22 @@ import AddIcon from "@material-ui/icons/Add";
 export default function CrudComponent(props) {
   const { selectOptions, itemsArray, actions, changesSaved } = props;
 
-  return (
-    <div>
+  return selectOptions?.selectedValue !== undefined ? (
+    <div key={selectOptions.selectedValue + "crud-component"}>
       <InputLabel id="demo-simple-select-label">
         {selectOptions?.selectText}
       </InputLabel>
       <Select
-        onChange={(e) => selectOptions.onChange(e.target.value)}
+        onChange={(e) => {
+          selectOptions.onChange(e.target.value);
+        }}
         value={selectOptions?.selectedValue}
         labelId="demo-simple-select"
         id="demo-simple-select"
       >
         {itemsArray.length > 0
           ? itemsArray?.map((item, index) => (
-              <MenuItem key={"options" + item.uuid + index} value={index}>
+              <MenuItem key={"options" + item.uuid + index} value={item?.uuid}>
                 {item?.name}
               </MenuItem>
             ))
@@ -91,5 +93,5 @@ export default function CrudComponent(props) {
         )}
       </div>
     </div>
-  );
+  ) : null;
 }

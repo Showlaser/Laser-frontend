@@ -55,6 +55,7 @@ export default function AnimationEditor() {
         setChangesSaved={setChangesSaved}
         changesSaved={changesSaved}
         updateAnimationProperty={updateAnimationProperty}
+        selectedAnimationUuid={selectedAnimationUuid}
       />
       {animations?.length > 0 ? (
         <div>
