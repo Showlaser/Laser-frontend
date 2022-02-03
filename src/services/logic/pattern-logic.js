@@ -21,15 +21,18 @@ export const getCircleTemplate = () => {
       patternUuid: uuid,
       x,
       y,
+      redLaserPowerPwm: 6,
+      greenLaserPowerPwm: 0,
+      blueLaserPowerPwm: 0,
     });
   }
 
   return { points, scale: 1, name: "Circle", uuid };
 };
 
-const uuid = createGuid();
-export const patternPlaceHolders = {
-  New: {
+export const getPatternPlaceHolder = () => {
+  const uuid = createGuid();
+  return {
     scale: 1,
     name: null,
     uuid,
@@ -37,11 +40,14 @@ export const patternPlaceHolders = {
       {
         uuid: createGuid(),
         patternUuid: uuid,
-        x: null,
-        y: null,
+        x: 0,
+        y: 0,
+        redLaserPowerPwm: 6,
+        greenLaserPowerPwm: 0,
+        blueLaserPowerPwm: 0,
       },
     ],
-  },
+  };
 };
 
 export const getPatterns = () => {

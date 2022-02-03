@@ -6,7 +6,7 @@ import "./index.css";
 import {
   getCircleTemplate,
   getPatterns,
-  patternPlaceHolders,
+  getPatternPlaceHolder,
   removePattern,
   savePattern,
 } from "services/logic/pattern-logic";
@@ -17,7 +17,9 @@ import { stringIsEmpty } from "services/shared/general";
 import PointsDrawer from "components/shared/points-drawer";
 
 export default function PatternEditor() {
-  const [selectedPatternUuid, setSelectedPatternUuid] = useState(emptyGuid());
+  const [selectedPatternUuid, setSelectedPatternAnimationUuid] = useState(
+    emptyGuid()
+  );
   const [patterns, setPatterns] = useState([]);
   const [, updateState] = useState();
   const forceUpdate = useCallback(() => updateState({}), []);
@@ -33,8 +35,13 @@ export default function PatternEditor() {
 
   useEffect(() => {
     getPatterns().then((p) => {
-      setSelectedPatternUuid(p?.at(0)?.uuid);
-      setPatterns(p);
+      let pat = p;
+      if (p?.length <= 0) {
+        pat.push(getPatternPlaceHolder());
+      }
+
+      setSelectedPatternAnimationUuid(pat?.at(0)?.uuid);
+      setPatterns(pat);
     });
   }, []);
 
@@ -56,12 +63,12 @@ export default function PatternEditor() {
     removePattern(selectedPatternUuid);
 
     if (updatedPatterns.length === 0) {
-      loadTemplate(() => patternPlaceHolders.New);
+      loadTemplate(() => getPatternPlaceHolder());
       return;
     }
 
     const lastItem = updatedPatterns.at(-1);
-    setSelectedPatternUuid(lastItem?.uuid);
+    setSelectedPatternAnimationUuid(lastItem?.uuid);
   };
 
   const loadTemplate = (templateFunction) => {
@@ -72,7 +79,7 @@ export default function PatternEditor() {
     setPatterns(patternsToUpdate);
 
     const lastItem = patternsToUpdate.at(-1);
-    setSelectedPatternUuid(lastItem?.uuid);
+    setSelectedPatternAnimationUuid(lastItem?.uuid);
   };
 
   const updatePatternProperty = (property, value) => {
@@ -98,7 +105,7 @@ export default function PatternEditor() {
           selectOptions={{
             selectText: "Select pattern",
             onChange: (selectedUuid) => {
-              setSelectedPatternUuid(selectedUuid);
+              setSelectedPatternAnimationUuid(selectedUuid);
             },
             selectedValue: selectedPatternUuid,
           }}
@@ -113,10 +120,10 @@ export default function PatternEditor() {
             onAdd: () => {
               setChangesSaved(false);
               let updatedPatterns = [...patterns];
-              const placeHolder = patternPlaceHolders.New;
+              const placeHolder = getPatternPlaceHolder();
               updatedPatterns.push(placeHolder);
               setPatterns(updatedPatterns);
-              setSelectedPatternUuid(placeHolder.uuid);
+              setSelectedPatternAnimationUuid(placeHolder.uuid);
             },
             onDelete: () => {
               let modal = modalOptions;

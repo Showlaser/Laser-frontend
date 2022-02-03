@@ -18,3 +18,7 @@
   height: 100%;
   padding: 6px 20px 15px 20px;
 }
+
+#animation-timeline-markers {
+  width: 100%;
+}

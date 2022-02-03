@@ -7,9 +7,11 @@ export default function AnimationTimeline(props) {
   const [sliderMaxValue, setSliderMaxValue] = useState(100);
   const [sliderMinValue, setSliderMinValue] = useState(0);
 
-  const { animationPatterns, setTimeLineCurrentMs } = props;
+  const { patternAnimations, setTimeLineCurrentMs } = props;
 
-  const onTimelineSliderChange = (value) => {};
+  const onTimelineSliderChange = (value) => {
+    setTimeLineCurrentMs(value);
+  };
 
   const onScaleSliderChange = (value) => {
     if (value === 0 && sliderMinValue !== 0) {
@@ -71,6 +73,11 @@ export default function AnimationTimeline(props) {
           </IconButton>
         </ButtonGroup>
       </ButtonGroup>
+      <div id="animation-timeline-markers">
+        {patternAnimations?.map((ap) => (
+          <p>{ap?.startTime}</p>
+        ))}
+      </div>
     </div>
   );
 }

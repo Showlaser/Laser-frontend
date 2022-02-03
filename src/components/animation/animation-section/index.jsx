@@ -91,7 +91,7 @@ export default function AnimationSection(props) {
       />
       <AnimationTimeline
         setTimeLineCurrentMs={setTimeLineCurrentMs}
-        animationPatterns={selectedPatternAnimation.animationSettings}
+        patternAnimations={selectedPatternAnimation.animationSettings}
       />
     </div>
   ) : null;

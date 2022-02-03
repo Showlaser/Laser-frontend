@@ -5,16 +5,16 @@ import Timeline from "./timeline";
 import { getPatternAnimationPlaceholder } from "services/logic/animation-logic";
 
 export default function PatternTimelineSection(props) {
-  const { animationPatterns, animations, selectedAnimationUuid } = props;
+  const { patternAnimations, animations, selectedAnimationUuid } = props;
 
-  useEffect(() => [animationPatterns, animations]);
+  useEffect(() => [patternAnimations, animations]);
 
   const selectedAnimation = animations.find(
     (a) => a.uuid === selectedAnimationUuid
   );
 
   const onPatternSelect = (selectedPatternName) => {
-    const selectedPattern = animationPatterns.find(
+    const selectedPattern = patternAnimations.find(
       (p) => p.name === selectedPatternName
     );
 
@@ -42,7 +42,7 @@ export default function PatternTimelineSection(props) {
       <div id="pattern-selector">
         <PatternSelector
           callback={(value) => onPatternSelect(value)}
-          options={animationPatterns?.map((p) => p.name)}
+          options={patternAnimations?.map((p) => p.name)}
         />
       </div>
       <div id="timeline">

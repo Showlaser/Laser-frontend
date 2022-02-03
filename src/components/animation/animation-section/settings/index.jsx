@@ -50,7 +50,7 @@ export default function AnimationSettings(props) {
       </Select>
       <br />
       <Button onClick={() => deletePatternAnimation(settings?.uuid)}>
-        Delete
+        Delete pattern animation
       </Button>
       <hr />
       <label>Animation points</label>

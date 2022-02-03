@@ -3,13 +3,15 @@ import { Autocomplete } from "@material-ui/lab";
 import { useState } from "react";
 
 export default function PatternSelector(props) {
-  const [selectedPatternName, setSelectedPatternUuid] = useState();
+  const [selectedPatternName, setSelectedPatternAnimationUuid] = useState();
   const { options } = props;
 
   return options?.length > 0 ? (
     <div>
       <Autocomplete
-        onChange={(e, patternName) => setSelectedPatternUuid(patternName)}
+        onChange={(e, patternName) =>
+          setSelectedPatternAnimationUuid(patternName)
+        }
         options={options}
         renderInput={(params) => (
           <TextField {...params} label="Select pattern" />

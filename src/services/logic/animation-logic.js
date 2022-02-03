@@ -37,6 +37,9 @@ export const getPatternAnimationPlaceholder = (
     timelineSettingsUuid,
     x: p.x,
     y: p.x,
+    redLaserPowerPwm: 6,
+    greenLaserPowerPwm: 0,
+    blueLaserPowerPwm: 0,
   }));
 
   let startTime = 0;

@@ -31,13 +31,7 @@ export default function Dashboard() {
         },
       },
       logs: {
-        errors: [
-          {
-            title: "Overheating",
-            message: "Galvo reached 60 degrees",
-            dateTime: "29-11-2021 17:00",
-          },
-        ],
+        errors: [],
         warnings: [
           {
             title: "Laser not connected",
@@ -86,8 +80,6 @@ export default function Dashboard() {
   }));
 
   const classes = useStyles();
-  const setTempColor = (current, max) =>
-    max - current > 10 ? "primary" : "secondary";
 
   const content = (
     <div>

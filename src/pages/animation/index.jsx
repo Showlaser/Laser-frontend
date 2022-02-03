@@ -13,16 +13,11 @@ export default function AnimationEditor() {
   const [selectedAnimationUuid, setSelectedAnimationUuid] = useState(
     emptyGuid()
   );
-  const [selectedPatternAnimationUuid, setSelectedPatternUuid] = useState(
-    emptyGuid()
-  );
+  const [selectedPatternAnimationUuid, setSelectedPatternAnimationUuid] =
+    useState(emptyGuid());
   const [animations, setAnimations] = useState([]);
   const [patterns, setPatterns] = useState([]);
   const [changesSaved, setChangesSaved] = useState(true);
-
-  const selectedPatternAnimation = patterns.find(
-    (p) => p.uuid === selectedPatternAnimationUuid
-  );
 
   useEffect(() => {
     getAnimations().then((value) => setAnimations(value));
@@ -68,13 +63,13 @@ export default function AnimationEditor() {
           />
           <PatternTimelineSection
             animations={animations}
-            animationPatterns={patterns}
+            patternAnimations={patterns}
             selectedPatternAnimationUuid={selectedPatternAnimationUuid}
             selectedAnimationUuid={selectedAnimationUuid}
             setAnimations={setAnimations}
             onPatternAnimationSelect={(uuid) => {
               setChangesSaved(false);
-              setSelectedPatternUuid(uuid);
+              setSelectedPatternAnimationUuid(uuid);
             }}
           />
         </div>

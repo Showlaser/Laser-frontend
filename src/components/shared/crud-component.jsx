@@ -25,7 +25,7 @@ export default function CrudComponent(props) {
         labelId="demo-simple-select"
         id="demo-simple-select"
       >
-        {itemsArray.length > 0
+        {Array.isArray(itemsArray)
           ? itemsArray?.map((item, index) => (
               <MenuItem key={"options" + item.uuid + index} value={item?.uuid}>
                 {item?.name}

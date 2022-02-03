@@ -44,7 +44,7 @@ export default function PointsForm(props) {
   };
 
   return (
-    <div key={"form" + item?.uuid}>
+    <div key={"form" + item?.uuid + item?.points[0]?.uuid}>
       {item?.points?.map((point, index) => (
         <div>
           <small>Point {index}</small>
