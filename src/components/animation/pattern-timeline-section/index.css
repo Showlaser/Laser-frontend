@@ -18,7 +18,7 @@
 
 .timeline-channel {
   border: rgb(112, 112, 112) solid 1px;
-  width: 100%;
+  min-width: 100%;
   height: 50px;
   display: flex;
   align-items: center;

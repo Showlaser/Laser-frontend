@@ -30,7 +30,7 @@ export const getPatternAnimationPlaceholder = (
   selectedPattern,
   selectedAnimation
 ) => {
-  const patternAnimationsUuid = createGuid();
+  const patternAnimationUuid = createGuid();
   const timelineSettingsUuid = createGuid();
   const points = selectedPattern?.points?.map((p) => ({
     uuid: p.uuid,
@@ -42,28 +42,31 @@ export const getPatternAnimationPlaceholder = (
     blueLaserPowerPwm: 0,
   }));
 
-  let startTime = 0;
-  selectedAnimation.patternAnimations.forEach((setting) => {
-    if (setting.startTime === startTime) {
-      startTime++;
-    }
-  });
+  let startTimeOffset = 0;
+  while (
+    selectedAnimation.patternAnimations.some(
+      (pa) => pa.startTimeOffset === startTimeOffset
+    )
+  ) {
+    startTimeOffset += 25;
+  }
 
   return {
-    uuid: patternAnimationsUuid,
+    uuid: patternAnimationUuid,
     animationUuid: selectedAnimation?.uuid,
     name: selectedPattern.name,
+    startTimeOffset,
     animationSettings: [
       {
         uuid: timelineSettingsUuid,
-        patternAnimationsUuid: patternAnimationsUuid,
+        patternAnimationUuid: patternAnimationUuid,
         scale: 0.5,
         centerX: 0,
         centerY: 0,
         points,
-        startTime,
+        startTime: 0,
       },
     ],
-    timelineId: 1,
+    timelineId: 0,
   };
 };

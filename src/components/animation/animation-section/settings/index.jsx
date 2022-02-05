@@ -1,23 +1,25 @@
 import { Button, MenuItem, Select, TextField } from "@material-ui/core";
 import PointsForm from "components/shared/point-form";
 import { useEffect } from "react";
-import { getPointsPlaceHolder } from "services/shared/points";
 
 export default function AnimationSettings(props) {
   const {
-    updateAnimationSettings,
+    updateAnimationSetting,
     selectedPatternAnimation,
     timeLineCurrentMs,
     updatePatternAnimation,
     deletePatternAnimation,
   } = props;
+
   const settings =
     selectedPatternAnimation !== undefined
       ? selectedPatternAnimation.animationSettings.find(
           (ase) => ase.startTime === timeLineCurrentMs
         )
       : undefined;
+
   useEffect(() => [selectedPatternAnimation]);
+
   const duration =
     selectedPatternAnimation?.animationSettings?.at(-1)?.startTime -
     selectedPatternAnimation?.animationSettings[0]?.startTime;
@@ -33,8 +35,12 @@ export default function AnimationSettings(props) {
         onChange={(e) => updatePatternAnimation("name", e.target.value)}
       />
       <TextField
-        defaultValue={settings?.startTimeMs ?? 0}
+        defaultValue={selectedPatternAnimation?.startTimeOffset}
         label="Start time ms"
+        onChange={(e) =>
+          updatePatternAnimation("startTimeOffset", e.target.value)
+        }
+        type="number"
       />
       <br />
       <label>Duration time ms</label>
@@ -43,10 +49,13 @@ export default function AnimationSettings(props) {
       <br />
       Timeline
       <br />
-      <Select value={selectedPatternAnimation?.timelineId ?? 1}>
-        <MenuItem value="0">0</MenuItem>
-        <MenuItem value="1">1</MenuItem>
-        <MenuItem value="2">2</MenuItem>
+      <Select
+        onChange={(e) => updatePatternAnimation("timelineId", e.target.value)}
+        value={selectedPatternAnimation?.timelineId ?? 1}
+      >
+        <MenuItem value={0}>0</MenuItem>
+        <MenuItem value={1}>1</MenuItem>
+        <MenuItem value={2}>2</MenuItem>
       </Select>
       <br />
       <Button onClick={() => deletePatternAnimation(settings?.uuid)}>
@@ -88,16 +97,7 @@ export default function AnimationSettings(props) {
       <PointsForm
         namePlaceHolder="Animation name"
         item={settings}
-        addPoint={() =>
-          updateAnimationSettings(
-            "points",
-            [...settings.points].push(
-              getPointsPlaceHolder(selectedPatternAnimation.uuid)
-            )
-          )
-        }
-        onPointUpdate={() => {}}
-        onDelete={() => {}}
+        onChange={(points) => updateAnimationSetting("points", points)}
       />
     </div>
   );

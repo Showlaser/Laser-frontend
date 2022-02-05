@@ -41,7 +41,7 @@ export default function PatternTimelineSection(props) {
     <div id="pattern-timeline-section">
       <div id="pattern-selector">
         <PatternSelector
-          callback={(value) => onPatternSelect(value)}
+          onPatternSelect={onPatternSelect}
           options={patternAnimations?.map((p) => p.name)}
         />
       </div>

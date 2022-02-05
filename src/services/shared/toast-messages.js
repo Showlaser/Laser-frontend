@@ -34,13 +34,17 @@ export const toastSubject = {
     message: "Data was not modified",
     id: 7,
   },
+  apiUnavailable: {
+    message: "Local API unavailable, start it",
+    id: 8,
+  },
   notImplemented: {
     message: "This is not implemented yet",
-    id: 8,
+    id: 9,
   },
   changesSaved: {
     message: "Changes saved",
-    id: 9,
+    id: 10,
   },
 };
 

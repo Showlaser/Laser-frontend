@@ -13,7 +13,7 @@ const handleErrorMessage = (statusCode, ignoredStatusCodes) => {
   };
 
   const subject = statusCodes[statusCode];
-  showError(subject !== undefined ? subject : toastSubject.notImplemented);
+  showError(subject !== undefined ? subject : toastSubject.apiUnavailable);
 };
 
 export async function sendRequest(

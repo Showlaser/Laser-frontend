@@ -2,12 +2,17 @@ import { ButtonGroup, Slider, IconButton } from "@material-ui/core";
 import { useState } from "react";
 import RemoveIcon from "@material-ui/icons/Remove";
 import AddIcon from "@material-ui/icons/Add";
+import { numberIsBetweenOrEqual } from "services/shared/math";
 
 export default function AnimationTimeline(props) {
   const [sliderMaxValue, setSliderMaxValue] = useState(100);
   const [sliderMinValue, setSliderMinValue] = useState(0);
 
-  const { patternAnimations, setTimeLineCurrentMs } = props;
+  const { patternAnimationSettings, setTimeLineCurrentMs } = props;
+
+  const settingsWithinRange = patternAnimationSettings?.filter((ast) =>
+    numberIsBetweenOrEqual(ast?.startTime, sliderMinValue, sliderMaxValue)
+  );
 
   const onTimelineSliderChange = (value) => {
     setTimeLineCurrentMs(value);
@@ -74,8 +79,12 @@ export default function AnimationTimeline(props) {
         </ButtonGroup>
       </ButtonGroup>
       <div id="animation-timeline-markers">
-        {patternAnimations?.map((ap) => (
-          <p>{ap?.startTime}</p>
+        {settingsWithinRange?.map((s) => (
+          <span style={{ marginLeft: `${s?.startTime - sliderMinValue}px` }}>
+            &#11044;
+            <br />
+            {s?.startTime}
+          </span>
         ))}
       </div>
     </div>

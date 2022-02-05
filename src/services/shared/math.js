@@ -26,3 +26,7 @@ export const convertToMilliWatts = (maxPower, currentValue) =>
 
 export const valueIsWithinBoundaries = (value, min, max) =>
   value <= max && value >= min;
+
+export const numberIsBetweenOrEqual = (number, min, max) => {
+  return number >= min && number <= max;
+};

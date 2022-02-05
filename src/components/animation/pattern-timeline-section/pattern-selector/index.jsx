@@ -3,8 +3,8 @@ import { Autocomplete } from "@material-ui/lab";
 import { useState } from "react";
 
 export default function PatternSelector(props) {
+  const { options, onPatternSelect } = props;
   const [selectedPatternName, setSelectedPatternAnimationUuid] = useState();
-  const { options } = props;
 
   return options?.length > 0 ? (
     <div>
@@ -23,7 +23,7 @@ export default function PatternSelector(props) {
           variant="contained"
           color="primary"
           size="small"
-          onClick={() => props.callback(selectedPatternName)}
+          onClick={() => onPatternSelect(selectedPatternName)}
         >
           Place on timeline
         </Button>

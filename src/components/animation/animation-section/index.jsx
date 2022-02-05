@@ -24,23 +24,23 @@ export default function AnimationSection(props) {
           )
       : undefined;
 
-  const updateAnimationSettings = (property, value) => {
+  const updateAnimationSetting = (property, value) => {
     if (typeof property !== "string" || stringIsEmpty(property)) {
       return;
     }
 
     let updatedAnimations = [...animations];
-    let patternAnimationSettingsToUpdate = updatedAnimations
+    let patternAnimationSettingToUpdate = updatedAnimations
       .find((ua) => ua.uuid === selectedAnimationUuid)
       .patternAnimations.find((pa) => pa.uuid === selectedPatternAnimationUuid)
       .animationSettings.find((ase) => ase.startTime === timeLineCurrentMs);
 
-    if (patternAnimationSettingsToUpdate === undefined) {
+    if (patternAnimationSettingToUpdate === undefined) {
       alert("Not found");
       return;
     }
 
-    patternAnimationSettingsToUpdate[property] = value;
+    patternAnimationSettingToUpdate[property] = value;
     setAnimations(updatedAnimations);
   };
 
@@ -84,14 +84,14 @@ export default function AnimationSection(props) {
     <div id="animation-section">
       <AnimationSettings
         selectedPatternAnimation={selectedPatternAnimation}
-        updateAnimationSettings={updateAnimationSettings}
+        updateAnimationSetting={updateAnimationSetting}
         updatePatternAnimation={updatePatternAnimation}
         timeLineCurrentMs={timeLineCurrentMs}
         deletePatternAnimation={deletePatternAnimation}
       />
       <AnimationTimeline
         setTimeLineCurrentMs={setTimeLineCurrentMs}
-        patternAnimations={selectedPatternAnimation.animationSettings}
+        patternAnimationSettings={selectedPatternAnimation.animationSettings}
       />
     </div>
   ) : null;

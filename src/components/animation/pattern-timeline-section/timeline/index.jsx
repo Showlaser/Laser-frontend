@@ -4,6 +4,7 @@ import { createGuid } from "services/shared/math";
 import TimeLineChannel from "./timeline-channel";
 
 export default function Timeline(props) {
+  const { patternsInTimeline } = props;
   const [timelines, setTimelines] = useState([
     {
       index: 0,
@@ -15,12 +16,13 @@ export default function Timeline(props) {
       index: 2,
     },
   ]);
-  const { patternsInTimeline } = props;
 
   useEffect(() => {
     let newTimeLines = [...timelines];
     newTimeLines.forEach((tl, index) => {
-      tl.items = patternsInTimeline?.filter((p) => p.timelineId === index);
+      tl.animationPatterns = patternsInTimeline?.filter(
+        (p) => p.timelineId === index
+      );
     });
 
     setTimelines(newTimeLines);
@@ -38,7 +40,7 @@ export default function Timeline(props) {
         <TimeLineChannel
           onTimelineChannelItemClick={props.onTimelineChannelItemClick}
           key={createGuid()}
-          data={timeline}
+          timeline={timeline}
         />
       ))}
     </Box>
