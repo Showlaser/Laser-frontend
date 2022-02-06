@@ -26,7 +26,7 @@ export default function Timeline(props) {
     });
 
     setTimelines(newTimeLines);
-  }, [props]);
+  }, [patternsInTimeline, timelines]);
 
   return (
     <Box

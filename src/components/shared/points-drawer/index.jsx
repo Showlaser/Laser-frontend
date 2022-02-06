@@ -1,5 +1,5 @@
 import { Box } from "@material-ui/core";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { getMappedRgbStringFromPoint } from "services/shared/general";
 import { mapNumber } from "services/shared/math";
 import "./index.css";
@@ -7,11 +7,7 @@ import "./index.css";
 export default function PointsDrawer(props) {
   const { points } = props;
 
-  useEffect(() => {
-    drawPattern();
-  }, [points]);
-
-  const drawPattern = () => {
+  const drawPattern = useCallback(() => {
     const length = points?.length;
     if (points === undefined || length === 0) {
       return;
@@ -27,7 +23,11 @@ export default function PointsDrawer(props) {
       drawDot(ctx, point);
     }
     ctx.stroke();
-  };
+  }, [points]);
+
+  useEffect(() => {
+    drawPattern();
+  }, [drawPattern]);
 
   const drawDot = (ctx, point) => {
     const { x, y } = point;

@@ -7,13 +7,11 @@ import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-  const theme = React.useMemo(() =>
-    createTheme({
-      palette: {
-        type: "dark",
-      },
-    })
-  );
+  const theme = createTheme({
+    palette: {
+      type: "dark",
+    },
+  });
 
   return (
     <div className="App">

@@ -42,14 +42,13 @@ export const getPatternAnimationPlaceholder = (
     blueLaserPowerPwm: 0,
   }));
 
-  let startTimeOffset = 0;
-  while (
-    selectedAnimation.patternAnimations.some(
-      (pa) => pa.startTimeOffset === startTimeOffset
-    )
-  ) {
-    startTimeOffset += 25;
-  }
+  const lastItemInTimeline = selectedAnimation.patternAnimations
+    .filter((pa) => pa?.timelineId === 0)
+    ?.at(-1);
+  const startTimeOffset =
+    lastItemInTimeline !== undefined
+      ? lastItemInTimeline?.startTimeOffset + 50
+      : 0;
 
   return {
     uuid: patternAnimationUuid,
