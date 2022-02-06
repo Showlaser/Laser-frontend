@@ -31,10 +31,10 @@ export const getPatternAnimationPlaceholder = (
   selectedAnimation
 ) => {
   const patternAnimationUuid = createGuid();
-  const timelineSettingsUuid = createGuid();
+  const settingsUuid = createGuid();
   const points = selectedPattern?.points?.map((p) => ({
     uuid: p.uuid,
-    timelineSettingsUuid,
+    timelineSettingsUuid: settingsUuid,
     x: p.x,
     y: p.x,
     redLaserPowerPwm: 6,
@@ -57,16 +57,28 @@ export const getPatternAnimationPlaceholder = (
     name: selectedPattern.name,
     startTimeOffset,
     animationSettings: [
-      {
-        uuid: timelineSettingsUuid,
-        patternAnimationUuid: patternAnimationUuid,
-        scale: 0.5,
-        centerX: 0,
-        centerY: 0,
-        points,
-        startTime: 0,
-      },
+      getPatternAnimationSettingsPlaceholder(
+        settingsUuid,
+        patternAnimationUuid,
+        points
+      ),
     ],
     timelineId: 0,
+  };
+};
+
+export const getPatternAnimationSettingsPlaceholder = (
+  settingsUuid,
+  patternAnimationUuid,
+  points
+) => {
+  return {
+    uuid: settingsUuid,
+    patternAnimationUuid: patternAnimationUuid,
+    scale: 0.5,
+    centerX: 0,
+    centerY: 0,
+    points,
+    startTime: 0,
   };
 };

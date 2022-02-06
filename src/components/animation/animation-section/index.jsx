@@ -3,6 +3,7 @@ import "./index.css";
 import AnimationTimeline from "./animation-timeline";
 import { useEffect, useState } from "react";
 import { stringIsEmpty } from "services/shared/general";
+import { createGuid } from "services/shared/math";
 
 export default function AnimationSection(props) {
   const [timeLineCurrentMs, setTimeLineCurrentMs] = useState(0);
@@ -30,13 +31,22 @@ export default function AnimationSection(props) {
     }
 
     let updatedAnimations = [...animations];
-    let patternAnimationSettingToUpdate = updatedAnimations
+    let selectedPattern = updatedAnimations
       .find((ua) => ua.uuid === selectedAnimationUuid)
-      .patternAnimations.find((pa) => pa.uuid === selectedPatternAnimationUuid)
-      .animationSettings.find((ase) => ase.startTime === timeLineCurrentMs);
+      .patternAnimations.find((pa) => pa.uuid === selectedPatternAnimationUuid);
+
+    let patternAnimationSettingToUpdate =
+      selectedPattern.animationSettings.find(
+        (ase) => ase.startTime === timeLineCurrentMs
+      );
 
     if (patternAnimationSettingToUpdate === undefined) {
-      alert("Not found");
+      let setting = { ...selectedPattern?.animationSettings?.at(0) };
+      setting.uuid = createGuid();
+      setting.startTime = timeLineCurrentMs;
+
+      selectedPattern.animationSettings.push(setting);
+      setAnimations(updatedAnimations);
       return;
     }
 
@@ -44,7 +54,7 @@ export default function AnimationSection(props) {
     setAnimations(updatedAnimations);
   };
 
-  const deletePatternAnimation = (uuid) => {
+  const deletePatternAnimation = () => {
     let animationsToUpdate = [...animations];
     let animationToUpdate = animationsToUpdate.find(
       (ato) => ato.uuid === selectedAnimationUuid

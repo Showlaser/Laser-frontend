@@ -132,6 +132,7 @@ export default function PointsForm(props) {
         </div>
       ))}
       <Button
+        disabled={item === undefined}
         onClick={() => addPoint()}
         style={{ marginTop: "5px", width: "225px" }}
         size="small"

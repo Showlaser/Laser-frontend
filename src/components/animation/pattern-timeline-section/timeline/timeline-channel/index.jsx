@@ -16,10 +16,7 @@ export default function TimeLineChannel(props) {
         {timeline?.animationPatterns?.map((animationPattern) => (
           <span
             style={{
-              marginLeft: `${
-                animationPattern?.animationSettings[0]?.startTime +
-                animationPattern?.startTimeOffset
-              }px`,
+              marginLeft: `${animationPattern?.startTimeOffset}px`,
             }}
             key={createGuid()}
             onClick={() => {

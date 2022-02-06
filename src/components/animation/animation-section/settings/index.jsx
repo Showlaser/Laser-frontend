@@ -68,6 +68,7 @@ export default function AnimationSettings(props) {
         defaultValue={settings?.scale}
         label="Scale"
         type="number"
+        onChange={(e) => updateAnimationSetting("scale", e.target.value)}
         inputProps={{
           step: "0.1",
           min: 0.1,
@@ -76,22 +77,24 @@ export default function AnimationSettings(props) {
       />
       <br />
       <TextField
-        label="X position"
+        label="Center x"
         type="number"
         inputProps={{
           min: -4000,
           max: 4000,
         }}
         defaultValue={settings?.centerX}
+        onChange={(e) => updateAnimationSetting("centerX", e.target.value)}
       />
       <TextField
-        label="Y position"
+        label="Center y"
         type="number"
         inputProps={{
           min: -4000,
           max: 4000,
         }}
         defaultValue={settings?.centerY}
+        onChange={(e) => updateAnimationSetting("centerY", e.target.value)}
       />
       <br />
       <PointsForm
