@@ -34,7 +34,7 @@ export const getPatternAnimationPlaceholder = (
   const settingsUuid = createGuid();
   const points = selectedPattern?.points?.map((p) => ({
     uuid: p.uuid,
-    timelineSettingsUuid: settingsUuid,
+    patternAnimationSettingsUuid: settingsUuid,
     x: p.x,
     y: p.x,
     redLaserPowerPwm: 6,
