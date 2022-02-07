@@ -1,0 +1,24 @@
+#animation-section {
+  width: 100%;
+  display: flex;
+  border: whitesmoke solid 1px;
+}
+
+#animation-settings {
+  border: whitesmoke solid 1px;
+  width: 30vh;
+  height: 50vh;
+  padding-top: 25px;
+  overflow-y: scroll;
+}
+
+#animation-timeline {
+  border: whitesmoke solid 1px;
+  width: 40%;
+  height: 100%;
+  padding: 6px 20px 15px 20px;
+}
+
+#animation-timeline-markers {
+  width: 100%;
+}

@@ -8,9 +8,6 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
-import { LinearProgress } from "@material-ui/core";
-import { normalise } from "services/shared/math";
-import LaserCommunicator from "services/shared/laser-communicator";
 import {
   showInfo,
   showWarning,
@@ -21,7 +18,6 @@ export default function Dashboard() {
   const [laser, setLaser] = useState({});
 
   useEffect(() => {
-    LaserCommunicator();
     const laserTelemetry = {
       connected: true,
       temperatures: {
@@ -35,13 +31,7 @@ export default function Dashboard() {
         },
       },
       logs: {
-        errors: [
-          {
-            title: "Overheating",
-            message: "Galvo reached 60 degrees",
-            dateTime: "29-11-2021 17:00",
-          },
-        ],
+        errors: [],
         warnings: [
           {
             title: "Laser not connected",
@@ -61,7 +51,7 @@ export default function Dashboard() {
 
     const { logs, settings } = laserTelemetry;
     if (logs?.errors?.includes || logs?.warnings?.includes) {
-      showWarning(toastSubject.LogsNotEmpty);
+      showWarning(toastSubject.logsNotEmpty);
     }
     if (settings?.development?.developmentModeEnabled) {
       showInfo(toastSubject.developmentModeActive);
@@ -90,8 +80,6 @@ export default function Dashboard() {
   }));
 
   const classes = useStyles();
-  const setTempColor = (current, max) =>
-    max - current > 10 ? "primary" : "secondary";
 
   const content = (
     <div>
@@ -111,39 +99,6 @@ export default function Dashboard() {
                       {" "}
                       &#x25cf;
                     </span>
-                    <hr />
-                    <b>Temperature</b>
-                    <br />
-                    <small>
-                      Galvo {laser?.temperatures?.galvo?.currentTemp}°
-                    </small>
-                    <LinearProgress
-                      color={setTempColor(
-                        laser?.temperatures?.galvo?.currentTemp,
-                        laser?.temperatures?.galvo?.maxTemp
-                      )}
-                      variant="determinate"
-                      value={normalise(
-                        laser?.temperatures?.galvo?.currentTemp,
-                        0,
-                        laser?.temperatures?.galvo?.maxTemp
-                      )}
-                    />
-                    <small>
-                      Base plate {laser?.temperatures?.basePlate?.currentTemp}°
-                    </small>
-                    <LinearProgress
-                      color={setTempColor(
-                        laser?.temperatures?.basePlate?.currentTemp,
-                        laser?.temperatures?.basePlate?.maxTemp
-                      )}
-                      variant="determinate"
-                      value={normalise(
-                        laser?.temperatures?.basePlate?.currentTemp,
-                        0,
-                        laser?.temperatures?.basePlate?.maxTemp
-                      )}
-                    />
                   </div>
                 ) : (
                   <div>
@@ -159,18 +114,18 @@ export default function Dashboard() {
               <hr />
               <b>Zones</b>
               <List className={classes.root}>
-                <text>Total: 2</text>
+                <p>Total: 2</p>
               </List>
-              <hr />
+              <Divider />
               <b>Development</b>
               <List className={classes.root}>
-                <text>
+                <p>
                   Development mode enabled{" "}
                   <span style={{ color: "green", fontSize: "130%" }}>
                     {" "}
                     &#x25cf;
                   </span>
-                </text>
+                </p>
               </List>
             </Paper>
           </Grid>
@@ -204,7 +159,7 @@ export default function Dashboard() {
                 <Divider component="li" />
               </List>
               <Button variant="text" onClick={() => clearLogs()}>
-                X Clear logs
+                X Clear warnings
               </Button>
             </Paper>
           </Grid>

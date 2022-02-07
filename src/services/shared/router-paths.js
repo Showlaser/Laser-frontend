@@ -4,6 +4,7 @@ const paths = {
   Zones: "/zones",
   PatternEditor: "/pattern-editor",
   AnimationEditor: "/animation-editor",
+  Installation: "/installation",
 };
 
 export default paths;

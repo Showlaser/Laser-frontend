@@ -11,10 +11,12 @@ export const mapNumber = (number, inMin, inMax, outMin, outMax) => {
 export const createGuid = () => {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
-      v = c == "x" ? r : (r & 0x3) | 0x8;
+      v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 };
+
+export const emptyGuid = () => "00000000-0000-0000-0000-000000000000";
 
 export const capitalizeFirstLetter = (string) =>
   string.charAt(0).toUpperCase() + string.slice(1);
@@ -24,3 +26,7 @@ export const convertToMilliWatts = (maxPower, currentValue) =>
 
 export const valueIsWithinBoundaries = (value, min, max) =>
   value <= max && value >= min;
+
+export const numberIsBetweenOrEqual = (number, min, max) => {
+  return number >= min && number <= max;
+};

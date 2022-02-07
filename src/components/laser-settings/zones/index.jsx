@@ -5,7 +5,6 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Snackbar,
   TextField,
 } from "@material-ui/core";
 import Slider from "@material-ui/core/Slider";
@@ -46,7 +45,7 @@ export default function Zones(props) {
 
   useEffect(() => {
     drawZone(props.zones[selectedZone]);
-  }, []);
+  }, [props?.zones, selectedZone]);
 
   const drawZone = (zone) => {
     let c = document.getElementById("zones-canvas");
@@ -79,7 +78,7 @@ export default function Zones(props) {
 
   const updateZone = (index, value, axle) => {
     if (!valueIsWithinBoundaries(value, -4000, 4000)) {
-      showError(toastSubject.BoundaryError);
+      showError(toastSubject.boundaryError);
       return;
     }
 
