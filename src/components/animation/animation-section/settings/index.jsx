@@ -11,7 +11,7 @@ export default function AnimationSettings(props) {
     deletePatternAnimation,
   } = props;
 
-  const settings =
+  const setting =
     selectedPatternAnimation !== undefined
       ? selectedPatternAnimation.animationSettings.find(
           (ase) => ase.startTime === timeLineCurrentMs
@@ -58,14 +58,14 @@ export default function AnimationSettings(props) {
         <MenuItem value={2}>2</MenuItem>
       </Select>
       <br />
-      <Button onClick={() => deletePatternAnimation(settings?.uuid)}>
+      <Button onClick={() => deletePatternAnimation(setting?.uuid)}>
         Delete pattern animation
       </Button>
       <hr />
       <label>Animation points</label>
       <br />
       <TextField
-        defaultValue={settings?.scale}
+        defaultValue={setting?.scale}
         label="Scale"
         type="number"
         onChange={(e) => updateAnimationSetting("scale", e.target.value)}
@@ -83,7 +83,7 @@ export default function AnimationSettings(props) {
           min: -4000,
           max: 4000,
         }}
-        defaultValue={settings?.centerX}
+        defaultValue={setting?.centerX}
         onChange={(e) => updateAnimationSetting("centerX", e.target.value)}
       />
       <TextField
@@ -93,13 +93,27 @@ export default function AnimationSettings(props) {
           min: -4000,
           max: 4000,
         }}
-        defaultValue={settings?.centerY}
+        defaultValue={setting?.centerY}
         onChange={(e) => updateAnimationSetting("centerY", e.target.value)}
       />
+      <Button
+        onClick={() => {
+          let settings = [...selectedPatternAnimation?.animationSettings];
+          const index = settings.findIndex((s) => s.uuid === setting.uuid);
+          if (index === -1) {
+            return;
+          }
+
+          settings.splice(index, 1);
+          updatePatternAnimation("animationSetting", settings);
+        }}
+      >
+        Delete point
+      </Button>
       <br />
       <PointsForm
         namePlaceHolder="Animation name"
-        item={settings}
+        item={setting}
         onChange={(points) => updateAnimationSetting("points", points)}
       />
     </div>

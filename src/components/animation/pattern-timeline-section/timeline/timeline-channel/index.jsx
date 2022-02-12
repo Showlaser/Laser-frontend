@@ -1,9 +1,8 @@
 import { useEffect } from "react";
-import { createGuid } from "services/shared/math";
 import "./index.css";
 
 export default function TimeLineChannel(props) {
-  const { timeline } = props;
+  const { timeline, animationPatternsInTimeline } = props;
 
   useEffect(() => [props]);
 
@@ -13,12 +12,12 @@ export default function TimeLineChannel(props) {
         <p>{timeline?.index}:</p>
       </div>
       <div className="timeline-content">
-        {timeline?.animationPatterns?.map((animationPattern) => (
+        {animationPatternsInTimeline?.map((animationPattern) => (
           <span
             style={{
               marginLeft: `${animationPattern?.startTimeOffset}px`,
             }}
-            key={createGuid()}
+            key={animationPattern?.uuid + "timeline"}
             onClick={() => {
               props.onTimelineChannelItemClick(animationPattern.uuid);
             }}

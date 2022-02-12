@@ -79,8 +79,11 @@ export default function AnimationTimeline(props) {
         </ButtonGroup>
       </ButtonGroup>
       <div id="animation-timeline-markers">
-        {settingsWithinRange?.map((s) => (
-          <span style={{ marginLeft: `${s?.startTime - sliderMinValue}px` }}>
+        {settingsWithinRange?.map((s, index) => (
+          <span
+            key={`${s?.uuid}${index}`}
+            style={{ marginLeft: `${s?.startTime - sliderMinValue}px` }}
+          >
             &#11044;
             <br />
             {s?.startTime}

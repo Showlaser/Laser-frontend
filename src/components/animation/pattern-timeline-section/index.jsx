@@ -7,7 +7,7 @@ import { getPatternAnimationPlaceholder } from "services/logic/animation-logic";
 export default function PatternTimelineSection(props) {
   const { patternAnimations, animations, selectedAnimationUuid } = props;
 
-  useEffect(() => [patternAnimations, animations]);
+  useEffect(() => [props]);
 
   const selectedAnimation = animations.find(
     (a) => a.uuid === selectedAnimationUuid
