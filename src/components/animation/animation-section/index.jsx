@@ -1,12 +1,16 @@
 import AnimationSettings from "./settings";
 import "./index.css";
 import AnimationTimeline from "./animation-timeline";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { stringIsEmpty } from "services/shared/general";
 import { createGuid } from "services/shared/math";
+import Modal from "components/modal";
 
 export default function AnimationSection(props) {
   const [timeLineCurrentMs, setTimeLineCurrentMs] = useState(0);
+  const [, updateState] = useState();
+  const forceUpdate = useCallback(() => updateState({}), []);
+
   const {
     setAnimations,
     animations,
@@ -14,7 +18,24 @@ export default function AnimationSection(props) {
     selectedAnimationUuid,
   } = props;
 
-  useEffect(() => [props]);
+  const [modalOptions, setModalOptions] = useState({
+    title: "Delete pattern animation?",
+    show: false,
+    onOkClick: null,
+    onCancelClick: () => closeModal(),
+  });
+
+  const closeModal = () => {
+    let modal = { ...modalOptions };
+    modal.show = false;
+    setModalOptions(modal);
+  };
+
+  useEffect(() => [
+    animations,
+    selectedPatternAnimationUuid,
+    selectedAnimationUuid,
+  ]);
 
   const selectedPatternAnimation =
     animations !== undefined
@@ -82,7 +103,6 @@ export default function AnimationSection(props) {
       .patternAnimations.find((pa) => pa.uuid === selectedPatternAnimationUuid);
 
     if (patternAnimationToUpdate === undefined) {
-      alert("Not found");
       return;
     }
 
@@ -92,14 +112,25 @@ export default function AnimationSection(props) {
 
   return selectedPatternAnimation !== undefined ? (
     <div id="animation-section">
+      <Modal modal={modalOptions} />
       <AnimationSettings
         selectedPatternAnimation={selectedPatternAnimation}
         updateAnimationSetting={updateAnimationSetting}
         updatePatternAnimation={updatePatternAnimation}
         timeLineCurrentMs={timeLineCurrentMs}
-        deletePatternAnimation={deletePatternAnimation}
+        deletePatternAnimation={() => {
+          let modal = modalOptions;
+          modal.show = true;
+          modal.onOkClick = () => {
+            deletePatternAnimation();
+            closeModal();
+          };
+          forceUpdate();
+          setModalOptions(modal);
+        }}
       />
       <AnimationTimeline
+        timeLineCurrentMs={timeLineCurrentMs}
         setTimeLineCurrentMs={setTimeLineCurrentMs}
         patternAnimationSettings={selectedPatternAnimation.animationSettings}
       />

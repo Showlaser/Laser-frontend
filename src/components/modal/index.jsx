@@ -2,19 +2,21 @@ import { Button } from "@material-ui/core";
 import "./index.css";
 
 export default function Modal(props) {
-  return props?.modal?.show ? (
+  const { modal } = props;
+
+  return modal?.show ? (
     <div id="modal">
       <div id="modal-items">
-        <h2>{props?.modal?.title}</h2>
+        <h2>{modal?.title}</h2>
         <Button
           variant="contained"
           color="primary"
           size="small"
-          onClick={() => props?.modal?.onOkClick()}
+          onClick={() => modal?.onOkClick()}
         >
           Ok
         </Button>
-        <Button size="large" onClick={() => props?.modal?.onCancelClick()}>
+        <Button size="large" onClick={() => modal?.onCancelClick()}>
           Cancel
         </Button>
       </div>

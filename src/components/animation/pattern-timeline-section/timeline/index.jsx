@@ -1,4 +1,3 @@
-import { Box } from "@material-ui/core";
 import TimeLineChannel from "./timeline-channel";
 
 export default function Timeline(props) {
@@ -16,13 +15,7 @@ export default function Timeline(props) {
   ];
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "flex-start",
-        flexDirection: "column",
-      }}
-    >
+    <div>
       {timelines?.map((timeline, index) => (
         <TimeLineChannel
           animationPatternsInTimeline={patternsInTimeline?.filter(
@@ -33,6 +26,6 @@ export default function Timeline(props) {
           timeline={timeline}
         />
       ))}
-    </Box>
+    </div>
   );
 }

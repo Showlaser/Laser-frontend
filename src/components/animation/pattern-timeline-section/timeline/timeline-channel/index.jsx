@@ -11,11 +11,14 @@ export default function TimeLineChannel(props) {
       <div className="timeline-identifier">
         <p>{timeline?.index}:</p>
       </div>
-      <div className="timeline-content">
+      <div>
         {animationPatternsInTimeline?.map((animationPattern) => (
-          <span
+          <div
             style={{
               marginLeft: `${animationPattern?.startTimeOffset}px`,
+              width: `${
+                animationPattern?.animationSettings?.at(-1)?.startTime
+              }px`,
             }}
             key={animationPattern?.uuid + "timeline"}
             onClick={() => {
@@ -24,7 +27,7 @@ export default function TimeLineChannel(props) {
             className="timeline-channel-item"
           >
             {animationPattern.name}
-          </span>
+          </div>
         ))}
       </div>
     </div>

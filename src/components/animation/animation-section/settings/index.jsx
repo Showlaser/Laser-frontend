@@ -1,6 +1,14 @@
-import { Button, MenuItem, Select, TextField } from "@material-ui/core";
+import {
+  Button,
+  IconButton,
+  MenuItem,
+  Select,
+  TextField,
+} from "@material-ui/core";
 import PointsForm from "components/shared/point-form";
 import { useEffect } from "react";
+import DeleteIcon from "@material-ui/icons/Delete";
+import AddIcon from "@material-ui/icons/Add";
 
 export default function AnimationSettings(props) {
   const {
@@ -37,9 +45,11 @@ export default function AnimationSettings(props) {
       <TextField
         defaultValue={selectedPatternAnimation?.startTimeOffset}
         label="Start time ms"
-        onChange={(e) =>
-          updatePatternAnimation("startTimeOffset", e.target.value)
-        }
+        onChange={(e) => {
+          if (e.target.value >= 0) {
+            updatePatternAnimation("startTimeOffset", e.target.value);
+          }
+        }}
         type="number"
       />
       <br />
@@ -58,14 +68,12 @@ export default function AnimationSettings(props) {
         <MenuItem value={2}>2</MenuItem>
       </Select>
       <br />
-      <Button onClick={() => deletePatternAnimation(setting?.uuid)}>
-        Delete pattern animation
-      </Button>
+      <Button onClick={deletePatternAnimation}>Delete pattern animation</Button>
       <hr />
       <label>Animation points</label>
       <br />
       <TextField
-        defaultValue={setting?.scale}
+        value={setting?.scale}
         label="Scale"
         type="number"
         onChange={(e) => updateAnimationSetting("scale", e.target.value)}
@@ -83,7 +91,7 @@ export default function AnimationSettings(props) {
           min: -4000,
           max: 4000,
         }}
-        defaultValue={setting?.centerX}
+        value={setting?.centerX}
         onChange={(e) => updateAnimationSetting("centerX", e.target.value)}
       />
       <TextField
@@ -93,10 +101,21 @@ export default function AnimationSettings(props) {
           min: -4000,
           max: 4000,
         }}
-        defaultValue={setting?.centerY}
+        value={setting?.centerY}
         onChange={(e) => updateAnimationSetting("centerY", e.target.value)}
       />
-      <Button
+      <br />
+      <IconButton
+        disabled={setting !== undefined}
+        onClick={() => updateAnimationSetting("animationSettings", [])}
+      >
+        <AddIcon />
+      </IconButton>
+      <IconButton
+        disabled={
+          setting === undefined ||
+          selectedPatternAnimation?.animationSettings?.length === 1
+        }
         onClick={() => {
           let settings = [...selectedPatternAnimation?.animationSettings];
           const index = settings.findIndex((s) => s.uuid === setting.uuid);
@@ -105,11 +124,11 @@ export default function AnimationSettings(props) {
           }
 
           settings.splice(index, 1);
-          updatePatternAnimation("animationSetting", settings);
+          updatePatternAnimation("animationSettings", settings);
         }}
       >
-        Delete point
-      </Button>
+        <DeleteIcon />
+      </IconButton>
       <br />
       <PointsForm
         namePlaceHolder="Animation name"

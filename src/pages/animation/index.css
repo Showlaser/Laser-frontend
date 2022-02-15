@@ -1,5 +1,5 @@
 #animation {
   max-width: 90%;
   min-width: 90%;
-  position: fixed;
+  position: absolute;
 }
