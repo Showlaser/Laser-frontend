@@ -1,5 +1,5 @@
-import { ButtonGroup, Slider, IconButton } from "@material-ui/core";
-import { useState } from "react";
+import { ButtonGroup, Slider, IconButton, Tooltip } from "@material-ui/core";
+import { useEffect, useState } from "react";
 import RemoveIcon from "@material-ui/icons/Remove";
 import AddIcon from "@material-ui/icons/Add";
 import { numberIsBetweenOrEqual } from "services/shared/math";
@@ -8,7 +8,10 @@ export default function AnimationTimeline(props) {
   const [sliderMaxValue, setSliderMaxValue] = useState(100);
   const [sliderMinValue, setSliderMinValue] = useState(0);
 
-  const { patternAnimationSettings, setTimeLineCurrentMs } = props;
+  const { patternAnimationSettings, setTimeLineCurrentMs, timeLineCurrentMs } =
+    props;
+
+  useEffect(() => [timeLineCurrentMs]);
 
   const settingsWithinRange = patternAnimationSettings?.filter((ast) =>
     numberIsBetweenOrEqual(ast?.startTime, sliderMinValue, sliderMaxValue)
@@ -28,6 +31,7 @@ export default function AnimationTimeline(props) {
 
       setSliderMinValue(newSliderMinValue);
       setSliderMaxValue(newSliderMaxValue);
+      setTimeLineCurrentMs(newSliderMinValue);
     } else if (value === 1) {
       const newSliderMaxValue = sliderMaxValue + 100;
       const newSliderMinValue =
@@ -37,8 +41,8 @@ export default function AnimationTimeline(props) {
 
       setSliderMaxValue(newSliderMaxValue);
       setSliderMinValue(newSliderMinValue);
+      setTimeLineCurrentMs(newSliderMinValue);
     }
-    setTimeLineCurrentMs(value);
   };
 
   const timelineSliderMarks = [
@@ -54,37 +58,39 @@ export default function AnimationTimeline(props) {
 
   return (
     <div id="animation-timeline">
-      <ButtonGroup>
-        <small>Time ms</small>
-        <Slider
-          onChange={(e, value) => onTimelineSliderChange(value)}
-          aria-label="Time ms"
-          defaultValue={0}
-          valueLabelDisplay="auto"
-          step={1}
-          marks={timelineSliderMarks}
-          min={sliderMinValue}
-          max={sliderMaxValue}
-        />
-        <ButtonGroup
-          size="small"
-          style={{ width: "120px", marginLeft: "25px" }}
-        >
-          <IconButton onClick={() => onScaleSliderChange(0)}>
-            <RemoveIcon />
-          </IconButton>
-          <IconButton onClick={() => onScaleSliderChange(1)}>
-            <AddIcon />
-          </IconButton>
-        </ButtonGroup>
+      <small>Time ms</small>
+      <Slider
+        style={{ width: "100%" }}
+        onChange={(e, value) => onTimelineSliderChange(value)}
+        aria-label="Time ms"
+        value={timeLineCurrentMs}
+        valueLabelDisplay="auto"
+        step={1}
+        marks={timelineSliderMarks}
+        min={sliderMinValue}
+        max={sliderMaxValue}
+      />
+      <ButtonGroup size="small" style={{ width: "120px", marginLeft: "25px" }}>
+        <IconButton onClick={() => onScaleSliderChange(0)}>
+          <RemoveIcon />
+        </IconButton>
+        <IconButton onClick={() => onScaleSliderChange(1)}>
+          <AddIcon />
+        </IconButton>
       </ButtonGroup>
       <div id="animation-timeline-markers">
-        {settingsWithinRange?.map((s) => (
-          <span style={{ marginLeft: `${s?.startTime - sliderMinValue}px` }}>
-            &#11044;
-            <br />
-            {s?.startTime}
-          </span>
+        {settingsWithinRange?.map((s, index) => (
+          <Tooltip className="marker" title={s?.startTime}>
+            <span
+              onClick={() => setTimeLineCurrentMs(s?.startTime)}
+              key={`${s?.uuid}${index}`}
+              style={{
+                marginLeft: `${(s?.startTime - sliderMinValue) / 1.4}%`,
+              }}
+            >
+              &#11044;
+            </span>
+          </Tooltip>
         ))}
       </div>
     </div>

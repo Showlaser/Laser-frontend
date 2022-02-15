@@ -45,9 +45,6 @@ export default function LaserSettings() {
 
   const classes = useStyles();
 
-  const [, updateState] = React.useState();
-  const forceUpdate = React.useCallback(() => updateState({}), []);
-
   const sideNavSettings = {
     pageName: "Laser settings",
   };
@@ -56,7 +53,6 @@ export default function LaserSettings() {
     let updatedLaser = laser;
     laser[propertyName] = value;
     setLaser(updatedLaser);
-    forceUpdate();
   };
 
   const content = (

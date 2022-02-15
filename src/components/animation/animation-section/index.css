@@ -14,11 +14,12 @@
 
 #animation-timeline {
   border: whitesmoke solid 1px;
-  width: 40%;
+  width: 100%;
   height: 100%;
   padding: 6px 20px 15px 20px;
 }
 
-#animation-timeline-markers {
-  width: 100%;
+.marker {
+  cursor: pointer;
+  position: absolute;
 }
