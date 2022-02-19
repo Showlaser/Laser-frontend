@@ -33,7 +33,7 @@ export default function AnimationEditor() {
       return;
     }
 
-    let updatedAnimations = [...animations];
+    let updatedAnimations = structuredClone(animations);
     let animationToUpdate = updatedAnimations.find(
       (ua) => ua.uuid === selectedAnimationUuid
     );

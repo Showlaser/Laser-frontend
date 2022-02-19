@@ -5,18 +5,17 @@ import { useCallback, useEffect, useState } from "react";
 import { stringIsEmpty } from "services/shared/general";
 import { createGuid } from "services/shared/math";
 import Modal from "components/modal";
+import PointsDrawer from "components/shared/points-drawer";
 
-export default function AnimationSection(props) {
+export default function AnimationSection({
+  setAnimations,
+  animations,
+  selectedPatternAnimationUuid,
+  selectedAnimationUuid,
+}) {
   const [timeLineCurrentMs, setTimeLineCurrentMs] = useState(0);
   const [, updateState] = useState();
   const forceUpdate = useCallback(() => updateState({}), []);
-
-  const {
-    setAnimations,
-    animations,
-    selectedPatternAnimationUuid,
-    selectedAnimationUuid,
-  } = props;
 
   const [modalOptions, setModalOptions] = useState({
     title: "Delete pattern animation?",
@@ -26,7 +25,7 @@ export default function AnimationSection(props) {
   });
 
   const closeModal = () => {
-    let modal = { ...modalOptions };
+    let modal = structuredClone(modalOptions);
     modal.show = false;
     setModalOptions(modal);
   };
@@ -46,12 +45,19 @@ export default function AnimationSection(props) {
           )
       : undefined;
 
+  const selectedSetting =
+    selectedPatternAnimation !== undefined
+      ? selectedPatternAnimation?.animationSettings?.find(
+          (ase) => ase?.startTime === timeLineCurrentMs
+        )
+      : undefined;
+
   const updateAnimationSetting = (property, value) => {
     if (typeof property !== "string" || stringIsEmpty(property)) {
       return;
     }
 
-    let updatedAnimations = [...animations];
+    let updatedAnimations = structuredClone(animations);
     let selectedPattern = updatedAnimations
       .find((ua) => ua.uuid === selectedAnimationUuid)
       .patternAnimations.find((pa) => pa.uuid === selectedPatternAnimationUuid);
@@ -62,7 +68,7 @@ export default function AnimationSection(props) {
       );
 
     if (patternAnimationSettingToUpdate === undefined) {
-      let setting = { ...selectedPattern?.animationSettings?.at(0) };
+      let setting = structuredClone(selectedPattern?.animationSettings?.at(0));
       setting.uuid = createGuid();
       setting.startTime = timeLineCurrentMs;
 
@@ -76,7 +82,7 @@ export default function AnimationSection(props) {
   };
 
   const deletePatternAnimation = () => {
-    let animationsToUpdate = [...animations];
+    let animationsToUpdate = structuredClone(animations);
     let animationToUpdate = animationsToUpdate.find(
       (ato) => ato.uuid === selectedAnimationUuid
     );
@@ -97,7 +103,7 @@ export default function AnimationSection(props) {
       return;
     }
 
-    let updatedAnimations = [...animations];
+    let updatedAnimations = structuredClone(animations);
     let patternAnimationToUpdate = updatedAnimations
       .find((ua) => ua.uuid === selectedAnimationUuid)
       .patternAnimations.find((pa) => pa.uuid === selectedPatternAnimationUuid);
@@ -114,10 +120,10 @@ export default function AnimationSection(props) {
     <div id="animation-section">
       <Modal modal={modalOptions} />
       <AnimationSettings
+        selectedSetting={selectedSetting}
         selectedPatternAnimation={selectedPatternAnimation}
         updateAnimationSetting={updateAnimationSetting}
         updatePatternAnimation={updatePatternAnimation}
-        timeLineCurrentMs={timeLineCurrentMs}
         deletePatternAnimation={() => {
           let modal = modalOptions;
           modal.show = true;
@@ -134,6 +140,7 @@ export default function AnimationSection(props) {
         setTimeLineCurrentMs={setTimeLineCurrentMs}
         patternAnimationSettings={selectedPatternAnimation.animationSettings}
       />
+      <PointsDrawer points={selectedSetting?.points} />
     </div>
   ) : null;
 }

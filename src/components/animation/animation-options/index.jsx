@@ -55,7 +55,7 @@ export default function AnimationOptions(props) {
           },
           onAdd: () => {
             setChangesSaved(false);
-            let updatedAnimations = [...animations];
+            let updatedAnimations = structuredClone(animations);
             const uuid = createGuid();
 
             updatedAnimations.push({

@@ -57,7 +57,7 @@ export default function PatternEditor() {
   };
 
   const deletePattern = () => {
-    let updatedPatterns = [...patterns].filter(
+    let updatedPatterns = structuredClone(patterns).filter(
       (p) => p?.uuid !== selectedPatternUuid
     );
     removePattern(selectedPatternUuid);
@@ -74,7 +74,7 @@ export default function PatternEditor() {
   const loadTemplate = (templateFunction) => {
     setChangesSaved(false);
     const template = templateFunction();
-    let patternsToUpdate = [...patterns];
+    let patternsToUpdate = structuredClone(patterns);
     patternsToUpdate.push(template);
     setPatterns(patternsToUpdate);
 
@@ -87,7 +87,7 @@ export default function PatternEditor() {
       return;
     }
 
-    let updatedPatterns = [...patterns];
+    let updatedPatterns = structuredClone(patterns);
     let patternToUpdate = updatedPatterns.find(
       (up) => up?.uuid === selectedPatternUuid
     );
@@ -119,7 +119,7 @@ export default function PatternEditor() {
             },
             onAdd: () => {
               setChangesSaved(false);
-              let updatedPatterns = [...patterns];
+              let updatedPatterns = structuredClone(patterns);
               const placeHolder = getPatternPlaceHolder();
               updatedPatterns.push(placeHolder);
               setPatterns(updatedPatterns);

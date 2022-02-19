@@ -22,7 +22,7 @@ export default function PatternTimelineSection(props) {
       return;
     }
 
-    let updatedAnimations = [...animations];
+    let updatedAnimations = structuredClone(animations);
     let updatedAnimation = updatedAnimations.find(
       (a) => a.uuid === selectedAnimationUuid
     );

@@ -5,9 +5,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import AddIcon from "@material-ui/icons/Add";
 import { getPointsPlaceHolder } from "services/shared/points";
 
-export default function PointsForm(props) {
-  const { item, onChange } = props;
-
+export default function PointsForm({ item, onChange }) {
   const onPointUpdate = (pointUuid, property, value) => {
     if (typeof property !== "string") {
       return;
@@ -19,7 +17,7 @@ export default function PointsForm(props) {
       return;
     }
 
-    let points = [...item?.points];
+    let points = structuredClone(item?.points);
     let pointToUpdate = points.find((p) => p?.uuid === pointUuid);
 
     pointToUpdate[property] = value;
@@ -27,13 +25,13 @@ export default function PointsForm(props) {
   };
 
   const addPoint = () => {
-    let points = [...item?.points];
+    let points = structuredClone(item?.points);
     points.push(getPointsPlaceHolder(item.uuid));
     onChange(points);
   };
 
   const deletePoint = (uuid) => {
-    let points = [...item?.points];
+    let points = structuredClone(item?.points);
     const index = points.findIndex((p) => p.uuid === uuid);
     if (index === -1) {
       return;
@@ -57,9 +55,7 @@ export default function PointsForm(props) {
             type="number"
             label="X"
             defaultValue={point.x}
-            onChange={(e) =>
-              onPointUpdate(point.uuid, "x", Number(e.target.value))
-            }
+            onChange={(e) => onPointUpdate(point.uuid, "x", e.target.value)}
           />
           <TextField
             name={`y${index}`}
@@ -69,9 +65,7 @@ export default function PointsForm(props) {
             type="number"
             label="Y"
             defaultValue={point.y}
-            onChange={(e) =>
-              onPointUpdate(point.uuid, "y", Number(e.target.value))
-            }
+            onChange={(e) => onPointUpdate(point.uuid, "y", e.target.value)}
           />
           <TextField
             name={`r${index}`}
@@ -82,11 +76,7 @@ export default function PointsForm(props) {
             label="R"
             defaultValue={point?.redLaserPowerPwm}
             onChange={(e) =>
-              onPointUpdate(
-                point.uuid,
-                "redLaserPowerPwm",
-                Number(e.target.value)
-              )
+              onPointUpdate(point.uuid, "redLaserPowerPwm", e.target.value)
             }
           />
           <TextField
@@ -98,11 +88,7 @@ export default function PointsForm(props) {
             label="G"
             defaultValue={point?.greenLaserPowerPwm}
             onChange={(e) =>
-              onPointUpdate(
-                point.uuid,
-                "greenLaserPowerPwm",
-                Number(e.target.value)
-              )
+              onPointUpdate(point.uuid, "greenLaserPowerPwm", e.target.value)
             }
           />
           <TextField
@@ -114,11 +100,7 @@ export default function PointsForm(props) {
             label="B"
             defaultValue={point?.blueLaserPowerPwm}
             onChange={(e) =>
-              onPointUpdate(
-                point.uuid,
-                "blueLaserPowerPwm",
-                Number(e.target.value)
-              )
+              onPointUpdate(point.uuid, "blueLaserPowerPwm", e.target.value)
             }
           />
           <Button

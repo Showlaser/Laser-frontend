@@ -36,7 +36,7 @@ export const getPatternAnimationPlaceholder = (
     uuid: p.uuid,
     patternAnimationSettingsUuid: settingsUuid,
     x: p.x,
-    y: p.x,
+    y: p.y,
     redLaserPowerPwm: 6,
     greenLaserPowerPwm: 0,
     blueLaserPowerPwm: 0,
