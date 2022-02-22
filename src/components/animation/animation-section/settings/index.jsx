@@ -1,9 +1,10 @@
 import {
-  Button,
+  Divider,
   IconButton,
   MenuItem,
   Select,
   TextField,
+  Tooltip,
 } from "@material-ui/core";
 import PointsForm from "components/shared/point-form";
 import { useEffect } from "react";
@@ -33,12 +34,12 @@ export default function AnimationSettings({
       <TextField
         defaultValue={selectedPatternAnimation?.startTimeOffset}
         label="Start time ms"
+        type="number"
         onChange={(e) => {
           if (e.target.value >= 0) {
-            updatePatternAnimation("startTimeOffset", e.target.value);
+            updatePatternAnimation("startTimeOffset", Number(e.target.value));
           }
         }}
-        type="number"
       />
       <br />
       <label>Duration time ms</label>
@@ -56,7 +57,11 @@ export default function AnimationSettings({
         <MenuItem value={2}>2</MenuItem>
       </Select>
       <br />
-      <Button onClick={deletePatternAnimation}>Delete pattern animation</Button>
+      <Tooltip title="Delete pattern animation">
+        <IconButton onClick={deletePatternAnimation}>
+          <DeleteIcon />
+        </IconButton>
+      </Tooltip>
       <hr />
       <label>Animation points</label>
       <br />
@@ -64,7 +69,9 @@ export default function AnimationSettings({
         value={selectedSetting?.scale}
         label="Scale"
         type="number"
-        onChange={(e) => updateAnimationSetting("scale", e.target.value)}
+        onChange={(e) =>
+          updateAnimationSetting("scale", Number(e.target.value))
+        }
         inputProps={{
           step: "0.1",
           min: 0.1,
@@ -79,8 +86,10 @@ export default function AnimationSettings({
           min: -4000,
           max: 4000,
         }}
-        value={selectedSetting?.centerX}
-        onChange={(e) => updateAnimationSetting("centerX", e.target.value)}
+        value={selectedSetting?.centerX ?? 0}
+        onChange={(e) =>
+          updateAnimationSetting("centerX", Number(e.target.value))
+        }
       />
       <TextField
         label="Center y"
@@ -89,8 +98,22 @@ export default function AnimationSettings({
           min: -4000,
           max: 4000,
         }}
-        value={selectedSetting?.centerY}
-        onChange={(e) => updateAnimationSetting("centerY", e.target.value)}
+        value={selectedSetting?.centerY ?? 0}
+        onChange={(e) =>
+          updateAnimationSetting("centerY", Number(e.target.value))
+        }
+      />
+      <TextField
+        label="Rotation °"
+        type="number"
+        value={selectedSetting?.rotation ?? 0}
+        onChange={(e) =>
+          updateAnimationSetting("rotation", Number(e.target.value))
+        }
+        inputProps={{
+          min: 0,
+          max: 360,
+        }}
       />
       <br />
       <IconButton
@@ -99,29 +122,35 @@ export default function AnimationSettings({
       >
         <AddIcon />
       </IconButton>
-      <IconButton
+      <span
         disabled={
           selectedSetting === undefined ||
           selectedPatternAnimation?.animationSettings?.length === 1
         }
-        onClick={() => {
-          let settings = structuredClone(
-            selectedPatternAnimation?.animationSettings
-          );
-          const index = settings.findIndex(
-            (s) => s.uuid === selectedSetting.uuid
-          );
-          if (index === -1) {
-            return;
-          }
-
-          settings.splice(index, 1);
-          updatePatternAnimation("animationSettings", settings);
-        }}
       >
-        <DeleteIcon />
-      </IconButton>
+        <Tooltip title="Delete current setting">
+          <IconButton
+            onClick={() => {
+              let settings = structuredClone(
+                selectedPatternAnimation?.animationSettings
+              );
+              const index = settings.findIndex(
+                (s) => s.uuid === selectedSetting.uuid
+              );
+              if (index === -1) {
+                return;
+              }
+
+              settings.splice(index, 1);
+              updatePatternAnimation("animationSettings", settings);
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      </span>
       <br />
+      <Divider />
       <PointsForm
         namePlaceHolder="Animation name"
         item={selectedSetting}

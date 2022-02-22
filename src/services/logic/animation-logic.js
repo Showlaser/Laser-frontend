@@ -62,7 +62,7 @@ export const getPatternAnimationPlaceholder = (
         points
       ),
     ],
-    timelineId: 0,
+    timeLineId: 0,
   };
 };
 

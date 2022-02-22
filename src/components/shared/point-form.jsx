@@ -55,7 +55,9 @@ export default function PointsForm({ item, onChange }) {
             type="number"
             label="X"
             defaultValue={point.x}
-            onChange={(e) => onPointUpdate(point.uuid, "x", e.target.value)}
+            onChange={(e) =>
+              onPointUpdate(point.uuid, "x", Number(e.target.value))
+            }
           />
           <TextField
             name={`y${index}`}
@@ -65,7 +67,9 @@ export default function PointsForm({ item, onChange }) {
             type="number"
             label="Y"
             defaultValue={point.y}
-            onChange={(e) => onPointUpdate(point.uuid, "y", e.target.value)}
+            onChange={(e) =>
+              onPointUpdate(point.uuid, "y", Number(e.target.value))
+            }
           />
           <TextField
             name={`r${index}`}
@@ -76,7 +80,11 @@ export default function PointsForm({ item, onChange }) {
             label="R"
             defaultValue={point?.redLaserPowerPwm}
             onChange={(e) =>
-              onPointUpdate(point.uuid, "redLaserPowerPwm", e.target.value)
+              onPointUpdate(
+                point.uuid,
+                "redLaserPowerPwm",
+                Number(e.target.value)
+              )
             }
           />
           <TextField
@@ -88,7 +96,11 @@ export default function PointsForm({ item, onChange }) {
             label="G"
             defaultValue={point?.greenLaserPowerPwm}
             onChange={(e) =>
-              onPointUpdate(point.uuid, "greenLaserPowerPwm", e.target.value)
+              onPointUpdate(
+                point.uuid,
+                "greenLaserPowerPwm",
+                Number(e.target.value)
+              )
             }
           />
           <TextField
@@ -100,7 +112,11 @@ export default function PointsForm({ item, onChange }) {
             label="B"
             defaultValue={point?.blueLaserPowerPwm}
             onChange={(e) =>
-              onPointUpdate(point.uuid, "blueLaserPowerPwm", e.target.value)
+              onPointUpdate(
+                point.uuid,
+                "blueLaserPowerPwm",
+                Number(e.target.value)
+              )
             }
           />
           <Button

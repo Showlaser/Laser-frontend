@@ -25,7 +25,7 @@ export default function AnimationSection({
   });
 
   const closeModal = () => {
-    let modal = structuredClone(modalOptions);
+    let modal = modalOptions;
     modal.show = false;
     setModalOptions(modal);
     forceUpdate();
@@ -98,6 +98,11 @@ export default function AnimationSection({
 
     animationToUpdate.patternAnimations.splice(indexToDelete, 1);
     setAnimations(animationsToUpdate);
+
+    let modal = modalOptions;
+    modal.show = false;
+    setModalOptions(modal);
+    forceUpdate();
   };
 
   const updatePatternAnimation = (property, value) => {
@@ -133,8 +138,8 @@ export default function AnimationSection({
             deletePatternAnimation();
             closeModal();
           };
-          forceUpdate();
           setModalOptions(modal);
+          forceUpdate();
         }}
       />
       <AnimationTimeline
@@ -142,7 +147,14 @@ export default function AnimationSection({
         setTimeLineCurrentMs={setTimeLineCurrentMs}
         patternAnimationSettings={selectedPatternAnimation.animationSettings}
       />
-      <PointsDrawer points={selectedSetting?.points} />
+      <PointsDrawer
+        options={{
+          rotation: selectedSetting.rotation,
+          centerX: selectedSetting.centerX,
+          centerY: selectedSetting.centerY,
+        }}
+        points={selectedSetting?.points}
+      />
     </div>
   ) : null;
 }

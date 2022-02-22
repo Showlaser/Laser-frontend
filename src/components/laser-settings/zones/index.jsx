@@ -101,7 +101,7 @@ export default function Zones(props) {
           type="number"
           label="X"
           value={point.x}
-          onChange={(e) => updateZone(index, e.target.value, "x")}
+          onChange={(e) => updateZone(index, Number(e.target.value), "x")}
         />
         <TextField
           name={`y${index}`}
@@ -111,7 +111,7 @@ export default function Zones(props) {
           type="number"
           label="Y"
           value={point.y}
-          onChange={(e) => updateZone(index, e.target.value, "y")}
+          onChange={(e) => updateZone(index, Number(e.target.value), "y")}
         />
       </div>
     ));

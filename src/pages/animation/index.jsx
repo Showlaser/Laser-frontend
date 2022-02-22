@@ -22,8 +22,12 @@ export default function AnimationEditor() {
   useEffect(() => {
     getAnimations().then((a) => {
       setAnimations(a);
-      const uuid = a.at(0)?.uuid ?? emptyGuid();
-      setSelectedAnimationUuid(uuid);
+      const animationUuid = a.at(0)?.uuid ?? emptyGuid();
+      setSelectedAnimationUuid(animationUuid);
+
+      const patternAnimationUuid =
+        a.at(0)?.patternAnimations.at(0)?.uuid ?? emptyGuid();
+      setSelectedPatternAnimationUuid(patternAnimationUuid);
     });
     getPatterns().then((p) => setPatterns(p));
   }, []);

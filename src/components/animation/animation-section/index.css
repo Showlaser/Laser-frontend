@@ -7,6 +7,7 @@
 #animation-settings {
   border: whitesmoke solid 1px;
   width: 30vh;
+  min-width: 500px;
   height: 50vh;
   padding-top: 25px;
   overflow-y: scroll;
@@ -14,7 +15,7 @@
 
 #animation-timeline {
   border: whitesmoke solid 1px;
-  width: 100%;
+  min-width: 600px;
   height: 100%;
   padding: 6px 20px 15px 20px;
 }

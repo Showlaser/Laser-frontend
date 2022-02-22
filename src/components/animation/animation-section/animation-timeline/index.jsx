@@ -1,4 +1,4 @@
-import { ButtonGroup, Slider, IconButton, Tooltip } from "@material-ui/core";
+import { Slider, IconButton, Tooltip } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import RemoveIcon from "@material-ui/icons/Remove";
 import AddIcon from "@material-ui/icons/Add";
@@ -70,14 +70,12 @@ export default function AnimationTimeline(props) {
         min={sliderMinValue}
         max={sliderMaxValue}
       />
-      <ButtonGroup size="small" style={{ width: "120px", marginLeft: "25px" }}>
-        <IconButton onClick={() => onScaleSliderChange(0)}>
-          <RemoveIcon />
-        </IconButton>
-        <IconButton onClick={() => onScaleSliderChange(1)}>
-          <AddIcon />
-        </IconButton>
-      </ButtonGroup>
+      <IconButton onClick={() => onScaleSliderChange(0)}>
+        <RemoveIcon />
+      </IconButton>
+      <IconButton onClick={() => onScaleSliderChange(1)}>
+        <AddIcon />
+      </IconButton>
       <div id="animation-timeline-markers">
         {settingsWithinRange?.map((s, index) => (
           <Tooltip key={s?.uuid} className="marker" title={s?.startTime}>
@@ -85,7 +83,7 @@ export default function AnimationTimeline(props) {
               onClick={() => setTimeLineCurrentMs(s?.startTime)}
               key={`${s?.uuid}${index}`}
               style={{
-                marginLeft: `${(s?.startTime - sliderMinValue) / 1.4}%`,
+                marginLeft: `${(s?.startTime - sliderMinValue) * 5.5}px`,
               }}
             >
               &#11044;

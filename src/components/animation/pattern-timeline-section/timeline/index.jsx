@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import TimeLineChannel from "./timeline-channel";
 
 export default function Timeline({

@@ -24,6 +24,10 @@ export default function AnimationOptions({
   const [, updateState] = useState();
   const forceUpdate = useCallback(() => updateState({}), []);
 
+  const selectedAnimation = animations?.find(
+    (a) => a?.uuid === selectedAnimationUuid
+  );
+
   const closeModal = () => {
     let modal = modalOptions;
     modal.show = false;
@@ -94,6 +98,7 @@ export default function AnimationOptions({
       <br />
       <Divider />
       <TextField
+        value={selectedAnimation?.name ?? "No name"}
         required
         label="Animation name"
         onChange={(e) => updateAnimationProperty("name", e.target.value)}
