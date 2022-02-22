@@ -4,10 +4,22 @@ import "./index.css";
 import Timeline from "./timeline";
 import { getPatternAnimationPlaceholder } from "services/logic/animation-logic";
 
-export default function PatternTimelineSection(props) {
-  const { patternAnimations, animations, selectedAnimationUuid } = props;
-
-  useEffect(() => [props]);
+export default function PatternTimelineSection({
+  animations,
+  patternAnimations,
+  selectedPatternAnimationUuid,
+  selectedAnimationUuid,
+  setAnimations,
+  onPatternAnimationSelect,
+}) {
+  useEffect(() => [
+    animations,
+    patternAnimations,
+    selectedPatternAnimationUuid,
+    selectedAnimationUuid,
+    setAnimations,
+    onPatternAnimationSelect,
+  ]);
 
   const selectedAnimation = animations.find(
     (a) => a.uuid === selectedAnimationUuid
@@ -32,9 +44,8 @@ export default function PatternTimelineSection(props) {
       updatedAnimation
     );
     updatedAnimation?.patternAnimations?.push(placeholder);
-    props.onPatternAnimationSelect(placeholder.uuid);
-
-    props?.setAnimations(updatedAnimations);
+    onPatternAnimationSelect(placeholder.uuid);
+    setAnimations(updatedAnimations);
   };
 
   return (
@@ -47,7 +58,7 @@ export default function PatternTimelineSection(props) {
       </div>
       <div id="timeline">
         <Timeline
-          onTimelineChannelItemClick={props.onPatternAnimationSelect}
+          onTimelineChannelItemClick={onPatternAnimationSelect}
           patternsInTimeline={selectedAnimation?.patternAnimations}
         />
       </div>

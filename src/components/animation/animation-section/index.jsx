@@ -28,6 +28,7 @@ export default function AnimationSection({
     let modal = structuredClone(modalOptions);
     modal.show = false;
     setModalOptions(modal);
+    forceUpdate();
   };
 
   useEffect(() => [
@@ -39,9 +40,9 @@ export default function AnimationSection({
   const selectedPatternAnimation =
     animations !== undefined
       ? animations
-          .find((ua) => ua.uuid === selectedAnimationUuid)
-          .patternAnimations.find(
-            (pa) => pa.uuid === selectedPatternAnimationUuid
+          ?.find((ua) => ua?.uuid === selectedAnimationUuid)
+          ?.patternAnimations?.find(
+            (pa) => pa?.uuid === selectedPatternAnimationUuid
           )
       : undefined;
 
@@ -71,6 +72,7 @@ export default function AnimationSection({
       let setting = structuredClone(selectedPattern?.animationSettings?.at(0));
       setting.uuid = createGuid();
       setting.startTime = timeLineCurrentMs;
+      setting.points.forEach((point) => (point.uuid = createGuid()));
 
       selectedPattern.animationSettings.push(setting);
       setAnimations(updatedAnimations);

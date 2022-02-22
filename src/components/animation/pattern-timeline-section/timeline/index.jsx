@@ -1,7 +1,10 @@
+import { useEffect } from "react";
 import TimeLineChannel from "./timeline-channel";
 
-export default function Timeline(props) {
-  const { patternsInTimeline } = props;
+export default function Timeline({
+  patternsInTimeline,
+  onTimelineChannelItemClick,
+}) {
   const timelines = [
     {
       index: 0,
@@ -19,9 +22,9 @@ export default function Timeline(props) {
       {timelines?.map((timeline, index) => (
         <TimeLineChannel
           animationPatternsInTimeline={patternsInTimeline?.filter(
-            (p) => p.timelineId === index
+            (p) => p.timeLineId === index
           )}
-          onTimelineChannelItemClick={props.onTimelineChannelItemClick}
+          onTimelineChannelItemClick={onTimelineChannelItemClick}
           key={index + "timelinechannel"}
           timeline={timeline}
         />

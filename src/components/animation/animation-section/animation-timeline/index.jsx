@@ -80,7 +80,7 @@ export default function AnimationTimeline(props) {
       </ButtonGroup>
       <div id="animation-timeline-markers">
         {settingsWithinRange?.map((s, index) => (
-          <Tooltip className="marker" title={s?.startTime}>
+          <Tooltip key={s?.uuid} className="marker" title={s?.startTime}>
             <span
               onClick={() => setTimeLineCurrentMs(s?.startTime)}
               key={`${s?.uuid}${index}`}

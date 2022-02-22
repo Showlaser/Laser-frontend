@@ -33,7 +33,7 @@ export const getPatternAnimationPlaceholder = (
   const patternAnimationUuid = createGuid();
   const settingsUuid = createGuid();
   const points = selectedPattern?.points?.map((p) => ({
-    uuid: p.uuid,
+    uuid: createGuid(),
     patternAnimationSettingsUuid: settingsUuid,
     x: p.x,
     y: p.y,

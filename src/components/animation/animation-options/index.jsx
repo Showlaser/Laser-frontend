@@ -1,26 +1,28 @@
 import { Divider, TextField } from "@material-ui/core";
+import Modal from "components/modal";
 import CrudComponent from "components/shared/crud-component";
-import { useState, React } from "react";
+import { useState, React, useCallback } from "react";
 import { removeAnimation, saveAnimation } from "services/logic/animation-logic";
 import { createGuid } from "services/shared/math";
 import "./index.css";
 
-export default function AnimationOptions(props) {
-  const {
-    animations,
-    selectedAnimationUuid,
-    changesSaved,
-    updateAnimationProperty,
-    setSelectedAnimationUuid,
-    setChangesSaved,
-    setAnimations,
-  } = props;
+export default function AnimationOptions({
+  animations,
+  selectedAnimationUuid,
+  changesSaved,
+  updateAnimationProperty,
+  setSelectedAnimationUuid,
+  setChangesSaved,
+  setAnimations,
+}) {
   const [modalOptions, setModalOptions] = useState({
     title: "Delete pattern?",
     show: false,
     onOkClick: null,
     onCancelClick: () => closeModal(),
   });
+  const [, updateState] = useState();
+  const forceUpdate = useCallback(() => updateState({}), []);
 
   const closeModal = () => {
     let modal = modalOptions;
@@ -29,16 +31,20 @@ export default function AnimationOptions(props) {
   };
 
   const deleteAnimation = () => {
-    let updatedAnimations = animations;
-    const animationUuid = updatedAnimations[selectedAnimationUuid]?.uuid;
+    let updatedAnimations = structuredClone(animations);
+    const animationUuid = updatedAnimations?.find(
+      (a) => a.uuid === selectedAnimationUuid
+    )?.uuid;
     updatedAnimations.splice(selectedAnimationUuid, 1);
     removeAnimation(animationUuid);
+    setAnimations(updatedAnimations);
 
-    props?.setSelectedAnimationId(updatedAnimations.length - 1);
+    setSelectedAnimationUuid(updatedAnimations.length - 1);
   };
 
   return (
     <div id="animation-options">
+      <Modal modal={modalOptions} />
       <CrudComponent
         selectOptions={{
           selectText: "Select animation",
@@ -51,7 +57,11 @@ export default function AnimationOptions(props) {
         actions={{
           onSave: () => {
             setChangesSaved(true);
-            saveAnimation(animations[selectedAnimationUuid]);
+            saveAnimation(
+              animations.find(
+                (animation) => animation.uuid === selectedAnimationUuid
+              )
+            );
           },
           onAdd: () => {
             setChangesSaved(false);
@@ -75,6 +85,7 @@ export default function AnimationOptions(props) {
               closeModal();
             };
             setModalOptions(modal);
+            forceUpdate();
             setChangesSaved(false);
           },
         }}
@@ -83,6 +94,7 @@ export default function AnimationOptions(props) {
       <br />
       <Divider />
       <TextField
+        required
         label="Animation name"
         onChange={(e) => updateAnimationProperty("name", e.target.value)}
       />

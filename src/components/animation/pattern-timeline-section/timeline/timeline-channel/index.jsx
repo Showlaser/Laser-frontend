@@ -1,11 +1,10 @@
-import { useEffect } from "react";
 import "./index.css";
 
-export default function TimeLineChannel(props) {
-  const { timeline, animationPatternsInTimeline } = props;
-
-  useEffect(() => [props]);
-
+export default function TimeLineChannel({
+  timeline,
+  animationPatternsInTimeline,
+  onTimelineChannelItemClick,
+}) {
   return (
     <div className="timeline-channel">
       <div className="timeline-identifier">
@@ -22,7 +21,7 @@ export default function TimeLineChannel(props) {
             }}
             key={animationPattern?.uuid + "timeline"}
             onClick={() => {
-              props.onTimelineChannelItemClick(animationPattern.uuid);
+              onTimelineChannelItemClick(animationPattern.uuid);
             }}
             className="timeline-channel-item"
           >

@@ -14,14 +14,18 @@ export default function AnimationEditor() {
     emptyGuid()
   );
   const [selectedPatternAnimationUuid, setSelectedPatternAnimationUuid] =
-    useState(emptyGuid());
+    useState();
   const [animations, setAnimations] = useState([]);
   const [patterns, setPatterns] = useState([]);
   const [changesSaved, setChangesSaved] = useState(true);
 
   useEffect(() => {
-    getAnimations().then((value) => setAnimations(value));
-    getPatterns().then((value) => setPatterns(value));
+    getAnimations().then((a) => {
+      setAnimations(a);
+      const uuid = a.at(0)?.uuid ?? emptyGuid();
+      setSelectedAnimationUuid(uuid);
+    });
+    getPatterns().then((p) => setPatterns(p));
   }, []);
 
   const sideNavSettings = {

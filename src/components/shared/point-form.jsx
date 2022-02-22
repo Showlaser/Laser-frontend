@@ -44,7 +44,7 @@ export default function PointsForm({ item, onChange }) {
   return (
     <div key={"form" + item?.uuid + item?.points[0]?.uuid}>
       {item?.points?.map((point, index) => (
-        <div>
+        <div key={point?.uuid}>
           <small>Point {index}</small>
           <br />
           <TextField
