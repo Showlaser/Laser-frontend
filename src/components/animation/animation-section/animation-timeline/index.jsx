@@ -1,8 +1,8 @@
-import { Slider, IconButton, Tooltip } from "@material-ui/core";
+import { IconButton, Slider, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
-import RemoveIcon from "@material-ui/icons/Remove";
-import AddIcon from "@material-ui/icons/Add";
 import { numberIsBetweenOrEqual } from "services/shared/math";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 export default function AnimationTimeline(props) {
   const [sliderMaxValue, setSliderMaxValue] = useState(100);

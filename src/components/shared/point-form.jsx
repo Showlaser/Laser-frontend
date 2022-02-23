@@ -1,9 +1,9 @@
 import { valueIsWithinBoundaries } from "services/shared/math";
 import { showError, toastSubject } from "services/shared/toast-messages";
-import { Button, TextField } from "@material-ui/core";
-import DeleteIcon from "@material-ui/icons/Delete";
-import AddIcon from "@material-ui/icons/Add";
 import { getPointsPlaceHolder } from "services/shared/points";
+import { Button, IconButton, TextField } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 
 export default function PointsForm({ item, onChange }) {
   const onPointUpdate = (pointUuid, property, value) => {
@@ -119,23 +119,23 @@ export default function PointsForm({ item, onChange }) {
               )
             }
           />
-          <Button
+          <IconButton
             key={"delete" + item.uuid + index}
             onClick={() => deletePoint(point.uuid)}
             style={{ marginTop: "15px" }}
             size="small"
-            color="secondary"
+            color="error"
             startIcon={<DeleteIcon />}
-          />
+          >
+            <DeleteIcon />
+          </IconButton>
         </div>
       ))}
       <Button
         disabled={item === undefined}
         onClick={() => addPoint()}
-        style={{ marginTop: "5px", width: "225px" }}
+        style={{ margin: "10px", width: "360px" }}
         size="small"
-        color="primary"
-        variant="contained"
         startIcon={<AddIcon />}
       >
         Add point

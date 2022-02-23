@@ -1,23 +1,23 @@
-import {
-  Box,
-  Button,
-  Divider,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-} from "@material-ui/core";
-import Slider from "@material-ui/core/Slider";
 import React, { useEffect } from "react";
 import {
   convertToMilliWatts,
   mapNumber,
   valueIsWithinBoundaries,
 } from "services/shared/math";
-import DeleteIcon from "@material-ui/icons/Delete";
-import AddIcon from "@material-ui/icons/Add";
 import "./index.css";
 import { showError, toastSubject } from "services/shared/toast-messages";
+import {
+  Button,
+  Divider,
+  InputLabel,
+  MenuItem,
+  Select,
+  Slider,
+  TextField,
+} from "@mui/material";
+import { Box } from "@mui/system";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function Zones(props) {
   const [selectedZone, setSelectedZone] = React.useState(0);

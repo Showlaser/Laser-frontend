@@ -1,4 +1,3 @@
-import { Divider, TextField } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react";
 import { emptyGuid } from "services/shared/math";
 import SideNav from "components/sidenav";
@@ -15,6 +14,8 @@ import CrudComponent from "components/shared/crud-component";
 import PointsForm from "components/shared/point-form";
 import { stringIsEmpty } from "services/shared/general";
 import PointsDrawer from "components/shared/points-drawer";
+import SendIcon from "@mui/icons-material/Send";
+import { Button, Divider, TextField } from "@mui/material";
 
 export default function PatternEditor() {
   const [selectedPatternUuid, setSelectedPatternAnimationUuid] = useState(
@@ -143,7 +144,11 @@ export default function PatternEditor() {
             ],
           }}
           changesSaved={changesSaved}
-        />
+        >
+          <Button variant="outlined" startIcon={<SendIcon />}>
+            Run
+          </Button>
+        </CrudComponent>
         <Divider style={{ marginTop: "5px" }} />
         <TextField
           label="Pattern name"

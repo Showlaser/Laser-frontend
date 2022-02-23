@@ -1,9 +1,9 @@
-import { Button, Divider, makeStyles } from "@material-ui/core";
 import SideNav from "components/sidenav";
 import React, { useState } from "react";
 import Zones from "components/laser-settings/zones";
 import LaserNetworkSettings from "components/laser-settings/network-settings";
 import DevelopmentSettings from "components/laser-settings/development-settings";
+import { Button, Divider, makeStyles } from "@mui/material";
 
 export default function LaserSettings() {
   const [laser, setLaser] = useState({
@@ -60,7 +60,6 @@ export default function LaserSettings() {
       <LaserNetworkSettings network={laser?.network} callback={updateLaser} />
       <Divider />
       <Zones zones={laser?.zones} callback={updateLaser} />
-      <Divider />
       <Divider />
       <DevelopmentSettings
         development={laser?.development}

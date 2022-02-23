@@ -1,18 +1,20 @@
+import { List } from "@mui/icons-material";
+import {
+  Button,
+  Divider,
+  Grid,
+  ListItem,
+  ListItemText,
+  Paper,
+} from "@mui/material";
 import SideNav from "components/sidenav";
 import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import Divider from "@material-ui/core/Divider";
 import {
   showInfo,
   showWarning,
   toastSubject,
 } from "services/shared/toast-messages";
+import { makeStyles } from "@mui/styles";
 
 export default function Dashboard() {
   const [laser, setLaser] = useState({});
@@ -66,36 +68,18 @@ export default function Dashboard() {
     pageName: "Dashboard",
   };
 
-  const useStyles = makeStyles((theme) => ({
-    root: {
-      flexGrow: 1,
-    },
-    paper: {
-      padding: theme.spacing(2),
-      textAlign: "left",
-    },
-    statusDot: {
-      fontSize: "130%",
-    },
-  }));
-
-  const classes = useStyles();
-
   const content = (
     <div>
-      <div className={classes.root}>
+      <div>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <Paper className={classes.paper}>
+            <Paper>
               <h1>Laser status</h1>
               <p>
                 {laser?.connected ? (
                   <div>
                     Connected{" "}
-                    <span
-                      className={classes.statusDot}
-                      style={{ color: laser?.connected ? "green" : "red" }}
-                    >
+                    <span style={{ color: laser?.connected ? "green" : "red" }}>
                       {" "}
                       &#x25cf;
                     </span>
@@ -109,16 +93,16 @@ export default function Dashboard() {
             </Paper>
           </Grid>
           <Grid item xs={6}>
-            <Paper className={classes.paper}>
+            <Paper>
               <h1>Laser settings</h1>
               <hr />
               <b>Zones</b>
-              <List className={classes.root}>
+              <List>
                 <p>Total: 2</p>
               </List>
               <Divider />
               <b>Development</b>
-              <List className={classes.root}>
+              <List>
                 <p>
                   Development mode enabled{" "}
                   <span style={{ color: "green", fontSize: "130%" }}>
@@ -130,11 +114,11 @@ export default function Dashboard() {
             </Paper>
           </Grid>
           <Grid item xs={6}>
-            <Paper className={classes.paper}>
+            <Paper>
               <h1>Logs</h1>
               <hr />
               <b>Error</b>
-              <List className={classes.root}>
+              <List>
                 <ListItem>
                   {laser?.logs?.errors?.map((error) => (
                     <ListItemText
@@ -147,7 +131,7 @@ export default function Dashboard() {
               </List>
 
               <b>Warnings</b>
-              <List className={classes.root}>
+              <List>
                 <ListItem>
                   {laser?.logs?.warnings?.map((warning) => (
                     <ListItemText
@@ -164,10 +148,10 @@ export default function Dashboard() {
             </Paper>
           </Grid>
           <Grid item xs={12}>
-            <Paper className={classes.paper}>
+            <Paper>
               <h1>Shows</h1>
               <hr />
-              <List className={classes.root}>
+              <List>
                 <ListItem>
                   <ListItemText primary="Total" secondary="2" />
                 </ListItem>

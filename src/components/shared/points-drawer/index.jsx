@@ -1,4 +1,4 @@
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import { useCallback, useEffect } from "react";
 import { getMappedRgbStringFromPoint } from "services/shared/general";
 import { mapNumber, rotatePoint } from "services/shared/math";

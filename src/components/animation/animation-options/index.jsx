@@ -1,4 +1,4 @@
-import { Divider, TextField } from "@material-ui/core";
+import { Divider, TextField } from "@mui/material";
 import Modal from "components/modal";
 import CrudComponent from "components/shared/crud-component";
 import { useState, React, useCallback } from "react";

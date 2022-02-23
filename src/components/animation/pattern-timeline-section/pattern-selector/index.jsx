@@ -1,5 +1,4 @@
-import { Button, TextField } from "@material-ui/core";
-import { Autocomplete } from "@material-ui/lab";
+import { Autocomplete, Button, TextField } from "@mui/material";
 import { useState } from "react";
 
 export default function PatternSelector(props) {

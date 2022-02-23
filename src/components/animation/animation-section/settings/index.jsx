@@ -1,15 +1,15 @@
 import {
-  Divider,
   IconButton,
   MenuItem,
   Select,
   TextField,
   Tooltip,
-} from "@material-ui/core";
+  Divider,
+} from "@mui/material";
 import PointsForm from "components/shared/point-form";
 import { useEffect } from "react";
-import DeleteIcon from "@material-ui/icons/Delete";
-import AddIcon from "@material-ui/icons/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 
 export default function AnimationSettings({
   updateAnimationSetting,
