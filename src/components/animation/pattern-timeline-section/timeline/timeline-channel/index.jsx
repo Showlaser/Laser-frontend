@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import "./index.css";
 
 export default function TimeLineChannel({
@@ -5,6 +6,8 @@ export default function TimeLineChannel({
   animationPatternsInTimeline,
   onTimelineChannelItemClick,
 }) {
+  useEffect(() => [animationPatternsInTimeline]);
+
   return (
     <div className="timeline-channel">
       <div className="timeline-identifier">

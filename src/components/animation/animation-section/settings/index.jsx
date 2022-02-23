@@ -49,7 +49,7 @@ export default function AnimationSettings({
       Timeline
       <br />
       <Select
-        onChange={(e) => updatePatternAnimation("timelineId", e.target.value)}
+        onChange={(e) => updatePatternAnimation("timeLineId", e.target.value)}
         value={selectedPatternAnimation?.timeLineId ?? 1}
       >
         <MenuItem value={0}>0</MenuItem>
