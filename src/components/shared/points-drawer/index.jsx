@@ -5,7 +5,7 @@ import { mapNumber, rotatePoint } from "services/shared/math";
 import "./index.css";
 
 export default function PointsDrawer({ points, options }) {
-  const { rotation, centerX, centerY } = options;
+  const { rotation, centerX, centerY } = options ?? {};
 
   const drawPattern = useCallback(() => {
     const length = points?.length;
@@ -31,8 +31,8 @@ export default function PointsDrawer({ points, options }) {
 
   const drawDot = (ctx, point) => {
     const clonedPoint = structuredClone(point);
-    clonedPoint.x += centerX;
-    clonedPoint.y += centerY;
+    clonedPoint.x += centerX ?? 0;
+    clonedPoint.y += centerY ?? 0;
 
     point = rotatePoint(clonedPoint, rotation ?? 0);
 

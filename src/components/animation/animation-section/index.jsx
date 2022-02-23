@@ -149,9 +149,9 @@ export default function AnimationSection({
       />
       <PointsDrawer
         options={{
-          rotation: selectedSetting.rotation,
-          centerX: selectedSetting.centerX,
-          centerY: selectedSetting.centerY,
+          rotation: selectedSetting?.rotation ?? 0,
+          centerX: selectedSetting?.centerX ?? 0,
+          centerY: selectedSetting?.centerY ?? 0,
         }}
         points={selectedSetting?.points}
       />
