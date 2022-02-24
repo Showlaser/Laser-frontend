@@ -71,3 +71,7 @@ export const removePattern = (uuid) => {
     toastSubject.changesSaved
   );
 };
+
+export const playPattern = (pattern) => {
+  return sendRequest(() => Post(apiEndpoints.pattern + "play", pattern), []);
+};

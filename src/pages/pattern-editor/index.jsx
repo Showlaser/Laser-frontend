@@ -8,6 +8,7 @@ import {
   getPatternPlaceHolder,
   removePattern,
   savePattern,
+  playPattern,
 } from "services/logic/pattern-logic";
 import DeleteModal from "components/modal";
 import CrudComponent from "components/shared/crud-component";
@@ -25,6 +26,7 @@ export default function PatternEditor() {
   const [, updateState] = useState();
   const forceUpdate = useCallback(() => updateState({}), []);
   const [changesSaved, setChangesSaved] = useState(true);
+  const [patternPlaying, setPatternPlaying] = useState(false);
   const [modalOptions, setModalOptions] = useState({
     title: "Delete pattern?",
     show: false,
@@ -96,6 +98,11 @@ export default function PatternEditor() {
     setPatterns(updatedPatterns);
   };
 
+  const play = () => {
+    setPatternPlaying(true);
+    playPattern(selectedPattern).then(() => setPatternPlaying(false));
+  };
+
   const content = (
     <div id="patterns-wrapper">
       <DeleteModal modal={modalOptions} />
@@ -145,7 +152,12 @@ export default function PatternEditor() {
           }}
           changesSaved={changesSaved}
         >
-          <Button variant="outlined" startIcon={<SendIcon />}>
+          <Button
+            variant="outlined"
+            disabled={patternPlaying}
+            startIcon={<SendIcon />}
+            onClick={play}
+          >
             Run
           </Button>
         </CrudComponent>
