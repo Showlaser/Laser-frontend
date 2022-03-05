@@ -73,5 +73,8 @@ export const removePattern = (uuid) => {
 };
 
 export const playPattern = (pattern) => {
-  return sendRequest(() => Post(apiEndpoints.pattern + "play", pattern), []);
+  return sendRequest(
+    () => Post(apiEndpoints.pattern + "play", pattern, false),
+    []
+  );
 };

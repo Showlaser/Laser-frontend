@@ -1,10 +1,15 @@
-import { Divider, TextField } from "@mui/material";
+import { Button, Divider, TextField } from "@mui/material";
 import Modal from "components/modal";
 import CrudComponent from "components/shared/crud-component";
 import { useState, React, useCallback } from "react";
-import { removeAnimation, saveAnimation } from "services/logic/animation-logic";
+import {
+  playAnimation,
+  removeAnimation,
+  saveAnimation,
+} from "services/logic/animation-logic";
 import { createGuid } from "services/shared/math";
 import "./index.css";
+import SendIcon from "@mui/icons-material/Send";
 
 export default function AnimationOptions({
   animations,
@@ -22,6 +27,7 @@ export default function AnimationOptions({
     onCancelClick: () => closeModal(),
   });
   const [, updateState] = useState();
+  const [animationPlaying, setAnimationPlaying] = useState(false);
   const forceUpdate = useCallback(() => updateState({}), []);
 
   const selectedAnimation = animations?.find(
@@ -44,6 +50,11 @@ export default function AnimationOptions({
     setAnimations(updatedAnimations);
 
     setSelectedAnimationUuid(updatedAnimations.length - 1);
+  };
+
+  const play = () => {
+    setAnimationPlaying(true);
+    playAnimation(selectedAnimation).then(() => setAnimationPlaying(false));
   };
 
   return (
@@ -94,7 +105,16 @@ export default function AnimationOptions({
           },
         }}
         changesSaved={changesSaved}
-      />
+      >
+        <Button
+          variant="outlined"
+          disabled={animationPlaying}
+          startIcon={<SendIcon />}
+          onClick={play}
+        >
+          Run
+        </Button>
+      </CrudComponent>
       <br />
       <Divider />
       <TextField

@@ -14,3 +14,8 @@ export function getMappedRgbStringFromPoint(point) {
     255
   )},${mapNumber(blueLaserPowerPwm, 0, 511, 0, 255)})`;
 }
+
+export function getFormDataObject(event) {
+  const formData = new FormData(event.target);
+  return Object.fromEntries(formData.entries());
+}

@@ -1,10 +1,10 @@
-export const Get = async (endpoint) => {
+export const Get = async (endpoint, getWithCredentials = false) => {
   try {
     return await fetch(endpoint, {
       method: "GET",
       mode: "cors",
       cache: "no-cache",
-      credentials: "same-origin",
+      credentials: getWithCredentials ? "include" : "same-origin",
       redirect: "follow",
       referrerPolicy: "no-referrer",
     });
@@ -13,35 +13,51 @@ export const Get = async (endpoint) => {
   }
 };
 
-export const Post = async (endpoint, data = null) => {
+export const Post = async (
+  endpoint,
+  data = null,
+  postWithCredentials = false
+) => {
   try {
     return await fetch(endpoint, {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "same-origin",
+      headers: postWithCredentials
+        ? {}
+        : {
+            "Content-Type": postWithCredentials
+              ? "multipart/form-data"
+              : "application/json",
+          },
+      credentials: postWithCredentials ? "include" : "same-origin",
       redirect: "follow",
       referrerPolicy: "no-referrer",
-      body: JSON.stringify(data),
+      body: postWithCredentials ? data : JSON.stringify(data),
     });
   } catch (error) {
     return error;
   }
 };
 
-export const Put = async (endpoint, data = null) => {
+export const Put = async (
+  endpoint,
+  data = null,
+  putWithCredentials = false
+) => {
   try {
     return await fetch(endpoint, {
       method: "PUT",
       mode: "cors",
       cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "same-origin",
+      headers: putWithCredentials
+        ? {}
+        : {
+            "Content-Type": putWithCredentials
+              ? "multipart/form-data"
+              : "application/json",
+          },
+      credentials: putWithCredentials ? "include" : "same-origin",
       redirect: "follow",
       referrerPolicy: "no-referrer",
       body: JSON.stringify(data),
@@ -51,13 +67,17 @@ export const Put = async (endpoint, data = null) => {
   }
 };
 
-export const Delete = async (endpoint, data = null) => {
+export const Delete = async (
+  endpoint,
+  data = null,
+  deleteWithCredentials = false
+) => {
   try {
     return await fetch(endpoint, {
       method: "DELETE",
       mode: "cors",
       cache: "no-cache",
-      credentials: "same-origin",
+      credentials: deleteWithCredentials ? "include" : "same-origin",
       redirect: "follow",
       referrerPolicy: "no-referrer",
       body: data,

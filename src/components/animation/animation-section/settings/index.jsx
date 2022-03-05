@@ -17,6 +17,8 @@ export default function AnimationSettings({
   updatePatternAnimation,
   deletePatternAnimation,
   selectedSetting,
+  setTimeLineCurrentMs,
+  timeLineCurrentMs,
 }) {
   useEffect(() => [selectedPatternAnimation, selectedSetting]);
 
@@ -76,6 +78,20 @@ export default function AnimationSettings({
           step: "0.1",
           min: 0.1,
           max: 1,
+        }}
+      />
+      <br />
+      <TextField
+        value={selectedSetting?.startTime}
+        label="StartTime"
+        type="number"
+        onChange={(e) => {
+          //TODO fix bug when changing start time it screws the animation up
+          setTimeLineCurrentMs(Number(e.target.value));
+          updateAnimationSetting("startTime", Number(e.target.value));
+        }}
+        inputProps={{
+          min: 0,
         }}
       />
       <br />

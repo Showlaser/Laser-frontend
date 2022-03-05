@@ -69,7 +69,7 @@ export default function AnimationSection({
       );
 
     if (patternAnimationSettingToUpdate === undefined) {
-      let setting = structuredClone(selectedPattern?.animationSettings?.at(0));
+      let setting = structuredClone(selectedPattern?.animationSettings?.at(-1));
       setting.uuid = createGuid();
       setting.startTime = timeLineCurrentMs;
       setting.points.forEach((point) => (point.uuid = createGuid()));
@@ -127,6 +127,8 @@ export default function AnimationSection({
     <div id="animation-section">
       <Modal modal={modalOptions} />
       <AnimationSettings
+        setTimeLineCurrentMs={setTimeLineCurrentMs}
+        timeLineCurrentMs={timeLineCurrentMs}
         selectedSetting={selectedSetting}
         selectedPatternAnimation={selectedPatternAnimation}
         updateAnimationSetting={updateAnimationSetting}

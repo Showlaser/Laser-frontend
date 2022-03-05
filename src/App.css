@@ -18,6 +18,23 @@ body {
   background: #f1f1f1;
 }
 
+.link-btn {
+  cursor: pointer;
+  background-color: Transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  color: white;
+  text-decoration: none;
+}
+
+.link-btn:hover {
+  transition: ease-in-out 0.3s;
+  transform: scale(1.03);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

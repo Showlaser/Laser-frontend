@@ -11,7 +11,9 @@ export default function AnimationTimeline(props) {
   const { patternAnimationSettings, setTimeLineCurrentMs, timeLineCurrentMs } =
     props;
 
-  useEffect(() => [timeLineCurrentMs]);
+  useEffect(() => {
+    //TODO set range to get between selected value
+  }, [timeLineCurrentMs]);
 
   const settingsWithinRange = patternAnimationSettings?.filter((ast) =>
     numberIsBetweenOrEqual(ast?.startTime, sliderMinValue, sliderMaxValue)
