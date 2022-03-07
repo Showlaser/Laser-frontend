@@ -13,7 +13,7 @@ export default function PointsForm({ item, onChange }) {
 
     const propertyIsXOrYAxle = property === "x" || property === "y";
     if (propertyIsXOrYAxle && !valueIsWithinBoundaries(value, -4000, 4000)) {
-      showError(toastSubject.boundaryError);
+      showError(toastSubject.pointsBoundaryError);
       return;
     }
 

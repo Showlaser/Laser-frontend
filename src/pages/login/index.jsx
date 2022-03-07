@@ -1,12 +1,24 @@
 import { Button, Divider, FormControl, Grid, TextField } from "@mui/material";
 import { login } from "services/logic/login-logic";
+import { getFormDataObject } from "services/shared/general";
 import routerPaths from "services/shared/router-paths";
+import Cookies from "universal-cookie";
 
 export default function Login() {
   const onSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    login(formData);
+    const json = new getFormDataObject(e);
+    login(json).then((r) => {
+      if (r.status === 200) {
+        const cookie = new Cookies();
+        cookie.set("LoggedIn", true, {
+          path: "/",
+          sameSite: true,
+        });
+
+        window.location = routerPaths.Root;
+      }
+    });
   };
 
   return (

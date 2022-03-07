@@ -84,7 +84,7 @@ export const getPatternAnimationSettingsPlaceholder = (
 
 export const playAnimation = (animation) => {
   return sendRequest(
-    () => Post(apiEndpoints.animation + "play", animation, false),
+    () => Post(apiEndpoints.animation + "/play", animation, false),
     []
   );
 };

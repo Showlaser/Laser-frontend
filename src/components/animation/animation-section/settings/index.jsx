@@ -10,6 +10,7 @@ import PointsForm from "components/shared/point-form";
 import { useEffect } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import { showError, toastSubject } from "services/shared/toast-messages";
 
 export default function AnimationSettings({
   updateAnimationSetting,
@@ -18,13 +19,31 @@ export default function AnimationSettings({
   deletePatternAnimation,
   selectedSetting,
   setTimeLineCurrentMs,
-  timeLineCurrentMs,
 }) {
   useEffect(() => [selectedPatternAnimation, selectedSetting]);
 
   const duration =
     selectedPatternAnimation?.animationSettings?.at(-1)?.startTime -
     selectedPatternAnimation?.animationSettings[0]?.startTime;
+
+  const validateStartTime = (startTime) => {
+    const lowerThanStartTime = selectedPatternAnimation.animationSettings
+      .filter((ast) => ast.startTime < selectedSetting.startTime)
+      .sort((a, b) => (a.startTime < b.startTime ? -1 : 1))
+      .reverse();
+
+    const largerThanStartTime = selectedPatternAnimation.animationSettings
+      .filter(
+        (ast) =>
+          ast.startTime > selectedSetting.startTime &&
+          ast.uuid !== selectedSetting.uuid
+      )
+      .sort((a, b) => (a.startTime < b.startTime ? -1 : 1));
+
+    const minValue = lowerThanStartTime.at(0)?.startTime ?? 0;
+    const maxValue = largerThanStartTime.at(0)?.startTime ?? startTime + 5;
+    return startTime > minValue && startTime < maxValue;
+  };
 
   return (
     <div id="animation-settings" key={selectedSetting?.uuid + "settings"}>
@@ -86,9 +105,15 @@ export default function AnimationSettings({
         label="StartTime"
         type="number"
         onChange={(e) => {
-          //TODO fix bug when changing start time it screws the animation up
-          setTimeLineCurrentMs(Number(e.target.value));
-          updateAnimationSetting("startTime", Number(e.target.value));
+          const value = Number(e.target.value);
+          const valueValid = validateStartTime(value);
+          if (!valueValid) {
+            showError(toastSubject.startTimeBoundaryError);
+            return;
+          }
+
+          setTimeLineCurrentMs(value);
+          updateAnimationSetting("startTime", value);
         }}
         inputProps={{
           min: 0,

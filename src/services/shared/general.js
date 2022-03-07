@@ -17,5 +17,9 @@ export function getMappedRgbStringFromPoint(point) {
 
 export function getFormDataObject(event) {
   const formData = new FormData(event.target);
-  return Object.fromEntries(formData.entries());
+  var object = {};
+  formData.forEach(function (value, key) {
+    object[key] = value;
+  });
+  return object;
 }

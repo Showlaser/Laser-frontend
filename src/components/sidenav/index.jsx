@@ -153,7 +153,7 @@ export default function SideNav({ content, settings }) {
               path: paths.LaserSettings,
             },
           ].map((item) => (
-            <Tooltip key={item.title} title={item.title}>
+            <Tooltip placement="right" key={item.title} title={item.title}>
               <ListItem
                 onClick={() => (window.location.href = item.path)}
                 button

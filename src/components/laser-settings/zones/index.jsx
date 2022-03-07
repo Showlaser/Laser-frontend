@@ -78,7 +78,7 @@ export default function Zones(props) {
 
   const updateZone = (index, value, axle) => {
     if (!valueIsWithinBoundaries(value, -4000, 4000)) {
-      showError(toastSubject.boundaryError);
+      showError(toastSubject.pointsBoundaryError);
       return;
     }
 

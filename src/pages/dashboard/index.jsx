@@ -14,7 +14,6 @@ import {
   showWarning,
   toastSubject,
 } from "services/shared/toast-messages";
-import { makeStyles } from "@mui/styles";
 
 export default function Dashboard() {
   const [laser, setLaser] = useState({});
@@ -120,8 +119,9 @@ export default function Dashboard() {
               <b>Error</b>
               <List>
                 <ListItem>
-                  {laser?.logs?.errors?.map((error) => (
+                  {laser?.logs?.errors?.map((error, index) => (
                     <ListItemText
+                      key={`error-${index}`}
                       primary={error?.title}
                       secondary={`${error?.message} ${error?.dateTime}`}
                     />
@@ -133,8 +133,9 @@ export default function Dashboard() {
               <b>Warnings</b>
               <List>
                 <ListItem>
-                  {laser?.logs?.warnings?.map((warning) => (
+                  {laser?.logs?.warnings?.map((warning, index) => (
                     <ListItemText
+                      key={`logs-${index}`}
                       primary={warning?.title}
                       secondary={`${warning?.message} ${warning?.dateTime}`}
                     />
