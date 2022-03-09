@@ -7,6 +7,7 @@
 #pattern-selector {
   border: whitesmoke solid 1px;
   width: 20%;
+  max-width: 200px;
 }
 
 #timeline {

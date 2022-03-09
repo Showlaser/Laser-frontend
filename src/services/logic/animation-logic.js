@@ -37,9 +37,9 @@ export const getPatternAnimationPlaceholder = (
     patternAnimationSettingsUuid: settingsUuid,
     x: p.x,
     y: p.y,
-    redLaserPowerPwm: 6,
-    greenLaserPowerPwm: 0,
-    blueLaserPowerPwm: 0,
+    redLaserPowerPwm: p.redLaserPowerPwm,
+    greenLaserPowerPwm: p.greenLaserPowerPwm,
+    blueLaserPowerPwm: p.blueLaserPowerPwm,
   }));
 
   const lastItemInTimeline = selectedAnimation.patternAnimations
