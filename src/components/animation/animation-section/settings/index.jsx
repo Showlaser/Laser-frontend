@@ -129,9 +129,19 @@ export default function AnimationSettings({
           max: 4000,
         }}
         value={selectedSetting?.centerX ?? 0}
-        onChange={(e) =>
-          updateAnimationSetting("centerX", Number(e.target.value))
-        }
+        onChange={(e) => {
+          const value = Number(e.target.value);
+          if (
+            selectedSetting?.points?.some(
+              (p) => p.x + value > 4000 || p.x + value < -4000
+            )
+          ) {
+            showError(toastSubject.pointsBoundaryError);
+            return;
+          }
+
+          updateAnimationSetting("centerX", value);
+        }}
       />
       <TextField
         label="Center y"
@@ -141,9 +151,19 @@ export default function AnimationSettings({
           max: 4000,
         }}
         value={selectedSetting?.centerY ?? 0}
-        onChange={(e) =>
-          updateAnimationSetting("centerY", Number(e.target.value))
-        }
+        onChange={(e) => {
+          const value = Number(e.target.value);
+          if (
+            selectedSetting?.points?.some(
+              (p) => p.y + value > 4000 || p.y + value < -4000
+            )
+          ) {
+            showError(toastSubject.pointsBoundaryError);
+            return;
+          }
+
+          updateAnimationSetting("centerY", Number(e.target.value));
+        }}
       />
       <TextField
         label="Rotation °"
