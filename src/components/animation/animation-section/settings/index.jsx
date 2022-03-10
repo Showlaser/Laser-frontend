@@ -22,9 +22,10 @@ export default function AnimationSettings({
 }) {
   useEffect(() => [selectedPatternAnimation, selectedSetting]);
 
-  const duration =
+  const duration = Math.abs(
     selectedPatternAnimation?.animationSettings?.at(-1)?.startTime -
-    selectedPatternAnimation?.animationSettings[0]?.startTime;
+      selectedPatternAnimation?.animationSettings[0]?.startTime
+  );
 
   const validateStartTime = (startTime) => {
     const lowerThanStartTime = selectedPatternAnimation.animationSettings
