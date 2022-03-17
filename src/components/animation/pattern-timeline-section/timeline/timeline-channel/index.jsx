@@ -19,7 +19,9 @@ export default function TimeLineChannel({
             style={{
               marginLeft: `${animationPattern?.startTimeOffset}px`,
               width: `${
-                animationPattern?.animationSettings?.at(-1)?.startTime
+                animationPattern?.animationSettings
+                  ?.sort((a, b) => (a.startTime > b.startTime ? 1 : -1))
+                  ?.at(-1)?.startTime
               }px`,
             }}
             key={animationPattern?.uuid + "timeline"}

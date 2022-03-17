@@ -38,6 +38,21 @@ export const rotatePoint = (point, angle) => {
     nx = cos * point.x + sin * point.y,
     ny = cos * point.y - sin * point.x;
 
+  console.log(
+    "x: " +
+      nx +
+      " y: " +
+      ny +
+      " cos: " +
+      cos +
+      " sin: " +
+      sin +
+      " point x: " +
+      point.x +
+      " point y: " +
+      point.y
+  );
+
   point.x = nx;
   point.y = ny;
   return point;
