@@ -32,7 +32,11 @@ export const getPatternAnimationPlaceholder = (
 ) => {
   const patternAnimationUuid = createGuid();
   const settingsUuid = createGuid();
-  const points = selectedPattern?.points?.map((p) => ({
+  selectedPattern.points = selectedPattern?.points?.sort((a, b) =>
+    a.order > b.order ? 1 : -1
+  );
+
+  const points = selectedPattern?.points?.map((p, index) => ({
     uuid: createGuid(),
     patternAnimationSettingsUuid: settingsUuid,
     x: p.x,
@@ -40,6 +44,7 @@ export const getPatternAnimationPlaceholder = (
     redLaserPowerPwm: p.redLaserPowerPwm,
     greenLaserPowerPwm: p.greenLaserPowerPwm,
     blueLaserPowerPwm: p.blueLaserPowerPwm,
+    order: index,
   }));
 
   const lastItemInTimeline = selectedAnimation.patternAnimations

@@ -22,6 +22,12 @@ export default function AnimationSettings({
 }) {
   useEffect(() => [selectedPatternAnimation, selectedSetting]);
 
+  if (selectedSetting !== undefined) {
+    selectedSetting.points = selectedSetting?.points?.sort((a, b) =>
+      a > b ? 1 : -1
+    );
+  }
+
   const duration =
     selectedPatternAnimation?.animationSettings?.at(-1)?.startTime -
     selectedPatternAnimation?.animationSettings[0]?.startTime;

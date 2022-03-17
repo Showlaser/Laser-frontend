@@ -11,6 +11,7 @@ export const getCircleTemplate = () => {
 
   let points = [];
   const uuid = createGuid();
+  let iterations = 0;
 
   for (let i = dotsPerCircle; i > 0; i--) {
     const desiredRadianAngleOnCircle = interval * i;
@@ -24,7 +25,10 @@ export const getCircleTemplate = () => {
       redLaserPowerPwm: 6,
       greenLaserPowerPwm: 0,
       blueLaserPowerPwm: 0,
+      order: iterations,
     });
+
+    iterations++;
   }
 
   return { points, scale: 1, name: "Circle", uuid };
@@ -45,6 +49,7 @@ export const getPatternPlaceHolder = () => {
         redLaserPowerPwm: 6,
         greenLaserPowerPwm: 0,
         blueLaserPowerPwm: 0,
+        order: 0,
       },
     ],
   };

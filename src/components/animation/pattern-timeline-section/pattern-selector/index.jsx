@@ -1,8 +1,7 @@
 import { Autocomplete, Button, TextField } from "@mui/material";
 import { useState } from "react";
 
-export default function PatternSelector(props) {
-  const { options, onPatternSelect } = props;
+export default function PatternSelector({ options, onPatternSelect }) {
   const [selectedPatternName, setSelectedPatternAnimationUuid] = useState();
 
   return options?.length > 0 ? (

@@ -6,6 +6,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 
 export default function PointsForm({ item, onChange }) {
+  if (item === undefined) {
+    return null;
+  }
+
+  item.points = item?.points?.sort((a, b) => (a.order > b.order ? 1 : -1));
+
   const onPointUpdate = (pointUuid, property, value) => {
     if (typeof property !== "string") {
       return;
@@ -26,7 +32,7 @@ export default function PointsForm({ item, onChange }) {
 
   const addPoint = () => {
     let points = structuredClone(item?.points);
-    points.push(getPointsPlaceHolder(item.uuid));
+    points.push(getPointsPlaceHolder(item.uuid, item.points.length));
     onChange(points);
   };
 
