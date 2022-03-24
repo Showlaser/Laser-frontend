@@ -21,6 +21,7 @@ import BrushIcon from "@mui/icons-material/Brush";
 import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import SettingsIcon from "@mui/icons-material/Settings";
 import paths from "services/shared/router-paths";
+import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
 
 const drawerWidth = 240;
 
@@ -146,6 +147,11 @@ export default function SideNav({ content, settings }) {
               title: "Pattern editor",
               icon: <AllInclusiveIcon />,
               path: paths.PatternEditor,
+            },
+            {
+              title: "Vote",
+              icon: <ThumbsUpDownIcon />,
+              path: paths.SpotifyVote,
             },
             {
               title: "Laser settings",

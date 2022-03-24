@@ -54,3 +54,11 @@ body {
     opacity: 1;
   }
 }
+
+.MuiListItemIcon-root > .MuiSvgIcon-root {
+  transition: transform 0.5s ease-in-out !important;
+}
+
+.MuiListItemIcon-root:hover > .MuiSvgIcon-root {
+  transform: rotate(360deg) !important;
+}

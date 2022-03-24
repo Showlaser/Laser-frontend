@@ -69,106 +69,107 @@ export default function Dashboard() {
 
   const content = (
     <div>
-      <div>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Paper>
-              <h1>Laser status</h1>
-              <p>
-                {laser?.connected ? (
-                  <div>
-                    Connected{" "}
-                    <span style={{ color: laser?.connected ? "green" : "red" }}>
-                      {" "}
-                      &#x25cf;
-                    </span>
-                  </div>
-                ) : (
-                  <div>
-                    <span style={{ color: "red" }}> Not connected</span>
-                  </div>
-                )}
-              </p>
-            </Paper>
-          </Grid>
-          <Grid item xs={6}>
-            <Paper>
-              <h1>Laser settings</h1>
-              <hr />
-              <b>Zones</b>
-              <List>
-                <p>Total: 2</p>
-              </List>
-              <Divider />
-              <b>Development</b>
-              <List>
-                <p>
-                  Development mode enabled{" "}
-                  <span style={{ color: "green", fontSize: "130%" }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Paper style={{ padding: "8px" }}>
+            <h1>Laser status</h1>
+            <p>
+              {laser?.connected ? (
+                <div>
+                  Connected{" "}
+                  <span style={{ color: laser?.connected ? "green" : "red" }}>
                     {" "}
                     &#x25cf;
                   </span>
-                </p>
-              </List>
-            </Paper>
-          </Grid>
-          <Grid item xs={6}>
-            <Paper>
-              <h1>Logs</h1>
-              <hr />
-              <b>Error</b>
-              <List>
-                <ListItem>
-                  {laser?.logs?.errors?.map((error, index) => (
-                    <ListItemText
-                      key={`error-${index}`}
-                      primary={error?.title}
-                      secondary={`${error?.message} ${error?.dateTime}`}
-                    />
-                  ))}
-                </ListItem>
-                <Divider component="li" />
-              </List>
-
-              <b>Warnings</b>
-              <List>
-                <ListItem>
-                  {laser?.logs?.warnings?.map((warning, index) => (
-                    <ListItemText
-                      key={`logs-${index}`}
-                      primary={warning?.title}
-                      secondary={`${warning?.message} ${warning?.dateTime}`}
-                    />
-                  ))}
-                </ListItem>
-                <Divider component="li" />
-              </List>
-              <Button variant="text" onClick={() => clearLogs()}>
-                X Clear warnings
-              </Button>
-            </Paper>
-          </Grid>
-          <Grid item xs={12}>
-            <Paper>
-              <h1>Shows</h1>
-              <hr />
-              <List>
-                <ListItem>
-                  <ListItemText primary="Total" secondary="2" />
-                </ListItem>
-                <Divider component="li" />
-                <ListItem>
-                  <ListItemText
-                    primary="Test show"
-                    secondary="21-07-2021 17:00"
-                  />
-                </ListItem>
-                <Divider component="li" />
-              </List>
-            </Paper>
-          </Grid>
+                </div>
+              ) : (
+                <div>
+                  <span style={{ color: "red" }}> Not connected</span>
+                </div>
+              )}
+            </p>
+          </Paper>
         </Grid>
-      </div>
+        <Grid item xs={6}>
+          <Paper style={{ padding: "8px" }}>
+            <h1>Laser settings</h1>
+            <hr />
+            <b>Zones</b>
+            <List>
+              <p>Total: 2</p>
+            </List>
+            <Divider />
+            <b>Development</b>
+            <List>
+              <p>
+                Development mode enabled{" "}
+                <span style={{ color: "green", fontSize: "130%" }}>
+                  {" "}
+                  &#x25cf;
+                </span>
+              </p>
+            </List>
+          </Paper>
+        </Grid>
+        <Grid item xs={6}>
+          <Paper style={{ padding: "8px" }}>
+            <h1>Logs</h1>
+            <hr />
+            <b>Error</b>
+            <br />
+            <List>
+              <ListItem>
+                {laser?.logs?.errors?.map((error, index) => (
+                  <ListItemText
+                    key={`error-${index}`}
+                    primary={error?.title}
+                    secondary={`${error?.message} ${error?.dateTime}`}
+                  />
+                ))}
+              </ListItem>
+              <Divider component="li" />
+            </List>
+            <br />
+            <b>Warnings</b>
+            <br />
+            <List>
+              <ListItem>
+                {laser?.logs?.warnings?.map((warning, index) => (
+                  <ListItemText
+                    key={`logs-${index}`}
+                    primary={warning?.title}
+                    secondary={`${warning?.message} ${warning?.dateTime}`}
+                  />
+                ))}
+              </ListItem>
+              <Divider component="li" />
+            </List>
+            <br />
+            <Button variant="text" onClick={() => clearLogs()}>
+              X Clear warnings
+            </Button>
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper style={{ padding: "8px" }}>
+            <h1>Shows</h1>
+            <hr />
+            <List>
+              <ListItem>
+                <ListItemText primary="Total" secondary="2" />
+              </ListItem>
+              <Divider component="li" />
+              <ListItem>
+                <ListItemText
+                  primary="Test show"
+                  secondary="21-07-2021 17:00"
+                />
+              </ListItem>
+              <Divider component="li" />
+            </List>
+          </Paper>
+        </Grid>
+      </Grid>
     </div>
   );
 

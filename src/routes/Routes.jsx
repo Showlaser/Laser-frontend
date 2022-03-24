@@ -7,6 +7,7 @@ import PatternEditor from "pages/pattern-editor";
 import AnimationEditor from "pages/animation";
 import Installation from "pages/installation";
 import Login from "pages/login";
+import SpotifyVote from "pages/spotify-vote";
 
 function routes() {
   return (
@@ -16,6 +17,7 @@ function routes() {
       <Route exact path={routerPaths.LaserSettings} component={LaserSettings} />
       <Route exact path={routerPaths.PatternEditor} component={PatternEditor} />
       <Route exact path={routerPaths.Installation} component={Installation} />
+      <Route exact path={routerPaths.SpotifyVote} component={SpotifyVote} />
       <Route
         exact
         path={routerPaths.AnimationEditor}
