@@ -14,9 +14,10 @@ export default function SpotifyLogin() {
       return;
     }
 
-    getSpotifyAccessTokens(code).then((d) =>
-      d.text().then((accessToken) => {
-        localStorage.setItem("SpotifyAccessToken", accessToken);
+    getSpotifyAccessTokens(code).then((data) =>
+      data.json().then((tokens) => {
+        localStorage.setItem("SpotifyAccessToken", tokens.access_token);
+        localStorage.setItem("SpotifyRefreshToken", tokens.refresh_token);
         window.location = paths.LaserSettings;
       })
     );
