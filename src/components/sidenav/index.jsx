@@ -22,6 +22,7 @@ import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import SettingsIcon from "@mui/icons-material/Settings";
 import paths from "services/shared/router-paths";
 import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
+import TheatersIcon from "@mui/icons-material/Theaters";
 
 const drawerWidth = 240;
 
@@ -138,6 +139,11 @@ export default function SideNav({ content, settings }) {
         <List>
           {[
             { title: "Dashboard", icon: <DashboardIcon />, path: paths.Root },
+            {
+              title: "Lasershow editor",
+              icon: <TheatersIcon />,
+              path: paths.Lasershow,
+            },
             {
               title: "Animation editor",
               icon: <BrushIcon />,

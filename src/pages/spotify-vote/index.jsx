@@ -4,7 +4,6 @@ import VoteOverView from "components/spotify-vote/vote-overview";
 import VoteSettings from "components/spotify-vote/vote-settings";
 import { useEffect, useState } from "react";
 import {
-  getCurrentDevice,
   getPlayerState,
   getPlaylistSongs,
   getUserPlaylists,

@@ -3,10 +3,10 @@ import "./index.css";
 
 export default function TimeLineChannel({
   timeline,
-  animationPatternsInTimeline,
+  itemsInTimeline,
   onTimelineChannelItemClick,
 }) {
-  useEffect(() => [animationPatternsInTimeline]);
+  useEffect(() => [itemsInTimeline]);
 
   return (
     <div className="timeline-channel">
@@ -14,7 +14,7 @@ export default function TimeLineChannel({
         <p>{timeline?.index}:</p>
       </div>
       <div>
-        {animationPatternsInTimeline?.map((animationPattern) => (
+        {itemsInTimeline?.map((animationPattern) => (
           <div
             style={{
               marginLeft: `${animationPattern?.startTimeOffset}px`,

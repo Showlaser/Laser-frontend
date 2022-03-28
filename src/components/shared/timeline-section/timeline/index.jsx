@@ -1,7 +1,7 @@
 import TimeLineChannel from "./timeline-channel";
 
 export default function Timeline({
-  patternsInTimeline,
+  itemsInTimeline,
   onTimelineChannelItemClick,
 }) {
   const timelines = [
@@ -20,7 +20,7 @@ export default function Timeline({
     <div>
       {timelines?.map((timeline, index) => (
         <TimeLineChannel
-          animationPatternsInTimeline={patternsInTimeline?.filter(
+          itemsInTimeline={itemsInTimeline?.filter(
             (p) => p.timeLineId === index
           )}
           onTimelineChannelItemClick={onTimelineChannelItemClick}

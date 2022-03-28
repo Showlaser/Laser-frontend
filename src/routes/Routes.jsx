@@ -8,12 +8,14 @@ import AnimationEditor from "pages/animation";
 import Installation from "pages/installation";
 import Login from "pages/login";
 import SpotifyVote from "pages/spotify-vote";
+import LaserShow from "pages/lasershow";
 
 function routes() {
   return (
     <BrowserRouter>
       <Route exact path={routerPaths.Login} component={Login} />
       <Route exact path={routerPaths.Root} component={Dashboard} />
+      <Route exact path={routerPaths.Lasershow} component={LaserShow} />
       <Route exact path={routerPaths.LaserSettings} component={LaserSettings} />
       <Route exact path={routerPaths.PatternEditor} component={PatternEditor} />
       <Route exact path={routerPaths.Installation} component={Installation} />

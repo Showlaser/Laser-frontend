@@ -1,10 +1,10 @@
-#pattern-timeline-section {
+#subitem-timeline-section {
   display: flex;
   border: whitesmoke solid 1px;
   margin-top: 20px;
 }
 
-#pattern-selector {
+#subitem-selector {
   border: whitesmoke solid 1px;
   width: 20%;
   max-width: 200px;

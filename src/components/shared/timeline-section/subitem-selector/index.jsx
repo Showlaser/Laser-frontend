@@ -1,15 +1,13 @@
 import { Autocomplete, Button, TextField } from "@mui/material";
 import { useState } from "react";
 
-export default function PatternSelector({ options, onPatternSelect }) {
-  const [selectedPatternName, setSelectedPatternAnimationUuid] = useState();
+export default function SubItemSelector({ options, onSubitemSelect }) {
+  const [selectedSubItemName, setSelectedSubItemName] = useState();
 
   return options?.length > 0 ? (
     <div>
       <Autocomplete
-        onChange={(e, patternName) =>
-          setSelectedPatternAnimationUuid(patternName)
-        }
+        onChange={(e, name) => setSelectedSubItemName(name)}
         options={options}
         renderInput={(params) => (
           <TextField {...params} label="Select pattern" />
@@ -21,13 +19,13 @@ export default function PatternSelector({ options, onPatternSelect }) {
           variant="contained"
           color="primary"
           size="small"
-          onClick={() => onPatternSelect(selectedPatternName)}
+          onClick={() => onSubitemSelect(selectedSubItemName)}
         >
           Place on timeline
         </Button>
       </div>
     </div>
   ) : (
-    <p>No patterns available add them on the patterns page</p>
+    <p>No items available add them</p>
   );
 }

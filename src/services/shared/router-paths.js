@@ -9,6 +9,7 @@ const paths = {
   Register: "/registration",
   ForgotPassword: "/forgot-password",
   SpotifyVote: "/vote",
+  Lasershow: "/lasershow",
 };
 
 export default paths;
