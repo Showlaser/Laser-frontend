@@ -63,9 +63,7 @@ export default function AnimationOptions({
       <CrudComponent
         selectOptions={{
           selectText: "Select animation",
-          onChange: (selectedUuid) => {
-            setSelectedAnimationUuid(selectedUuid);
-          },
+          onChange: setSelectedAnimationUuid,
           selectedValue: selectedAnimationUuid,
         }}
         itemsArray={animations}

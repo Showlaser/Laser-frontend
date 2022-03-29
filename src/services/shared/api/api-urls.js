@@ -12,6 +12,7 @@ const apiEndpoints = {
   grandSpotifyAccess: `${authApiUrl}spotify/grand-access`,
   refreshSpotifyAccessToken: `${authApiUrl}spotify/refresh`,
   vote: `${voteApiUrl}vote`,
+  zone: `${laserApiUrl}zone`,
 };
 
 export default apiEndpoints;
