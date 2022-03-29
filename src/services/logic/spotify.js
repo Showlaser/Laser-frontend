@@ -15,7 +15,8 @@ const onError = async (errorCode) => {
   const code = Number(errorCode);
   if (code === 401) {
     const refreshToken = localStorage.getItem("SpotifyRefreshToken");
-    const tokens = await refreshSpotifyAccessToken(refreshToken);
+    const response = await refreshSpotifyAccessToken(refreshToken);
+    const tokens = await response.json();
     localStorage.setItem("SpotifyAccessToken", tokens.access_token);
     localStorage.setItem("SpotifyRefreshToken", tokens.refresh_token);
     Spotify.setAccessToken(tokens.access_token);
@@ -33,16 +34,14 @@ export const getSpotifyAccessTokens = (code) => {
   );
 };
 
-export const refreshSpotifyAccessToken = (refreshToken) => {
-  return sendRequest(
+export const refreshSpotifyAccessToken = async (refreshToken) =>
+  sendRequest(
     () =>
       Get(
         `${apiEndpoints.refreshSpotifyAccessToken}?refreshToken=${refreshToken}`
       ),
     []
   );
-};
-
 const executeRequest = (request) => {
   const accessToken = localStorage.getItem("SpotifyAccessToken");
   Spotify.setAccessToken(accessToken);
