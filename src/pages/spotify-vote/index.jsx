@@ -1,3 +1,4 @@
+import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 import SideNav from "components/sidenav";
 import SpotifyPlaylist from "components/spotify-vote/spotify-playlist";
 import VoteOverView from "components/spotify-vote/vote-overview";
@@ -15,9 +16,9 @@ import { createGuid } from "services/shared/math";
 import Cookies from "universal-cookie";
 
 export default function SpotifyVote() {
-  const Cookie = new Cookies();
+  const cookie = new Cookies();
   const accessToken = localStorage.getItem("SpotifyAccessToken");
-  const voteCookie = Cookie.get("vote-started");
+  const voteCookie = cookie.get("vote-started");
   const voteInProgress = voteCookie !== undefined;
 
   const [userPlaylists, setUserPlaylists] = useState([]);
@@ -26,7 +27,6 @@ export default function SpotifyVote() {
   const [joinData, setJoinData] = useState(voteCookie?.joinInfo ?? undefined);
   const [voteState, setVoteState] = useState();
   const [connected, setConnected] = useState(false);
-  const [playerState, setPlayerState] = useState();
 
   useEffect(() => {
     if (accessToken === null) {
@@ -44,16 +44,7 @@ export default function SpotifyVote() {
         voteCookie.joinInfo.accessCode
       ).then((conn) => setConnected(conn));
     }
-
-    setInterval(() => updatePlayerState(), 2000);
   }, [voteStarted, accessToken]);
-
-  const updatePlayerState = () => {
-    getPlayerState().then((data) => {
-      console.log(data);
-      setPlayerState(data);
-    });
-  };
 
   const connectToWebsocketServer = async (joinCode, accessCode) => {
     const response = await getVoteData({ joinCode, accessCode });
@@ -65,7 +56,7 @@ export default function SpotifyVote() {
     voteData.validUntil = new Date(voteData.validUntil);
 
     let newSocket = new WebSocket("ws://localhost:5002/ws");
-    newSocket.onopen = (event) => {
+    newSocket.onopen = () => {
       const identifier = {
         voteDataUuid: voteData.uuid,
         websocketUuid: createGuid(),
@@ -81,6 +72,8 @@ export default function SpotifyVote() {
       setVoteState(object);
     };
 
+    const timeout = voteData.validUntil.getTime() - new Date().getTime();
+    setTimeout(() => onVoteEnded({ joinCode, accessCode }), timeout);
     setVoteState(voteData);
     return true;
   };
@@ -110,6 +103,7 @@ export default function SpotifyVote() {
               uuid: createGuid(),
               voteDataUuid,
               playlistName: playlist.name,
+              spotifyPlaylistId: playlistId,
               playlistImageUrl: playlist?.images?.at(0)?.url,
               songsInPlaylist: playlistSongs.map((track) => {
                 return {
@@ -127,7 +121,7 @@ export default function SpotifyVote() {
     };
 
     const joinInfo = await startVote(voteData);
-    Cookie.set(
+    cookie.set(
       "vote-started",
       { joinInfo, validUntil: expirationDate },
       {
@@ -138,13 +132,43 @@ export default function SpotifyVote() {
 
     setVoteStarted(true);
     setJoinData(joinInfo);
+    setTimeout(() => onVoteEnded(joinInfo), voteValidTimeInMinutes * 60000);
   };
 
-  const onVoteEnded = () => {
-    const mostVotedPlaylist = voteState?.voteablePlaylistCollection
-      ?.sort((a, b) => (a.votes.length < b.votes.length ? -1 : 1))
+  const onVoteEnded = async (joinInfo) => {
+    const { joinCode, accessCode } = joinInfo;
+    const response = await getVoteData({ joinCode, accessCode });
+    if (response.status !== 200) {
+      return false;
+    }
+
+    const playPlaylistAfterSongEnded = document
+      .getElementById("play-after-song-ended-checkbox")
+      .getElementsByTagName("input")
+      .item(0).checked;
+
+    const voteData = await response.json();
+    const mostVotedPlaylist = voteData?.voteablePlaylistCollection
+      ?.sort((a, b) => (a.votes.length > b.votes.length ? -1 : 1))
       .at(0);
-    playPlaylist(mostVotedPlaylist.spotifyPlaylistId, playerState.device.id);
+
+    const oldPlayerState = await getPlayerState();
+
+    if (playPlaylistAfterSongEnded) {
+      const interval = setInterval(async () => {
+        const currentPlayerState = await getPlayerState();
+        if (currentPlayerState.item.id !== oldPlayerState.item.id) {
+          playPlaylist(
+            mostVotedPlaylist.spotifyPlaylistId,
+            currentPlayerState.device.id
+          );
+          clearInterval(interval);
+        }
+      }, 2000);
+      return;
+    }
+
+    playPlaylist(mostVotedPlaylist.spotifyPlaylistId, oldPlayerState.device.id);
   };
 
   const voteComponents = voteStarted ? (
@@ -157,11 +181,14 @@ export default function SpotifyVote() {
         <br />
         Access code: {joinData?.accessCode}
       </p>
-      <VoteOverView
-        voteCookie={voteCookie}
-        voteState={voteState}
-        onVoteEnded={onVoteEnded}
-      />
+      <FormGroup>
+        <FormControlLabel
+          id="play-after-song-ended-checkbox"
+          control={<Checkbox defaultChecked />}
+          label="Play playlist after current playing song finished"
+        />
+      </FormGroup>
+      <VoteOverView voteCookie={voteCookie} voteState={voteState} />
     </div>
   ) : (
     <div>

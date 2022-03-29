@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { normalise } from "services/shared/math";
 import { getDifferenceBetweenTwoDatesInMinutesAndSecondsString } from "services/shared/general";
 
-export default function VoteOverView({ voteState, voteCookie, onVoteEnded }) {
+export default function VoteOverView({ voteState, voteCookie }) {
   const totalVotes = voteState?.voteablePlaylistCollection
     ?.map((p) => p?.votes?.length)
     .reduce((partialSum, a) => partialSum + a, 0);
@@ -17,9 +17,6 @@ export default function VoteOverView({ voteState, voteCookie, onVoteEnded }) {
         new Date()
       );
       document.getElementById("countdown").innerHTML = value;
-      if (value === "Voting ended!") {
-        onVoteEnded();
-      }
     }, 1000);
   }, []);
 

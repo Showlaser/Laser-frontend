@@ -77,7 +77,7 @@ export const playPlaylist = (id, deviceToPlayId) => {
   );
 };
 
-export const getPlayerState = () =>
+export const getPlayerState = async () =>
   executeRequest(() =>
     Spotify.getMyCurrentPlaybackState().then((data) => data)
   );
