@@ -1,42 +1,59 @@
 import {
-  Button,
   IconButton,
   MenuItem,
   Select,
   TextField,
-} from "@material-ui/core";
+  Tooltip,
+  Divider,
+} from "@mui/material";
 import PointsForm from "components/shared/point-form";
 import { useEffect } from "react";
-import DeleteIcon from "@material-ui/icons/Delete";
-import AddIcon from "@material-ui/icons/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import { showError, toastSubject } from "services/shared/toast-messages";
 
-export default function AnimationSettings(props) {
-  const {
-    updateAnimationSetting,
-    selectedPatternAnimation,
-    timeLineCurrentMs,
-    updatePatternAnimation,
-    deletePatternAnimation,
-  } = props;
+export default function AnimationSettings({
+  updateAnimationSetting,
+  selectedPatternAnimation,
+  updatePatternAnimation,
+  deletePatternAnimation,
+  selectedSetting,
+  setTimeLineCurrentMs,
+}) {
+  useEffect(() => [selectedPatternAnimation, selectedSetting]);
 
-  const setting =
-    selectedPatternAnimation !== undefined
-      ? selectedPatternAnimation.animationSettings.find(
-          (ase) => ase.startTime === timeLineCurrentMs
-        )
-      : undefined;
+  if (selectedSetting !== undefined) {
+    selectedSetting.points = selectedSetting?.points?.sort((a, b) =>
+      a > b ? 1 : -1
+    );
+  }
 
-  useEffect(() => [selectedPatternAnimation]);
-
-  const duration =
+  const duration = Math.abs(
     selectedPatternAnimation?.animationSettings?.at(-1)?.startTime -
-    selectedPatternAnimation?.animationSettings[0]?.startTime;
+      selectedPatternAnimation?.animationSettings[0]?.startTime
+  );
+
+  const validateStartTime = (startTime) => {
+    const lowerThanStartTime = selectedPatternAnimation.animationSettings
+      .filter((ast) => ast.startTime < selectedSetting.startTime)
+      .sort((a, b) => (a.startTime < b.startTime ? -1 : 1))
+      .reverse();
+
+    const largerThanStartTime = selectedPatternAnimation.animationSettings
+      .filter(
+        (ast) =>
+          ast.startTime > selectedSetting.startTime &&
+          ast.uuid !== selectedSetting.uuid
+      )
+      .sort((a, b) => (a.startTime < b.startTime ? -1 : 1));
+
+    const minValue = lowerThanStartTime.at(0)?.startTime ?? 0;
+    const maxValue = largerThanStartTime.at(0)?.startTime ?? startTime + 5;
+    return startTime > minValue && startTime < maxValue;
+  };
 
   return (
-    <div
-      id="animation-settings"
-      key={selectedPatternAnimation.uuid + "settings"}
-    >
+    <div id="animation-settings" key={selectedSetting?.uuid + "settings"}>
       <TextField
         label="Pattern animation name"
         defaultValue={selectedPatternAnimation?.name ?? ""}
@@ -45,12 +62,12 @@ export default function AnimationSettings(props) {
       <TextField
         defaultValue={selectedPatternAnimation?.startTimeOffset}
         label="Start time ms"
+        type="number"
         onChange={(e) => {
           if (e.target.value >= 0) {
-            updatePatternAnimation("startTimeOffset", e.target.value);
+            updatePatternAnimation("startTimeOffset", Number(e.target.value));
           }
         }}
-        type="number"
       />
       <br />
       <label>Duration time ms</label>
@@ -60,27 +77,53 @@ export default function AnimationSettings(props) {
       Timeline
       <br />
       <Select
-        onChange={(e) => updatePatternAnimation("timelineId", e.target.value)}
-        value={selectedPatternAnimation?.timelineId ?? 1}
+        onChange={(e) => updatePatternAnimation("timeLineId", e.target.value)}
+        value={selectedPatternAnimation?.timeLineId ?? 1}
       >
         <MenuItem value={0}>0</MenuItem>
         <MenuItem value={1}>1</MenuItem>
         <MenuItem value={2}>2</MenuItem>
       </Select>
       <br />
-      <Button onClick={deletePatternAnimation}>Delete pattern animation</Button>
+      <Tooltip title="Delete pattern animation">
+        <IconButton onClick={deletePatternAnimation}>
+          <DeleteIcon />
+        </IconButton>
+      </Tooltip>
       <hr />
       <label>Animation points</label>
       <br />
       <TextField
-        value={setting?.scale}
+        value={selectedSetting?.scale}
         label="Scale"
         type="number"
-        onChange={(e) => updateAnimationSetting("scale", e.target.value)}
+        onChange={(e) =>
+          updateAnimationSetting("scale", Number(e.target.value))
+        }
         inputProps={{
           step: "0.1",
           min: 0.1,
           max: 1,
+        }}
+      />
+      <br />
+      <TextField
+        value={selectedSetting?.startTime}
+        label="StartTime"
+        type="number"
+        onChange={(e) => {
+          const value = Number(e.target.value);
+          const valueValid = validateStartTime(value);
+          if (!valueValid) {
+            showError(toastSubject.startTimeBoundaryError);
+            return;
+          }
+
+          setTimeLineCurrentMs(value);
+          updateAnimationSetting("startTime", value);
+        }}
+        inputProps={{
+          min: 0,
         }}
       />
       <br />
@@ -91,8 +134,20 @@ export default function AnimationSettings(props) {
           min: -4000,
           max: 4000,
         }}
-        value={setting?.centerX}
-        onChange={(e) => updateAnimationSetting("centerX", e.target.value)}
+        value={selectedSetting?.centerX ?? 0}
+        onChange={(e) => {
+          const value = Number(e.target.value);
+          if (
+            selectedSetting?.points?.some(
+              (p) => p.x + value > 4000 || p.x + value < -4000
+            )
+          ) {
+            showError(toastSubject.pointsBoundaryError);
+            return;
+          }
+
+          updateAnimationSetting("centerX", value);
+        }}
       />
       <TextField
         label="Center y"
@@ -101,38 +156,72 @@ export default function AnimationSettings(props) {
           min: -4000,
           max: 4000,
         }}
-        value={setting?.centerY}
-        onChange={(e) => updateAnimationSetting("centerY", e.target.value)}
+        value={selectedSetting?.centerY ?? 0}
+        onChange={(e) => {
+          const value = Number(e.target.value);
+          if (
+            selectedSetting?.points?.some(
+              (p) => p.y + value > 4000 || p.y + value < -4000
+            )
+          ) {
+            showError(toastSubject.pointsBoundaryError);
+            return;
+          }
+
+          updateAnimationSetting("centerY", Number(e.target.value));
+        }}
+      />
+      <TextField
+        label="Rotation °"
+        type="number"
+        value={selectedSetting?.rotation ?? 0}
+        onChange={(e) =>
+          updateAnimationSetting("rotation", Number(e.target.value))
+        }
+        inputProps={{
+          min: 0,
+          max: 360,
+        }}
       />
       <br />
       <IconButton
-        disabled={setting !== undefined}
+        disabled={selectedSetting !== undefined}
         onClick={() => updateAnimationSetting("animationSettings", [])}
       >
         <AddIcon />
       </IconButton>
-      <IconButton
+      <span
         disabled={
-          setting === undefined ||
+          selectedSetting === undefined ||
           selectedPatternAnimation?.animationSettings?.length === 1
         }
-        onClick={() => {
-          let settings = [...selectedPatternAnimation?.animationSettings];
-          const index = settings.findIndex((s) => s.uuid === setting.uuid);
-          if (index === -1) {
-            return;
-          }
-
-          settings.splice(index, 1);
-          updatePatternAnimation("animationSettings", settings);
-        }}
       >
-        <DeleteIcon />
-      </IconButton>
+        <Tooltip title="Delete current setting">
+          <IconButton
+            onClick={() => {
+              let settings = structuredClone(
+                selectedPatternAnimation?.animationSettings
+              );
+              const index = settings.findIndex(
+                (s) => s.uuid === selectedSetting.uuid
+              );
+              if (index === -1) {
+                return;
+              }
+
+              settings.splice(index, 1);
+              updatePatternAnimation("animationSettings", settings);
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      </span>
       <br />
+      <Divider />
       <PointsForm
         namePlaceHolder="Animation name"
-        item={setting}
+        item={selectedSetting}
         onChange={(points) => updateAnimationSetting("points", points)}
       />
     </div>

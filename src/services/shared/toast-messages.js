@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 
 export const toastSubject = {
-  boundaryError: {
+  pointsBoundaryError: {
     message: "Select a value between or equal to -4000 and 4000",
     id: 0,
   },
@@ -45,6 +45,10 @@ export const toastSubject = {
   changesSaved: {
     message: "Changes saved",
     id: 10,
+  },
+  startTimeBoundaryError: {
+    message: "Value cannot be lower or higher than an other setting start time",
+    id: 11,
   },
 };
 

@@ -1,6 +1,6 @@
 import { createGuid } from "./math";
 
-export const getPointsPlaceHolder = (patternUuid) => {
+export const getPointsPlaceHolder = (patternUuid, index) => {
   return {
     uuid: createGuid(),
     patternUuid,
@@ -9,5 +9,6 @@ export const getPointsPlaceHolder = (patternUuid) => {
     redLaserPowerPwm: 6,
     greenLaserPowerPwm: 0,
     blueLaserPowerPwm: 0,
+    order: index,
   };
 };

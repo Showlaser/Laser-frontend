@@ -1,4 +1,3 @@
-import { Divider, TextField } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react";
 import { emptyGuid } from "services/shared/math";
 import SideNav from "components/sidenav";
@@ -9,12 +8,15 @@ import {
   getPatternPlaceHolder,
   removePattern,
   savePattern,
+  playPattern,
 } from "services/logic/pattern-logic";
 import DeleteModal from "components/modal";
 import CrudComponent from "components/shared/crud-component";
 import PointsForm from "components/shared/point-form";
 import { stringIsEmpty } from "services/shared/general";
 import PointsDrawer from "components/shared/points-drawer";
+import SendIcon from "@mui/icons-material/Send";
+import { Button, Divider, TextField } from "@mui/material";
 
 export default function PatternEditor() {
   const [selectedPatternUuid, setSelectedPatternAnimationUuid] = useState(
@@ -24,6 +26,7 @@ export default function PatternEditor() {
   const [, updateState] = useState();
   const forceUpdate = useCallback(() => updateState({}), []);
   const [changesSaved, setChangesSaved] = useState(true);
+  const [patternPlaying, setPatternPlaying] = useState(false);
   const [modalOptions, setModalOptions] = useState({
     title: "Delete pattern?",
     show: false,
@@ -57,7 +60,7 @@ export default function PatternEditor() {
   };
 
   const deletePattern = () => {
-    let updatedPatterns = [...patterns].filter(
+    let updatedPatterns = structuredClone(patterns).filter(
       (p) => p?.uuid !== selectedPatternUuid
     );
     removePattern(selectedPatternUuid);
@@ -74,7 +77,7 @@ export default function PatternEditor() {
   const loadTemplate = (templateFunction) => {
     setChangesSaved(false);
     const template = templateFunction();
-    let patternsToUpdate = [...patterns];
+    let patternsToUpdate = structuredClone(patterns);
     patternsToUpdate.push(template);
     setPatterns(patternsToUpdate);
 
@@ -87,12 +90,17 @@ export default function PatternEditor() {
       return;
     }
 
-    let updatedPatterns = [...patterns];
+    let updatedPatterns = structuredClone(patterns);
     let patternToUpdate = updatedPatterns.find(
       (up) => up?.uuid === selectedPatternUuid
     );
     patternToUpdate[property] = value;
     setPatterns(updatedPatterns);
+  };
+
+  const play = () => {
+    setPatternPlaying(true);
+    playPattern(selectedPattern).then(() => setPatternPlaying(false));
   };
 
   const content = (
@@ -119,7 +127,7 @@ export default function PatternEditor() {
             },
             onAdd: () => {
               setChangesSaved(false);
-              let updatedPatterns = [...patterns];
+              let updatedPatterns = structuredClone(patterns);
               const placeHolder = getPatternPlaceHolder();
               updatedPatterns.push(placeHolder);
               setPatterns(updatedPatterns);
@@ -143,7 +151,16 @@ export default function PatternEditor() {
             ],
           }}
           changesSaved={changesSaved}
-        />
+        >
+          <Button
+            variant="outlined"
+            disabled={patternPlaying}
+            startIcon={<SendIcon />}
+            onClick={play}
+          >
+            Run
+          </Button>
+        </CrudComponent>
         <Divider style={{ marginTop: "5px" }} />
         <TextField
           label="Pattern name"

@@ -1,11 +1,11 @@
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import { useCallback, useEffect } from "react";
 import { getMappedRgbStringFromPoint } from "services/shared/general";
-import { mapNumber } from "services/shared/math";
+import { mapNumber, rotatePoint } from "services/shared/math";
 import "./index.css";
 
-export default function PointsDrawer(props) {
-  const { points } = props;
+export default function PointsDrawer({ points, options }) {
+  const { rotation, centerX, centerY } = options ?? {};
 
   const drawPattern = useCallback(() => {
     const length = points?.length;
@@ -30,6 +30,12 @@ export default function PointsDrawer(props) {
   }, [drawPattern]);
 
   const drawDot = (ctx, point) => {
+    const clonedPoint = structuredClone(point);
+    clonedPoint.x += centerX ?? 0;
+    clonedPoint.y += centerY ?? 0;
+
+    point = rotatePoint(clonedPoint, rotation ?? 0);
+
     const { x, y } = point;
 
     ctx.fillStyle = getMappedRgbStringFromPoint(point);

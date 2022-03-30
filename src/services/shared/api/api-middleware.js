@@ -1,4 +1,7 @@
+import paths from "../router-paths";
 import { showError, toastSubject, showSuccess } from "../toast-messages";
+import { Post } from "./api-actions";
+import apiEndpoints from "./api-urls";
 
 const handleErrorMessage = (statusCode, ignoredStatusCodes) => {
   if (ignoredStatusCodes.includes(statusCode)) {
@@ -21,7 +24,17 @@ export async function sendRequest(
   ignoredStatusCodes,
   onSuccessToastSubject
 ) {
-  const response = await requestFunction();
+  let response = await requestFunction();
+  if (response.status === 401) {
+    const refreshResponse = await Post(apiEndpoints.refreshToken, null, true);
+    if (refreshResponse.status !== 200) {
+      window.location = paths.Login;
+      return;
+    }
+
+    response = await requestFunction();
+  }
+
   if (response.status !== 200) {
     handleErrorMessage(response.status, ignoredStatusCodes);
     return response;

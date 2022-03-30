@@ -1,17 +1,57 @@
 import React from "react";
 import "./App.css";
-import { createTheme, ThemeProvider } from "@material-ui/core/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
 import Routes from "./routes/Routes";
+import CssBaseline from "@mui/material/CssBaseline";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 function App() {
-  const theme = createTheme({
-    palette: {
-      type: "dark",
-    },
-  });
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: "dark",
+          ...{
+            background: {
+              default: "#2b2b2b",
+              paper: "#2b2b2b",
+            },
+          },
+        },
+        components: {
+          MuiSelect: {
+            defaultProps: {
+              variant: "standard",
+            },
+          },
+          MuiTextField: {
+            defaultProps: {
+              variant: "standard",
+            },
+          },
+          MuiButton: {
+            styleOverrides: {
+              root: {
+                backgroundColor: "#2660bd",
+                color: "white",
+                ":hover": {
+                  backgroundColor: "#2248a1",
+                },
+              },
+            },
+          },
+          MuiSlider: {
+            styleOverrides: {
+              root: {
+                color: "#2660bd",
+              },
+            },
+          },
+        },
+      }),
+    []
+  );
 
   return (
     <div className="App">
