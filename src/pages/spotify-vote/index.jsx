@@ -33,7 +33,12 @@ export default function SpotifyVote() {
       return;
     }
 
-    getUserPlaylists().then((data) => setUserPlaylists(data.items));
+    getUserPlaylists().then((data) => {
+      const playlistsWithTracks = data.items.filter(
+        (playlist) => playlist.tracks.total > 0
+      );
+      setUserPlaylists(playlistsWithTracks);
+    });
     if (!voteStarted) {
       return;
     }
@@ -194,6 +199,7 @@ export default function SpotifyVote() {
     <div>
       <VoteSettings setVoteValidTimeInMinutes={setVoteValidTimeInMinutes} />
       <SpotifyPlaylist
+        voteStarted={voteStarted}
         userPlaylists={userPlaylists}
         onVoteStart={(selectedPlaylistsId) => onVoteStart(selectedPlaylistsId)}
       />

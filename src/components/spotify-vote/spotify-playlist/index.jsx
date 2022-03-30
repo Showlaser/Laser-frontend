@@ -12,7 +12,11 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 
-export default function SpotifyPlaylist({ userPlaylists, onVoteStart }) {
+export default function SpotifyPlaylist({
+  userPlaylists,
+  onVoteStart,
+  voteStarted,
+}) {
   const [checked, setChecked] = useState([]);
 
   const handleToggle = (value) => () => {
@@ -67,7 +71,9 @@ export default function SpotifyPlaylist({ userPlaylists, onVoteStart }) {
           );
         })}
       </List>
-      <Button onClick={() => onVoteStart(checked)}>Start vote</Button>
+      <Button disabled={voteStarted} onClick={() => onVoteStart(checked)}>
+        Start vote
+      </Button>
     </div>
   );
 }
