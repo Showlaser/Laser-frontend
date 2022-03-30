@@ -4,14 +4,18 @@ import {
   ListItemText,
   MenuItem,
   Select,
-} from "@material-ui/core";
-import SaveAltIcon from "@material-ui/icons/SaveAlt";
-import DeleteIcon from "@material-ui/icons/Delete";
-import AddIcon from "@material-ui/icons/Add";
+} from "@mui/material";
+import SaveAltIcon from "@mui/icons-material/Save";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-export default function CrudComponent(props) {
-  const { selectOptions, itemsArray, actions, changesSaved } = props;
-
+export default function CrudComponent({
+  selectOptions,
+  itemsArray,
+  actions,
+  changesSaved,
+  children,
+}) {
   return selectOptions?.selectedValue !== undefined ? (
     <div key={selectOptions.selectedValue + "crud-component"}>
       <InputLabel id="demo-simple-select-label">
@@ -85,6 +89,7 @@ export default function CrudComponent(props) {
           </MenuItem>
         ) : null}
       </Select>
+      {children}
       <div style={{ float: "right" }}>
         {changesSaved ? (
           <p>Changes saved</p>

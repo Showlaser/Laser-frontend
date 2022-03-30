@@ -1,12 +1,16 @@
 import { valueIsWithinBoundaries } from "services/shared/math";
 import { showError, toastSubject } from "services/shared/toast-messages";
-import { Button, TextField } from "@material-ui/core";
-import DeleteIcon from "@material-ui/icons/Delete";
-import AddIcon from "@material-ui/icons/Add";
 import { getPointsPlaceHolder } from "services/shared/points";
+import { Button, IconButton, TextField } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 
-export default function PointsForm(props) {
-  const { item, onChange } = props;
+export default function PointsForm({ item, onChange }) {
+  if (item === undefined) {
+    return null;
+  }
+
+  item.points = item?.points?.sort((a, b) => (a.order > b.order ? 1 : -1));
 
   const onPointUpdate = (pointUuid, property, value) => {
     if (typeof property !== "string") {
@@ -15,11 +19,11 @@ export default function PointsForm(props) {
 
     const propertyIsXOrYAxle = property === "x" || property === "y";
     if (propertyIsXOrYAxle && !valueIsWithinBoundaries(value, -4000, 4000)) {
-      showError(toastSubject.boundaryError);
+      showError(toastSubject.pointsBoundaryError);
       return;
     }
 
-    let points = [...item?.points];
+    let points = structuredClone(item?.points);
     let pointToUpdate = points.find((p) => p?.uuid === pointUuid);
 
     pointToUpdate[property] = value;
@@ -27,13 +31,13 @@ export default function PointsForm(props) {
   };
 
   const addPoint = () => {
-    let points = [...item?.points];
-    points.push(getPointsPlaceHolder(item.uuid));
+    let points = structuredClone(item?.points);
+    points.push(getPointsPlaceHolder(item.uuid, item.points.length));
     onChange(points);
   };
 
   const deletePoint = (uuid) => {
-    let points = [...item?.points];
+    let points = structuredClone(item?.points);
     const index = points.findIndex((p) => p.uuid === uuid);
     if (index === -1) {
       return;
@@ -46,7 +50,7 @@ export default function PointsForm(props) {
   return (
     <div key={"form" + item?.uuid + item?.points[0]?.uuid}>
       {item?.points?.map((point, index) => (
-        <div>
+        <div key={point?.uuid}>
           <small>Point {index}</small>
           <br />
           <TextField
@@ -121,23 +125,23 @@ export default function PointsForm(props) {
               )
             }
           />
-          <Button
+          <IconButton
             key={"delete" + item.uuid + index}
             onClick={() => deletePoint(point.uuid)}
             style={{ marginTop: "15px" }}
             size="small"
-            color="secondary"
+            color="error"
             startIcon={<DeleteIcon />}
-          />
+          >
+            <DeleteIcon />
+          </IconButton>
         </div>
       ))}
       <Button
         disabled={item === undefined}
         onClick={() => addPoint()}
-        style={{ marginTop: "5px", width: "225px" }}
+        style={{ margin: "10px", width: "360px" }}
         size="small"
-        color="primary"
-        variant="contained"
         startIcon={<AddIcon />}
       >
         Add point

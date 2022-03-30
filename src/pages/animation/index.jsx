@@ -1,27 +1,38 @@
 import { React, useState, useEffect } from "react";
 import SideNav from "components/sidenav";
-import PatternTimelineSection from "components/animation/pattern-timeline-section";
 import AnimationSection from "components/animation/animation-section";
 import AnimationOptions from "components/animation/animation-options";
 import "./index.css";
-import { getAnimations } from "services/logic/animation-logic";
+import {
+  getAnimations,
+  getPatternAnimationPlaceholder,
+} from "services/logic/animation-logic";
 import { getPatterns } from "services/logic/pattern-logic";
 import { emptyGuid } from "services/shared/math";
 import { stringIsEmpty } from "services/shared/general";
+import TimelineSection from "components/shared/timeline-section";
 
 export default function AnimationEditor() {
   const [selectedAnimationUuid, setSelectedAnimationUuid] = useState(
     emptyGuid()
   );
   const [selectedPatternAnimationUuid, setSelectedPatternAnimationUuid] =
-    useState(emptyGuid());
+    useState();
   const [animations, setAnimations] = useState([]);
   const [patterns, setPatterns] = useState([]);
   const [changesSaved, setChangesSaved] = useState(true);
 
   useEffect(() => {
-    getAnimations().then((value) => setAnimations(value));
-    getPatterns().then((value) => setPatterns(value));
+    getAnimations().then((a) => {
+      setAnimations(a);
+      const animationUuid = a.at(0)?.uuid ?? emptyGuid();
+      setSelectedAnimationUuid(animationUuid);
+
+      const patternAnimationUuid =
+        a.at(0)?.patternAnimations.at(0)?.uuid ?? emptyGuid();
+      setSelectedPatternAnimationUuid(patternAnimationUuid);
+    });
+    getPatterns().then((p) => setPatterns(p));
   }, []);
 
   const sideNavSettings = {
@@ -33,12 +44,33 @@ export default function AnimationEditor() {
       return;
     }
 
-    let updatedAnimations = [...animations];
+    let updatedAnimations = structuredClone(animations);
     let animationToUpdate = updatedAnimations.find(
       (ua) => ua.uuid === selectedAnimationUuid
     );
     animationToUpdate[property] = value;
     setAnimations(updatedAnimations);
+  };
+
+  const addPatternToAnimation = (selectedPattern) => {
+    if (selectedPattern === undefined) {
+      return;
+    }
+
+    let updatedAnimations = structuredClone(animations);
+    let updatedAnimation = updatedAnimations.find(
+      (a) => a.uuid === selectedAnimationUuid
+    );
+
+    const placeholder = getPatternAnimationPlaceholder(
+      selectedPattern,
+      updatedAnimation
+    );
+    updatedAnimation?.patternAnimations?.push(placeholder);
+    setAnimations(updatedAnimations);
+
+    setChangesSaved(false);
+    setSelectedPatternAnimationUuid(placeholder.uuid);
   };
 
   const content = (
@@ -61,16 +93,13 @@ export default function AnimationEditor() {
             selectedAnimationUuid={selectedAnimationUuid}
             selectedPatternAnimationUuid={selectedPatternAnimationUuid}
           />
-          <PatternTimelineSection
-            animations={animations}
-            patternAnimations={patterns}
-            selectedPatternAnimationUuid={selectedPatternAnimationUuid}
-            selectedAnimationUuid={selectedAnimationUuid}
-            setAnimations={setAnimations}
-            onPatternAnimationSelect={(uuid) => {
-              setChangesSaved(false);
-              setSelectedPatternAnimationUuid(uuid);
-            }}
+          <TimelineSection
+            items={animations}
+            availableItems={patterns}
+            selectedSubItemUuid={selectedPatternAnimationUuid}
+            selectedItemUuid={selectedAnimationUuid}
+            setItems={setAnimations}
+            onSelect={addPatternToAnimation}
           />
         </div>
       ) : null}

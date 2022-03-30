@@ -1,10 +1,9 @@
-import { Box, Card, CardContent, Divider, Typography } from "@material-ui/core";
+import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
 import React from "react";
-import ComputerIcon from "@material-ui/icons/Computer";
-import CloudIcon from "@material-ui/icons/Cloud";
-import PhoneLinkIcon from "@material-ui/icons/Phonelink";
-
 import "./index.css";
+import ComputerIcon from "@mui/icons-material/Computer";
+import CloudIcon from "@mui/icons-material/Cloud";
+import PhoneLinkIcon from "@mui/icons-material/Phonelink";
 
 export default function Installation() {
   const [selectedId, setSelectedId] = React.useState(-1);

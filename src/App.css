@@ -1,5 +1,5 @@
 body {
-  overflow-x: hidden;
+  overflow-x: auto;
   overflow-y: auto;
 }
 
@@ -36,4 +36,12 @@ body {
   to {
     opacity: 1;
   }
+}
+
+.MuiListItemIcon-root > .MuiSvgIcon-root {
+  transition: transform 0.25s ease-in-out !important;
+}
+
+.MuiListItemIcon-root:hover > .MuiSvgIcon-root {
+  transform: scale(1.1) !important;
 }

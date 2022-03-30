@@ -30,3 +30,30 @@ export const valueIsWithinBoundaries = (value, min, max) =>
 export const numberIsBetweenOrEqual = (number, min, max) => {
   return number >= min && number <= max;
 };
+
+export const rotatePoint = (point, angle) => {
+  var radians = (Math.PI / 180) * angle,
+    cos = Math.cos(radians),
+    sin = Math.sin(radians),
+    nx = cos * point.x + sin * point.y,
+    ny = cos * point.y - sin * point.x;
+
+  console.log(
+    "x: " +
+      nx +
+      " y: " +
+      ny +
+      " cos: " +
+      cos +
+      " sin: " +
+      sin +
+      " point x: " +
+      point.x +
+      " point y: " +
+      point.y
+  );
+
+  point.x = nx;
+  point.y = ny;
+  return point;
+};

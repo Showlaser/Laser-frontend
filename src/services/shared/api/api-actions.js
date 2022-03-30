@@ -4,7 +4,7 @@ export const Get = async (endpoint) => {
       method: "GET",
       mode: "cors",
       cache: "no-cache",
-      credentials: "same-origin",
+      credentials: "include",
       redirect: "follow",
       referrerPolicy: "no-referrer",
     });
@@ -22,7 +22,7 @@ export const Post = async (endpoint, data = null) => {
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "same-origin",
+      credentials: "include",
       redirect: "follow",
       referrerPolicy: "no-referrer",
       body: JSON.stringify(data),
@@ -41,7 +41,7 @@ export const Put = async (endpoint, data = null) => {
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "same-origin",
+      credentials: "include",
       redirect: "follow",
       referrerPolicy: "no-referrer",
       body: JSON.stringify(data),
@@ -57,7 +57,7 @@ export const Delete = async (endpoint, data = null) => {
       method: "DELETE",
       mode: "cors",
       cache: "no-cache",
-      credentials: "same-origin",
+      credentials: "include",
       redirect: "follow",
       referrerPolicy: "no-referrer",
       body: data,

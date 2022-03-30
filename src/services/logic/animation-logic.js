@@ -32,14 +32,19 @@ export const getPatternAnimationPlaceholder = (
 ) => {
   const patternAnimationUuid = createGuid();
   const settingsUuid = createGuid();
-  const points = selectedPattern?.points?.map((p) => ({
-    uuid: p.uuid,
+  selectedPattern.points = selectedPattern?.points?.sort((a, b) =>
+    a.order > b.order ? 1 : -1
+  );
+
+  const points = selectedPattern?.points?.map((p, index) => ({
+    uuid: createGuid(),
     patternAnimationSettingsUuid: settingsUuid,
     x: p.x,
-    y: p.x,
-    redLaserPowerPwm: 6,
-    greenLaserPowerPwm: 0,
-    blueLaserPowerPwm: 0,
+    y: p.y,
+    redLaserPowerPwm: p.redLaserPowerPwm,
+    greenLaserPowerPwm: p.greenLaserPowerPwm,
+    blueLaserPowerPwm: p.blueLaserPowerPwm,
+    order: index,
   }));
 
   const lastItemInTimeline = selectedAnimation.patternAnimations
@@ -62,7 +67,7 @@ export const getPatternAnimationPlaceholder = (
         points
       ),
     ],
-    timelineId: 0,
+    timeLineId: 0,
   };
 };
 
@@ -80,4 +85,11 @@ export const getPatternAnimationSettingsPlaceholder = (
     points,
     startTime: 0,
   };
+};
+
+export const playAnimation = (animation) => {
+  return sendRequest(
+    () => Post(apiEndpoints.animation + "/play", animation, false),
+    []
+  );
 };
