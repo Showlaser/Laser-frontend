@@ -5,6 +5,7 @@ import { Button, IconButton, TextField } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import React from "react";
+import { objectsAreSame } from "services/shared/general";
 
 function PointsForm({ item, onChange }) {
   if (item === undefined) {
@@ -154,24 +155,14 @@ function PointsForm({ item, onChange }) {
   );
 }
 
+// checks if props are the same. If true no rerender will occur. This is to improve performance
 export default React.memo(PointsForm, (prevProps, nextProps) => {
-  const pointsAreSame =
-    prevProps.item.points.length == nextProps.item.points.length &&
-    prevProps.item.points.every(function (element, index) {
-      const nextPropElement = nextProps.item.points[index];
-      return (
-        element.x === nextPropElement.x &&
-        element.y === nextPropElement.y &&
-        element.redLaserPowerPwm === nextPropElement.redLaserPowerPwm &&
-        element.greenLaserPowerPwm === nextPropElement.greenLaserPowerPwm &&
-        element.blueLaserPowerPwm === nextPropElement.blueLaserPowerPwm
-      );
-    });
+  alert("test me!");
   if (
     prevProps.namePlaceHolder === nextProps.namePlaceHolder &&
-    pointsAreSame
+    objectsAreSame(prevProps.item.points, nextProps.item.points)
   ) {
-    return true; // props are equal
+    return true;
   }
   return false; // props are not equal -> update the component
 });

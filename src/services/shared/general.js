@@ -47,3 +47,6 @@ export function toCamelCase(key, value) {
   }
   return value;
 }
+
+export const objectsAreSame = (obj1, obj2) =>
+  JSON.stringify(obj1) === JSON.stringify(obj2);
