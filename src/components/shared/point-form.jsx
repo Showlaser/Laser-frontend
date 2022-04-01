@@ -21,6 +21,9 @@ export default function PointsForm({ item, onChange }) {
     if (propertyIsXOrYAxle && !valueIsWithinBoundaries(value, -4000, 4000)) {
       showError(toastSubject.pointsBoundaryError);
       return;
+    } else if (!valueIsWithinBoundaries(value, 0, 255)) {
+      showError(toastSubject.laserPwmPowerBoundaryError);
+      return;
     }
 
     let points = structuredClone(item?.points);
@@ -81,7 +84,7 @@ export default function PointsForm({ item, onChange }) {
             name={`r${index}`}
             size="small"
             style={{ margin: "2px" }}
-            InputProps={{ inputProps: { min: 0, max: 511 } }}
+            InputProps={{ inputProps: { min: 0, max: 255 } }}
             type="number"
             label="R"
             defaultValue={point?.redLaserPowerPwm}
@@ -97,7 +100,7 @@ export default function PointsForm({ item, onChange }) {
             name={`r${index}`}
             size="small"
             style={{ margin: "2px" }}
-            InputProps={{ inputProps: { min: 0, max: 511 } }}
+            InputProps={{ inputProps: { min: 0, max: 255 } }}
             type="number"
             label="G"
             defaultValue={point?.greenLaserPowerPwm}
@@ -113,7 +116,7 @@ export default function PointsForm({ item, onChange }) {
             name={`r${index}`}
             size="small"
             style={{ margin: "2px" }}
-            InputProps={{ inputProps: { min: 0, max: 511 } }}
+            InputProps={{ inputProps: { min: 0, max: 255 } }}
             type="number"
             label="B"
             defaultValue={point?.blueLaserPowerPwm}

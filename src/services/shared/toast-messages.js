@@ -50,6 +50,10 @@ export const toastSubject = {
     message: "Value cannot be lower or higher than an other setting start time",
     id: 11,
   },
+  laserPwmPowerBoundaryError: {
+    message: "Select a value between or equal to 0 and 255",
+    id: 0,
+  },
 };
 
 const calculateAutoCloseTime = (text) => {

@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { useCallback, useEffect } from "react";
-import { getMappedRgbStringFromPoint } from "services/shared/general";
+import { getRgbStringFromPoint } from "services/shared/general";
 import { mapNumber, rotatePoint } from "services/shared/math";
 import "./index.css";
 
@@ -38,7 +38,7 @@ export default function PointsDrawer({ points, options }) {
 
     const { x, y } = point;
 
-    ctx.fillStyle = getMappedRgbStringFromPoint(point);
+    ctx.fillStyle = getRgbStringFromPoint(point);
     ctx.fillRect(
       mapNumber(x, 4000, -4000, 395, 0),
       mapNumber(y, 4000, -4000, 0, 395),

@@ -5,6 +5,7 @@ export default function TimeLineChannel({
   timeline,
   itemsInTimeline,
   onTimelineChannelItemClick,
+  itemsInTimelineSubItemsName,
 }) {
   useEffect(() => [itemsInTimeline]);
 
@@ -14,23 +15,23 @@ export default function TimeLineChannel({
         <p>{timeline?.index}:</p>
       </div>
       <div>
-        {itemsInTimeline?.map((animationPattern) => (
+        {itemsInTimeline?.map((item) => (
           <div
             style={{
-              marginLeft: `${animationPattern?.startTimeOffset}px`,
+              marginLeft: `${item?.startTimeOffset}px`,
               width: `${
-                animationPattern?.animationSettings
+                item[itemsInTimelineSubItemsName]
                   ?.sort((a, b) => (a.startTime > b.startTime ? 1 : -1))
                   ?.at(-1)?.startTime
               }px`,
             }}
-            key={animationPattern?.uuid + "timeline"}
+            key={item?.uuid + "timeline"}
             onClick={() => {
-              onTimelineChannelItemClick(animationPattern.uuid);
+              onTimelineChannelItemClick(item.uuid);
             }}
             className="timeline-channel-item"
           >
-            {animationPattern.name}
+            {item.name}
           </div>
         ))}
       </div>

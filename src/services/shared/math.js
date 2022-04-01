@@ -22,7 +22,7 @@ export const capitalizeFirstLetter = (string) =>
   string.charAt(0).toUpperCase() + string.slice(1);
 
 export const convertToMilliWatts = (maxPower, currentValue) =>
-  Math.round((maxPower / 511) * currentValue);
+  Math.round((maxPower / 255) * currentValue);
 
 export const valueIsWithinBoundaries = (value, min, max) =>
   value <= max && value >= min;

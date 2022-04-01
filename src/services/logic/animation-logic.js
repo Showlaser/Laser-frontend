@@ -20,7 +20,7 @@ export const saveAnimation = (animation) => {
 
 export const removeAnimation = (uuid) => {
   return sendRequest(
-    () => Delete(apiEndpoints.animation + uuid),
+    () => Delete(`${apiEndpoints.animation}/${uuid}`),
     [],
     toastSubject.changesSaved
   );

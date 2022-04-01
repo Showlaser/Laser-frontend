@@ -71,7 +71,7 @@ export const savePattern = (pattern) => {
 
 export const removePattern = (uuid) => {
   return sendRequest(
-    () => Delete(apiEndpoints.pattern + uuid),
+    () => Delete(`${apiEndpoints.pattern}/${uuid}`),
     [],
     toastSubject.changesSaved
   );

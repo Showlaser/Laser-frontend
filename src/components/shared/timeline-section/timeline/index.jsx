@@ -26,6 +26,7 @@ export default function Timeline({
           onTimelineChannelItemClick={onTimelineChannelItemClick}
           key={index + "timelinechannel"}
           timeline={timeline}
+          itemsInTimelineSubItemsName={"animationSettings"}
         />
       ))}
     </div>

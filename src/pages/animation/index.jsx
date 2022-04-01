@@ -99,7 +99,7 @@ export default function AnimationEditor() {
             selectedSubItemUuid={selectedPatternAnimationUuid}
             selectedItemUuid={selectedAnimationUuid}
             setItems={setAnimations}
-            onSelect={addPatternToAnimation}
+            onSelect={setSelectedPatternAnimationUuid}
           />
         </div>
       ) : null}
