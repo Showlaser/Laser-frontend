@@ -4,8 +4,9 @@ import { getPointsPlaceHolder } from "services/shared/points";
 import { Button, IconButton, TextField } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import React from "react";
 
-export default function PointsForm({ item, onChange }) {
+function PointsForm({ item, onChange }) {
   if (item === undefined) {
     return null;
   }
@@ -21,7 +22,7 @@ export default function PointsForm({ item, onChange }) {
     if (propertyIsXOrYAxle && !valueIsWithinBoundaries(value, -4000, 4000)) {
       showError(toastSubject.pointsBoundaryError);
       return;
-    } else if (!valueIsWithinBoundaries(value, 0, 255)) {
+    } else if (!propertyIsXOrYAxle && !valueIsWithinBoundaries(value, 0, 255)) {
       showError(toastSubject.laserPwmPowerBoundaryError);
       return;
     }
@@ -152,3 +153,25 @@ export default function PointsForm({ item, onChange }) {
     </div>
   );
 }
+
+export default React.memo(PointsForm, (prevProps, nextProps) => {
+  const pointsAreSame =
+    prevProps.item.points.length == nextProps.item.points.length &&
+    prevProps.item.points.every(function (element, index) {
+      const nextPropElement = nextProps.item.points[index];
+      return (
+        element.x === nextPropElement.x &&
+        element.y === nextPropElement.y &&
+        element.redLaserPowerPwm === nextPropElement.redLaserPowerPwm &&
+        element.greenLaserPowerPwm === nextPropElement.greenLaserPowerPwm &&
+        element.blueLaserPowerPwm === nextPropElement.blueLaserPowerPwm
+      );
+    });
+  if (
+    prevProps.namePlaceHolder === nextProps.namePlaceHolder &&
+    pointsAreSame
+  ) {
+    return true; // props are equal
+  }
+  return false; // props are not equal -> update the component
+});
