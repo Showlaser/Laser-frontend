@@ -157,10 +157,10 @@ function PointsForm({ item, onChange }) {
 
 // checks if props are the same. If true no rerender will occur. This is to improve performance
 export default React.memo(PointsForm, (prevProps, nextProps) => {
-  alert("test me!");
+  // TODO alert("test me!");
   if (
     prevProps.namePlaceHolder === nextProps.namePlaceHolder &&
-    objectsAreSame(prevProps.item.points, nextProps.item.points)
+    objectsAreSame(prevProps?.item?.points, nextProps?.item?.points)
   ) {
     return true;
   }
