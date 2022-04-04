@@ -24,7 +24,7 @@ export default function TimelineSection({
 
   const onSubItemSelect = (selectedSubItemName) => {
     const selectedSubItem = availableItems.find(
-      (p) => p.name === selectedSubItemName
+      (si) => si.name === selectedSubItemName
     );
 
     onSelect(selectedSubItem);

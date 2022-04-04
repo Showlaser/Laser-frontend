@@ -12,8 +12,6 @@ function PointsForm({ item, onChange }) {
     return null;
   }
 
-  item.points = item?.points?.sort((a, b) => (a.order > b.order ? 1 : -1));
-
   const onPointUpdate = (pointUuid, property, value) => {
     if (typeof property !== "string") {
       return;
@@ -42,13 +40,18 @@ function PointsForm({ item, onChange }) {
   };
 
   const deletePoint = (uuid) => {
-    let points = structuredClone(item?.points);
-    const index = points.findIndex((p) => p.uuid === uuid);
-    if (index === -1) {
+    const pointToDeleteIndex = item.points.findIndex((p) => p.uuid === uuid);
+    if (pointToDeleteIndex === -1) {
       return;
     }
 
-    points.splice(index, 1);
+    let points = structuredClone(item?.points);
+    points.splice(pointToDeleteIndex, 1);
+
+    for (let i = pointToDeleteIndex; i < points.length; i++) {
+      points[i].order = i;
+    }
+
     onChange(points);
   };
 
@@ -144,7 +147,7 @@ function PointsForm({ item, onChange }) {
       ))}
       <Button
         disabled={item === undefined}
-        onClick={() => addPoint()}
+        onClick={addPoint}
         style={{ margin: "10px", width: "360px" }}
         size="small"
         startIcon={<AddIcon />}
@@ -156,13 +159,9 @@ function PointsForm({ item, onChange }) {
 }
 
 // checks if props are the same. If true no rerender will occur. This is to improve performance
-export default React.memo(PointsForm, (prevProps, nextProps) => {
-  // TODO alert("test me!");
-  if (
+export default React.memo(
+  PointsForm,
+  (prevProps, nextProps) =>
     prevProps.namePlaceHolder === nextProps.namePlaceHolder &&
     objectsAreSame(prevProps?.item?.points, nextProps?.item?.points)
-  ) {
-    return true;
-  }
-  return false; // props are not equal -> update the component
-});
+);

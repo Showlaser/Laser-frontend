@@ -23,13 +23,23 @@ export default function AnimationEditor() {
   const [changesSaved, setChangesSaved] = useState(true);
 
   useEffect(() => {
-    getAnimations().then((a) => {
-      setAnimations(a);
-      const animationUuid = a.at(0)?.uuid ?? emptyGuid();
+    getAnimations().then((animationCollection) => {
+      animationCollection.forEach((animation) => {
+        animation.patternAnimations.forEach((pa) => {
+          pa.animationSettings.forEach((ast) => {
+            ast.points = ast?.points?.sort((a, b) =>
+              a.order > b.order ? 1 : -1
+            );
+          });
+        });
+      });
+
+      setAnimations(animationCollection);
+      const animationUuid = animationCollection.at(0)?.uuid ?? emptyGuid();
       setSelectedAnimationUuid(animationUuid);
 
       const patternAnimationUuid =
-        a.at(0)?.patternAnimations.at(0)?.uuid ?? emptyGuid();
+        animationCollection.at(0)?.patternAnimations.at(0)?.uuid ?? emptyGuid();
       setSelectedPatternAnimationUuid(patternAnimationUuid);
     });
     getPatterns().then((p) => setPatterns(p));
@@ -50,6 +60,7 @@ export default function AnimationEditor() {
     );
     animationToUpdate[property] = value;
     setAnimations(updatedAnimations);
+    setChangesSaved(false);
   };
 
   const addPatternToAnimation = (selectedPattern) => {
@@ -99,7 +110,7 @@ export default function AnimationEditor() {
             selectedSubItemUuid={selectedPatternAnimationUuid}
             selectedItemUuid={selectedAnimationUuid}
             setItems={setAnimations}
-            onSelect={setSelectedPatternAnimationUuid}
+            onSelect={addPatternToAnimation}
           />
         </div>
       ) : null}
