@@ -4,6 +4,7 @@ const voteApiUrl = "http://localhost:5002/";
 
 const apiEndpoints = {
   pattern: `${laserApiUrl}pattern`,
+  lasershow: `${laserApiUrl}lasershow`,
   animation: `${laserApiUrl}animation`,
   user: `${authApiUrl}user`,
   login: `${authApiUrl}user/login`,

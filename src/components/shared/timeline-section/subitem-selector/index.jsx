@@ -9,9 +9,7 @@ export default function SubItemSelector({ options, onSubitemSelect }) {
       <Autocomplete
         onChange={(e, name) => setSelectedSubItemName(name)}
         options={options}
-        renderInput={(params) => (
-          <TextField {...params} label="Select pattern" />
-        )}
+        renderInput={(params) => <TextField {...params} label="Select item" />}
       />
       <div>
         <Button

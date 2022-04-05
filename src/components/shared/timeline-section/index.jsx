@@ -7,9 +7,12 @@ export default function TimelineSection({
   items,
   availableItems,
   selectedSubItemUuid,
+  setSelectedSubItemUuid,
   selectedItemUuid,
   setItems,
   onSelect,
+  subItemsName,
+  getSubItemDuration,
 }) {
   useEffect(() => [
     items,
@@ -40,8 +43,11 @@ export default function TimelineSection({
       </div>
       <div id="timeline">
         <Timeline
-          onTimelineChannelItemClick={onSelect}
-          itemsInTimeline={selectedItem?.patternAnimations}
+          onTimelineChannelItemClick={setSelectedSubItemUuid}
+          itemsInTimeline={
+            selectedItem !== undefined ? selectedItem[subItemsName] : undefined
+          }
+          getSubItemDuration={getSubItemDuration}
         />
       </div>
     </div>

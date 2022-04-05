@@ -106,6 +106,13 @@ export default function AnimationEditor() {
           />
           <TimelineSection
             items={animations}
+            setSelectedSubItemUuid={setSelectedPatternAnimationUuid}
+            subItemsName="patternAnimations"
+            getSubItemDuration={(item) => {
+              return item.animationSettings
+                ?.sort((a, b) => (a.startTime > b.startTime ? 1 : -1))
+                ?.at(-1)?.startTime;
+            }}
             availableItems={patterns}
             selectedSubItemUuid={selectedPatternAnimationUuid}
             selectedItemUuid={selectedAnimationUuid}

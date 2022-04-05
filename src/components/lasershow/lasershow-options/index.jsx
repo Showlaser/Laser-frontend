@@ -2,98 +2,97 @@ import { Button, Divider, TextField } from "@mui/material";
 import Modal from "components/modal";
 import CrudComponent from "components/shared/crud-component";
 import { useState, React, useCallback } from "react";
-import {
-  playAnimation,
-  removeAnimation,
-  saveAnimation,
-} from "services/logic/animation-logic";
 import { createGuid } from "services/shared/math";
 import "./index.css";
 import SendIcon from "@mui/icons-material/Send";
+import {
+  playLasershow,
+  removeLasershow,
+  saveLasershow,
+} from "services/logic/lasershow-logic";
 
-export default function AnimationOptions({
-  animations,
-  selectedAnimationUuid,
+export default function LasershowOptions({
+  lasershows,
+  selectedLasershowUuid,
   changesSaved,
-  updateAnimationProperty,
-  setSelectedAnimationUuid,
+  updateLasershowProperty,
+  setSelectedLasershowUuid,
   setChangesSaved,
-  setAnimations,
+  setLasershows,
 }) {
   const [modalOptions, setModalOptions] = useState({
-    title: "Delete animation?",
+    title: "Delete lasershow?",
     show: false,
     onOkClick: null,
     onCancelClick: () => closeModal(),
   });
   const [, updateState] = useState();
-  const [animationPlaying, setAnimationPlaying] = useState(false);
+  const [lasershowPlaying, setLasershowPlaying] = useState(false);
   const forceUpdate = useCallback(() => updateState({}), []);
 
-  const selectedAnimation = animations?.find(
-    (a) => a?.uuid === selectedAnimationUuid
+  const selectedLasershow = lasershows?.find(
+    (l) => l?.uuid === selectedLasershowUuid
   );
 
   const closeModal = () => {
     let modal = modalOptions;
     modal.show = false;
     setModalOptions(modal);
-    forceUpdate();
   };
 
-  const deleteAnimation = () => {
-    let updatedAnimations = structuredClone(animations);
-    const animationUuid = updatedAnimations?.find(
-      (a) => a.uuid === selectedAnimationUuid
+  const deleteLasershow = () => {
+    let updatedLasershows = structuredClone(lasershows);
+    const lasershowUuid = updatedLasershows?.find(
+      (l) => l.uuid === selectedLasershowUuid
     )?.uuid;
-    updatedAnimations.splice(selectedAnimationUuid, 1);
-    removeAnimation(animationUuid);
-    setAnimations(updatedAnimations);
+    updatedLasershows.splice(selectedLasershowUuid, 1);
+    removeLasershow(lasershowUuid);
+    setLasershows(updatedLasershows);
   };
 
   const play = () => {
-    setAnimationPlaying(true);
-    playAnimation(selectedAnimation).then(() => setAnimationPlaying(false));
+    setLasershowPlaying(true);
+    playLasershow(selectedLasershow).then(() => setLasershowPlaying(false));
   };
 
   return (
-    <div id="animation-options">
+    <div id="lasershow-options">
       <Modal modal={modalOptions} />
       <CrudComponent
         selectOptions={{
-          selectText: "Select animation",
-          onChange: setSelectedAnimationUuid,
-          selectedValue: selectedAnimationUuid,
+          selectText: "Select lasershow",
+          onChange: setSelectedLasershowUuid,
+          selectedValue: selectedLasershowUuid,
         }}
-        itemsArray={animations}
+        itemsArray={lasershows}
         actions={{
           onSave: () => {
             setChangesSaved(true);
-            saveAnimation(
-              animations.find(
-                (animation) => animation.uuid === selectedAnimationUuid
+            saveLasershow(
+              lasershows.find(
+                (lasershow) => lasershow.uuid === selectedLasershowUuid
               )
             );
           },
           onAdd: () => {
             setChangesSaved(false);
-            let updatedAnimations = structuredClone(animations);
+            let updatedLasershows = structuredClone(lasershows);
             const uuid = createGuid();
 
-            updatedAnimations.push({
+            updatedLasershows.push({
               uuid,
-              name: "New",
-              patternAnimations: [],
+              name: "New lasershow",
+              animations: [],
             });
-            setSelectedAnimationUuid(uuid);
-            setAnimations(updatedAnimations);
+            setSelectedLasershowUuid(uuid);
+            setLasershows(updatedLasershows);
             setChangesSaved(false);
           },
           onDelete: () => {
             let modal = modalOptions;
             modal.show = true;
             modal.onOkClick = () => {
-              deleteAnimation();
+              deleteLasershow();
               closeModal();
             };
             setModalOptions(modal);
@@ -105,7 +104,7 @@ export default function AnimationOptions({
       >
         <Button
           variant="outlined"
-          disabled={animationPlaying}
+          disabled={lasershowPlaying}
           startIcon={<SendIcon />}
           onClick={play}
         >
@@ -115,10 +114,10 @@ export default function AnimationOptions({
       <br />
       <Divider />
       <TextField
-        value={selectedAnimation?.name ?? "No name"}
+        value={selectedLasershow?.name ?? "No name"}
         required
-        label="Animation name"
-        onChange={(e) => updateAnimationProperty("name", e.target.value)}
+        label="Lasershow name"
+        onChange={(e) => updateLasershowProperty("name", e.target.value)}
       />
     </div>
   );
