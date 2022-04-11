@@ -1,10 +1,11 @@
 import { createGuid } from "./math";
 
-export const getPointsPlaceHolder = (patternUuid, index) => {
+export const getPointsPlaceHolder = (parentUuid, index) => {
   return {
     uuid: createGuid(),
-    patternUuid: patternUuid,
-    patternAnimationSettingsUuid: patternUuid,
+    patternUuid: parentUuid,
+    patternAnimationSettingsUuid: parentUuid,
+    zoneUuid: parentUuid,
     x: 0,
     y: 0,
     redLaserPowerPwm: 6,

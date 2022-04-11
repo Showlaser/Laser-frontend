@@ -7,7 +7,8 @@ import AddIcon from "@mui/icons-material/Add";
 import React from "react";
 import { objectsAreSame } from "services/shared/general";
 
-function PointsForm({ item, onChange }) {
+function PointsForm({ item, onChange, options }) {
+  const { hideLaserPower } = options ?? {};
   if (item === undefined) {
     return null;
   }
@@ -85,54 +86,58 @@ function PointsForm({ item, onChange }) {
               onPointUpdate(point.uuid, "y", Number(e.target.value))
             }
           />
-          <TextField
-            name={`r${index}`}
-            size="small"
-            style={{ margin: "2px" }}
-            InputProps={{ inputProps: { min: 0, max: 255 } }}
-            type="number"
-            label="R"
-            defaultValue={point?.redLaserPowerPwm}
-            onChange={(e) =>
-              onPointUpdate(
-                point.uuid,
-                "redLaserPowerPwm",
-                Number(e.target.value)
-              )
-            }
-          />
-          <TextField
-            name={`r${index}`}
-            size="small"
-            style={{ margin: "2px" }}
-            InputProps={{ inputProps: { min: 0, max: 255 } }}
-            type="number"
-            label="G"
-            defaultValue={point?.greenLaserPowerPwm}
-            onChange={(e) =>
-              onPointUpdate(
-                point.uuid,
-                "greenLaserPowerPwm",
-                Number(e.target.value)
-              )
-            }
-          />
-          <TextField
-            name={`r${index}`}
-            size="small"
-            style={{ margin: "2px" }}
-            InputProps={{ inputProps: { min: 0, max: 255 } }}
-            type="number"
-            label="B"
-            defaultValue={point?.blueLaserPowerPwm}
-            onChange={(e) =>
-              onPointUpdate(
-                point.uuid,
-                "blueLaserPowerPwm",
-                Number(e.target.value)
-              )
-            }
-          />
+          {!hideLaserPower ? (
+            <span>
+              <TextField
+                name={`r${index}`}
+                size="small"
+                style={{ margin: "2px" }}
+                InputProps={{ inputProps: { min: 0, max: 255 } }}
+                type="number"
+                label="R"
+                defaultValue={point?.redLaserPowerPwm}
+                onChange={(e) =>
+                  onPointUpdate(
+                    point.uuid,
+                    "redLaserPowerPwm",
+                    Number(e.target.value)
+                  )
+                }
+              />
+              <TextField
+                name={`r${index}`}
+                size="small"
+                style={{ margin: "2px" }}
+                InputProps={{ inputProps: { min: 0, max: 255 } }}
+                type="number"
+                label="G"
+                defaultValue={point?.greenLaserPowerPwm}
+                onChange={(e) =>
+                  onPointUpdate(
+                    point.uuid,
+                    "greenLaserPowerPwm",
+                    Number(e.target.value)
+                  )
+                }
+              />
+              <TextField
+                name={`r${index}`}
+                size="small"
+                style={{ margin: "2px" }}
+                InputProps={{ inputProps: { min: 0, max: 255 } }}
+                type="number"
+                label="B"
+                defaultValue={point?.blueLaserPowerPwm}
+                onChange={(e) =>
+                  onPointUpdate(
+                    point.uuid,
+                    "blueLaserPowerPwm",
+                    Number(e.target.value)
+                  )
+                }
+              />
+            </span>
+          ) : null}
           <IconButton
             key={"delete" + item.uuid + index}
             onClick={() => deletePoint(point.uuid)}
