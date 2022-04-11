@@ -1,13 +1,14 @@
 import AnimationSettings from "./settings";
 import "./index.css";
 import AnimationTimeline from "./animation-timeline";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { stringIsEmpty } from "services/shared/general";
 import { createGuid } from "services/shared/math";
 import Modal from "components/modal";
 import PointsDrawer from "components/shared/points-drawer";
 
 export default function AnimationSection({
+  duplicatePatternAnimation,
   setAnimations,
   animations,
   selectedPatternAnimationUuid,
@@ -16,6 +17,8 @@ export default function AnimationSection({
   const [timeLineCurrentMs, setTimeLineCurrentMs] = useState(0);
   const [, updateState] = useState();
   const forceUpdate = useCallback(() => updateState({}), []);
+  const animationStateRef = useRef();
+  animationStateRef.current = animations;
 
   const [modalOptions, setModalOptions] = useState({
     title: "Delete pattern animation?",
@@ -39,7 +42,7 @@ export default function AnimationSection({
 
   const selectedPatternAnimation =
     animations !== undefined
-      ? animations
+      ? animationStateRef.current
           ?.find((ua) => ua?.uuid === selectedAnimationUuid)
           ?.patternAnimations?.find(
             (pa) => pa?.uuid === selectedPatternAnimationUuid
@@ -58,7 +61,7 @@ export default function AnimationSection({
       return;
     }
 
-    let updatedAnimations = structuredClone(animations);
+    let updatedAnimations = structuredClone(animationStateRef.current);
     let selectedPattern = updatedAnimations
       .find((ua) => ua.uuid === selectedAnimationUuid)
       .patternAnimations.find((pa) => pa.uuid === selectedPatternAnimationUuid);
@@ -127,6 +130,7 @@ export default function AnimationSection({
     <div id="animation-section">
       <Modal modal={modalOptions} />
       <AnimationSettings
+        duplicatePatternAnimation={duplicatePatternAnimation}
         setTimeLineCurrentMs={setTimeLineCurrentMs}
         timeLineCurrentMs={timeLineCurrentMs}
         selectedSetting={selectedSetting}

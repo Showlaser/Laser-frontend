@@ -1,9 +1,7 @@
 import { Button } from "@mui/material";
 import "./index.css";
 
-export default function Modal(props) {
-  const { modal } = props;
-
+export default function Modal({ modal }) {
   return modal?.show ? (
     <div id="modal">
       <div id="modal-items">

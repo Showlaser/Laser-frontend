@@ -22,9 +22,7 @@ export default function TimeLineChannel({
               width: `${getSubItemDuration(item)}px`,
             }}
             key={item?.uuid + "timeline"}
-            onClick={() => {
-              onTimelineChannelItemClick(item.uuid);
-            }}
+            onClick={() => onTimelineChannelItemClick(item.uuid)}
             className="timeline-channel-item"
           >
             {item.name}

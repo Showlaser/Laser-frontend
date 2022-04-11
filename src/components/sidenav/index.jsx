@@ -17,7 +17,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { Tooltip } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import BrushIcon from "@mui/icons-material/Brush";
 import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import SettingsIcon from "@mui/icons-material/Settings";
 import paths from "services/shared/router-paths";
@@ -142,12 +141,7 @@ export default function SideNav({ content, settings }) {
             {
               title: "Lasershow editor",
               icon: <TheatersIcon />,
-              path: paths.Lasershow,
-            },
-            {
-              title: "Animation editor",
-              icon: <BrushIcon />,
-              path: paths.AnimationEditor,
+              path: paths.LasershowEditor,
             },
             {
               title: "Pattern editor",

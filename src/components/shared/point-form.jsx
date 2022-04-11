@@ -4,10 +4,14 @@ import { getPointsPlaceHolder } from "services/shared/points";
 import { Button, IconButton, TextField } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import React from "react";
 import { objectsAreSame } from "services/shared/general";
+import React, { useState } from "react";
 
 function PointsForm({ item, onChange, options }) {
+  const [redPower, setRedPower] = useState(0);
+  const [greenPower, setGreenPower] = useState(0);
+  const [bluePower, setBluePower] = useState(0);
+
   const { hideLaserPower } = options ?? {};
   if (item === undefined) {
     return null;
@@ -57,7 +61,71 @@ function PointsForm({ item, onChange, options }) {
   };
 
   return (
-    <div key={"form" + item?.uuid + item?.points[0]?.uuid}>
+    <div
+      key={
+        "form" +
+        item?.uuid +
+        item?.points[0]?.uuid +
+        redPower +
+        greenPower +
+        bluePower
+      }
+    >
+      {!hideLaserPower ? (
+        <span>
+          <TextField
+            size="small"
+            style={{ margin: "2px" }}
+            InputProps={{ inputProps: { min: 0, max: 255 } }}
+            type="number"
+            label="R all"
+            value={redPower}
+            onChange={(e) => {
+              let updatedPoints = [];
+              structuredClone(item?.points)?.forEach((point) => {
+                point.redLaserPowerPwm = Number(e.target.value);
+                updatedPoints.push(point);
+              });
+              onChange(updatedPoints);
+              setRedPower(Number(e.target.value));
+            }}
+          />
+          <TextField
+            size="small"
+            style={{ margin: "2px" }}
+            InputProps={{ inputProps: { min: 0, max: 255 } }}
+            type="number"
+            label="G all"
+            value={greenPower}
+            onChange={(e) => {
+              let updatedPoints = [];
+              structuredClone(item?.points)?.forEach((point) => {
+                point.greenLaserPowerPwm = Number(e.target.value);
+                updatedPoints.push(point);
+              });
+              onChange(updatedPoints);
+              setGreenPower(Number(e.target.value));
+            }}
+          />
+          <TextField
+            size="small"
+            style={{ margin: "2px" }}
+            InputProps={{ inputProps: { min: 0, max: 255 } }}
+            type="number"
+            label="B all"
+            value={bluePower}
+            onChange={(e) => {
+              let updatedPoints = [];
+              structuredClone(item?.points)?.forEach((point) => {
+                point.blueLaserPowerPwm = Number(e.target.value);
+                updatedPoints.push(point);
+              });
+              onChange(updatedPoints);
+              setBluePower(Number(e.target.value));
+            }}
+          />
+        </span>
+      ) : null}
       {item?.points?.map((point, index) => (
         <div key={point?.uuid}>
           <small>Point {index}</small>
@@ -105,7 +173,6 @@ function PointsForm({ item, onChange, options }) {
                 }
               />
               <TextField
-                name={`r${index}`}
                 size="small"
                 style={{ margin: "2px" }}
                 InputProps={{ inputProps: { min: 0, max: 255 } }}
@@ -121,7 +188,6 @@ function PointsForm({ item, onChange, options }) {
                 }
               />
               <TextField
-                name={`r${index}`}
                 size="small"
                 style={{ margin: "2px" }}
                 InputProps={{ inputProps: { min: 0, max: 255 } }}
@@ -164,9 +230,9 @@ function PointsForm({ item, onChange, options }) {
 }
 
 // checks if props are the same. If true no rerender will occur. This is to improve performance
-export default React.memo(
-  PointsForm,
-  (prevProps, nextProps) =>
+export default React.memo(PointsForm, (prevProps, nextProps) => {
+  return (
     prevProps.namePlaceHolder === nextProps.namePlaceHolder &&
-    objectsAreSame(prevProps?.item?.points, nextProps?.item?.points)
-);
+    objectsAreSame(prevProps?.item, nextProps?.item)
+  );
+});

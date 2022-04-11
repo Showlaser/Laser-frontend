@@ -8,7 +8,7 @@ import {
   getPatternAnimationPlaceholder,
 } from "services/logic/animation-logic";
 import { getPatterns } from "services/logic/pattern-logic";
-import { emptyGuid } from "services/shared/math";
+import { createGuid, emptyGuid } from "services/shared/math";
 import { stringIsEmpty } from "services/shared/general";
 import TimelineSection from "components/shared/timeline-section";
 
@@ -46,7 +46,7 @@ export default function AnimationEditor() {
   }, []);
 
   const sideNavSettings = {
-    pageName: "Animation editor",
+    pageName: "Lasershow editor",
   };
 
   const updateAnimationProperty = (property, value) => {
@@ -84,6 +84,31 @@ export default function AnimationEditor() {
     setSelectedPatternAnimationUuid(placeholder.uuid);
   };
 
+  const duplicatePatternAnimation = (selectedPatternAnimation) => {
+    if (selectedPatternAnimation === undefined) {
+      return;
+    }
+
+    let newPatternAnimation = structuredClone(selectedPatternAnimation);
+    newPatternAnimation.uuid = createGuid();
+    newPatternAnimation.name += " duplicate";
+    newPatternAnimation.animationSettings.forEach((setting) => {
+      setting.uuid = createGuid();
+      setting.points.forEach((point) => (point.uuid = createGuid()));
+    });
+
+    let updatedAnimations = structuredClone(animations);
+    let updatedAnimation = updatedAnimations.find(
+      (a) => a.uuid === selectedAnimationUuid
+    );
+
+    updatedAnimation?.patternAnimations?.push(newPatternAnimation);
+    setAnimations(updatedAnimations);
+
+    setChangesSaved(false);
+    setSelectedPatternAnimationUuid(newPatternAnimation.uuid);
+  };
+
   const content = (
     <div id="animation">
       <AnimationOptions
@@ -98,6 +123,7 @@ export default function AnimationEditor() {
       {animations?.length > 0 ? (
         <div>
           <AnimationSection
+            duplicatePatternAnimation={duplicatePatternAnimation}
             setAnimations={setAnimations}
             animations={animations}
             patterns={patterns}
