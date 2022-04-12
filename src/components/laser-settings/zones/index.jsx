@@ -103,6 +103,14 @@ export default function Zones({ onDataAvailable }) {
             let modal = modalOptions;
             modal.show = true;
             modal.onOkClick = () => {
+              const index = zones.findIndex((z) => z.uuid === selectedZoneUuid);
+              if (index === -1) {
+                return;
+              }
+
+              let updatedZones = structuredClone(zones);
+              updatedZones.splice(index, 1);
+              setZones(updatedZones);
               deleteZone(selectedZoneUuid);
               closeModal();
             };
