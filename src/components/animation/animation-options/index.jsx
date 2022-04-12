@@ -108,6 +108,8 @@ export default function AnimationOptions({
           disabled={animationPlaying}
           startIcon={<SendIcon />}
           onClick={play}
+          style={{ marginLeft: "5px" }}
+          size="small"
         >
           Run
         </Button>

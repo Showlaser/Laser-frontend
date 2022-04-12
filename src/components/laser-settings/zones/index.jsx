@@ -11,11 +11,11 @@ import {
 import PointForm from "components/shared/point-form";
 import Modal from "components/modal";
 import PointsDrawer from "components/shared/points-drawer";
-import { Grid, TextField, Button, Divider } from "@mui/material";
+import { Grid, TextField, Button } from "@mui/material";
 import { stringIsEmpty } from "services/shared/general";
 import SendIcon from "@mui/icons-material/Send";
 
-export default function Zones() {
+export default function Zones({ onDataAvailable }) {
   const [zones, setZones] = useState([]);
   const [selectedZoneUuid, setSelectedZoneUuid] = useState();
   const [zonePlaying, setZonePlaying] = useState(false);
@@ -32,6 +32,7 @@ export default function Zones() {
 
   useEffect(() => {
     getZones().then((data) => {
+      onDataAvailable(data);
       setZones(data);
       setSelectedZoneUuid(data[0]?.uuid ?? emptyGuid());
     });
@@ -116,6 +117,8 @@ export default function Zones() {
           disabled={zonePlaying}
           startIcon={<SendIcon />}
           onClick={play}
+          style={{ marginLeft: "5px" }}
+          size="small"
         >
           Run
         </Button>

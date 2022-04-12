@@ -11,6 +11,7 @@ import { getPatterns } from "services/logic/pattern-logic";
 import { createGuid, emptyGuid } from "services/shared/math";
 import { stringIsEmpty } from "services/shared/general";
 import TimelineSection from "components/shared/timeline-section";
+import Loading from "components/shared/loading";
 
 export default function AnimationEditor() {
   const [selectedAnimationUuid, setSelectedAnimationUuid] = useState(
@@ -18,7 +19,7 @@ export default function AnimationEditor() {
   );
   const [selectedPatternAnimationUuid, setSelectedPatternAnimationUuid] =
     useState();
-  const [animations, setAnimations] = useState([]);
+  const [animations, setAnimations] = useState();
   const [patterns, setPatterns] = useState([]);
   const [changesSaved, setChangesSaved] = useState(true);
 
@@ -110,43 +111,47 @@ export default function AnimationEditor() {
   };
 
   const content = (
-    <div id="animation">
-      <AnimationOptions
-        setAnimations={setAnimations}
-        setSelectedAnimationUuid={setSelectedAnimationUuid}
-        animations={animations}
-        setChangesSaved={setChangesSaved}
-        changesSaved={changesSaved}
-        updateAnimationProperty={updateAnimationProperty}
-        selectedAnimationUuid={selectedAnimationUuid}
-      />
-      {animations?.length > 0 ? (
-        <div>
-          <AnimationSection
-            duplicatePatternAnimation={duplicatePatternAnimation}
-            setAnimations={setAnimations}
-            animations={animations}
-            patterns={patterns}
-            selectedAnimationUuid={selectedAnimationUuid}
-            selectedPatternAnimationUuid={selectedPatternAnimationUuid}
-          />
-          <TimelineSection
-            items={animations}
-            setSelectedSubItemUuid={setSelectedPatternAnimationUuid}
-            subItemsName="patternAnimations"
-            getSubItemDuration={(item) => {
-              return item.animationSettings
-                ?.sort((a, b) => (a.startTime > b.startTime ? 1 : -1))
-                ?.at(-1)?.startTime;
-            }}
-            availableItems={patterns}
-            selectedSubItemUuid={selectedPatternAnimationUuid}
-            selectedItemUuid={selectedAnimationUuid}
-            setItems={setAnimations}
-            onSelect={addPatternToAnimation}
-          />
-        </div>
-      ) : null}
+    <div>
+      <div id="animation">
+        <AnimationOptions
+          setAnimations={setAnimations}
+          setSelectedAnimationUuid={setSelectedAnimationUuid}
+          animations={animations}
+          setChangesSaved={setChangesSaved}
+          changesSaved={changesSaved}
+          updateAnimationProperty={updateAnimationProperty}
+          selectedAnimationUuid={selectedAnimationUuid}
+        />
+        <Loading objectToLoad={animations}>
+          {animations?.length > 0 ? (
+            <div>
+              <AnimationSection
+                duplicatePatternAnimation={duplicatePatternAnimation}
+                setAnimations={setAnimations}
+                animations={animations}
+                patterns={patterns}
+                selectedAnimationUuid={selectedAnimationUuid}
+                selectedPatternAnimationUuid={selectedPatternAnimationUuid}
+              />
+              <TimelineSection
+                items={animations}
+                setSelectedSubItemUuid={setSelectedPatternAnimationUuid}
+                subItemsName="patternAnimations"
+                getSubItemDuration={(item) => {
+                  return item.animationSettings
+                    ?.sort((a, b) => (a.startTime > b.startTime ? 1 : -1))
+                    ?.at(-1)?.startTime;
+                }}
+                availableItems={patterns}
+                selectedSubItemUuid={selectedPatternAnimationUuid}
+                selectedItemUuid={selectedAnimationUuid}
+                setItems={setAnimations}
+                onSelect={addPatternToAnimation}
+              />
+            </div>
+          ) : null}
+        </Loading>
+      </div>
     </div>
   );
 

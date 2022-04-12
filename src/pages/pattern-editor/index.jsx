@@ -17,12 +17,13 @@ import { stringIsEmpty } from "services/shared/general";
 import PointsDrawer from "components/shared/points-drawer";
 import SendIcon from "@mui/icons-material/Send";
 import { Button, Divider, TextField } from "@mui/material";
+import Loading from "components/shared/loading";
 
 export default function PatternEditor() {
   const [selectedPatternUuid, setSelectedPatternAnimationUuid] = useState(
     emptyGuid()
   );
-  const [patterns, setPatterns] = useState([]);
+  const [patterns, setPatterns] = useState();
   const [, updateState] = useState();
   const forceUpdate = useCallback(() => updateState({}), []);
   const [changesSaved, setChangesSaved] = useState(true);
@@ -34,7 +35,7 @@ export default function PatternEditor() {
     onCancelClick: () => closeModal(),
   });
   const selectedPattern =
-    patterns.find((p) => p?.uuid === selectedPatternUuid) ?? patterns?.at(-1);
+    patterns?.find((p) => p?.uuid === selectedPatternUuid) ?? patterns?.at(-1);
 
   useEffect(() => {
     getPatterns().then((p) => {
@@ -104,78 +105,82 @@ export default function PatternEditor() {
   };
 
   const content = (
-    <div id="patterns-wrapper">
-      <DeleteModal modal={modalOptions} />
-      <h2>Patterns</h2>
-      <p>Patterns can be used on the animation page</p>
-      <div id="patterns-form-wrapper">
-        <CrudComponent
-          selectOptions={{
-            selectText: "Select pattern",
-            onChange: (selectedUuid) => {
-              setSelectedPatternAnimationUuid(selectedUuid);
-            },
-            selectedValue: selectedPatternUuid,
-          }}
-          itemsArray={patterns}
-          actions={{
-            onSave: () => {
-              setChangesSaved(true);
-              savePattern(
-                patterns.find((p) => p?.uuid === selectedPatternUuid)
-              );
-            },
-            onAdd: () => {
-              setChangesSaved(false);
-              let updatedPatterns = structuredClone(patterns);
-              const placeHolder = getPatternPlaceHolder();
-              updatedPatterns.push(placeHolder);
-              setPatterns(updatedPatterns);
-              setSelectedPatternAnimationUuid(placeHolder.uuid);
-            },
-            onDelete: () => {
-              let modal = modalOptions;
-              modal.show = true;
-              modal.onOkClick = () => {
-                deletePattern();
-                closeModal();
-              };
-              setModalOptions(modal);
-              forceUpdate();
-            },
-            templates: [
-              {
-                name: "Circle",
-                getTemplate: () => loadTemplate(getCircleTemplate),
+    <Loading objectToLoad={patterns}>
+      <div id="patterns-wrapper">
+        <DeleteModal modal={modalOptions} />
+        <h2>Patterns</h2>
+        <p>Patterns can be used on the animation page</p>
+        <div id="patterns-form-wrapper">
+          <CrudComponent
+            selectOptions={{
+              selectText: "Select pattern",
+              onChange: (selectedUuid) => {
+                setSelectedPatternAnimationUuid(selectedUuid);
               },
-            ],
-          }}
-          changesSaved={changesSaved}
-        >
-          <Button
-            variant="outlined"
-            disabled={patternPlaying}
-            startIcon={<SendIcon />}
-            onClick={play}
+              selectedValue: selectedPatternUuid,
+            }}
+            itemsArray={patterns}
+            actions={{
+              onSave: () => {
+                setChangesSaved(true);
+                savePattern(
+                  patterns.find((p) => p?.uuid === selectedPatternUuid)
+                );
+              },
+              onAdd: () => {
+                setChangesSaved(false);
+                let updatedPatterns = structuredClone(patterns);
+                const placeHolder = getPatternPlaceHolder();
+                updatedPatterns.push(placeHolder);
+                setPatterns(updatedPatterns);
+                setSelectedPatternAnimationUuid(placeHolder.uuid);
+              },
+              onDelete: () => {
+                let modal = modalOptions;
+                modal.show = true;
+                modal.onOkClick = () => {
+                  deletePattern();
+                  closeModal();
+                };
+                setModalOptions(modal);
+                forceUpdate();
+              },
+              templates: [
+                {
+                  name: "Circle",
+                  getTemplate: () => loadTemplate(getCircleTemplate),
+                },
+              ],
+            }}
+            changesSaved={changesSaved}
           >
-            Run
-          </Button>
-        </CrudComponent>
-        <Divider style={{ marginTop: "5px" }} />
-        <TextField
-          label="Pattern name"
-          value={selectedPattern?.name ?? ""}
-          onChange={(e) => updatePatternProperty("name", e.target.value)}
-        />
-        <PointsForm
-          namePlaceHolder="Pattern name"
-          item={selectedPattern}
-          onChange={(newPoints) => updatePatternProperty("points", newPoints)}
-        />
-      </div>
+            <Button
+              variant="outlined"
+              disabled={patternPlaying}
+              startIcon={<SendIcon />}
+              onClick={play}
+              style={{ marginLeft: "5px" }}
+              size="small"
+            >
+              Run
+            </Button>
+          </CrudComponent>
+          <Divider style={{ marginTop: "5px" }} />
+          <TextField
+            label="Pattern name"
+            value={selectedPattern?.name ?? ""}
+            onChange={(e) => updatePatternProperty("name", e.target.value)}
+          />
+          <PointsForm
+            namePlaceHolder="Pattern name"
+            item={selectedPattern}
+            onChange={(newPoints) => updatePatternProperty("points", newPoints)}
+          />
+        </div>
 
-      <PointsDrawer points={selectedPattern?.points} />
-    </div>
+        <PointsDrawer points={selectedPattern?.points} />
+      </div>
+    </Loading>
   );
 
   return (

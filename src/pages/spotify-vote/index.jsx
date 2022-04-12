@@ -1,4 +1,5 @@
 import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import Loading from "components/shared/loading";
 import SideNav from "components/sidenav";
 import SpotifyPlaylist from "components/spotify-vote/spotify-playlist";
 import VoteOverView from "components/spotify-vote/vote-overview";
@@ -21,7 +22,7 @@ export default function SpotifyVote() {
   const voteCookie = cookie.get("vote-started");
   const voteInProgress = voteCookie !== undefined;
 
-  const [userPlaylists, setUserPlaylists] = useState([]);
+  const [userPlaylists, setUserPlaylists] = useState();
   const [voteValidTimeInMinutes, setVoteValidTimeInMinutes] = useState(5);
   const [voteStarted, setVoteStarted] = useState(voteInProgress);
   const [joinData, setJoinData] = useState(voteCookie?.joinInfo ?? undefined);
@@ -177,7 +178,7 @@ export default function SpotifyVote() {
   };
 
   const voteComponents = voteStarted ? (
-    <div>
+    <Loading objectToLoad={joinData}>
       <p>
         Users can join the session at http://localhost:3001/ with the following
         codes:
@@ -194,16 +195,16 @@ export default function SpotifyVote() {
         />
       </FormGroup>
       <VoteOverView voteCookie={voteCookie} voteState={voteState} />
-    </div>
+    </Loading>
   ) : (
-    <div>
+    <Loading objectToLoad={userPlaylists}>
       <VoteSettings setVoteValidTimeInMinutes={setVoteValidTimeInMinutes} />
       <SpotifyPlaylist
         voteStarted={voteStarted}
         userPlaylists={userPlaylists}
         onVoteStart={(selectedPlaylistsId) => onVoteStart(selectedPlaylistsId)}
       />
-    </div>
+    </Loading>
   );
 
   const content =

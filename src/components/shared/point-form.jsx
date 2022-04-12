@@ -219,7 +219,7 @@ function PointsForm({ item, onChange, options }) {
       <Button
         disabled={item === undefined}
         onClick={addPoint}
-        style={{ margin: "10px", width: "360px" }}
+        style={{ marginTop: "10px", width: "305px" }}
         size="small"
         startIcon={<AddIcon />}
       >

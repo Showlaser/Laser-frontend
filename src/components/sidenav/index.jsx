@@ -171,7 +171,7 @@ export default function SideNav({ content, settings }) {
           ))}
         </List>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 1 }}>
+      <Box className="fade-in" component="main" sx={{ flexGrow: 1, p: 1 }}>
         <DrawerHeader />
         {content}
       </Box>

@@ -1,93 +1,47 @@
-import { List } from "@mui/icons-material";
 import {
-  Button,
   Divider,
   Grid,
   ListItem,
   ListItemText,
   Paper,
+  List,
 } from "@mui/material";
+import Loading from "components/shared/loading";
 import SideNav from "components/sidenav";
 import React, { useState, useEffect } from "react";
-import {
-  showInfo,
-  showWarning,
-  toastSubject,
-} from "services/shared/toast-messages";
+import { getDashboardData } from "services/logic/dashboard-logic";
 
 export default function Dashboard() {
-  const [laser, setLaser] = useState({});
+  const [dashboardData, setDashboardData] = useState(undefined);
+  const { laserStatus, laserSettings, logs, shows } = dashboardData ?? {};
 
   useEffect(() => {
-    const laserTelemetry = {
-      connected: true,
-      temperatures: {
-        galvo: {
-          currentTemp: 50,
-          maxTemp: 60,
-        },
-        basePlate: {
-          currentTemp: 35,
-          maxTemp: 50,
-        },
-      },
-      logs: {
-        errors: [],
-        warnings: [
-          {
-            title: "Laser not connected",
-            message: "The laser is not connected to the computer",
-            dateTime: "29-11-2021 16:50",
-          },
-        ],
-      },
-      settings: {
-        development: {
-          developmentModeEnabled: true,
-        },
-      },
-    };
-
-    setLaser(laserTelemetry);
-
-    const { logs, settings } = laserTelemetry;
-    if (logs?.errors?.includes || logs?.warnings?.includes) {
-      showWarning(toastSubject.logsNotEmpty);
-    }
-    if (settings?.development?.developmentModeEnabled) {
-      showInfo(toastSubject.developmentModeActive);
-    }
+    getDashboardData().then((data) => setDashboardData(data));
+    setInterval(
+      () => getDashboardData().then((data) => setDashboardData(data)),
+      10000
+    );
   }, []);
-
-  const clearLogs = () => {
-    alert("Not implemented yet!");
-  };
 
   const sideNavSettings = {
     pageName: "Dashboard",
   };
 
   const content = (
-    <div>
+    <Loading objectToLoad={dashboardData}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Paper style={{ padding: "8px" }}>
             <h1>Laser status</h1>
-            <p>
-              {laser?.connected ? (
-                <div>
-                  Connected{" "}
-                  <span style={{ color: laser?.connected ? "green" : "red" }}>
-                    {" "}
-                    &#x25cf;
-                  </span>
-                </div>
-              ) : (
-                <div>
-                  <span style={{ color: "red" }}> Not connected</span>
-                </div>
-              )}
-            </p>
+            {laserStatus?.connected ? (
+              <p>
+                Connected <span style={{ color: "green" }}> &#x25cf;</span>
+              </p>
+            ) : (
+              <p>
+                <span style={{ color: "red" }}> Not connected</span>
+              </p>
+            )}
           </Paper>
         </Grid>
         <Grid item xs={6}>
@@ -95,19 +49,24 @@ export default function Dashboard() {
             <h1>Laser settings</h1>
             <hr />
             <b>Zones</b>
+            <br />
             <List>
-              <p>Total: 2</p>
+              <p>Total: {laserSettings?.zonesLength}</p>
             </List>
             <Divider />
             <b>Development</b>
+            <br />
             <List>
-              <p>
-                Development mode enabled{" "}
-                <span style={{ color: "green", fontSize: "130%" }}>
+              {laserSettings?.developmentModeIsActive ? (
+                <p>
                   {" "}
-                  &#x25cf;
-                </span>
-              </p>
+                  Development mode enabled{" "}
+                  <span style={{ color: "green", fontSize: "130%" }}>
+                    {" "}
+                    &#x25cf;
+                  </span>
+                </p>
+              ) : null}
             </List>
           </Paper>
         </Grid>
@@ -118,36 +77,34 @@ export default function Dashboard() {
             <b>Error</b>
             <br />
             <List>
-              <ListItem>
-                {laser?.logs?.errors?.map((error, index) => (
-                  <ListItemText
-                    key={`error-${index}`}
-                    primary={error?.title}
-                    secondary={`${error?.message} ${error?.dateTime}`}
-                  />
+              {logs
+                ?.filter((l) => l.logType === "Error")
+                ?.map((error, index) => (
+                  <ListItem>
+                    <ListItemText
+                      key={`error-${index}`}
+                      primary={error?.message}
+                    />
+                  </ListItem>
                 ))}
-              </ListItem>
               <Divider component="li" />
             </List>
             <br />
             <b>Warnings</b>
             <br />
             <List>
-              <ListItem>
-                {laser?.logs?.warnings?.map((warning, index) => (
-                  <ListItemText
-                    key={`logs-${index}`}
-                    primary={warning?.title}
-                    secondary={`${warning?.message} ${warning?.dateTime}`}
-                  />
+              {logs
+                ?.filter((l) => l.logType === "Warning")
+                ?.map((warning, index) => (
+                  <ListItem>
+                    <ListItemText
+                      key={`logs-${index}`}
+                      primary={warning?.message}
+                    />
+                  </ListItem>
                 ))}
-              </ListItem>
               <Divider component="li" />
             </List>
-            <br />
-            <Button variant="text" onClick={() => clearLogs()}>
-              X Clear warnings
-            </Button>
           </Paper>
         </Grid>
         <Grid item xs={12}>
@@ -156,21 +113,19 @@ export default function Dashboard() {
             <hr />
             <List>
               <ListItem>
-                <ListItemText primary="Total" secondary="2" />
+                <ListItemText primary="Total" secondary={shows?.length} />
               </ListItem>
               <Divider component="li" />
-              <ListItem>
-                <ListItemText
-                  primary="Test show"
-                  secondary="21-07-2021 17:00"
-                />
-              </ListItem>
-              <Divider component="li" />
+              {shows?.map((show, index) => (
+                <ListItem key={`${index}-show`}>
+                  <ListItemText primary={show?.showName} />
+                </ListItem>
+              ))}
             </List>
           </Paper>
         </Grid>
       </Grid>
-    </div>
+    </Loading>
   );
 
   return (

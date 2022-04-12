@@ -14,6 +14,7 @@ const apiEndpoints = {
   refreshSpotifyAccessToken: `${authApiUrl}spotify/refresh`,
   vote: `${voteApiUrl}vote`,
   zone: `${laserApiUrl}zone`,
+  dashboard: `${laserApiUrl}dashboard`,
 };
 
 export default apiEndpoints;
