@@ -10,6 +10,7 @@ import {
 import { createGuid } from "services/shared/math";
 import "./index.css";
 import SendIcon from "@mui/icons-material/Send";
+import { deepClone } from "services/shared/general";
 
 export default function AnimationOptions({
   animations,
@@ -42,7 +43,7 @@ export default function AnimationOptions({
   };
 
   const deleteAnimation = () => {
-    let updatedAnimations = structuredClone(animations);
+    let updatedAnimations = deepClone(animations);
     const animationUuid = updatedAnimations?.find(
       (a) => a.uuid === selectedAnimationUuid
     )?.uuid;
@@ -77,7 +78,7 @@ export default function AnimationOptions({
           },
           onAdd: () => {
             setChangesSaved(false);
-            let updatedAnimations = structuredClone(animations);
+            let updatedAnimations = deepClone(animations);
             const uuid = createGuid();
 
             updatedAnimations.push({

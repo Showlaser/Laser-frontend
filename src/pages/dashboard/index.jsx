@@ -9,6 +9,7 @@ import {
 import Loading from "components/shared/loading";
 import SideNav from "components/sidenav";
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { getDashboardData } from "services/logic/dashboard-logic";
 
 export default function Dashboard() {
@@ -16,7 +17,12 @@ export default function Dashboard() {
   const { laserStatus, laserSettings, logs, shows } = dashboardData ?? {};
 
   useEffect(() => {
-    getDashboardData().then((data) => setDashboardData(data));
+    getDashboardData().then((data) => {
+      setDashboardData(data);
+      data?.logs
+        ?.filter((l) => l.logType === "Warning")
+        ?.forEach((warning) => toast.warning(warning.message));
+    });
     setInterval(
       () => getDashboardData().then((data) => setDashboardData(data)),
       10000

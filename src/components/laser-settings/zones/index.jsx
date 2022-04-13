@@ -12,7 +12,7 @@ import PointForm from "components/shared/point-form";
 import Modal from "components/modal";
 import PointsDrawer from "components/shared/points-drawer";
 import { Grid, TextField, Button } from "@mui/material";
-import { stringIsEmpty } from "services/shared/general";
+import { deepClone, stringIsEmpty } from "services/shared/general";
 import SendIcon from "@mui/icons-material/Send";
 
 export default function Zones({ onDataAvailable }) {
@@ -46,7 +46,7 @@ export default function Zones({ onDataAvailable }) {
   };
 
   const onPointsUpdate = (points) => {
-    let updatedZones = structuredClone(zones);
+    let updatedZones = deepClone(zones);
     let zoneToUpdate = updatedZones.find((z) => z.uuid === selectedZoneUuid);
     zoneToUpdate.points = points;
     setZones(updatedZones);
@@ -57,7 +57,7 @@ export default function Zones({ onDataAvailable }) {
       return;
     }
 
-    let updatedZones = structuredClone(zones);
+    let updatedZones = deepClone(zones);
     let zoneToUpdate = updatedZones.find((up) => up?.uuid === selectedZoneUuid);
     zoneToUpdate[property] = value;
     setZones(updatedZones);
@@ -86,7 +86,7 @@ export default function Zones({ onDataAvailable }) {
             saveZone(zones.find((zone) => zone.uuid === selectedZoneUuid));
           },
           onAdd: () => {
-            let updatedZones = structuredClone(zones);
+            let updatedZones = deepClone(zones);
             const uuid = createGuid();
             updatedZones.push({
               uuid,
@@ -108,7 +108,7 @@ export default function Zones({ onDataAvailable }) {
                 return;
               }
 
-              let updatedZones = structuredClone(zones);
+              let updatedZones = deepClone(zones);
               updatedZones.splice(index, 1);
               setZones(updatedZones);
               deleteZone(selectedZoneUuid);

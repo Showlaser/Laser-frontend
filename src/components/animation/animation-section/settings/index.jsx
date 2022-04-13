@@ -12,6 +12,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { deepClone } from "services/shared/general";
 
 export default function AnimationSettings({
   duplicatePatternAnimation,
@@ -209,7 +210,7 @@ export default function AnimationSettings({
         <Tooltip title="Delete current setting">
           <IconButton
             onClick={() => {
-              let settings = structuredClone(
+              let settings = deepClone(
                 selectedPatternAnimation?.animationSettings
               );
               const index = settings.findIndex(

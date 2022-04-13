@@ -9,7 +9,7 @@ import {
 } from "services/logic/animation-logic";
 import { getPatterns } from "services/logic/pattern-logic";
 import { createGuid, emptyGuid } from "services/shared/math";
-import { stringIsEmpty } from "services/shared/general";
+import { deepClone, stringIsEmpty } from "services/shared/general";
 import TimelineSection from "components/shared/timeline-section";
 import Loading from "components/shared/loading";
 
@@ -55,7 +55,7 @@ export default function AnimationEditor() {
       return;
     }
 
-    let updatedAnimations = structuredClone(animations);
+    let updatedAnimations = deepClone(animations);
     let animationToUpdate = updatedAnimations.find(
       (ua) => ua.uuid === selectedAnimationUuid
     );
@@ -69,7 +69,7 @@ export default function AnimationEditor() {
       return;
     }
 
-    let updatedAnimations = structuredClone(animations);
+    let updatedAnimations = deepClone(animations);
     let updatedAnimation = updatedAnimations.find(
       (a) => a.uuid === selectedAnimationUuid
     );
@@ -90,7 +90,7 @@ export default function AnimationEditor() {
       return;
     }
 
-    let newPatternAnimation = structuredClone(selectedPatternAnimation);
+    let newPatternAnimation = deepClone(selectedPatternAnimation);
     newPatternAnimation.uuid = createGuid();
     newPatternAnimation.name += " duplicate";
     newPatternAnimation.animationSettings.forEach((setting) => {
@@ -98,7 +98,7 @@ export default function AnimationEditor() {
       setting.points.forEach((point) => (point.uuid = createGuid()));
     });
 
-    let updatedAnimations = structuredClone(animations);
+    let updatedAnimations = deepClone(animations);
     let updatedAnimation = updatedAnimations.find(
       (a) => a.uuid === selectedAnimationUuid
     );

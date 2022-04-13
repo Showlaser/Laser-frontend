@@ -13,7 +13,7 @@ import {
 import DeleteModal from "components/modal";
 import CrudComponent from "components/shared/crud-component";
 import PointsForm from "components/shared/point-form";
-import { stringIsEmpty } from "services/shared/general";
+import { deepClone, stringIsEmpty } from "services/shared/general";
 import PointsDrawer from "components/shared/points-drawer";
 import SendIcon from "@mui/icons-material/Send";
 import { Button, Divider, TextField } from "@mui/material";
@@ -61,7 +61,7 @@ export default function PatternEditor() {
   };
 
   const deletePattern = () => {
-    let updatedPatterns = structuredClone(patterns).filter(
+    let updatedPatterns = deepClone(patterns).filter(
       (p) => p?.uuid !== selectedPatternUuid
     );
     removePattern(selectedPatternUuid);
@@ -78,7 +78,7 @@ export default function PatternEditor() {
   const loadTemplate = (templateFunction) => {
     setChangesSaved(false);
     const template = templateFunction();
-    let patternsToUpdate = structuredClone(patterns);
+    let patternsToUpdate = deepClone(patterns);
     patternsToUpdate.push(template);
     setPatterns(patternsToUpdate);
 
@@ -91,7 +91,7 @@ export default function PatternEditor() {
       return;
     }
 
-    let updatedPatterns = structuredClone(patterns);
+    let updatedPatterns = deepClone(patterns);
     let patternToUpdate = updatedPatterns.find(
       (up) => up?.uuid === selectedPatternUuid
     );
@@ -129,7 +129,7 @@ export default function PatternEditor() {
               },
               onAdd: () => {
                 setChangesSaved(false);
-                let updatedPatterns = structuredClone(patterns);
+                let updatedPatterns = deepClone(patterns);
                 const placeHolder = getPatternPlaceHolder();
                 updatedPatterns.push(placeHolder);
                 setPatterns(updatedPatterns);

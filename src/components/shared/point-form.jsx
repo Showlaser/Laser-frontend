@@ -4,7 +4,7 @@ import { getPointsPlaceHolder } from "services/shared/points";
 import { Button, IconButton, TextField } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import { objectsAreSame } from "services/shared/general";
+import { deepClone, objectsAreSame } from "services/shared/general";
 import React, { useState } from "react";
 
 function PointsForm({ item, onChange, options }) {
@@ -31,7 +31,7 @@ function PointsForm({ item, onChange, options }) {
       return;
     }
 
-    let points = structuredClone(item?.points);
+    let points = deepClone(item?.points);
     let pointToUpdate = points.find((p) => p?.uuid === pointUuid);
 
     pointToUpdate[property] = value;
@@ -39,7 +39,7 @@ function PointsForm({ item, onChange, options }) {
   };
 
   const addPoint = () => {
-    let points = structuredClone(item?.points);
+    let points = deepClone(item?.points);
     points.push(getPointsPlaceHolder(item.uuid, item.points.length));
     onChange(points);
   };
@@ -50,7 +50,7 @@ function PointsForm({ item, onChange, options }) {
       return;
     }
 
-    let points = structuredClone(item?.points);
+    let points = deepClone(item?.points);
     points.splice(pointToDeleteIndex, 1);
 
     for (let i = pointToDeleteIndex; i < points.length; i++) {
@@ -82,7 +82,7 @@ function PointsForm({ item, onChange, options }) {
             value={redPower}
             onChange={(e) => {
               let updatedPoints = [];
-              structuredClone(item?.points)?.forEach((point) => {
+              deepClone(item?.points)?.forEach((point) => {
                 point.redLaserPowerPwm = Number(e.target.value);
                 updatedPoints.push(point);
               });
@@ -99,7 +99,7 @@ function PointsForm({ item, onChange, options }) {
             value={greenPower}
             onChange={(e) => {
               let updatedPoints = [];
-              structuredClone(item?.points)?.forEach((point) => {
+              deepClone(item?.points)?.forEach((point) => {
                 point.greenLaserPowerPwm = Number(e.target.value);
                 updatedPoints.push(point);
               });
@@ -116,7 +116,7 @@ function PointsForm({ item, onChange, options }) {
             value={bluePower}
             onChange={(e) => {
               let updatedPoints = [];
-              structuredClone(item?.points)?.forEach((point) => {
+              deepClone(item?.points)?.forEach((point) => {
                 point.blueLaserPowerPwm = Number(e.target.value);
                 updatedPoints.push(point);
               });
