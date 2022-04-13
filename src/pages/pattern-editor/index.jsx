@@ -109,7 +109,7 @@ export default function PatternEditor() {
       <div id="patterns-wrapper">
         <DeleteModal modal={modalOptions} />
         <h2>Patterns</h2>
-        <p>Patterns can be used on the animation page</p>
+        <p>Patterns can be used on the lasershow page</p>
         <div id="patterns-form-wrapper">
           <CrudComponent
             selectOptions={{

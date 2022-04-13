@@ -141,11 +141,16 @@ export default function Zones({ onDataAvailable }) {
       <br />
       <TextField
         key={selectedZoneUuid + "zonesettings-power"}
-        label="Max allowed power in the zone"
+        label="Max allowed power in the zone (0 / 765)"
         onChange={(e) =>
           updateZoneProperty("maxLaserPowerInZonePwm", e.target.value)
         }
-        defaultValue={selectedZone?.maxLaserPowerInZonePwm}
+        type="number"
+        inputProps={{
+          min: 0,
+          max: 765,
+        }}
+        defaultValue={selectedZone?.maxLaserPowerInZonePwm ?? 20}
       />
       <Grid container>
         <PointForm

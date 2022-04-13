@@ -216,6 +216,7 @@ function PointsForm({ item, onChange, options }) {
           </IconButton>
         </div>
       ))}
+      <br />
       <Button
         disabled={item === undefined}
         onClick={addPoint}
