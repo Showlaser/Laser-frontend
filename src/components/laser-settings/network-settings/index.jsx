@@ -1,6 +1,15 @@
-import { TextField } from "@mui/material";
+import { Button, MenuItem, Select, TextField } from "@mui/material";
+import { useEffect, useState } from "react";
+import { getAvailableComDevices } from "services/logic/laser-network-settings";
 
-export default function LaserNetworkSettings(props) {
+export default function LaserNetworkSettings() {
+  const [availableComPorts, setAvailableComPorts] = useState([]);
+  const [selectedComPortId, setSelectedComPortId] = useState();
+
+  useEffect(() => {
+    getAvailableComDevices().then((data) => setAvailableComPorts(data));
+  }, []);
+
   const validateIp = (ip) => {
     if (
       /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
@@ -16,21 +25,31 @@ export default function LaserNetworkSettings(props) {
     if (!validateIp(ip)) {
       return;
     }
-
-    let updatedNetwork = props?.network;
-    updatedNetwork.ipAddress = ip;
-    props.callback(updatedNetwork, "network");
   };
 
   return (
     <div>
-      <h2>Network</h2>
-      <small>Laser ip address</small>
+      <h2>Laser network</h2>
+      <small>Computer ip address</small>
       <br />
       <TextField
-        placeholder="192.168.1.120"
+        placeholder="This computer ip address"
+        defaultValue={localStorage.getItem("computer-ip")}
         onChange={(e) => onIpChange(e.target.value)}
       />
+      <br />
+      <small>Server com port</small>
+      <br />
+      <Select
+        onChange={(e) => setSelectedComPortId(e.target.value)}
+        value={selectedComPortId ?? 0}
+      >
+        {availableComPorts?.map((comPort, index) => (
+          <MenuItem value={index}>{comPort}</MenuItem>
+        ))}
+      </Select>
+      <br />
+      <Button style={{ margin: "5px 0 5px 0" }}>Set server ip on laser</Button>
     </div>
   );
 }

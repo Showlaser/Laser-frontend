@@ -15,6 +15,8 @@ const apiEndpoints = {
   vote: `${voteApiUrl}vote`,
   zone: `${laserApiUrl}zone`,
   dashboard: `${laserApiUrl}dashboard`,
+  settings: `${laserApiUrl}settings`,
+  serial: `${laserApiUrl}settings/serial`,
 };
 
 export default apiEndpoints;
