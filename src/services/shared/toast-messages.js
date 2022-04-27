@@ -52,7 +52,23 @@ export const toastSubject = {
   },
   laserPwmPowerBoundaryError: {
     message: "Select a value between or equal to 0 and 255",
-    id: 0,
+    id: 12,
+  },
+  passwordResetSuccess: {
+    message: "Password reset successful",
+    id: 13,
+  },
+  passwordsDoNotMatch: {
+    message: "Passwords do not match",
+    id: 14,
+  },
+  invalidCode: {
+    message: "The code was invalid",
+    id: 15,
+  },
+  invalidLoginCredentials: {
+    message: "Username or password is invalid",
+    id: 16,
   },
 };
 

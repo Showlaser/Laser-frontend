@@ -27,7 +27,10 @@ export async function sendRequest(
   let response = await requestFunction();
   if (response.status === 401) {
     const refreshResponse = await Post(apiEndpoints.refreshToken, null, true);
-    if (refreshResponse.status !== 200) {
+    if (
+      refreshResponse.status !== 200 &&
+      !window.location.href.includes("login")
+    ) {
       window.location = paths.Login;
       return;
     }

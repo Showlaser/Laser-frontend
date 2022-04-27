@@ -7,8 +7,8 @@ const paths = {
   Installation: "/installation",
   Login: "/login",
   Register: "/registration",
-  ForgotPassword: "/forgot-password",
   SpotifyVote: "/vote",
+  ResetPassword: "/reset-password",
 };
 
 export default paths;
