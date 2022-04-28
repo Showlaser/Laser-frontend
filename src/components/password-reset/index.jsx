@@ -9,7 +9,7 @@ export default function ResetPassword({ code }) {
   const [buttonDisabled, setButtonDisabled] = useState(false);
 
   const passwordsMatch = () => {
-    return newPassword == newPasswordRepeat;
+    return newPassword === newPasswordRepeat;
   };
 
   return (

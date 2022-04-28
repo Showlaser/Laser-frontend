@@ -9,6 +9,7 @@ const paths = {
   Register: "/registration",
   SpotifyVote: "/vote",
   ResetPassword: "/reset-password",
+  Account: "/account",
 };
 
 export default paths;

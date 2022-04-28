@@ -22,6 +22,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import paths from "services/shared/router-paths";
 import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
 import TheatersIcon from "@mui/icons-material/Theaters";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const drawerWidth = 240;
 
@@ -157,6 +158,11 @@ export default function SideNav({ content, settings }) {
               title: "Laser settings",
               icon: <SettingsIcon />,
               path: paths.LaserSettings,
+            },
+            {
+              title: "Account",
+              icon: <AccountCircleIcon />,
+              path: paths.Account,
             },
           ].map((item) => (
             <Tooltip placement="right" key={item.title} title={item.title}>

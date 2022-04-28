@@ -155,9 +155,5 @@ export default function AnimationEditor() {
     </div>
   );
 
-  return (
-    <div>
-      <SideNav content={content} settings={sideNavSettings} />
-    </div>
-  );
+  return <SideNav content={content} settings={sideNavSettings} />;
 }
