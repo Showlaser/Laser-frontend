@@ -2,14 +2,13 @@ import { Grid } from "@mui/material";
 import ResetPassword from "components/password-reset";
 import RequestPasswordReset from "components/password-reset/request-password-reset";
 import { useEffect, useState } from "react";
-import { getResetCode } from "services/logic/password-reset-logic";
-import { stringIsEmpty } from "services/shared/general";
+import { getUrlCode, stringIsEmpty } from "services/shared/general";
 
 export default function PasswordReset() {
   const [resetCode, setResetCode] = useState("");
 
   useEffect(() => {
-    const code = getResetCode();
+    const code = getUrlCode();
     if (!stringIsEmpty(code)) {
       setResetCode(code);
     }

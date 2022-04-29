@@ -52,3 +52,10 @@ export const objectsAreSame = (obj1, obj2) =>
   JSON.stringify(obj1) === JSON.stringify(obj2);
 
 export const deepClone = (obj) => JSON.parse(JSON.stringify(obj));
+
+// function to obtain a single code in the url
+export const getUrlCode = () => {
+  const urlData = window.location.search;
+  const indexOfData = urlData.indexOf("=");
+  return urlData.substring(indexOfData + 1, urlData.length);
+};

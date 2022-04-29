@@ -21,9 +21,3 @@ export const resetPassword = (code, newPassword) => {
     toastSubject.passwordResetSuccess
   );
 };
-
-export const getResetCode = () => {
-  const urlData = window.location.search;
-  const indexOfData = urlData.indexOf("=");
-  return urlData.substring(indexOfData + 1, urlData.length);
-};

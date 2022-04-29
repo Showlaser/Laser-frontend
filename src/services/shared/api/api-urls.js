@@ -19,6 +19,7 @@ const apiEndpoints = {
   serial: `${laserApiUrl}settings/serial`,
   requestPasswordReset: `${authApiUrl}user/request-password-reset`,
   resetPassword: `${authApiUrl}user/reset-password`,
+  activateAccount: `${authApiUrl}user/activate`,
 };
 
 export default apiEndpoints;

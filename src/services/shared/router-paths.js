@@ -10,6 +10,7 @@ const paths = {
   SpotifyVote: "/vote",
   ResetPassword: "/reset-password",
   Account: "/account",
+  ActivateAccount: "/account-activation",
 };
 
 export default paths;

@@ -6,11 +6,11 @@ import { showError, toastSubject } from "services/shared/toast-messages";
 import Cookies from "universal-cookie";
 
 export default function Login() {
-  const onSubmit = async (e) => {
+  const onSubmit = (e) => {
     e.preventDefault();
     const json = new getFormDataObject(e);
-    login(json).then((r) => {
-      if (r.status === 200) {
+    login(json).then((result) => {
+      if (result.status === 200) {
         const cookie = new Cookies();
         cookie.set("LoggedIn", true, {
           path: "/",
@@ -18,6 +18,9 @@ export default function Login() {
         });
 
         window.location = routerPaths.Root;
+        return;
+      } else if (result.status === 451) {
+        showError(toastSubject.accountDisabled);
         return;
       }
 

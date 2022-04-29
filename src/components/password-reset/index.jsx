@@ -1,6 +1,7 @@
 import { Button, FormControl, TextField } from "@mui/material";
 import { useState } from "react";
 import { resetPassword } from "services/logic/password-reset-logic";
+import paths from "services/shared/router-paths";
 import { showError, toastSubject } from "services/shared/toast-messages";
 
 export default function ResetPassword({ code }) {
@@ -10,6 +11,24 @@ export default function ResetPassword({ code }) {
 
   const passwordsMatch = () => {
     return newPassword === newPasswordRepeat;
+  };
+
+  const onReset = () => {
+    setButtonDisabled(true);
+    if (passwordsMatch()) {
+      resetPassword(code, newPassword).then((result) => {
+        if (result.status === 404) {
+          showError(toastSubject.invalidCode);
+        } else if (result.status === 200) {
+          setTimeout(() => (window.location = paths.Login), 3000);
+        }
+      });
+      setButtonDisabled(false);
+      return;
+    }
+
+    showError(toastSubject.passwordsDoNotMatch);
+    setButtonDisabled(false);
   };
 
   return (
@@ -27,25 +46,7 @@ export default function ResetPassword({ code }) {
         onChange={(e) => setNewPasswordRepeat(e.target.value)}
       />
       <br />
-      <Button
-        disabled={buttonDisabled}
-        fullWidth
-        onClick={() => {
-          setButtonDisabled(true);
-          if (passwordsMatch()) {
-            resetPassword(code, newPassword).then((result) => {
-              if (result.status === 404) {
-                showError(toastSubject.invalidCode);
-              }
-            });
-            setButtonDisabled(false);
-            return;
-          }
-
-          showError(toastSubject.passwordsDoNotMatch);
-          setButtonDisabled(false);
-        }}
-      >
+      <Button disabled={buttonDisabled} fullWidth onClick={onReset}>
         Reset password
       </Button>
     </FormControl>

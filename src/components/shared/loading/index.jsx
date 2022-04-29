@@ -2,32 +2,41 @@ import { LinearProgress } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import "./index.css";
 import HeartBrokenIcon from "@mui/icons-material/HeartBroken";
+import { stringIsEmpty } from "services/shared/general";
 
-export default function Loading({ children, objectToLoad, style }) {
+export default function Loading({ children, objectToLoad }) {
   const [hideLoading, setHideLoading] = useState(true);
   const [loadingFailed, setLoadingFailed] = useState(false);
   const objectToLoadRef = useRef();
   objectToLoadRef.current = objectToLoad;
 
   useEffect(() => {
-    if (objectToLoad !== undefined) {
+    if (!objectIsNotLoaded(objectToLoadRef.current)) {
       setHideLoading(true);
       return;
     }
 
     setTimeout(() => {
-      if (objectToLoadRef.current === undefined) {
+      if (objectIsNotLoaded(objectToLoadRef.current)) {
         setHideLoading(false);
       }
     }, 100);
 
     setTimeout(() => {
-      if (objectToLoadRef.current === undefined) {
+      if (objectIsNotLoaded(objectToLoadRef.current)) {
         setLoadingFailed(true);
         setHideLoading(true);
       }
     }, 5000);
   }, [hideLoading, loadingFailed, objectToLoadRef.current]);
+
+  const objectIsNotLoaded = (obj) => {
+    if (obj === undefined || obj === null) {
+      return true;
+    }
+
+    return typeof obj === "string" && stringIsEmpty(obj);
+  };
 
   return loadingFailed ? (
     <div id="loading-failed">
@@ -42,7 +51,9 @@ export default function Loading({ children, objectToLoad, style }) {
       <span hidden={hideLoading}>
         <LinearProgress />
       </span>
-      <span hidden={objectToLoad === undefined}>{children}</span>
+      <span hidden={objectIsNotLoaded(objectToLoadRef.current)}>
+        {children}
+      </span>
     </span>
   );
 }

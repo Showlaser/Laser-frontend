@@ -70,6 +70,19 @@ export const toastSubject = {
     message: "Username or password is invalid",
     id: 16,
   },
+  invalidPassword: {
+    message: "Password is invalid",
+    id: 17,
+  },
+  accountDisabled: {
+    message:
+      "Your account is disabled, contact the helpdesk to unblock your account",
+    id: 18,
+  },
+  activationSuccessful: {
+    message: "Activation successful",
+    id: 19,
+  },
 };
 
 const calculateAutoCloseTime = (text) => {
