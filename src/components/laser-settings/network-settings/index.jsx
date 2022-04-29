@@ -51,7 +51,9 @@ export default function LaserNetworkSettings() {
         ))}
       </Select>
       <br />
-      <Button style={{ margin: "5px 0 5px 0" }}>Set server ip on laser</Button>
+      <Button variant="contained" style={{ margin: "5px 0 5px 0" }}>
+        Set server ip on laser
+      </Button>
     </div>
   );
 }

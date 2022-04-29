@@ -56,3 +56,12 @@ body {
   animation-name: fadeIn;
   -webkit-animation-name: fadeIn;
 }
+
+.MuiButton-contained {
+  background-color: #2660bd !important;
+  color: white !important;
+}
+
+.MuiButton-contained:hover {
+  background-color: #2248a1 !important;
+}

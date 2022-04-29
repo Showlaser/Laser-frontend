@@ -32,7 +32,7 @@ export default function RequestPasswordReset() {
         onChange={(e) => setEmail(e.target.value)}
       />
       <br />
-      <Button onClick={resetPassword} fullWidth>
+      <Button variant="contained" onClick={resetPassword} fullWidth>
         Reset password
       </Button>
     </FormControl>

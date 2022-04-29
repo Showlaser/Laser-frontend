@@ -155,7 +155,7 @@ export default function PatternEditor() {
             changesSaved={changesSaved}
           >
             <Button
-              variant="outlined"
+              variant="contained"
               disabled={patternPlaying}
               startIcon={<SendIcon />}
               onClick={play}

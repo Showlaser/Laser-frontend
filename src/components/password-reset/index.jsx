@@ -46,7 +46,12 @@ export default function ResetPassword({ code }) {
         onChange={(e) => setNewPasswordRepeat(e.target.value)}
       />
       <br />
-      <Button disabled={buttonDisabled} fullWidth onClick={onReset}>
+      <Button
+        variant="contained"
+        disabled={buttonDisabled}
+        fullWidth
+        onClick={onReset}
+      >
         Reset password
       </Button>
     </FormControl>

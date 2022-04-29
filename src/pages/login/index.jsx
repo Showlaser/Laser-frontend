@@ -54,7 +54,7 @@ export default function Login() {
             name="password"
           />
           <br />
-          <Button type="submit" fullWidth>
+          <Button variant="contained" type="submit" fullWidth>
             Login
           </Button>
           <br />

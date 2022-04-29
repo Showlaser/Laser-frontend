@@ -218,6 +218,7 @@ function PointsForm({ item, onChange, options }) {
       ))}
       <br />
       <Button
+        variant="contained"
         disabled={item === undefined}
         onClick={addPoint}
         style={{ marginTop: "10px", width: "305px" }}

@@ -71,7 +71,11 @@ export default function SpotifyPlaylist({
           );
         })}
       </List>
-      <Button disabled={voteStarted} onClick={() => onVoteStart(checked)}>
+      <Button
+        variant="contained"
+        disabled={voteStarted}
+        onClick={() => onVoteStart(checked)}
+      >
         Start vote
       </Button>
     </div>

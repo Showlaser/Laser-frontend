@@ -105,7 +105,7 @@ export default function AnimationOptions({
         changesSaved={changesSaved}
       >
         <Button
-          variant="outlined"
+          variant="contained"
           disabled={animationPlaying}
           startIcon={<SendIcon />}
           onClick={play}

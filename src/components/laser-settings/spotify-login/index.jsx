@@ -37,7 +37,11 @@ export default function SpotifyLogin() {
       {localStorage.getItem("SpotifyAccessToken")?.length > 10 ? (
         <p>You are logged in to Spotify</p>
       ) : (
-        <Button style={{ backgroundColor: "#1DB954" }} onClick={login}>
+        <Button
+          variant="contained"
+          style={{ backgroundColor: "#1DB954" }}
+          onClick={login}
+        >
           Login to Spotify
         </Button>
       )}

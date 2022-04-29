@@ -30,17 +30,6 @@ function App() {
               variant: "standard",
             },
           },
-          MuiButton: {
-            styleOverrides: {
-              root: {
-                backgroundColor: "#2660bd",
-                color: "white",
-                ":hover": {
-                  backgroundColor: "#2248a1",
-                },
-              },
-            },
-          },
           MuiSlider: {
             styleOverrides: {
               root: {

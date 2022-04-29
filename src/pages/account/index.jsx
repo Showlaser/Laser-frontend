@@ -6,11 +6,16 @@ import {
   Divider,
   Alert,
 } from "@mui/material";
+import Modal from "components/modal";
 import Loading from "components/shared/loading";
 import SideNav from "components/sidenav";
-import { useEffect, useState } from "react";
-import { getCurrentUser, updateUser } from "services/logic/user-logic";
-import { stringIsEmpty } from "services/shared/general";
+import { useCallback, useEffect, useState } from "react";
+import {
+  getCurrentUser,
+  removeUser,
+  updateUser,
+} from "services/logic/user-logic";
+import { deepClone, stringIsEmpty } from "services/shared/general";
 import { showError, toastSubject } from "services/shared/toast-messages";
 
 export default function Account() {
@@ -22,6 +27,14 @@ export default function Account() {
   const [currentEmail, setCurrentEmail] = useState("");
   const [emailChanged, setEmailChanged] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
+  const [, updateState] = useState();
+  const forceUpdate = useCallback(() => updateState({}), []);
+  const [modalOptions, setModalOptions] = useState({
+    title: "Remove account?",
+    show: false,
+    onOkClick: null,
+    onCancelClick: null,
+  });
 
   const sideNavSettings = { pageName: "Account" };
 
@@ -32,6 +45,13 @@ export default function Account() {
       setCurrentEmail(user.email);
     });
   }, []);
+
+  const closeModal = () => {
+    let modal = modalOptions;
+    modal.show = false;
+    setModalOptions(modal);
+    forceUpdate();
+  };
 
   const passwordsMatch = () => {
     return newPassword === newPasswordRepeat;
@@ -67,6 +87,7 @@ export default function Account() {
 
   const content = (
     <Loading objectToLoad={username}>
+      <Modal modal={modalOptions} />
       <Grid
         container
         spacing={0}
@@ -129,8 +150,28 @@ export default function Account() {
             </Alert>
           </span>
           <br />
-          <Button disabled={buttonDisabled} fullWidth onClick={onUpdate}>
+          <Button
+            variant="contained"
+            disabled={buttonDisabled}
+            fullWidth
+            onClick={onUpdate}
+          >
             Update account
+          </Button>
+          <hr style={{ width: "100%" }} />
+          <Button
+            color="error"
+            variant="text"
+            onClick={() => {
+              let options = deepClone(modalOptions);
+              options.show = true;
+              options.onCancelClick = closeModal;
+              options.onOkClick = removeUser;
+              setModalOptions(options);
+              forceUpdate();
+            }}
+          >
+            Remove account
           </Button>
         </FormControl>
       </Grid>

@@ -111,7 +111,7 @@ export default function Zones({
         }}
       >
         <Button
-          variant="outlined"
+          variant="contained"
           disabled={zonePlaying}
           startIcon={<SendIcon />}
           onClick={play}
