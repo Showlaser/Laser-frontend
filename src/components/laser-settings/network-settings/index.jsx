@@ -45,7 +45,9 @@ export default function LaserNetworkSettings() {
         value={selectedComPortId ?? 0}
       >
         {availableComPorts?.map((comPort, index) => (
-          <MenuItem value={index}>{comPort}</MenuItem>
+          <MenuItem key={`${index}-comport`} value={index}>
+            {comPort}
+          </MenuItem>
         ))}
       </Select>
       <br />

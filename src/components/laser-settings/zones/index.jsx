@@ -1,13 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { createGuid, emptyGuid } from "services/shared/math";
+import React, { useCallback, useState } from "react";
+import { createGuid } from "services/shared/math";
 import "./index.css";
 import CrudComponent from "components/shared/crud-component";
-import {
-  deleteZone,
-  getZones,
-  playZone,
-  saveZone,
-} from "services/logic/zone-logic";
+import { deleteZone, playZone, saveZone } from "services/logic/zone-logic";
 import PointForm from "components/shared/point-form";
 import Modal from "components/modal";
 import PointsDrawer from "components/shared/points-drawer";
@@ -15,9 +10,12 @@ import { Grid, TextField, Button } from "@mui/material";
 import { deepClone, stringIsEmpty } from "services/shared/general";
 import SendIcon from "@mui/icons-material/Send";
 
-export default function Zones({ onDataAvailable }) {
-  const [zones, setZones] = useState([]);
-  const [selectedZoneUuid, setSelectedZoneUuid] = useState();
+export default function Zones({
+  zones,
+  setZones,
+  selectedZoneUuid,
+  setSelectedZoneUuid,
+}) {
   const [zonePlaying, setZonePlaying] = useState(false);
   const [changesSaved, setChangesSaved] = useState(false);
   const [modalOptions, setModalOptions] = useState({
@@ -28,15 +26,7 @@ export default function Zones({ onDataAvailable }) {
   });
   const [, updateState] = useState();
   const forceUpdate = useCallback(() => updateState({}), []);
-  const selectedZone = zones.find((z) => z.uuid === selectedZoneUuid);
-
-  useEffect(() => {
-    getZones().then((data) => {
-      onDataAvailable(data);
-      setZones(data);
-      setSelectedZoneUuid(data[0]?.uuid ?? emptyGuid());
-    });
-  }, []);
+  const selectedZone = zones?.find((z) => z?.uuid === selectedZoneUuid);
 
   const closeModal = () => {
     let modal = modalOptions;

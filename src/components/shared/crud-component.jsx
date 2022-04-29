@@ -31,7 +31,7 @@ export default function CrudComponent({
       >
         {Array.isArray(itemsArray)
           ? itemsArray?.map((item, index) => (
-              <MenuItem key={"options" + item.uuid + index} value={item?.uuid}>
+              <MenuItem key={"options" + item?.uuid + index} value={item?.uuid}>
                 {item?.name}
               </MenuItem>
             ))
