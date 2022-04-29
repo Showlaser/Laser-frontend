@@ -4,6 +4,7 @@ const voteApiUrl = "http://localhost:5002/";
 
 const apiEndpoints = {
   pattern: `${laserApiUrl}pattern`,
+  lasershow: `${laserApiUrl}lasershow`,
   animation: `${laserApiUrl}animation`,
   user: `${authApiUrl}user`,
   login: `${authApiUrl}user/login`,
@@ -13,6 +14,12 @@ const apiEndpoints = {
   refreshSpotifyAccessToken: `${authApiUrl}spotify/refresh`,
   vote: `${voteApiUrl}vote`,
   zone: `${laserApiUrl}zone`,
+  dashboard: `${laserApiUrl}dashboard`,
+  settings: `${laserApiUrl}settings`,
+  serial: `${laserApiUrl}settings/serial`,
+  requestPasswordReset: `${authApiUrl}user/request-password-reset`,
+  resetPassword: `${authApiUrl}user/reset-password`,
+  activateAccount: `${authApiUrl}user/activate`,
 };
 
 export default apiEndpoints;

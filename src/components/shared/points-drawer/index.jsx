@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { useCallback, useEffect } from "react";
-import { getMappedRgbStringFromPoint } from "services/shared/general";
+import { deepClone, getRgbStringFromPoint } from "services/shared/general";
 import { mapNumber, rotatePoint } from "services/shared/math";
 import "./index.css";
 
@@ -30,7 +30,7 @@ export default function PointsDrawer({ points, options }) {
   }, [drawPattern]);
 
   const drawDot = (ctx, point) => {
-    const clonedPoint = structuredClone(point);
+    const clonedPoint = deepClone(point);
     clonedPoint.x += centerX ?? 0;
     clonedPoint.y += centerY ?? 0;
 
@@ -38,7 +38,7 @@ export default function PointsDrawer({ points, options }) {
 
     const { x, y } = point;
 
-    ctx.fillStyle = getMappedRgbStringFromPoint(point);
+    ctx.fillStyle = getRgbStringFromPoint(point);
     ctx.fillRect(
       mapNumber(x, 4000, -4000, 395, 0),
       mapNumber(y, 4000, -4000, 0, 395),

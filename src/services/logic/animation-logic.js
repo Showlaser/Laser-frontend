@@ -4,7 +4,7 @@ import apiEndpoints from "services/shared/api/api-urls";
 import { createGuid } from "services/shared/math";
 import { toastSubject } from "services/shared/toast-messages";
 
-export function getAnimations() {
+export async function getAnimations() {
   return sendRequest(() => Get(apiEndpoints.animation), []).then((value) =>
     value.json()
   );
@@ -20,7 +20,7 @@ export const saveAnimation = (animation) => {
 
 export const removeAnimation = (uuid) => {
   return sendRequest(
-    () => Delete(apiEndpoints.animation + uuid),
+    () => Delete(`${apiEndpoints.animation}/${uuid}`),
     [],
     toastSubject.changesSaved
   );
@@ -89,7 +89,7 @@ export const getPatternAnimationSettingsPlaceholder = (
 
 export const playAnimation = (animation) => {
   return sendRequest(
-    () => Post(apiEndpoints.animation + "/play", animation, false),
+    () => Post(apiEndpoints.animation + "/play", animation),
     []
   );
 };

@@ -1,5 +1,5 @@
 import { Autocomplete, Button, TextField } from "@mui/material";
-import { useState } from "react";
+import React, { useState } from "react";
 
 export default function SubItemSelector({ options, onSubitemSelect }) {
   const [selectedSubItemName, setSelectedSubItemName] = useState();
@@ -9,9 +9,7 @@ export default function SubItemSelector({ options, onSubitemSelect }) {
       <Autocomplete
         onChange={(e, name) => setSelectedSubItemName(name)}
         options={options}
-        renderInput={(params) => (
-          <TextField {...params} label="Select pattern" />
-        )}
+        renderInput={(params) => <TextField {...params} label="Select item" />}
       />
       <div>
         <Button

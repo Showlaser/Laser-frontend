@@ -38,7 +38,7 @@ export default function SpotifyPlaylist({
       <small>Select the playlists to vote on</small>
       <Divider />
       <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-        {userPlaylists.map((playlist, index) => {
+        {userPlaylists?.map((playlist, index) => {
           const labelId = `checkbox-list-label-${index}`;
 
           return (

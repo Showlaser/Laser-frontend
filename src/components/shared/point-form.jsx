@@ -4,13 +4,18 @@ import { getPointsPlaceHolder } from "services/shared/points";
 import { Button, IconButton, TextField } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import { deepClone, objectsAreSame } from "services/shared/general";
+import React, { useState } from "react";
 
-export default function PointsForm({ item, onChange }) {
+function PointsForm({ item, onChange, options }) {
+  const [redPower, setRedPower] = useState(0);
+  const [greenPower, setGreenPower] = useState(0);
+  const [bluePower, setBluePower] = useState(0);
+
+  const { hideLaserPower } = options ?? {};
   if (item === undefined) {
     return null;
   }
-
-  item.points = item?.points?.sort((a, b) => (a.order > b.order ? 1 : -1));
 
   const onPointUpdate = (pointUuid, property, value) => {
     if (typeof property !== "string") {
@@ -21,9 +26,12 @@ export default function PointsForm({ item, onChange }) {
     if (propertyIsXOrYAxle && !valueIsWithinBoundaries(value, -4000, 4000)) {
       showError(toastSubject.pointsBoundaryError);
       return;
+    } else if (!propertyIsXOrYAxle && !valueIsWithinBoundaries(value, 0, 255)) {
+      showError(toastSubject.laserPwmPowerBoundaryError);
+      return;
     }
 
-    let points = structuredClone(item?.points);
+    let points = deepClone(item?.points);
     let pointToUpdate = points.find((p) => p?.uuid === pointUuid);
 
     pointToUpdate[property] = value;
@@ -31,24 +39,93 @@ export default function PointsForm({ item, onChange }) {
   };
 
   const addPoint = () => {
-    let points = structuredClone(item?.points);
+    let points = deepClone(item?.points);
     points.push(getPointsPlaceHolder(item.uuid, item.points.length));
     onChange(points);
   };
 
   const deletePoint = (uuid) => {
-    let points = structuredClone(item?.points);
-    const index = points.findIndex((p) => p.uuid === uuid);
-    if (index === -1) {
+    const pointToDeleteIndex = item.points.findIndex((p) => p.uuid === uuid);
+    if (pointToDeleteIndex === -1) {
       return;
     }
 
-    points.splice(index, 1);
+    let points = deepClone(item?.points);
+    points.splice(pointToDeleteIndex, 1);
+
+    for (let i = pointToDeleteIndex; i < points.length; i++) {
+      points[i].order = i;
+    }
+
     onChange(points);
   };
 
   return (
-    <div key={"form" + item?.uuid + item?.points[0]?.uuid}>
+    <div
+      key={
+        "form" +
+        item?.uuid +
+        item?.points[0]?.uuid +
+        redPower +
+        greenPower +
+        bluePower
+      }
+    >
+      {!hideLaserPower ? (
+        <span>
+          <TextField
+            size="small"
+            style={{ margin: "2px" }}
+            InputProps={{ inputProps: { min: 0, max: 255 } }}
+            type="number"
+            label="R all"
+            value={redPower}
+            onChange={(e) => {
+              let updatedPoints = [];
+              deepClone(item?.points)?.forEach((point) => {
+                point.redLaserPowerPwm = Number(e.target.value);
+                updatedPoints.push(point);
+              });
+              onChange(updatedPoints);
+              setRedPower(Number(e.target.value));
+            }}
+          />
+          <TextField
+            size="small"
+            style={{ margin: "2px" }}
+            InputProps={{ inputProps: { min: 0, max: 255 } }}
+            type="number"
+            label="G all"
+            value={greenPower}
+            onChange={(e) => {
+              let updatedPoints = [];
+              deepClone(item?.points)?.forEach((point) => {
+                point.greenLaserPowerPwm = Number(e.target.value);
+                updatedPoints.push(point);
+              });
+              onChange(updatedPoints);
+              setGreenPower(Number(e.target.value));
+            }}
+          />
+          <TextField
+            size="small"
+            style={{ margin: "2px" }}
+            InputProps={{ inputProps: { min: 0, max: 255 } }}
+            type="number"
+            label="B all"
+            value={bluePower}
+            onChange={(e) => {
+              let updatedPoints = [];
+              deepClone(item?.points)?.forEach((point) => {
+                point.blueLaserPowerPwm = Number(e.target.value);
+                updatedPoints.push(point);
+              });
+              onChange(updatedPoints);
+              setBluePower(Number(e.target.value));
+            }}
+          />
+        </span>
+      ) : null}
       {item?.points?.map((point, index) => (
         <div key={point?.uuid}>
           <small>Point {index}</small>
@@ -77,54 +154,56 @@ export default function PointsForm({ item, onChange }) {
               onPointUpdate(point.uuid, "y", Number(e.target.value))
             }
           />
-          <TextField
-            name={`r${index}`}
-            size="small"
-            style={{ margin: "2px" }}
-            InputProps={{ inputProps: { min: 0, max: 511 } }}
-            type="number"
-            label="R"
-            defaultValue={point?.redLaserPowerPwm}
-            onChange={(e) =>
-              onPointUpdate(
-                point.uuid,
-                "redLaserPowerPwm",
-                Number(e.target.value)
-              )
-            }
-          />
-          <TextField
-            name={`r${index}`}
-            size="small"
-            style={{ margin: "2px" }}
-            InputProps={{ inputProps: { min: 0, max: 511 } }}
-            type="number"
-            label="G"
-            defaultValue={point?.greenLaserPowerPwm}
-            onChange={(e) =>
-              onPointUpdate(
-                point.uuid,
-                "greenLaserPowerPwm",
-                Number(e.target.value)
-              )
-            }
-          />
-          <TextField
-            name={`r${index}`}
-            size="small"
-            style={{ margin: "2px" }}
-            InputProps={{ inputProps: { min: 0, max: 511 } }}
-            type="number"
-            label="B"
-            defaultValue={point?.blueLaserPowerPwm}
-            onChange={(e) =>
-              onPointUpdate(
-                point.uuid,
-                "blueLaserPowerPwm",
-                Number(e.target.value)
-              )
-            }
-          />
+          {!hideLaserPower ? (
+            <span>
+              <TextField
+                name={`r${index}`}
+                size="small"
+                style={{ margin: "2px" }}
+                InputProps={{ inputProps: { min: 0, max: 255 } }}
+                type="number"
+                label="R"
+                defaultValue={point?.redLaserPowerPwm}
+                onChange={(e) =>
+                  onPointUpdate(
+                    point.uuid,
+                    "redLaserPowerPwm",
+                    Number(e.target.value)
+                  )
+                }
+              />
+              <TextField
+                size="small"
+                style={{ margin: "2px" }}
+                InputProps={{ inputProps: { min: 0, max: 255 } }}
+                type="number"
+                label="G"
+                defaultValue={point?.greenLaserPowerPwm}
+                onChange={(e) =>
+                  onPointUpdate(
+                    point.uuid,
+                    "greenLaserPowerPwm",
+                    Number(e.target.value)
+                  )
+                }
+              />
+              <TextField
+                size="small"
+                style={{ margin: "2px" }}
+                InputProps={{ inputProps: { min: 0, max: 255 } }}
+                type="number"
+                label="B"
+                defaultValue={point?.blueLaserPowerPwm}
+                onChange={(e) =>
+                  onPointUpdate(
+                    point.uuid,
+                    "blueLaserPowerPwm",
+                    Number(e.target.value)
+                  )
+                }
+              />
+            </span>
+          ) : null}
           <IconButton
             key={"delete" + item.uuid + index}
             onClick={() => deletePoint(point.uuid)}
@@ -137,10 +216,11 @@ export default function PointsForm({ item, onChange }) {
           </IconButton>
         </div>
       ))}
+      <br />
       <Button
         disabled={item === undefined}
-        onClick={() => addPoint()}
-        style={{ margin: "10px", width: "360px" }}
+        onClick={addPoint}
+        style={{ marginTop: "10px", width: "305px" }}
         size="small"
         startIcon={<AddIcon />}
       >
@@ -149,3 +229,11 @@ export default function PointsForm({ item, onChange }) {
     </div>
   );
 }
+
+// checks if props are the same. If true no rerender will occur. This is to improve performance
+export default React.memo(PointsForm, (prevProps, nextProps) => {
+  return (
+    prevProps.namePlaceHolder === nextProps.namePlaceHolder &&
+    objectsAreSame(prevProps?.item, nextProps?.item)
+  );
+});

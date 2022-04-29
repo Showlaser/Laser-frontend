@@ -1,18 +1,10 @@
-import { mapNumber } from "./math";
-
 export function stringIsEmpty(str) {
   return str === undefined || str === "" || str === null;
 }
 
-export function getMappedRgbStringFromPoint(point) {
+export function getRgbStringFromPoint(point) {
   const { redLaserPowerPwm, greenLaserPowerPwm, blueLaserPowerPwm } = point;
-  return `rgb(${mapNumber(redLaserPowerPwm, 0, 511, 0, 255)},${mapNumber(
-    greenLaserPowerPwm,
-    0,
-    511,
-    0,
-    255
-  )},${mapNumber(blueLaserPowerPwm, 0, 511, 0, 255)})`;
+  return `rgb(${redLaserPowerPwm},${greenLaserPowerPwm},${blueLaserPowerPwm})`;
 }
 
 export function getFormDataObject(event) {
@@ -55,3 +47,15 @@ export function toCamelCase(key, value) {
   }
   return value;
 }
+
+export const objectsAreSame = (obj1, obj2) =>
+  JSON.stringify(obj1) === JSON.stringify(obj2);
+
+export const deepClone = (obj) => JSON.parse(JSON.stringify(obj));
+
+// function to obtain a single code in the url
+export const getUrlCode = () => {
+  const urlData = window.location.search;
+  const indexOfData = urlData.indexOf("=");
+  return urlData.substring(indexOfData + 1, urlData.length);
+};

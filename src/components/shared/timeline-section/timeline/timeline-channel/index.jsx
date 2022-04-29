@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import "./index.css";
 
 export default function TimeLineChannel({
   timeline,
   itemsInTimeline,
   onTimelineChannelItemClick,
+  getSubItemDuration,
 }) {
   useEffect(() => [itemsInTimeline]);
 
@@ -14,23 +15,17 @@ export default function TimeLineChannel({
         <p>{timeline?.index}:</p>
       </div>
       <div>
-        {itemsInTimeline?.map((animationPattern) => (
+        {itemsInTimeline?.map((item) => (
           <div
             style={{
-              marginLeft: `${animationPattern?.startTimeOffset}px`,
-              width: `${
-                animationPattern?.animationSettings
-                  ?.sort((a, b) => (a.startTime > b.startTime ? 1 : -1))
-                  ?.at(-1)?.startTime
-              }px`,
+              marginLeft: `${item?.startTimeOffset}px`,
+              width: `${getSubItemDuration(item)}px`,
             }}
-            key={animationPattern?.uuid + "timeline"}
-            onClick={() => {
-              onTimelineChannelItemClick(animationPattern.uuid);
-            }}
+            key={item?.uuid + "timeline"}
+            onClick={() => onTimelineChannelItemClick(item.uuid)}
             className="timeline-channel-item"
           >
-            {animationPattern.name}
+            {item.name}
           </div>
         ))}
       </div>

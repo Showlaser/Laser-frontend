@@ -22,7 +22,7 @@ export const capitalizeFirstLetter = (string) =>
   string.charAt(0).toUpperCase() + string.slice(1);
 
 export const convertToMilliWatts = (maxPower, currentValue) =>
-  Math.round((maxPower / 511) * currentValue);
+  Math.round((maxPower / 255) * currentValue);
 
 export const valueIsWithinBoundaries = (value, min, max) =>
   value <= max && value >= min;
@@ -37,21 +37,6 @@ export const rotatePoint = (point, angle) => {
     sin = Math.sin(radians),
     nx = cos * point.x + sin * point.y,
     ny = cos * point.y - sin * point.x;
-
-  console.log(
-    "x: " +
-      nx +
-      " y: " +
-      ny +
-      " cos: " +
-      cos +
-      " sin: " +
-      sin +
-      " point x: " +
-      point.x +
-      " point y: " +
-      point.y
-  );
 
   point.x = nx;
   point.y = ny;

@@ -2,14 +2,15 @@ import { Button, Divider, FormControl, Grid, TextField } from "@mui/material";
 import { login } from "services/logic/login-logic";
 import { getFormDataObject } from "services/shared/general";
 import routerPaths from "services/shared/router-paths";
+import { showError, toastSubject } from "services/shared/toast-messages";
 import Cookies from "universal-cookie";
 
 export default function Login() {
-  const onSubmit = async (e) => {
+  const onSubmit = (e) => {
     e.preventDefault();
     const json = new getFormDataObject(e);
-    login(json).then((r) => {
-      if (r.status === 200) {
+    login(json).then((result) => {
+      if (result.status === 200) {
         const cookie = new Cookies();
         cookie.set("LoggedIn", true, {
           path: "/",
@@ -17,7 +18,13 @@ export default function Login() {
         });
 
         window.location = routerPaths.Root;
+        return;
+      } else if (result.status === 451) {
+        showError(toastSubject.accountDisabled);
+        return;
       }
+
+      showError(toastSubject.invalidLoginCredentials);
     });
   };
 
@@ -35,14 +42,14 @@ export default function Login() {
           <h1>Login</h1>
           <TextField
             autoComplete="off"
-            value="vincent"
+            defaultValue="vincent"
             label="Username"
             name="username"
           />
           <br />
           <TextField
             label="Password"
-            value="qwerty"
+            defaultValue="qwerty"
             type="password"
             name="password"
           />
@@ -55,7 +62,7 @@ export default function Login() {
           <a className="link-btn" href={routerPaths.Register}>
             Register
           </a>
-          <a className="link-btn" href={routerPaths.ForgotPassword}>
+          <a className="link-btn" href={routerPaths.ResetPassword}>
             Forgot password?
           </a>
         </FormControl>

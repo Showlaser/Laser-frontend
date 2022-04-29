@@ -5,7 +5,7 @@ body {
 
 /* width */
 ::-webkit-scrollbar {
-  width: 3px;
+  width: 6px;
 }
 
 /* Track */
@@ -18,9 +18,16 @@ body {
   background: #f1f1f1;
 }
 
+.MuiListItemIcon-root > .MuiSvgIcon-root {
+  transition: transform 0.25s ease-in-out !important;
+}
+
+.MuiListItemIcon-root:hover > .MuiSvgIcon-root {
+  transform: scale(1.1) !important;
+}
+
 @keyframes fadeIn {
   from {
-    opacity: 0;
   }
 
   to {
@@ -30,7 +37,6 @@ body {
 
 @-webkit-keyframes fadeIn {
   from {
-    opacity: 0;
   }
 
   to {
@@ -38,10 +44,13 @@ body {
   }
 }
 
-.MuiListItemIcon-root > .MuiSvgIcon-root {
-  transition: transform 0.25s ease-in-out !important;
-}
+.fade-in {
+  animation-duration: 0.8s;
+  animation-fill-mode: both;
+  -webkit-animation-duration: 0.8s;
+  -webkit-animation-fill-mode: both;
 
-.MuiListItemIcon-root:hover > .MuiSvgIcon-root {
-  transform: scale(1.1) !important;
+  opacity: 0;
+  animation-name: fadeIn;
+  -webkit-animation-name: fadeIn;
 }

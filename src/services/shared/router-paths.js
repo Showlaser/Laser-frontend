@@ -3,13 +3,14 @@ const paths = {
   LaserSettings: "/laser-settings",
   Zones: "/zones",
   PatternEditor: "/pattern-editor",
-  AnimationEditor: "/animation-editor",
+  LasershowEditor: "/lasershow-editor",
   Installation: "/installation",
   Login: "/login",
   Register: "/registration",
-  ForgotPassword: "/forgot-password",
   SpotifyVote: "/vote",
-  Lasershow: "/lasershow",
+  ResetPassword: "/reset-password",
+  Account: "/account",
+  ActivateAccount: "/account-activation",
 };
 
 export default paths;

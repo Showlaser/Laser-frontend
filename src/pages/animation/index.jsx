@@ -8,9 +8,10 @@ import {
   getPatternAnimationPlaceholder,
 } from "services/logic/animation-logic";
 import { getPatterns } from "services/logic/pattern-logic";
-import { emptyGuid } from "services/shared/math";
-import { stringIsEmpty } from "services/shared/general";
+import { createGuid, emptyGuid } from "services/shared/math";
+import { deepClone, stringIsEmpty } from "services/shared/general";
 import TimelineSection from "components/shared/timeline-section";
+import Loading from "components/shared/loading";
 
 export default function AnimationEditor() {
   const [selectedAnimationUuid, setSelectedAnimationUuid] = useState(
@@ -18,25 +19,35 @@ export default function AnimationEditor() {
   );
   const [selectedPatternAnimationUuid, setSelectedPatternAnimationUuid] =
     useState();
-  const [animations, setAnimations] = useState([]);
+  const [animations, setAnimations] = useState();
   const [patterns, setPatterns] = useState([]);
   const [changesSaved, setChangesSaved] = useState(true);
 
   useEffect(() => {
-    getAnimations().then((a) => {
-      setAnimations(a);
-      const animationUuid = a.at(0)?.uuid ?? emptyGuid();
+    getAnimations().then((animationCollection) => {
+      animationCollection.forEach((animation) => {
+        animation.patternAnimations.forEach((pa) => {
+          pa.animationSettings.forEach((ast) => {
+            ast.points = ast?.points?.sort((a, b) =>
+              a.order > b.order ? 1 : -1
+            );
+          });
+        });
+      });
+
+      setAnimations(animationCollection);
+      const animationUuid = animationCollection.at(0)?.uuid ?? emptyGuid();
       setSelectedAnimationUuid(animationUuid);
 
       const patternAnimationUuid =
-        a.at(0)?.patternAnimations.at(0)?.uuid ?? emptyGuid();
+        animationCollection.at(0)?.patternAnimations.at(0)?.uuid ?? emptyGuid();
       setSelectedPatternAnimationUuid(patternAnimationUuid);
     });
     getPatterns().then((p) => setPatterns(p));
   }, []);
 
   const sideNavSettings = {
-    pageName: "Animation editor",
+    pageName: "Lasershow editor",
   };
 
   const updateAnimationProperty = (property, value) => {
@@ -44,12 +55,13 @@ export default function AnimationEditor() {
       return;
     }
 
-    let updatedAnimations = structuredClone(animations);
+    let updatedAnimations = deepClone(animations);
     let animationToUpdate = updatedAnimations.find(
       (ua) => ua.uuid === selectedAnimationUuid
     );
     animationToUpdate[property] = value;
     setAnimations(updatedAnimations);
+    setChangesSaved(false);
   };
 
   const addPatternToAnimation = (selectedPattern) => {
@@ -57,7 +69,7 @@ export default function AnimationEditor() {
       return;
     }
 
-    let updatedAnimations = structuredClone(animations);
+    let updatedAnimations = deepClone(animations);
     let updatedAnimation = updatedAnimations.find(
       (a) => a.uuid === selectedAnimationUuid
     );
@@ -73,42 +85,75 @@ export default function AnimationEditor() {
     setSelectedPatternAnimationUuid(placeholder.uuid);
   };
 
+  const duplicatePatternAnimation = (selectedPatternAnimation) => {
+    if (selectedPatternAnimation === undefined) {
+      return;
+    }
+
+    let newPatternAnimation = deepClone(selectedPatternAnimation);
+    newPatternAnimation.uuid = createGuid();
+    newPatternAnimation.name += " duplicate";
+    newPatternAnimation.animationSettings.forEach((setting) => {
+      setting.uuid = createGuid();
+      setting.points.forEach((point) => (point.uuid = createGuid()));
+    });
+
+    let updatedAnimations = deepClone(animations);
+    let updatedAnimation = updatedAnimations.find(
+      (a) => a.uuid === selectedAnimationUuid
+    );
+
+    updatedAnimation?.patternAnimations?.push(newPatternAnimation);
+    setAnimations(updatedAnimations);
+
+    setChangesSaved(false);
+    setSelectedPatternAnimationUuid(newPatternAnimation.uuid);
+  };
+
   const content = (
-    <div id="animation">
-      <AnimationOptions
-        setAnimations={setAnimations}
-        setSelectedAnimationUuid={setSelectedAnimationUuid}
-        animations={animations}
-        setChangesSaved={setChangesSaved}
-        changesSaved={changesSaved}
-        updateAnimationProperty={updateAnimationProperty}
-        selectedAnimationUuid={selectedAnimationUuid}
-      />
-      {animations?.length > 0 ? (
-        <div>
-          <AnimationSection
-            setAnimations={setAnimations}
-            animations={animations}
-            patterns={patterns}
-            selectedAnimationUuid={selectedAnimationUuid}
-            selectedPatternAnimationUuid={selectedPatternAnimationUuid}
-          />
-          <TimelineSection
-            items={animations}
-            availableItems={patterns}
-            selectedSubItemUuid={selectedPatternAnimationUuid}
-            selectedItemUuid={selectedAnimationUuid}
-            setItems={setAnimations}
-            onSelect={addPatternToAnimation}
-          />
-        </div>
-      ) : null}
+    <div>
+      <div id="animation">
+        <AnimationOptions
+          setAnimations={setAnimations}
+          setSelectedAnimationUuid={setSelectedAnimationUuid}
+          animations={animations}
+          setChangesSaved={setChangesSaved}
+          changesSaved={changesSaved}
+          updateAnimationProperty={updateAnimationProperty}
+          selectedAnimationUuid={selectedAnimationUuid}
+        />
+        <Loading objectToLoad={animations}>
+          {animations?.length > 0 ? (
+            <div>
+              <AnimationSection
+                duplicatePatternAnimation={duplicatePatternAnimation}
+                setAnimations={setAnimations}
+                animations={animations}
+                patterns={patterns}
+                selectedAnimationUuid={selectedAnimationUuid}
+                selectedPatternAnimationUuid={selectedPatternAnimationUuid}
+              />
+              <TimelineSection
+                items={animations}
+                setSelectedSubItemUuid={setSelectedPatternAnimationUuid}
+                subItemsName="patternAnimations"
+                getSubItemDuration={(item) => {
+                  return item.animationSettings
+                    ?.sort((a, b) => (a.startTime > b.startTime ? 1 : -1))
+                    ?.at(-1)?.startTime;
+                }}
+                availableItems={patterns}
+                selectedSubItemUuid={selectedPatternAnimationUuid}
+                selectedItemUuid={selectedAnimationUuid}
+                setItems={setAnimations}
+                onSelect={addPatternToAnimation}
+              />
+            </div>
+          ) : null}
+        </Loading>
+      </div>
     </div>
   );
 
-  return (
-    <div>
-      <SideNav content={content} settings={sideNavSettings} />
-    </div>
-  );
+  return <SideNav content={content} settings={sideNavSettings} />;
 }

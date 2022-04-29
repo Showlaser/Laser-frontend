@@ -11,8 +11,11 @@ import { useEffect } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { showError, toastSubject } from "services/shared/toast-messages";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { deepClone } from "services/shared/general";
 
 export default function AnimationSettings({
+  duplicatePatternAnimation,
   updateAnimationSetting,
   selectedPatternAnimation,
   updatePatternAnimation,
@@ -62,6 +65,7 @@ export default function AnimationSettings({
       <TextField
         defaultValue={selectedPatternAnimation?.startTimeOffset}
         label="Start time ms"
+        InputProps={{ inputProps: { min: 0, max: 2147483647 } }}
         type="number"
         onChange={(e) => {
           if (e.target.value >= 0) {
@@ -88,6 +92,13 @@ export default function AnimationSettings({
       <Tooltip title="Delete pattern animation">
         <IconButton onClick={deletePatternAnimation}>
           <DeleteIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Duplicate pattern animation">
+        <IconButton
+          onClick={() => duplicatePatternAnimation(selectedPatternAnimation)}
+        >
+          <ContentCopyIcon />
         </IconButton>
       </Tooltip>
       <hr />
@@ -199,7 +210,7 @@ export default function AnimationSettings({
         <Tooltip title="Delete current setting">
           <IconButton
             onClick={() => {
-              let settings = structuredClone(
+              let settings = deepClone(
                 selectedPatternAnimation?.animationSettings
               );
               const index = settings.findIndex(

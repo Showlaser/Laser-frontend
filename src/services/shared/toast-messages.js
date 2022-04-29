@@ -50,6 +50,39 @@ export const toastSubject = {
     message: "Value cannot be lower or higher than an other setting start time",
     id: 11,
   },
+  laserPwmPowerBoundaryError: {
+    message: "Select a value between or equal to 0 and 255",
+    id: 12,
+  },
+  passwordResetSuccess: {
+    message: "Password reset successful",
+    id: 13,
+  },
+  passwordsDoNotMatch: {
+    message: "Passwords do not match",
+    id: 14,
+  },
+  invalidCode: {
+    message: "The code was invalid",
+    id: 15,
+  },
+  invalidLoginCredentials: {
+    message: "Username or password is invalid",
+    id: 16,
+  },
+  invalidPassword: {
+    message: "Password is invalid",
+    id: 17,
+  },
+  accountDisabled: {
+    message:
+      "Your account is disabled, contact the helpdesk to unblock your account",
+    id: 18,
+  },
+  activationSuccessful: {
+    message: "Activation successful",
+    id: 19,
+  },
 };
 
 const calculateAutoCloseTime = (text) => {

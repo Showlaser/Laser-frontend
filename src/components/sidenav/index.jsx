@@ -17,12 +17,12 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { Tooltip } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import BrushIcon from "@mui/icons-material/Brush";
 import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import SettingsIcon from "@mui/icons-material/Settings";
 import paths from "services/shared/router-paths";
 import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
 import TheatersIcon from "@mui/icons-material/Theaters";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const drawerWidth = 240;
 
@@ -142,12 +142,7 @@ export default function SideNav({ content, settings }) {
             {
               title: "Lasershow editor",
               icon: <TheatersIcon />,
-              path: paths.Lasershow,
-            },
-            {
-              title: "Animation editor",
-              icon: <BrushIcon />,
-              path: paths.AnimationEditor,
+              path: paths.LasershowEditor,
             },
             {
               title: "Pattern editor",
@@ -164,6 +159,11 @@ export default function SideNav({ content, settings }) {
               icon: <SettingsIcon />,
               path: paths.LaserSettings,
             },
+            {
+              title: "Account",
+              icon: <AccountCircleIcon />,
+              path: paths.Account,
+            },
           ].map((item) => (
             <Tooltip placement="right" key={item.title} title={item.title}>
               <ListItem
@@ -177,7 +177,7 @@ export default function SideNav({ content, settings }) {
           ))}
         </List>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 1 }}>
+      <Box className="fade-in" component="main" sx={{ flexGrow: 1, p: 1 }}>
         <DrawerHeader />
         {content}
       </Box>

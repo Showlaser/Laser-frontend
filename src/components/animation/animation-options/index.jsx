@@ -10,6 +10,7 @@ import {
 import { createGuid } from "services/shared/math";
 import "./index.css";
 import SendIcon from "@mui/icons-material/Send";
+import { deepClone } from "services/shared/general";
 
 export default function AnimationOptions({
   animations,
@@ -21,7 +22,7 @@ export default function AnimationOptions({
   setAnimations,
 }) {
   const [modalOptions, setModalOptions] = useState({
-    title: "Delete pattern?",
+    title: "Delete animation?",
     show: false,
     onOkClick: null,
     onCancelClick: () => closeModal(),
@@ -38,18 +39,17 @@ export default function AnimationOptions({
     let modal = modalOptions;
     modal.show = false;
     setModalOptions(modal);
+    forceUpdate();
   };
 
   const deleteAnimation = () => {
-    let updatedAnimations = structuredClone(animations);
+    let updatedAnimations = deepClone(animations);
     const animationUuid = updatedAnimations?.find(
       (a) => a.uuid === selectedAnimationUuid
     )?.uuid;
     updatedAnimations.splice(selectedAnimationUuid, 1);
     removeAnimation(animationUuid);
     setAnimations(updatedAnimations);
-
-    setSelectedAnimationUuid(updatedAnimations.length - 1);
   };
 
   const play = () => {
@@ -78,7 +78,7 @@ export default function AnimationOptions({
           },
           onAdd: () => {
             setChangesSaved(false);
-            let updatedAnimations = structuredClone(animations);
+            let updatedAnimations = deepClone(animations);
             const uuid = createGuid();
 
             updatedAnimations.push({
@@ -109,6 +109,8 @@ export default function AnimationOptions({
           disabled={animationPlaying}
           startIcon={<SendIcon />}
           onClick={play}
+          style={{ marginLeft: "5px" }}
+          size="small"
         >
           Run
         </Button>

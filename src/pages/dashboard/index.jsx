@@ -1,66 +1,47 @@
-import { List } from "@mui/icons-material";
 import {
-  Button,
   Divider,
   Grid,
   ListItem,
   ListItemText,
   Paper,
+  List,
 } from "@mui/material";
+import Loading from "components/shared/loading";
 import SideNav from "components/sidenav";
 import React, { useState, useEffect } from "react";
-import {
-  showInfo,
-  showWarning,
-  toastSubject,
-} from "services/shared/toast-messages";
+import { toast } from "react-toastify";
+import { getDashboardData } from "services/logic/dashboard-logic";
+import { stringIsEmpty } from "services/shared/general";
 
 export default function Dashboard() {
-  const [laser, setLaser] = useState({});
+  const [dashboardData, setDashboardData] = useState(undefined);
+  const { applicationStatus, laserSettings, logs, shows } = dashboardData ?? {};
 
   useEffect(() => {
-    const laserTelemetry = {
-      connected: true,
-      temperatures: {
-        galvo: {
-          currentTemp: 50,
-          maxTemp: 60,
-        },
-        basePlate: {
-          currentTemp: 35,
-          maxTemp: 50,
-        },
-      },
-      logs: {
-        errors: [],
-        warnings: [
-          {
-            title: "Laser not connected",
-            message: "The laser is not connected to the computer",
-            dateTime: "29-11-2021 16:50",
-          },
-        ],
-      },
-      settings: {
-        development: {
-          developmentModeEnabled: true,
-        },
-      },
-    };
+    getDashboardData().then((data) => {
+      if (!stringIsEmpty(data?.applicationStatus?.computerIpAddress)) {
+        localStorage.setItem(
+          "computer-ip",
+          data?.applicationStatus?.computerIpAddress
+        );
+      }
 
-    setLaser(laserTelemetry);
-
-    const { logs, settings } = laserTelemetry;
-    if (logs?.errors?.includes || logs?.warnings?.includes) {
-      showWarning(toastSubject.logsNotEmpty);
-    }
-    if (settings?.development?.developmentModeEnabled) {
-      showInfo(toastSubject.developmentModeActive);
-    }
+      setDashboardData(data);
+      showMessages(data);
+    });
+    setInterval(
+      () => getDashboardData().then((data) => setDashboardData(data)),
+      4000
+    );
   }, []);
 
-  const clearLogs = () => {
-    alert("Not implemented yet!");
+  const showMessages = (data) => {
+    data?.logs
+      ?.filter((l) => l.logType === "Warning")
+      ?.forEach((warning) => toast.warning(warning.message));
+    data?.logs
+      ?.filter((l) => l.logType === "Info")
+      ?.forEach((info) => toast.info(info.message));
   };
 
   const sideNavSettings = {
@@ -68,46 +49,72 @@ export default function Dashboard() {
   };
 
   const content = (
-    <div>
+    <Loading objectToLoad={dashboardData}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Paper style={{ padding: "8px" }}>
-            <h1>Laser status</h1>
-            <p>
-              {laser?.connected ? (
-                <div>
-                  Connected{" "}
-                  <span style={{ color: laser?.connected ? "green" : "red" }}>
-                    {" "}
-                    &#x25cf;
-                  </span>
-                </div>
-              ) : (
-                <div>
-                  <span style={{ color: "red" }}> Not connected</span>
-                </div>
-              )}
-            </p>
+            <h1>Application status</h1>
+            <hr />
+            <List>
+              <b>Laser connection status</b>
+              <ListItem>
+                <ListItemText
+                  primary={
+                    applicationStatus?.laserConnected ? (
+                      <span>
+                        Laser connected{" "}
+                        <span style={{ color: "green" }}> &#x25cf;</span>
+                      </span>
+                    ) : (
+                      <span>
+                        <span style={{ color: "red" }}>
+                          Laser is not connected, set the connection in the
+                          settings page
+                        </span>
+                      </span>
+                    )
+                  }
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemText
+                  primary={`Computer ip: ${applicationStatus?.computerIpAddress}`}
+                />
+              </ListItem>
+            </List>
           </Paper>
         </Grid>
         <Grid item xs={6}>
           <Paper style={{ padding: "8px" }}>
             <h1>Laser settings</h1>
             <hr />
-            <b>Zones</b>
             <List>
-              <p>Total: 2</p>
+              <b>Zones</b>
+              <ListItem>
+                <ListItemText
+                  primary={`Total: ${laserSettings?.zonesLength}`}
+                />
+              </ListItem>
             </List>
             <Divider />
-            <b>Development</b>
             <List>
-              <p>
-                Development mode enabled{" "}
-                <span style={{ color: "green", fontSize: "130%" }}>
-                  {" "}
-                  &#x25cf;
-                </span>
-              </p>
+              <b>Development</b>
+              <ListItem>
+                <ListItemText
+                  primary={
+                    laserSettings?.developmentModeIsActive ? (
+                      <span>
+                        {" "}
+                        Development mode enabled{" "}
+                        <span style={{ color: "green", fontSize: "130%" }}>
+                          {" "}
+                          &#x25cf;
+                        </span>
+                      </span>
+                    ) : null
+                  }
+                />
+              </ListItem>
             </List>
           </Paper>
         </Grid>
@@ -115,39 +122,47 @@ export default function Dashboard() {
           <Paper style={{ padding: "8px" }}>
             <h1>Logs</h1>
             <hr />
-            <b>Error</b>
-            <br />
             <List>
-              <ListItem>
-                {laser?.logs?.errors?.map((error, index) => (
-                  <ListItemText
-                    key={`error-${index}`}
-                    primary={error?.title}
-                    secondary={`${error?.message} ${error?.dateTime}`}
-                  />
+              <b>Errors</b>
+              {logs
+                ?.filter((l) => l.logType === "Error")
+                ?.map((error, index) => (
+                  <ListItem>
+                    <ListItemText
+                      key={`error-${index}`}
+                      primary={error?.message}
+                    />
+                  </ListItem>
                 ))}
-              </ListItem>
-              <Divider component="li" />
             </List>
-            <br />
-            <b>Warnings</b>
-            <br />
+            <Divider />
             <List>
-              <ListItem>
-                {laser?.logs?.warnings?.map((warning, index) => (
-                  <ListItemText
-                    key={`logs-${index}`}
-                    primary={warning?.title}
-                    secondary={`${warning?.message} ${warning?.dateTime}`}
-                  />
+              <b>Warnings</b>
+              {logs
+                ?.filter((l) => l.logType === "Warning")
+                ?.map((warning, index) => (
+                  <ListItem>
+                    <ListItemText
+                      key={`logs-${index}`}
+                      primary={warning?.message}
+                    />
+                  </ListItem>
                 ))}
-              </ListItem>
-              <Divider component="li" />
             </List>
-            <br />
-            <Button variant="text" onClick={() => clearLogs()}>
-              X Clear warnings
-            </Button>
+            <Divider />
+            <List>
+              <b>Info</b>
+              {logs
+                ?.filter((l) => l.logType === "Info")
+                ?.map((info, index) => (
+                  <ListItem>
+                    <ListItemText
+                      key={`logs-${index}`}
+                      primary={info?.message}
+                    />
+                  </ListItem>
+                ))}
+            </List>
           </Paper>
         </Grid>
         <Grid item xs={12}>
@@ -155,22 +170,24 @@ export default function Dashboard() {
             <h1>Shows</h1>
             <hr />
             <List>
+              <b>Total</b>
               <ListItem>
-                <ListItemText primary="Total" secondary="2" />
+                <ListItemText primary={shows?.length} />
               </ListItem>
-              <Divider component="li" />
-              <ListItem>
-                <ListItemText
-                  primary="Test show"
-                  secondary="21-07-2021 17:00"
-                />
-              </ListItem>
-              <Divider component="li" />
+            </List>
+            <Divider />
+            <List>
+              <b>Show names</b>
+              {shows?.map((show, index) => (
+                <ListItem key={`${index}-show`}>
+                  <ListItemText primary={show?.showName} />
+                </ListItem>
+              ))}
             </List>
           </Paper>
         </Grid>
       </Grid>
-    </div>
+    </Loading>
   );
 
   return (

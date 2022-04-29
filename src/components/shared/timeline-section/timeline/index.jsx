@@ -3,6 +3,7 @@ import TimeLineChannel from "./timeline-channel";
 export default function Timeline({
   itemsInTimeline,
   onTimelineChannelItemClick,
+  getSubItemDuration,
 }) {
   const timelines = [
     {
@@ -26,6 +27,7 @@ export default function Timeline({
           onTimelineChannelItemClick={onTimelineChannelItemClick}
           key={index + "timelinechannel"}
           timeline={timeline}
+          getSubItemDuration={getSubItemDuration}
         />
       ))}
     </div>
