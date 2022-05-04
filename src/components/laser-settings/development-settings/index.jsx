@@ -9,6 +9,7 @@ export default function DevelopmentSettings({
   developmentZone,
 }) {
   const [developmentModeIsActive, setDevelopmentModeIsActive] = useState();
+  const [sliderIsDisabled, setSliderIsDisabled] = useState(false);
 
   useEffect(() => {
     setDevelopmentModeIsActive(developmentZone !== undefined);
@@ -60,16 +61,21 @@ export default function DevelopmentSettings({
         <FormControlLabel
           control={
             <Switch
+              disabled={sliderIsDisabled}
               checked={developmentModeIsActive}
               onChange={() => {
+                setSliderIsDisabled(true);
                 if (developmentModeIsActive) {
                   deleteZone(developmentZone.uuid);
                   setDevelopmentModeIsActive(false);
                   onDevelopmentModeInactive(developmentZone.uuid);
+                  setSliderIsDisabled(false);
                   return;
                 }
 
-                saveZone(getDevelopmentZone());
+                saveZone(getDevelopmentZone()).then(() =>
+                  setSliderIsDisabled(false)
+                );
                 setDevelopmentModeIsActive(true);
                 onDevelopmentModeActive(developmentZone);
               }}
