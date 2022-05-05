@@ -130,10 +130,11 @@ export default function Zones({
       />
       <br />
       <TextField
+        style={{ width: "250px" }}
         key={selectedZoneUuid + "zonesettings-power"}
         label="Max allowed power in the zone (0 / 765)"
         onChange={(e) =>
-          updateZoneProperty("maxLaserPowerInZonePwm", e.target.value)
+          updateZoneProperty("maxLaserPowerInZonePwm", Number(e.target.value))
         }
         type="number"
         inputProps={{

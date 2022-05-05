@@ -13,7 +13,7 @@ export default function DevelopmentSettings({
 
   useEffect(() => {
     setDevelopmentModeIsActive(developmentZone !== undefined);
-  }, [developmentZone]);
+  }, []);
 
   const getDevelopmentZone = () => {
     const uuid = createGuid();

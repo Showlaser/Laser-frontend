@@ -19,7 +19,7 @@ export default function LaserSettings() {
       setZones(data);
       setSelectedZoneUuid(data[0]?.uuid ?? emptyGuid());
     });
-  }, [zones]);
+  }, []);
 
   const sideNavSettings = {
     pageName: "Laser settings",

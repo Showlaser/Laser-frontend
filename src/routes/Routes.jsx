@@ -2,7 +2,7 @@ import { BrowserRouter, Route } from "react-router-dom";
 import React from "react";
 import routerPaths from "services/shared/router-paths";
 import Dashboard from "pages/dashboard";
-import LaserSettings from "pages/laser-settings/laser-settings";
+import LaserSettings from "pages/laser-settings";
 import PatternEditor from "pages/pattern-editor";
 import AnimationEditor from "pages/animation";
 import Installation from "pages/installation";
