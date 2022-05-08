@@ -1,5 +1,10 @@
 import { toast } from "react-toastify";
 
+type ToastSubject = {
+  message: string;
+  id: number;
+};
+
 export const toastSubject = {
   pointsBoundaryError: {
     message: "Select a value between or equal to -4000 and 4000",
@@ -83,32 +88,36 @@ export const toastSubject = {
     message: "Activation successful",
     id: 19,
   },
+  invalidFile: {
+    message: "Invalid file uploaded",
+    id: 20,
+  },
 };
 
-const calculateAutoCloseTime = (text) => {
+const calculateAutoCloseTime = (text: string) => {
   const autoCloseTime = text.length * 100;
   return autoCloseTime > 3000 ? autoCloseTime : 3000;
 };
 
-export const showError = (subject) => {
+export const showError = (subject: ToastSubject) => {
   const { message, id } = subject;
   const time = calculateAutoCloseTime(message);
   toast.error(message, { toastId: id, autoClose: time });
 };
 
-export const showSuccess = (subject) => {
+export const showSuccess = (subject: ToastSubject) => {
   const { message, id } = subject;
   const time = calculateAutoCloseTime(message);
   toast.success(message, { toastId: id, autoClose: time });
 };
 
-export const showWarning = (subject) => {
+export const showWarning = (subject: ToastSubject) => {
   const { message, id } = subject;
   const time = calculateAutoCloseTime(message);
   toast.warning(message, { toastId: id, autoClose: time });
 };
 
-export const showInfo = (subject) => {
+export const showInfo = (subject: ToastSubject) => {
   const { message, id } = subject;
   const time = calculateAutoCloseTime(message);
   toast.info(message, { toastId: id, autoClose: time });

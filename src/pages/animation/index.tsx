@@ -6,8 +6,9 @@ import { IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import PublicIcon from "@mui/icons-material/Public";
+import SvgToCoordinatesConverter from "components/svg-to-coordinates-converter";
 
-export default () => {
+export default function AnimationPage() {
   return (
     <SideNav>
       <TemporaryDrawer
@@ -17,7 +18,7 @@ export default () => {
             <MenuIcon />
           </IconButton>
         }
-        menuItems={[
+        topMenuItems={[
           {
             icon: <AttachFileIcon />,
             text: "Import from file",
@@ -34,6 +35,7 @@ export default () => {
           },
         ]}
       />
+      <SvgToCoordinatesConverter />
     </SideNav>
   );
-};
+}

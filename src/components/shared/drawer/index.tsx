@@ -6,8 +6,6 @@ import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 
 type Anchor = "top" | "left" | "bottom" | "right";
 type MenuItem = {
@@ -17,14 +15,16 @@ type MenuItem = {
 };
 type Props = {
   location: Anchor;
-  menuItems: MenuItem[];
+  topMenuItems?: MenuItem[];
+  bottomMenuItems?: MenuItem[];
   button: React.ReactElement;
 };
 
 export default function TemporaryDrawer({
   location,
   button,
-  menuItems,
+  topMenuItems,
+  bottomMenuItems,
 }: Props) {
   const [state, setState] = React.useState({
     top: false,
@@ -55,8 +55,8 @@ export default function TemporaryDrawer({
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {menuItems.map((item, index) => (
-          <ListItem onClick={item.onClick} button key={item?.text + index}>
+        {topMenuItems?.map((item, index) => (
+          <ListItem onClick={item?.onClick} button key={item?.text + index}>
             <ListItemIcon>{item?.icon}</ListItemIcon>
             <ListItemText primary={item?.text} />
           </ListItem>
@@ -64,12 +64,10 @@ export default function TemporaryDrawer({
       </List>
       <Divider />
       <List>
-        {["All mail", "Trash", "Spam"].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>
-              {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-            </ListItemIcon>
-            <ListItemText primary={text} />
+        {bottomMenuItems?.map((item, index) => (
+          <ListItem onClick={item?.onClick} button key={item?.text + index}>
+            <ListItemIcon>{item?.icon}</ListItemIcon>
+            <ListItemText primary={item?.text} />
           </ListItem>
         ))}
       </List>
