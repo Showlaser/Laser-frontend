@@ -1,6 +1,6 @@
 import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 import Loading from "components/shared/loading";
-import SideNav from "components/sidenav";
+import SideNav from "components/shared/sidenav";
 import SpotifyPlaylist from "components/spotify-vote/spotify-playlist";
 import VoteOverView from "components/spotify-vote/vote-overview";
 import VoteSettings from "components/spotify-vote/vote-settings";

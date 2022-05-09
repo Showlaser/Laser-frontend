@@ -2,7 +2,7 @@ import * as React from "react";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import { range } from "d3-array";
 import "./index.css";
-import { FormControl, FormLabel, Slider } from "@mui/material";
+import { FormControl, FormLabel, Grid, Slider } from "@mui/material";
 const flattenSVG = require("flatten-svg");
 
 type Props = {
@@ -11,14 +11,17 @@ type Props = {
 
 export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
   const [rawSvg, setRawSvg] = React.useState<string | ArrayBuffer | null>();
-  const [scale, setScale] = React.useState<number>(10);
+  const [scale, setScale] = React.useState<number>(5);
+  const [numberOfPoints, setNumberOfPoints] = React.useState<number>(100);
+  const [xOffset, setXOffset] = React.useState<number>(0);
+  const [yOffset, setYOffset] = React.useState<number>(0);
 
   React.useEffect(() => {
     if (uploadedFile !== undefined) {
       onFileUpload(uploadedFile);
     }
     setNewSvg(rawSvg);
-  }, [scale, uploadedFile]);
+  }, [scale, numberOfPoints, xOffset, yOffset, uploadedFile]);
 
   const onFileUpload = (file: File) => {
     if (file.type !== "image/svg+xml") {
@@ -36,12 +39,16 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     reader.readAsText(file);
   };
 
-  const setNewSvg = (rawSvg: any) => {
-    if (!rawSvg) {
-      return;
+  const setNewSvg = (svg: any) => {
+    if (!svg) {
+      if (!rawSvg) {
+        return;
+      }
+
+      svg = rawSvg;
     }
 
-    const pathsOnly = pathologize(rawSvg);
+    const pathsOnly = pathologize(svg);
     let newDiv = document.createElement("div");
     newDiv.innerHTML = pathsOnly;
 
@@ -51,23 +58,17 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
       return;
     }
 
-    const numberOfPoints = 100;
-    const xOffset = 20;
-    const yOffset = 20;
-
-    const coordinates = pathsToCoords(paths, numberOfPoints, xOffset, yOffset);
-
+    const coordinates = pathsToCoords(paths);
     drawDotsOnCanvas(coordinates);
   };
 
   const drawDotsOnCanvas = (dotsToDraw: any) => {
     const screenScale = window.devicePixelRatio || 1;
     const canvas = document.getElementById("svg-canvas") as HTMLCanvasElement;
-    canvas.width = 1000 * screenScale;
-    canvas.height = 1000 * screenScale;
-    canvas.style.width = "1000px";
-    canvas.style.height = "1000px";
-
+    canvas.width = 500;
+    canvas.height = 500;
+    canvas.style.width = "500";
+    canvas.style.height = "500";
     const ctx = canvas.getContext("2d");
     if (ctx === null) {
       return;
@@ -113,12 +114,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     }
   };
 
-  const pathsToCoords = (
-    paths: any,
-    numberOfPoints: number,
-    translateX: number,
-    translateY: number
-  ) => {
+  const pathsToCoords = (paths: any) => {
     const totalLengthAllPaths: any = getTotalLengthAllPaths(paths);
 
     let runningPointsTotal = 0;
@@ -133,10 +129,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
         );
         runningPointsTotal += pointsForPath;
       }
-      return [
-        ...prev,
-        ...polygonize(item, pointsForPath, translateX, translateY),
-      ];
+      return [...prev, ...polygonize(item, pointsForPath, xOffset, yOffset)];
     }, []);
   };
 
@@ -163,8 +156,8 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
   };
 
   return (
-    <div>
-      <div style={{ width: "20%" }}>
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
         <FormControl fullWidth>
           <FormLabel htmlFor="svg-scale">Scale</FormLabel>
           <Slider
@@ -178,9 +171,50 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
             valueLabelDisplay="auto"
           />
         </FormControl>
-      </div>
+        <FormControl fullWidth>
+          <FormLabel htmlFor="svg-points">Number of points</FormLabel>
+          <Slider
+            id="svg-points"
+            size="small"
+            value={numberOfPoints}
+            onChange={(e, value) => setNumberOfPoints(Number(value))}
+            min={1}
+            max={600}
+            aria-label="Small"
+            valueLabelDisplay="auto"
+          />
+        </FormControl>
+        <FormControl fullWidth>
+          <FormLabel htmlFor="svg-points">X offset</FormLabel>
+          <Slider
+            id="svg-points"
+            size="small"
+            value={xOffset}
+            onChange={(e, value) => setXOffset(Number(value))}
+            min={-60}
+            max={500}
+            aria-label="Small"
+            valueLabelDisplay="auto"
+          />
+        </FormControl>
+        <FormControl fullWidth>
+          <FormLabel htmlFor="svg-points">Y offset</FormLabel>
+          <Slider
+            id="svg-points"
+            size="small"
+            value={yOffset}
+            onChange={(e, value) => setYOffset(Number(value))}
+            min={-60}
+            max={500}
+            aria-label="Small"
+            valueLabelDisplay="auto"
+          />
+        </FormControl>
+      </Grid>
       <br />
-      <canvas id="svg-canvas" />
-    </div>
+      <div id="svg-canvas-container">
+        <canvas id="svg-canvas" />
+      </div>
+    </Grid>
   );
 }

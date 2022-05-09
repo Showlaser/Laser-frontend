@@ -4,6 +4,7 @@ const paths = {
   Zones: "/zones",
   PatternEditor: "/pattern-editor",
   LasershowEditor: "/lasershow-editor",
+  AnimationEditor: "/animation-editor",
   Installation: "/installation",
   Login: "/login",
   Register: "/registration",

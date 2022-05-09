@@ -15,8 +15,14 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
+import SettingsIcon from "@mui/icons-material/Settings";
+import paths from "services/shared/router-paths";
+import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
+import TheatersIcon from "@mui/icons-material/Theaters";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import "./index.css";
 
 const drawerWidth = 240;
 
@@ -71,9 +77,10 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 type Props = {
   children: React.ReactNode;
+  pageName: string;
 };
 
-export default function SideNav({ children }: Props) {
+export default function SideNav({ children, pageName }: Props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -100,7 +107,7 @@ export default function SideNav({ children }: Props) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Persistent drawer
+            {pageName}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -128,28 +135,42 @@ export default function SideNav({ children }: Props) {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <List>
-          {["All mail", "Trash", "Spam"].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
+          {[
+            { title: "Dashboard", icon: <DashboardIcon />, path: paths.Root },
+            {
+              title: "Animation editor",
+              icon: <TheatersIcon />,
+              path: paths.AnimationEditor,
+            },
+            {
+              title: "Pattern editor",
+              icon: <AllInclusiveIcon />,
+              path: paths.PatternEditor,
+            },
+            {
+              title: "Vote",
+              icon: <ThumbsUpDownIcon />,
+              path: paths.SpotifyVote,
+            },
+            {
+              title: "Laser settings",
+              icon: <SettingsIcon />,
+              path: paths.LaserSettings,
+            },
+            {
+              title: "Account",
+              icon: <AccountCircleIcon />,
+              path: paths.Account,
+            },
+          ].map((item) => (
+            <ListItem onClick={() => (window.location.href = item.path)} button>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.title} />
             </ListItem>
           ))}
         </List>
       </Drawer>
-      <Main open={open}>
+      <Main id="menu-children" open={open}>
         <DrawerHeader />
         {children}
       </Main>

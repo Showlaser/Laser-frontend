@@ -1,15 +1,9 @@
-#svg-holder {
-  fill: none;
-  stroke: black;
-  stroke-width: 2px;
-  width: 100px;
-  height: 100px;
-  position: absolute;
-  top: 60px;
-  right: 30px;
+#svg-canvas-container {
+  width: 100%;
+  text-align: center;
 }
 
-#svg-holder > svg {
-  width: 100px;
-  height: 100px;
+#svg-canvas {
+  border: 1px solid;
+  display: inline;
 }

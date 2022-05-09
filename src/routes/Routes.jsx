@@ -30,7 +30,7 @@ function routes() {
       />
       <Route
         exact
-        path={routerPaths.LasershowEditor}
+        path={routerPaths.AnimationEditor}
         component={AnimationEditor}
       />
     </BrowserRouter>

@@ -7,7 +7,7 @@ import {
   List,
 } from "@mui/material";
 import Loading from "components/shared/loading";
-import SideNav from "components/sidenav";
+import SideNav from "components/shared/sidenav";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { getDashboardData } from "services/logic/dashboard-logic";

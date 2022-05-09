@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import Modal from "components/modal";
 import Loading from "components/shared/loading";
-import SideNav from "components/sidenav";
+import SideNav from "components/shared/sidenav";
 import { useCallback, useEffect, useState } from "react";
 import {
   getCurrentUser,

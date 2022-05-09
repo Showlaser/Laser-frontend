@@ -1,6 +1,6 @@
 import "./index.css";
-import React, { useEffect } from "react";
-import SideNav from "components/sidenav";
+import React from "react";
+import SideNav from "components/shared/sidenav";
 import TemporaryDrawer from "components/shared/drawer";
 import {
   IconButton,
@@ -16,7 +16,7 @@ export default function AnimationPage() {
   const [uploadedFile, setUploadedFiles] = React.useState<any>();
 
   return (
-    <SideNav>
+    <SideNav pageName="Animation editor">
       <TemporaryDrawer
         location="bottom"
         button={
@@ -48,6 +48,7 @@ export default function AnimationPage() {
           </label>
         </span>
       </TemporaryDrawer>
+      <br />
       <SvgToCoordinatesConverter uploadedFile={uploadedFile} />
     </SideNav>
   );
