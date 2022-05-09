@@ -2,30 +2,14 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-
 type Anchor = "top" | "left" | "bottom" | "right";
-type MenuItem = {
-  icon: React.ReactElement;
-  text: string;
-  onClick: () => void;
-};
 type Props = {
   location: Anchor;
-  topMenuItems?: MenuItem[];
-  bottomMenuItems?: MenuItem[];
+  children: any;
   button: React.ReactElement;
 };
 
-export default function TemporaryDrawer({
-  location,
-  button,
-  topMenuItems,
-  bottomMenuItems,
-}: Props) {
+export default function TemporaryDrawer({ location, children, button }: Props) {
   const [state, setState] = React.useState({
     top: false,
     left: false,
@@ -51,26 +35,8 @@ export default function TemporaryDrawer({
     <Box
       sx={{ width: anchor === "top" || anchor === "bottom" ? "auto" : 250 }}
       role="presentation"
-      onClick={toggleDrawer(anchor, false)}
-      onKeyDown={toggleDrawer(anchor, false)}
     >
-      <List>
-        {topMenuItems?.map((item, index) => (
-          <ListItem onClick={item?.onClick} button key={item?.text + index}>
-            <ListItemIcon>{item?.icon}</ListItemIcon>
-            <ListItemText primary={item?.text} />
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {bottomMenuItems?.map((item, index) => (
-          <ListItem onClick={item?.onClick} button key={item?.text + index}>
-            <ListItemIcon>{item?.icon}</ListItemIcon>
-            <ListItemText primary={item?.text} />
-          </ListItem>
-        ))}
-      </List>
+      <List>{children}</List>
     </Box>
   );
 
