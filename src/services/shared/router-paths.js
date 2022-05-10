@@ -11,6 +11,7 @@ const paths = {
   ResetPassword: "/reset-password",
   Account: "/account",
   ActivateAccount: "/account-activation",
+  LasershowGenerator: "/lasershow-generator",
 };
 
 export default paths;

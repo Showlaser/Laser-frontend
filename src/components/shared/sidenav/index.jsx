@@ -23,6 +23,7 @@ import paths from "services/shared/router-paths";
 import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
 import TheatersIcon from "@mui/icons-material/Theaters";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LasershowGeneratorControls from "../lasershow-generator-controls";
 
 const drawerWidth = 240;
 
@@ -177,9 +178,15 @@ export default function SideNav({ content, settings }) {
           ))}
         </List>
       </Drawer>
-      <Box className="fade-in" component="main" sx={{ flexGrow: 1, p: 1 }}>
+      <Box
+        className="fade-in"
+        style={{ marginBottom: "80px" }}
+        component="main"
+        sx={{ flexGrow: 1, p: 1 }}
+      >
         <DrawerHeader />
         {content}
+        <LasershowGeneratorControls />
       </Box>
     </Box>
   );

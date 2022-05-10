@@ -1,4 +1,3 @@
-import SideNav from "components/sidenav";
 import React, { useEffect, useState } from "react";
 import Zones from "components/laser-settings/zones";
 import LaserNetworkSettings from "components/laser-settings/network-settings";
@@ -9,6 +8,7 @@ import Loading from "components/shared/loading";
 import { getZones } from "services/logic/zone-logic";
 import { emptyGuid } from "services/shared/math";
 import { deepClone } from "services/shared/general";
+import SideNav from "components/shared/sidenav";
 
 export default function LaserSettings() {
   const [zones, setZones] = useState();
@@ -61,9 +61,6 @@ export default function LaserSettings() {
       />
       <Divider />
       <SpotifyLogin />
-      <Button variant="contained" color="primary">
-        Save settings
-      </Button>
     </Loading>
   );
 

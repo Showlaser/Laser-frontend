@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import SideNav from "components/sidenav";
+import SideNav from "components/shared/sidenav";
 import AnimationSection from "components/animation/animation-section";
 import AnimationOptions from "components/animation/animation-options";
 import "./index.css";
