@@ -7,9 +7,15 @@ type Props = {
   location: Anchor;
   children: any;
   button: React.ReactElement;
+  forceClose?: boolean;
 };
 
-export default function TemporaryDrawer({ location, children, button }: Props) {
+export default function TemporaryDrawer({
+  location,
+  children,
+  button,
+  forceClose,
+}: Props) {
   const [state, setState] = React.useState({
     top: false,
     left: false,
@@ -17,19 +23,15 @@ export default function TemporaryDrawer({ location, children, button }: Props) {
     right: false,
   });
 
-  const toggleDrawer =
-    (anchor: Anchor, open: boolean) =>
-    (event: React.KeyboardEvent | React.MouseEvent) => {
-      if (
-        event.type === "keydown" &&
-        ((event as React.KeyboardEvent).key === "Tab" ||
-          (event as React.KeyboardEvent).key === "Shift")
-      ) {
-        return;
-      }
+  React.useEffect(() => {
+    if (forceClose) {
+      toggleDrawer(location, false);
+    }
+  }, [forceClose]);
 
-      setState({ ...state, [anchor]: open });
-    };
+  const toggleDrawer = (anchor: Anchor, open: boolean) => {
+    setState({ ...state, [anchor]: open });
+  };
 
   const list = (anchor: Anchor) => (
     <Box
@@ -45,12 +47,12 @@ export default function TemporaryDrawer({ location, children, button }: Props) {
       {([location] as const).map((anchor) => (
         <React.Fragment key={anchor}>
           {React.cloneElement(button, {
-            onClick: toggleDrawer(anchor, true),
+            onClick: () => toggleDrawer(anchor, true),
           })}
           <Drawer
             anchor={anchor}
             open={state[anchor]}
-            onClose={toggleDrawer(anchor, false)}
+            onClose={() => toggleDrawer(anchor, false)}
           >
             {list(anchor)}
           </Drawer>
