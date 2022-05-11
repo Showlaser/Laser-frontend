@@ -45,6 +45,10 @@ export const refreshSpotifyAccessToken = async (refreshToken) =>
 
 const executeRequest = (request) => {
   const accessToken = localStorage.getItem("SpotifyAccessToken");
+  if (accessToken === null || accessToken === "undefined") {
+    return;
+  }
+
   Spotify.setAccessToken(accessToken);
 
   return request()
@@ -82,7 +86,10 @@ export const getPlayerState = async () =>
     Spotify.getMyCurrentPlaybackState().then((data) => data)
   );
 
-export const startPlayer = async () => executeRequest(() => Spotify.play());
+export const startPlayer = async (deviceId = null) =>
+  executeRequest(() =>
+    Spotify.play(deviceId !== null ? { device_id: deviceId } : undefined)
+  );
 
 export const pausePlayer = async () => executeRequest(() => Spotify.pause());
 
@@ -90,3 +97,12 @@ export const skipSong = async () => executeRequest(() => Spotify.skipToNext());
 
 export const previousSong = async () =>
   executeRequest(() => Spotify.skipToPrevious());
+
+export const getSpotifyDevices = async () =>
+  executeRequest(() => Spotify.getMyDevices());
+
+export const getDataForCurrentArtist = async (artistId) =>
+  executeRequest(() => Spotify.getArtist(artistId));
+
+export const getCurrentTrackData = async (trackId) =>
+  executeRequest(() => Spotify.getAudioFeaturesForTrack(trackId));

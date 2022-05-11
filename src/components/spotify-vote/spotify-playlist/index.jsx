@@ -33,7 +33,7 @@ export default function SpotifyPlaylist({
   };
 
   return (
-    <div>
+    <div style={{ marginBottom: "50px" }}>
       <h3>Playlists</h3>
       <small>Select the playlists to vote on</small>
       <Divider />
