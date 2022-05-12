@@ -17,6 +17,16 @@ const onError = async (errorCode) => {
     const refreshToken = localStorage.getItem("SpotifyRefreshToken");
     const response = await refreshSpotifyAccessToken(refreshToken);
     const tokens = await response.json();
+
+    const tokensInvalid =
+      !tokens.access_token ||
+      tokens.access_token.length < 20 ||
+      !tokens.refresh_token ||
+      tokens.refresh_token.length < 20;
+    if (tokensInvalid) {
+      return;
+    }
+
     localStorage.setItem("SpotifyAccessToken", tokens.access_token);
     localStorage.setItem("SpotifyRefreshToken", tokens.refresh_token);
     Spotify.setAccessToken(tokens.access_token);
@@ -106,3 +116,6 @@ export const getDataForCurrentArtist = async (artistId) =>
 
 export const getCurrentTrackData = async (trackId) =>
   executeRequest(() => Spotify.getAudioFeaturesForTrack(trackId));
+
+export const searchSpotify = async (searchValue, limit = 50) =>
+  executeRequest(() => Spotify.search(searchValue, ["track"], { limit }));

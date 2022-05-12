@@ -17,7 +17,10 @@ export default function LasershowGeneratorSettings() {
     <div>
       <h2>Lasershow generator</h2>
       <InputLabel id="label">Audio device to listen to</InputLabel>
-      <Select onChange={(e) => onDeviceSelect(e.target.value)}>
+      <Select
+        onChange={(e) => onDeviceSelect(e.target.value)}
+        defaultValue={localStorage.getItem("selected-audio-device")}
+      >
         {devices?.map((device) => (
           <MenuItem key={device} value={device}>
             {device}

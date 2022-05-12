@@ -24,6 +24,7 @@ import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
 import TheatersIcon from "@mui/icons-material/Theaters";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LasershowGeneratorControls from "../lasershow-generator-controls";
+import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
 
 const drawerWidth = 240;
 
@@ -154,6 +155,11 @@ export default function SideNav({ content, settings }) {
               title: "Vote",
               icon: <ThumbsUpDownIcon />,
               path: paths.SpotifyVote,
+            },
+            {
+              title: "Lasershow Spotify connector",
+              icon: <SettingsInputComponentIcon />,
+              path: paths.LasershowSpotifyConnector,
             },
             {
               title: "Laser settings",

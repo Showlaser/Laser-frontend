@@ -12,6 +12,8 @@ const paths = {
   Account: "/account",
   ActivateAccount: "/account-activation",
   LasershowGenerator: "/lasershow-generator",
+  Registration: "/registration",
+  LasershowSpotifyConnector: "/lasershow-spotify-connector",
 };
 
 export default paths;

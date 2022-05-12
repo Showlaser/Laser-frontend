@@ -62,12 +62,20 @@ export default function LasershowGeneratorControls() {
     setIntervalsSet(true);
     updateData();
     getActiveDevice();
-    setInterval(() => updateData(), 1500);
+    setInterval(() => updateData(), 1800);
     setInterval(() => getActiveDevice(), 10000);
   }, [activeDevice, playerStateRef.current]);
 
   const updateData = () => {
+    if (!userIsLoggedIntoSpotify) {
+      return;
+    }
+
     getSpotifyPlayerState();
+    if (!playerStateRef.current) {
+      return;
+    }
+
     getArtistData();
     getTrackData();
     getGeneratorStatus();
@@ -129,8 +137,10 @@ export default function LasershowGeneratorControls() {
 
   const getSpotifyPlayerState = () => {
     getPlayerState().then((data) => {
-      setPlaying(data.is_playing);
-      playerStateRef.current = data;
+      if (data) {
+        setPlaying(data.is_playing);
+        playerStateRef.current = data;
+      }
     });
   };
 

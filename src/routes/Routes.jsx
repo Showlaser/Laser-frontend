@@ -11,6 +11,8 @@ import SpotifyVote from "pages/spotify-vote";
 import PasswordReset from "pages/password-reset";
 import Account from "pages/account";
 import AccountActivation from "pages/account-activation";
+import Registration from "pages/registration";
+import LasershowSpotifyConnector from "pages/lasershow-spotify-connector";
 
 function routes() {
   return (
@@ -23,6 +25,12 @@ function routes() {
       <Route exact path={routerPaths.SpotifyVote} component={SpotifyVote} />
       <Route exact path={routerPaths.ResetPassword} component={PasswordReset} />
       <Route exact path={routerPaths.Account} component={Account} />
+      <Route exact path={routerPaths.Registration} component={Registration} />
+      <Route
+        exact
+        path={routerPaths.LasershowSpotifyConnector}
+        component={LasershowSpotifyConnector}
+      />
       <Route
         exact
         path={routerPaths.ActivateAccount}

@@ -15,7 +15,9 @@ import {
   removeUser,
   updateUser,
 } from "services/logic/user-logic";
+import { getFormDataFromEvent } from "services/shared/form-data-helper";
 import { deepClone, stringIsEmpty } from "services/shared/general";
+import { createGuid } from "services/shared/math";
 import { showError, toastSubject } from "services/shared/toast-messages";
 
 export default function Account() {
@@ -57,15 +59,11 @@ export default function Account() {
     return newPassword === newPasswordRepeat;
   };
 
-  const onUpdate = () => {
+  const onUpdate = (e) => {
     setButtonDisabled(true);
+    let formData = getFormDataFromEvent(e);
     const passwordShouldBeUpdated =
       !stringIsEmpty(newPassword) && !stringIsEmpty(newPasswordRepeat);
-    let accountModel = {
-      username,
-      password: currentPassword,
-      email,
-    };
 
     if (passwordShouldBeUpdated) {
       if (!passwordsMatch()) {
@@ -73,10 +71,10 @@ export default function Account() {
         setButtonDisabled(false);
         return;
       }
-      accountModel.newPassword = newPassword;
+      formData.newPassword = newPassword;
     }
 
-    updateUser(accountModel).then((result) => {
+    updateUser(formData).then((result) => {
       if (result.status === 401) {
         showError(toastSubject.invalidPassword);
       }
@@ -96,38 +94,39 @@ export default function Account() {
         justifyContent="center"
         style={{ minHeight: "70vh" }}
       >
-        <FormControl
-          style={{ width: "50%", maxWidth: "40vh" }}
-          key="user-account"
+        <form
+          onSubmit={onUpdate}
+          key={createGuid()}
+          style={{ maxWidth: "40vh" }}
         >
           <TextField
             fullWidth
             label="Username"
-            value={username}
+            name={username}
+            defaultValue={username}
             required
-            onChange={(e) => setUsername(e.target.value)}
           />
           <TextField
             fullWidth
             label="Email"
             type="email"
-            value={email}
+            defaultValue={email}
             required
             onChange={(e) => {
               currentEmail !== e.target.value
                 ? setEmailChanged(true)
                 : setEmailChanged(false);
-              setEmail(e.target.value);
             }}
           />
           <TextField
             fullWidth
             type="password"
             label="New password"
-            onChange={(e) => setNewPassword(e.target.value)}
+            name="newPassword"
           />
           <TextField
             fullWidth
+            name="repeatPassword"
             type="password"
             label="Repeat password"
             onChange={(e) => setNewPasswordRepeat(e.target.value)}
@@ -137,9 +136,9 @@ export default function Account() {
           <TextField
             required
             fullWidth
+            name="currentPassword"
             type="password"
             label="Current password"
-            onChange={(e) => setCurrentPassword(e.target.value)}
           />
           <br />
           <span hidden={!emailChanged}>
@@ -151,10 +150,10 @@ export default function Account() {
           </span>
           <br />
           <Button
+            type="submit"
             variant="contained"
             disabled={buttonDisabled}
             fullWidth
-            onClick={onUpdate}
           >
             Update account
           </Button>
@@ -173,7 +172,7 @@ export default function Account() {
           >
             Remove account
           </Button>
-        </FormControl>
+        </form>
       </Grid>
     </Loading>
   );
