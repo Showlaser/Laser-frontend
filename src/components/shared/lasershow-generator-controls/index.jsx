@@ -64,7 +64,7 @@ export default function LasershowGeneratorControls() {
     getActiveDevice();
     setInterval(() => updateData(), 1800);
     setInterval(() => getActiveDevice(), 10000);
-  }, [activeDevice, playerStateRef.current]);
+  }, [activeDevice]);
 
   const updateData = () => {
     if (!userIsLoggedIntoSpotify) {

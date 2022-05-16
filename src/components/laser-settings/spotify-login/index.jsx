@@ -31,11 +31,20 @@ export default function SpotifyLogin() {
     });
   };
 
+  const removeSpotifyTokens = () => {
+    localStorage.removeItem("SpotifyAccessToken");
+    localStorage.removeItem("SpotifyRefreshToken");
+    window.location = paths.LaserSettings;
+  };
+
   return (
     <div>
       <h2>Spotify</h2>
       {localStorage.getItem("SpotifyAccessToken")?.length > 10 ? (
-        <p>You are logged in to Spotify</p>
+        <span>
+          <p>You are logged in to Spotify</p>
+          <Button onClick={removeSpotifyTokens}>Logout of Spotify</Button>
+        </span>
       ) : (
         <Button
           variant="contained"
