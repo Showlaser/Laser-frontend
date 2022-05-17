@@ -47,6 +47,7 @@ export default function Account() {
   };
 
   const onSubmit = (e) => {
+    e.preventDefault();
     setSubmitInProgress(true);
     let formData = getFormDataFromEvent(e);
     const passwordShouldBeUpdated =

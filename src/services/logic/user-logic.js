@@ -19,7 +19,7 @@ export const updateUser = async (user) => {
     () => Put(apiEndpoints.user, user),
     [401],
     toastSubject.changesSaved
-  ).then((value) => value.json());
+  );
 };
 
 export const removeUser = async () => {

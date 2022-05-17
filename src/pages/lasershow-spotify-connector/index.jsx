@@ -14,6 +14,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  Divider,
 } from "@mui/material";
 import SideNav from "components/shared/sidenav";
 import { useEffect, useState } from "react";
@@ -52,7 +53,7 @@ export default function LasershowSpotifyConnector() {
     const currentIndex = checked.findIndex((e) => e === value);
     const newChecked = [...checked];
 
-    if (currentIndex === -1) {
+    if (currentIndex === -1 && newChecked.length === 0) {
       newChecked.push(value);
     } else {
       newChecked.splice(currentIndex, 1);
@@ -87,19 +88,21 @@ export default function LasershowSpotifyConnector() {
           />
         </Paper>
       </Grid>
-      <div style={{ maxWidth: "30%", marginBottom: "10px" }}>
+      <div style={{ maxWidth: "30%", marginBottom: "10px", marginTop: "25px" }}>
         <ButtonGroup>
           <FormControl style={{ minWidth: "250px" }}>
-            <InputLabel>Lasershow to set songs to</InputLabel>
+            <InputLabel>Lasershow to set song to</InputLabel>
             <Select>
               {lasershows.map((lasershow) => (
                 <MenuItem value={lasershow}>{lasershow}</MenuItem>
               ))}
             </Select>
           </FormControl>
-          <Button>Save</Button>
+          <Button variant="text">Save</Button>
         </ButtonGroup>
       </div>
+      <Divider />
+      <small>Only one song can be connected to a lasershow!</small>
       <List sx={{ width: "100%", bgcolor: "background.paper" }} disablePadding>
         {searchResults.map((searchResult, index) => (
           <ListItem key={searchResult?.songName + index} disablePadding>

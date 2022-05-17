@@ -8,8 +8,6 @@ import {
   Switch,
   FormGroup,
   FormControlLabel,
-  Select,
-  MenuItem,
   Alert,
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
@@ -45,9 +43,12 @@ export default function LasershowGeneratorControls() {
   );
   const [playing, setPlaying] = useState(false);
   const [activeDevice, setActiveDevice] = useState();
-  const [lasershowGeneratorStatus, setLasershowGeneratorStatus] =
-    useState(false);
+  const [lasershowGeneratorStatus, setLasershowGeneratorStatus] = useState({
+    isActive: false,
+  });
   const [intervalsSet, setIntervalsSet] = useState(false);
+  const [generatorSubmitInProgress, setGeneratorSubmitInProgress] =
+    useState(false);
   const selectedAudioDevice = localStorage.getItem("selected-audio-device");
 
   const playerStateRef = useRef();
@@ -61,9 +62,9 @@ export default function LasershowGeneratorControls() {
 
     setIntervalsSet(true);
     updateData();
-    getActiveDevice();
+    updateActiveDevice();
     setInterval(() => updateData(), 1800);
-    setInterval(() => getActiveDevice(), 10000);
+    setInterval(() => updateActiveDevice(), 10000);
   }, [activeDevice]);
 
   const updateData = () => {
@@ -71,18 +72,18 @@ export default function LasershowGeneratorControls() {
       return;
     }
 
-    getSpotifyPlayerState();
+    updateSpotifyPlayerState();
     if (!playerStateRef.current) {
       return;
     }
 
-    getArtistData();
-    getTrackData();
-    getGeneratorStatus();
+    updateArtistData();
+    updateTrackData();
+    updateGeneratorStatus();
     updateGeneratorSettings();
   };
 
-  const getGeneratorStatus = () => {
+  const updateGeneratorStatus = () => {
     getLasershowGeneratorStatus().then((status) =>
       setLasershowGeneratorStatus(status)
     );
@@ -99,9 +100,9 @@ export default function LasershowGeneratorControls() {
     });
   };
 
-  const getActiveDevice = () => {
+  const updateActiveDevice = () => {
     getSpotifyDevices().then((data) => {
-      const device = data.devices.filter((dev) => dev.is_active)[0];
+      const device = data.devices.find((dev) => dev.is_active);
       if (!device) {
         return;
       }
@@ -110,7 +111,7 @@ export default function LasershowGeneratorControls() {
     });
   };
 
-  const getTrackData = () => {
+  const updateTrackData = () => {
     if (!playerStateRef.current) {
       return;
     }
@@ -120,7 +121,7 @@ export default function LasershowGeneratorControls() {
     });
   };
 
-  const getArtistData = () => {
+  const updateArtistData = () => {
     if (
       !playerStateRef.current ||
       playerStateRef.current.item.id === currentTrackDataRef.current?.id
@@ -135,7 +136,7 @@ export default function LasershowGeneratorControls() {
     );
   };
 
-  const getSpotifyPlayerState = () => {
+  const updateSpotifyPlayerState = () => {
     getPlayerState().then((data) => {
       if (data) {
         setPlaying(data.is_playing);
@@ -145,6 +146,7 @@ export default function LasershowGeneratorControls() {
   };
 
   const onLasershowGeneratorToggle = (startGenerator) => {
+    setGeneratorSubmitInProgress(true);
     setLasershowGeneratorStatus(startGenerator);
     startGenerator
       ? startLasershowGeneration(
@@ -153,8 +155,10 @@ export default function LasershowGeneratorControls() {
             bpm: parseInt(currentTrackDataRef.current.tempo),
           },
           selectedAudioDevice
-        )
-      : stopLasershowGeneration();
+        ).then(() => setGeneratorSubmitInProgress(false))
+      : stopLasershowGeneration().then(() =>
+          setGeneratorSubmitInProgress(false)
+        );
   };
 
   const toggleControls = () => {
@@ -207,6 +211,7 @@ export default function LasershowGeneratorControls() {
           <FormControlLabel
             control={
               <Switch
+                disabled={generatorSubmitInProgress}
                 key="lgc-switch"
                 checked={lasershowGeneratorStatus.isActive}
                 onChange={(e) => onLasershowGeneratorToggle(e.target.checked)}
@@ -214,6 +219,9 @@ export default function LasershowGeneratorControls() {
             }
             label="Enable lasershow generation"
           />
+          {generatorSubmitInProgress ? (
+            <LinearProgress style={{ width: "250px" }} />
+          ) : null}
         </FormGroup>
         <br />
         <ButtonGroup>
