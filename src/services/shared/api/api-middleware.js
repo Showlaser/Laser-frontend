@@ -1,7 +1,7 @@
 import paths from "../router-paths";
 import { showError, toastSubject, showSuccess } from "../toast-messages";
 import { Post } from "./api-actions";
-import apiEndpoints from "./api-urls";
+import apiEndpoints from "./api-endpoints";
 
 const handleErrorMessage = (statusCode, ignoredStatusCodes) => {
   if (ignoredStatusCodes.includes(statusCode)) {
@@ -11,6 +11,7 @@ const handleErrorMessage = (statusCode, ignoredStatusCodes) => {
   const statusCodes = {
     400: toastSubject.apiBadRequest,
     404: toastSubject.apiNotFound,
+    409: toastSubject.apiDuplication,
     304: toastSubject.apiNotModified,
     500: toastSubject.apiException,
   };

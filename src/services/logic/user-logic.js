@@ -1,6 +1,6 @@
 import { Delete, Get, Put, Post } from "services/shared/api/api-actions";
 import { sendRequest } from "services/shared/api/api-middleware";
-import apiEndpoints from "services/shared/api/api-urls";
+import apiEndpoints from "services/shared/api/api-endpoints";
 import paths from "services/shared/router-paths";
 import { toastSubject } from "services/shared/toast-messages";
 

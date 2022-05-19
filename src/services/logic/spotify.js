@@ -1,6 +1,6 @@
 import { Get } from "services/shared/api/api-actions";
 import { sendRequest } from "services/shared/api/api-middleware";
-import apiEndpoints from "services/shared/api/api-urls";
+import apiEndpoints from "services/shared/api/api-endpoints";
 import SpotifyWebApi from "spotify-web-api-js";
 
 const Spotify = new SpotifyWebApi();
@@ -114,8 +114,15 @@ export const getSpotifyDevices = async () =>
 export const getDataForCurrentArtist = async (artistId) =>
   executeRequest(() => Spotify.getArtist(artistId));
 
-export const getCurrentTrackData = async (trackId) =>
+export const getTrackAudioFeatures = async (trackId) =>
   executeRequest(() => Spotify.getAudioFeaturesForTrack(trackId));
 
 export const searchSpotify = async (searchValue, limit = 50) =>
-  executeRequest(() => Spotify.search(searchValue, ["track"], { limit }));
+  executeRequest(() =>
+    Spotify.search(searchValue, ["track"], {
+      limit,
+    })
+  );
+
+export const getCurrentTrackData = async (trackId) =>
+  executeRequest(() => Spotify.getTrack(trackId));

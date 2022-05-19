@@ -19,18 +19,26 @@ import {
 import SideNav from "components/shared/sidenav";
 import { useEffect, useState } from "react";
 import { getAnimations } from "services/logic/animation-logic";
-import { searchSpotify } from "services/logic/spotify";
+import {
+  addLasershowToSpotifyConnector,
+  getAllConnectors,
+} from "services/logic/lasershow-spotify-connector";
+import { getCurrentTrackData, searchSpotify } from "services/logic/spotify";
+import { createGuid } from "services/shared/math";
 
 export default function LasershowSpotifyConnector() {
   const [searchResults, setSearchResults] = useState([]);
   const [lasershows, setLasershows] = useState([]);
-  const [checked, setChecked] = useState([]);
+  const [selectedSpotifySongId, setSelectedSpotifySongId] = useState();
+  const [selectedLasershowUuid, setSelectedLasershowUuid] = useState();
+  const [existingConnectors, setExistingConnectors] = useState([]);
 
   useEffect(() => {
     if (lasershows.length === 0) {
-      getAnimations().then((animations) =>
-        setLasershows(animations.map((a) => a.name))
-      );
+      getAnimations().then((animations) => setLasershows(animations));
+    }
+    if (existingConnectors.length === 0) {
+      getAllConnectors().then((data) => setExistingConnectors(data));
     }
   }, [setSearchResults]);
 
@@ -49,17 +57,50 @@ export default function LasershowSpotifyConnector() {
     );
   };
 
-  const handleToggle = (value) => () => {
-    const currentIndex = checked.findIndex((e) => e === value);
-    const newChecked = [...checked];
+  const onSave = () => {
+    const connector = {
+      uuid: createGuid(),
+      spotifySongId: selectedSpotifySongId,
+      lasershowUuid: selectedLasershowUuid,
+    };
 
-    if (currentIndex === -1 && newChecked.length === 0) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
+    addLasershowToSpotifyConnector(connector);
+    let newExistingConnectors = [...existingConnectors];
+    newExistingConnectors.push(connector);
+    setExistingConnectors(newExistingConnectors);
+  };
+
+  const handleToggle = (songId) => () => {
+    if (songId === selectedSpotifySongId) {
+      setSelectedSpotifySongId(undefined);
+      return;
     }
 
-    setChecked(newChecked);
+    setSelectedSpotifySongId(songId);
+  };
+
+  const onLasershowSelect = (lasershowUuid) => {
+    setSelectedLasershowUuid(lasershowUuid);
+    const lasershowConnector = existingConnectors.find(
+      (c) => c.lasershowUuid === lasershowUuid
+    );
+    if (lasershowConnector === undefined) {
+      setSearchResults([]);
+      setSelectedSpotifySongId(undefined);
+      return;
+    }
+
+    getCurrentTrackData(lasershowConnector.spotifySongId).then((track) => {
+      let currentSearchResults = [...searchResults];
+      currentSearchResults.unshift({
+        artist: track.artists[0]?.name,
+        songName: track.name,
+        id: track.id,
+      });
+
+      setSearchResults(currentSearchResults);
+      setSelectedSpotifySongId(track.id);
+    });
   };
 
   const content = (
@@ -90,48 +131,62 @@ export default function LasershowSpotifyConnector() {
       </Grid>
       <div style={{ maxWidth: "30%", marginBottom: "10px", marginTop: "25px" }}>
         <ButtonGroup>
-          <FormControl style={{ minWidth: "250px" }}>
-            <InputLabel>Lasershow to set song to</InputLabel>
-            <Select>
-              {lasershows.map((lasershow) => (
-                <MenuItem value={lasershow}>{lasershow}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button variant="text">Save</Button>
+          {lasershows.length > 0 ? (
+            <FormControl style={{ minWidth: "250px" }}>
+              <InputLabel>Lasershow to set song to</InputLabel>
+              <Select>
+                {lasershows.map((lasershow) => (
+                  <MenuItem
+                    onClick={() => onLasershowSelect(lasershow.uuid)}
+                    value={lasershow.name}
+                    key={createGuid()}
+                  >
+                    {lasershow.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
+            <h1>No lasershows available create one first</h1>
+          )}
+          <Button variant="text" onClick={onSave}>
+            Save
+          </Button>
         </ButtonGroup>
       </div>
       <Divider />
       <small>Only one song can be connected to a lasershow!</small>
-      <List sx={{ width: "100%", bgcolor: "background.paper" }} disablePadding>
-        {searchResults.map((searchResult, index) => (
-          <ListItem key={searchResult?.songName + index} disablePadding>
-            <ListItemButton
-              role={undefined}
-              onClick={handleToggle(searchResult?.id)}
-              dense
-            >
-              <ListItemIcon>
-                <Checkbox
-                  edge="start"
-                  checked={
-                    checked.findIndex((e) => e === searchResult.id) !== -1
-                  }
-                  tabIndex={-1}
-                  disableRipple
-                  inputProps={{
-                    "aria-labelledby": `checkbox-list-label-${index}`,
-                  }}
+      {searchResults.length > 0 ? (
+        <List sx={{ width: "100%" }} disablePadding>
+          {searchResults.map((searchResult, index) => (
+            <ListItem key={searchResult?.songName + index} disablePadding>
+              <ListItemButton
+                role={undefined}
+                onClick={handleToggle(searchResult?.id)}
+                dense
+              >
+                <ListItemIcon>
+                  <Checkbox
+                    edge="start"
+                    checked={selectedSpotifySongId === searchResult.id}
+                    tabIndex={-1}
+                    disableRipple
+                    inputProps={{
+                      "aria-labelledby": `checkbox-list-label-${index}`,
+                    }}
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  id={`checkbox-list-label-${index}`}
+                  primary={`${searchResult?.songName} | ${searchResult.artist}`}
                 />
-              </ListItemIcon>
-              <ListItemText
-                id={`checkbox-list-label-${index}`}
-                primary={`${searchResult?.songName} | ${searchResult.artist}`}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      ) : (
+        <h3>Type a song in the searchbar</h3>
+      )}
     </div>
   );
 

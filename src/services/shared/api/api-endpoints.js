@@ -21,6 +21,7 @@ const apiEndpoints = {
   resetPassword: `${authApiUrl}user/reset-password`,
   activateAccount: `${authApiUrl}user/activate`,
   lasershowGenerator: `${laserApiUrl}lasershow-generator`,
+  spotifyConnector: `${laserApiUrl}spotify-connector`,
 };
 
 export default apiEndpoints;

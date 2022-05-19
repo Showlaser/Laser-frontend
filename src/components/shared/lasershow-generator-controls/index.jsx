@@ -31,7 +31,7 @@ import {
   previousSong,
   getSpotifyDevices,
   getDataForCurrentArtist,
-  getCurrentTrackData,
+  getTrackAudioFeatures,
 } from "services/logic/spotify";
 
 export default function LasershowGeneratorControls() {
@@ -84,9 +84,11 @@ export default function LasershowGeneratorControls() {
   };
 
   const updateGeneratorStatus = () => {
-    getLasershowGeneratorStatus().then((status) =>
-      setLasershowGeneratorStatus(status)
-    );
+    if (lasershowGeneratorStatus?.isActive) {
+      getLasershowGeneratorStatus().then((status) =>
+        setLasershowGeneratorStatus(status)
+      );
+    }
   };
 
   const updateGeneratorSettings = () => {
@@ -116,7 +118,7 @@ export default function LasershowGeneratorControls() {
       return;
     }
 
-    getCurrentTrackData(playerStateRef.current.item.id).then((trackData) => {
+    getTrackAudioFeatures(playerStateRef.current.item.id).then((trackData) => {
       currentTrackDataRef.current = trackData;
     });
   };
