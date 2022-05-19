@@ -124,5 +124,5 @@ export const searchSpotify = async (searchValue, limit = 50) =>
     })
   );
 
-export const getCurrentTrackData = async (trackId) =>
-  executeRequest(() => Spotify.getTrack(trackId));
+export const getCurrentTracksData = async (trackIds) =>
+  executeRequest(() => Spotify.getTracks(trackIds));
