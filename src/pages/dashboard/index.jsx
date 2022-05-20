@@ -57,7 +57,7 @@ export default function Dashboard() {
             <hr />
             <List>
               <b>Laser connection status</b>
-              <ListItem>
+              <ListItem key="connection-status">
                 <ListItemText
                   primary={
                     applicationStatus?.laserConnected ? (
@@ -76,7 +76,7 @@ export default function Dashboard() {
                   }
                 />
               </ListItem>
-              <ListItem>
+              <ListItem key="computer-ip">
                 <ListItemText
                   primary={`Computer ip: ${applicationStatus?.computerIpAddress}`}
                 />
@@ -90,7 +90,7 @@ export default function Dashboard() {
             <hr />
             <List>
               <b>Zones</b>
-              <ListItem>
+              <ListItem key="zones">
                 <ListItemText
                   primary={`Total: ${laserSettings?.zonesLength}`}
                 />
@@ -99,7 +99,7 @@ export default function Dashboard() {
             <Divider />
             <List>
               <b>Development</b>
-              <ListItem>
+              <ListItem key="development">
                 <ListItemText
                   primary={
                     laserSettings?.developmentModeIsActive ? (
@@ -127,7 +127,7 @@ export default function Dashboard() {
               {logs
                 ?.filter((l) => l.logType === "Error")
                 ?.map((error, index) => (
-                  <ListItem>
+                  <ListItem key={error + index}>
                     <ListItemText
                       key={`error-${index}`}
                       primary={error?.message}
@@ -141,7 +141,7 @@ export default function Dashboard() {
               {logs
                 ?.filter((l) => l.logType === "Warning")
                 ?.map((warning, index) => (
-                  <ListItem>
+                  <ListItem key={warning + index}>
                     <ListItemText
                       key={`logs-${index}`}
                       primary={warning?.message}
@@ -155,7 +155,7 @@ export default function Dashboard() {
               {logs
                 ?.filter((l) => l.logType === "Info")
                 ?.map((info, index) => (
-                  <ListItem>
+                  <ListItem key={info + index}>
                     <ListItemText
                       key={`logs-${index}`}
                       primary={info?.message}
@@ -171,7 +171,7 @@ export default function Dashboard() {
             <hr />
             <List>
               <b>Total</b>
-              <ListItem>
+              <ListItem key="total">
                 <ListItemText primary={shows?.length} />
               </ListItem>
             </List>

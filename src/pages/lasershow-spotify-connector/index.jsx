@@ -15,6 +15,7 @@ import {
   Paper,
   Select,
   Divider,
+  Tooltip,
 } from "@mui/material";
 import SideNav from "components/shared/sidenav";
 import { useEffect, useState } from "react";
@@ -25,6 +26,7 @@ import {
 } from "services/logic/lasershow-spotify-connector";
 import { getCurrentTracksData, searchSpotify } from "services/logic/spotify";
 import { createGuid } from "services/shared/math";
+import HelpIcon from "@mui/icons-material/Help";
 
 export default function LasershowSpotifyConnector() {
   const [searchResults, setSearchResults] = useState([]);
@@ -134,6 +136,7 @@ export default function LasershowSpotifyConnector() {
           }}
         >
           <InputBase
+            disabled={selectedLasershowUuid === undefined}
             sx={{ ml: 1, flex: 1 }}
             placeholder="Search Spotify"
             onChange={(e) => onSearchInput(e.target.value)}
@@ -144,8 +147,8 @@ export default function LasershowSpotifyConnector() {
         <ButtonGroup>
           {lasershows.length > 0 ? (
             <FormControl style={{ minWidth: "250px" }}>
-              <InputLabel>Lasershow to set song to</InputLabel>
-              <Select>
+              <InputLabel>Lasershow to connect songs to</InputLabel>
+              <Select defaultValue="">
                 {lasershows.map((lasershow) => (
                   <MenuItem
                     onClick={() => onLasershowSelect(lasershow.uuid)}
@@ -160,42 +163,69 @@ export default function LasershowSpotifyConnector() {
           ) : (
             <h1>No lasershows available create one first</h1>
           )}
-          <Button variant="text" onClick={onSave}>
+          <Button
+            variant="text"
+            onClick={onSave}
+            disabled={
+              lasershows.length === 0 || selectedSpotifySongIds.length === 0
+            }
+          >
             Save
           </Button>
         </ButtonGroup>
       </div>
       <Divider />
-      <small>Only one song can be connected to a lasershow!</small>
+      <small>
+        A song can only be connected to one lasershow
+        <Tooltip title="This is not possible since it would run two lasershows at the same time.">
+          <HelpIcon fontSize="inherit" />
+        </Tooltip>
+      </small>
       {selectedLasershowUuid !== undefined ? (
         <List sx={{ width: "100%" }} disablePadding>
-          {searchResults.map((searchResult, index) => (
-            <ListItem key={searchResult?.songName + index} disablePadding>
-              <ListItemButton
-                role={undefined}
-                onClick={handleToggle(searchResult?.id)}
-                dense
-              >
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    checked={selectedSpotifySongIds?.some(
-                      (spsi) => spsi === searchResult.id
-                    )}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{
-                      "aria-labelledby": `checkbox-list-label-${index}`,
-                    }}
+          {searchResults.map((searchResult, index) => {
+            const songIsAlreadyConnected = existingConnectors.some(
+              (ex) =>
+                ex.spotifySongs.some(
+                  (ss) => ss.spotifySongId === searchResult?.id
+                ) && ex.lasershowUuid !== selectedLasershowUuid
+            );
+
+            return (
+              <ListItem key={searchResult?.songName + index} disablePadding>
+                <ListItemButton
+                  role={undefined}
+                  onClick={handleToggle(searchResult?.id)}
+                  disabled={songIsAlreadyConnected}
+                  dense
+                >
+                  <ListItemIcon>
+                    <Checkbox
+                      edge="start"
+                      checked={selectedSpotifySongIds?.some(
+                        (spsi) => spsi === searchResult.id
+                      )}
+                      tabIndex={-1}
+                      disableRipple
+                      inputProps={{
+                        "aria-labelledby": `checkbox-list-label-${index}`,
+                      }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    id={`checkbox-list-label-${index}`}
+                    primary={`${searchResult?.songName} | ${
+                      searchResult.artist
+                    } ${
+                      songIsAlreadyConnected
+                        ? " (this song is already connected)"
+                        : ""
+                    }`}
                   />
-                </ListItemIcon>
-                <ListItemText
-                  id={`checkbox-list-label-${index}`}
-                  primary={`${searchResult?.songName} | ${searchResult.artist}`}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
         </List>
       ) : (
         <h3>

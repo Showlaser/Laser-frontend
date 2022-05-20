@@ -84,11 +84,9 @@ export default function LasershowGeneratorControls() {
   };
 
   const updateGeneratorStatus = () => {
-    if (lasershowGeneratorStatus?.isActive) {
-      getLasershowGeneratorStatus().then((status) =>
-        setLasershowGeneratorStatus(status)
-      );
-    }
+    getLasershowGeneratorStatus().then((status) =>
+      setLasershowGeneratorStatus(status)
+    );
   };
 
   const updateGeneratorSettings = () => {
