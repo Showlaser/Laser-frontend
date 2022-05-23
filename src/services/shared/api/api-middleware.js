@@ -12,6 +12,7 @@ const handleErrorMessage = (statusCode, ignoredStatusCodes) => {
     400: toastSubject.apiBadRequest,
     404: toastSubject.apiNotFound,
     409: toastSubject.apiDuplication,
+    410: toastSubject.noLongerAvailable,
     304: toastSubject.apiNotModified,
     500: toastSubject.apiException,
   };

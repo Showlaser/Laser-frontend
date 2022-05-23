@@ -92,6 +92,10 @@ export const toastSubject = {
       "Your account is created! Activate your account by clicking the link in the email you received.",
     id: 21,
   },
+  noLongerAvailable: {
+    message: "The requested item is no longer available.",
+    id: 22,
+  },
 };
 
 const calculateAutoCloseTime = (text) => {
