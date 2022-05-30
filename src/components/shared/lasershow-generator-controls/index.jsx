@@ -97,6 +97,8 @@ export default function LasershowGeneratorControls() {
     updateLasershowGeneratorSettings({
       genres: currentArtistRef.current.genres,
       bpm: parseInt(currentTrackDataRef.current.tempo),
+      saveLasershow: localStorage.getItem("save-generated-lasershows") !== null,
+      songName: playerStateRef.current?.item?.name,
     });
   };
 
@@ -140,6 +142,7 @@ export default function LasershowGeneratorControls() {
     getPlayerState().then((data) => {
       if (data) {
         setPlaying(data.is_playing);
+        console.log(data);
         playerStateRef.current = data;
       }
     });
@@ -252,6 +255,8 @@ export default function LasershowGeneratorControls() {
             }`}</small>
           </span>
         ) : null}
+        <br />
+        <small>{`Bpm: ${parseInt(currentTrackDataRef?.current?.tempo)}`}</small>
       </span>
     );
   };
