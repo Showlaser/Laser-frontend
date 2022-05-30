@@ -5,12 +5,15 @@ import {
   FormGroup,
   FormControlLabel,
   Switch,
+  Alert,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getAudioDevices } from "services/logic/lasershow-generation-logic";
 
 export default function LasershowGeneratorSettings() {
   const [devices, setDevices] = useState([]);
+  const saveGeneratedLasershow =
+    localStorage.getItem("save-generated-lasershows") !== null;
 
   useEffect(() => {
     getAudioDevices().then((devices) => setDevices(devices));
@@ -27,9 +30,7 @@ export default function LasershowGeneratorSettings() {
         <FormControlLabel
           control={
             <Switch
-              defaultChecked={
-                localStorage.getItem("save-generated-lasershows") !== null
-              }
+              defaultChecked={saveGeneratedLasershow}
               onChange={(e) =>
                 e.target.checked
                   ? localStorage.setItem("save-generated-lasershows", null)
@@ -39,6 +40,12 @@ export default function LasershowGeneratorSettings() {
           }
           label="Save generated lasershows"
         />
+        <Alert severity="info">
+          The show will be saved if a new song starts. Do not close the
+          application, otherwise your generated lasershow will not be saved! It
+          is recommended that you do not pause the song during generation, since
+          this can create a small delay.
+        </Alert>
       </FormGroup>
       <InputLabel id="label">Audio device to listen to</InputLabel>
       <Select

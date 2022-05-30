@@ -99,6 +99,7 @@ export default function LasershowGeneratorControls() {
       bpm: parseInt(currentTrackDataRef.current.tempo),
       saveLasershow: localStorage.getItem("save-generated-lasershows") !== null,
       songName: playerStateRef.current?.item?.name,
+      isPlaying: playerStateRef.current?.is_playing,
     });
   };
 
