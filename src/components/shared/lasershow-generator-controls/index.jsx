@@ -270,7 +270,9 @@ export default function LasershowGeneratorControls() {
       >
         <AccordionSummary onClick={toggleControls}>
           <small>
-            {open ? "Close Spotify controls" : "Open Spotify controls"}
+            {open
+              ? "Close Spotify / laser generator controls"
+              : "Open Spotify / laser generator controls"}
           </small>
         </AccordionSummary>
         <AccordionDetails>

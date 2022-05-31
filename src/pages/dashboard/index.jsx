@@ -4,6 +4,7 @@ import {
   ListItem,
   ListItemText,
   Paper,
+  Alert,
   List,
 } from "@mui/material";
 import Loading from "components/shared/loading";
@@ -67,10 +68,10 @@ export default function Dashboard() {
                       </span>
                     ) : (
                       <span>
-                        <span style={{ color: "red" }}>
+                        <Alert severity="error">
                           Laser is not connected, set the connection in the
                           settings page
-                        </span>
+                        </Alert>
                       </span>
                     )
                   }
