@@ -25,6 +25,7 @@ import TheatersIcon from "@mui/icons-material/Theaters";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LasershowGeneratorControls from "../lasershow-generator-controls";
 import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const drawerWidth = 240;
 
@@ -170,6 +171,11 @@ export default function SideNav({ content, settings }) {
               title: "Account",
               icon: <AccountCircleIcon />,
               path: paths.Account,
+            },
+            {
+              title: "Logout",
+              icon: <LogoutIcon />,
+              path: paths.Logout,
             },
           ].map((item) => (
             <Tooltip placement="right" key={item.title} title={item.title}>

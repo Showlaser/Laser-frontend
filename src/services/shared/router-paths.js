@@ -14,6 +14,7 @@ const paths = {
   LasershowGenerator: "/lasershow-generator",
   Registration: "/registration",
   LasershowSpotifyConnector: "/lasershow-spotify-connector",
+  Logout: "/logout",
 };
 
 export default paths;

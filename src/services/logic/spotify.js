@@ -2,6 +2,7 @@ import { Get } from "services/shared/api/api-actions";
 import { sendRequest } from "services/shared/api/api-middleware";
 import apiEndpoints from "services/shared/api/api-endpoints";
 import SpotifyWebApi from "spotify-web-api-js";
+import { stringIsEmpty } from "services/shared/general";
 
 const Spotify = new SpotifyWebApi();
 
@@ -15,9 +16,11 @@ const onError = async (errorCode) => {
   const code = Number(errorCode);
   if (code === 401) {
     const refreshToken = localStorage.getItem("SpotifyRefreshToken");
-    const response = await refreshSpotifyAccessToken(refreshToken);
-    const tokens = await response.json();
+    if (refreshToken?.length < 20 || stringIsEmpty(refreshToken)) {
+      return;
+    }
 
+    const tokens = await refreshSpotifyAccessToken(refreshToken);
     const tokensInvalid =
       !tokens.access_token ||
       tokens.access_token.length < 20 ||
@@ -37,19 +40,18 @@ export const grandSpotifyAccess = () => {
   return sendRequest(() => Get(apiEndpoints.grandSpotifyAccess), []);
 };
 
-export const getSpotifyAccessTokens = (code) => {
-  return sendRequest(
+export const getSpotifyAccessTokens = (code) =>
+  sendRequest(
     () => Get(`${apiEndpoints.getSpotifyAccessToken}?code=${code}`),
     []
-  );
-};
+  ).then((value) => value.json());
 
 export const refreshSpotifyAccessToken = async (refreshToken) =>
   sendRequest(
     () =>
       Get(
         `${apiEndpoints.refreshSpotifyAccessToken}?refreshToken=${refreshToken}`
-      ),
+      ).then((value) => value.json()),
     []
   );
 
@@ -60,7 +62,6 @@ const executeRequest = (request) => {
   }
 
   Spotify.setAccessToken(accessToken);
-
   return request()
     .then((data) => data)
     .catch(async (error) => {

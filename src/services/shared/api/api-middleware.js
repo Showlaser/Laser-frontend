@@ -38,6 +38,7 @@ export async function sendRequest(
       return;
     }
 
+    alert("Refresh occurred");
     response = await requestFunction();
   }
 

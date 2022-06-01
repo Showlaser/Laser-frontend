@@ -14,13 +14,11 @@ export default function SpotifyLogin() {
       return;
     }
 
-    getSpotifyAccessTokens(code).then((data) =>
-      data.json().then((tokens) => {
-        localStorage.setItem("SpotifyAccessToken", tokens.access_token);
-        localStorage.setItem("SpotifyRefreshToken", tokens.refresh_token);
-        window.location = paths.LaserSettings;
-      })
-    );
+    getSpotifyAccessTokens(code).then((tokens) => {
+      localStorage.setItem("SpotifyAccessToken", tokens.access_token);
+      localStorage.setItem("SpotifyRefreshToken", tokens.refresh_token);
+      window.location = paths.LaserSettings;
+    });
   }, []);
 
   const login = () => {

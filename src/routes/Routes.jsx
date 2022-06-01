@@ -13,6 +13,7 @@ import Account from "pages/account";
 import AccountActivation from "pages/account-activation";
 import Registration from "pages/registration";
 import LasershowSpotifyConnector from "pages/lasershow-spotify-connector";
+import Logout from "pages/logout";
 
 function routes() {
   return (
@@ -26,6 +27,7 @@ function routes() {
       <Route exact path={routerPaths.ResetPassword} component={PasswordReset} />
       <Route exact path={routerPaths.Account} component={Account} />
       <Route exact path={routerPaths.Registration} component={Registration} />
+      <Route exact path={routerPaths.Logout} component={Logout} />
       <Route
         exact
         path={routerPaths.LasershowSpotifyConnector}
