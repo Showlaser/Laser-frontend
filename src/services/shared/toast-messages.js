@@ -96,6 +96,10 @@ export const toastSubject = {
     message: "The requested item is no longer available.",
     id: 22,
   },
+  unsafePattern: {
+    message: "The pattern is unsafe to project and will not be projected.",
+    id: 22,
+  },
 };
 
 const calculateAutoCloseTime = (text) => {
