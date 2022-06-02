@@ -22,11 +22,9 @@ export default function SpotifyLogin() {
   }, []);
 
   const login = () => {
-    grandSpotifyAccess().then((response) => {
-      response.text().then((responseText) => {
-        window.location = responseText;
-      });
-    });
+    grandSpotifyAccess().then((response) =>
+      response.text().then((responseText) => (window.location = responseText))
+    );
   };
 
   const removeSpotifyTokens = () => {
