@@ -3,6 +3,7 @@ import {
   Button,
   Checkbox,
   Divider,
+  LinearProgress,
   List,
   ListItem,
   ListItemAvatar,
@@ -18,6 +19,7 @@ export default function SpotifyPlaylist({
   voteStarted,
 }) {
   const [checked, setChecked] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleToggle = (value) => () => {
     const currentIndex = checked.findIndex((e) => e === value);
@@ -32,12 +34,21 @@ export default function SpotifyPlaylist({
     setChecked(newChecked);
   };
 
+  const startVote = async () => {
+    setIsLoading(true);
+    await onVoteStart(checked);
+    setIsLoading(false);
+  };
+
   return (
     <div style={{ marginBottom: "50px" }}>
       <h3>Playlists</h3>
       <small>Select the playlists to vote on</small>
       <Divider />
-      <List sx={{ width: "100%", bgcolor: "background.paper" }}>
+      <List
+        style={{ maxHeight: "50vh", overflow: "auto" }}
+        sx={{ width: "100%" }}
+      >
         {userPlaylists?.map((playlist, index) => {
           const labelId = `checkbox-list-label-${index}`;
 
@@ -71,13 +82,16 @@ export default function SpotifyPlaylist({
           );
         })}
       </List>
+      <br />
       <Button
+        disabled={isLoading}
         variant="contained"
         disabled={voteStarted}
-        onClick={() => onVoteStart(checked)}
+        onClick={startVote}
       >
         Start vote
       </Button>
+      {isLoading ? <LinearProgress /> : null}
     </div>
   );
 }
