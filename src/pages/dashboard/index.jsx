@@ -192,7 +192,7 @@ export default function Dashboard() {
   );
 
   return (
-    <div>
+    <div style={{ marginBottom: "75px" }}>
       <SideNav content={content} settings={sideNavSettings} />
     </div>
   );

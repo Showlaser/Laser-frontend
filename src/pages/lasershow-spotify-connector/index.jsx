@@ -118,31 +118,6 @@ export default function LasershowSpotifyConnector() {
 
   const content = (
     <div>
-      <Grid
-        style={{ marginTop: "25px" }}
-        container
-        spacing={0}
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <Paper
-          id="spotify-search-paper"
-          sx={{
-            p: "4px 6px",
-            display: "flex",
-            alignItems: "center",
-            width: 400,
-          }}
-        >
-          <InputBase
-            disabled={selectedLasershowUuid === undefined}
-            sx={{ ml: 1, flex: 1 }}
-            placeholder="Search Spotify"
-            onChange={(e) => onSearchInput(e.target.value)}
-          />
-        </Paper>
-      </Grid>
       <div style={{ maxWidth: "30%", marginBottom: "10px", marginTop: "25px" }}>
         <ButtonGroup>
           {lasershows.length > 0 ? (
@@ -176,63 +151,89 @@ export default function LasershowSpotifyConnector() {
       </div>
       <Divider />
       <small>
-        A song can only be connected to one lasershow
-        <Tooltip title="This is not possible since it would run two lasershows at the same time.">
+        A song can only be connected to one lasershow{" "}
+        <Tooltip title="A song cannot be connected to multiple lasershows since it would run two lasershows at the same time.">
           <HelpIcon fontSize="inherit" />
         </Tooltip>
       </small>
-      {selectedLasershowUuid !== undefined ? (
-        <List sx={{ width: "100%" }} disablePadding>
-          {searchResults.map((searchResult, index) => {
-            const songIsAlreadyConnected = existingConnectors.some(
-              (ex) =>
-                ex.spotifySongs.some(
-                  (ss) => ss.spotifySongId === searchResult?.id
-                ) && ex.lasershowUuid !== selectedLasershowUuid
-            );
+      <Grid
+        style={{ marginTop: "25px" }}
+        container
+        spacing={0}
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Paper
+          id="spotify-search-paper"
+          sx={{
+            p: "4px 6px",
+            display: "flex",
+            alignItems: "center",
+            width: 400,
+          }}
+        >
+          <Tooltip
+            title={
+              selectedLasershowUuid !== undefined
+                ? ""
+                : "Select a lasershow first!"
+            }
+          >
+            <InputBase
+              disabled={selectedLasershowUuid === undefined}
+              sx={{ ml: 1, flex: 1 }}
+              placeholder="Search Spotify"
+              onChange={(e) => onSearchInput(e.target.value)}
+            />
+          </Tooltip>
+        </Paper>
+      </Grid>
+      <List sx={{ width: "100%" }} disablePadding>
+        {searchResults.map((searchResult, index) => {
+          const songIsAlreadyConnected = existingConnectors.some(
+            (ex) =>
+              ex.spotifySongs.some(
+                (ss) => ss.spotifySongId === searchResult?.id
+              ) && ex.lasershowUuid !== selectedLasershowUuid
+          );
 
-            return (
-              <ListItem key={searchResult?.songName + index} disablePadding>
-                <ListItemButton
-                  role={undefined}
-                  onClick={handleToggle(searchResult?.id)}
-                  disabled={songIsAlreadyConnected}
-                  dense
-                >
-                  <ListItemIcon>
-                    <Checkbox
-                      edge="start"
-                      checked={selectedSpotifySongIds?.some(
-                        (spsi) => spsi === searchResult.id
-                      )}
-                      tabIndex={-1}
-                      disableRipple
-                      inputProps={{
-                        "aria-labelledby": `checkbox-list-label-${index}`,
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    id={`checkbox-list-label-${index}`}
-                    primary={`${searchResult?.songName} | ${
-                      searchResult.artist
-                    } ${
-                      songIsAlreadyConnected
-                        ? " (this song is already connected)"
-                        : ""
-                    }`}
+          return (
+            <ListItem key={searchResult?.songName + index} disablePadding>
+              <ListItemButton
+                role={undefined}
+                onClick={handleToggle(searchResult?.id)}
+                disabled={songIsAlreadyConnected}
+                dense
+              >
+                <ListItemIcon>
+                  <Checkbox
+                    edge="start"
+                    checked={selectedSpotifySongIds?.some(
+                      (spsi) => spsi === searchResult.id
+                    )}
+                    tabIndex={-1}
+                    disableRipple
+                    inputProps={{
+                      "aria-labelledby": `checkbox-list-label-${index}`,
+                    }}
                   />
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
-        </List>
-      ) : (
-        <h3>
-          No lasershow selected. Select a lasershow first and the type in the
-          searchbox
-        </h3>
-      )}
+                </ListItemIcon>
+                <ListItemText
+                  id={`checkbox-list-label-${index}`}
+                  primary={`${searchResult?.songName} | ${
+                    searchResult.artist
+                  } ${
+                    songIsAlreadyConnected
+                      ? " (this song is already connected)"
+                      : ""
+                  }`}
+                />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
+      </List>
     </div>
   );
 

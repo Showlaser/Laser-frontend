@@ -42,7 +42,7 @@ export default function LaserSettings() {
   );
 
   return (
-    <div style={{ marginBottom: "50px" }}>
+    <div style={{ marginBottom: "75px" }}>
       <SideNav content={content} settings={sideNavSettings} />
     </div>
   );

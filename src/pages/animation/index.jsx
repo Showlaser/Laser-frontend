@@ -111,47 +111,45 @@ export default function AnimationEditor() {
   };
 
   const content = (
-    <div>
-      <div id="animation">
-        <AnimationOptions
-          setAnimations={setAnimations}
-          setSelectedAnimationUuid={setSelectedAnimationUuid}
-          animations={animations}
-          setChangesSaved={setChangesSaved}
-          changesSaved={changesSaved}
-          updateAnimationProperty={updateAnimationProperty}
-          selectedAnimationUuid={selectedAnimationUuid}
-        />
-        <Loading objectToLoad={animations}>
-          {animations?.length > 0 ? (
-            <div>
-              <AnimationSection
-                duplicatePatternAnimation={duplicatePatternAnimation}
-                setAnimations={setAnimations}
-                animations={animations}
-                patterns={patterns}
-                selectedAnimationUuid={selectedAnimationUuid}
-                selectedPatternAnimationUuid={selectedPatternAnimationUuid}
-              />
-              <TimelineSection
-                items={animations}
-                setSelectedSubItemUuid={setSelectedPatternAnimationUuid}
-                subItemsName="patternAnimations"
-                getSubItemDuration={(item) => {
-                  return item.animationSettings
-                    ?.sort((a, b) => (a.startTime > b.startTime ? 1 : -1))
-                    ?.at(-1)?.startTime;
-                }}
-                availableItems={patterns}
-                selectedSubItemUuid={selectedPatternAnimationUuid}
-                selectedItemUuid={selectedAnimationUuid}
-                setItems={setAnimations}
-                onSelect={addPatternToAnimation}
-              />
-            </div>
-          ) : null}
-        </Loading>
-      </div>
+    <div id="animation">
+      <AnimationOptions
+        setAnimations={setAnimations}
+        setSelectedAnimationUuid={setSelectedAnimationUuid}
+        animations={animations}
+        setChangesSaved={setChangesSaved}
+        changesSaved={changesSaved}
+        updateAnimationProperty={updateAnimationProperty}
+        selectedAnimationUuid={selectedAnimationUuid}
+      />
+      <Loading objectToLoad={animations}>
+        {animations?.length > 0 ? (
+          <div>
+            <AnimationSection
+              duplicatePatternAnimation={duplicatePatternAnimation}
+              setAnimations={setAnimations}
+              animations={animations}
+              patterns={patterns}
+              selectedAnimationUuid={selectedAnimationUuid}
+              selectedPatternAnimationUuid={selectedPatternAnimationUuid}
+            />
+            <TimelineSection
+              items={animations}
+              setSelectedSubItemUuid={setSelectedPatternAnimationUuid}
+              subItemsName="patternAnimations"
+              getSubItemDuration={(item) => {
+                return item.animationSettings
+                  ?.sort((a, b) => (a.startTime > b.startTime ? 1 : -1))
+                  ?.at(-1)?.startTime;
+              }}
+              availableItems={patterns}
+              selectedSubItemUuid={selectedPatternAnimationUuid}
+              selectedItemUuid={selectedAnimationUuid}
+              setItems={setAnimations}
+              onSelect={addPatternToAnimation}
+            />
+          </div>
+        ) : null}
+      </Loading>
     </div>
   );
 

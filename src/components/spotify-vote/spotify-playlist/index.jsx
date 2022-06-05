@@ -84,9 +84,8 @@ export default function SpotifyPlaylist({
       </List>
       <br />
       <Button
-        disabled={isLoading}
+        disabled={isLoading || voteStarted}
         variant="contained"
-        disabled={voteStarted}
         onClick={startVote}
       >
         Start vote

@@ -9,6 +9,7 @@ import {
   FormGroup,
   FormControlLabel,
   Alert,
+  Button,
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import "./index.css";
@@ -33,6 +34,8 @@ import {
   getDataForCurrentArtist,
   getTrackAudioFeatures,
 } from "services/logic/spotify";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 export default function LasershowGeneratorControls() {
   const userIsLoggedIntoSpotify =
@@ -269,11 +272,30 @@ export default function LasershowGeneratorControls() {
         style={{ boxShadow: "0 2px 10px rgba(0, 0, 0, 0.8)" }}
       >
         <AccordionSummary onClick={toggleControls}>
-          <small>
-            {open
-              ? "Close Spotify / laser generator controls"
-              : "Open Spotify / laser generator controls"}
-          </small>
+          {open ? (
+            <span>
+              <Button>
+                Close Spotify / laser generator controls{" "}
+                <KeyboardArrowDownIcon />
+              </Button>
+            </span>
+          ) : (
+            <span className="fade-in">
+              <Button>
+                Open Spotify / laser generator controls <KeyboardArrowUpIcon />
+              </Button>
+              <LinearProgress
+                variant="determinate"
+                value={mapNumber(
+                  playerStateRef.current?.progress_ms,
+                  0,
+                  playerStateRef.current?.item?.duration_ms,
+                  0,
+                  100
+                )}
+              />
+            </span>
+          )}
         </AccordionSummary>
         <AccordionDetails>
           {renderComponentByLoggedInAndDeviceState()}
