@@ -257,9 +257,9 @@ export default function LasershowGeneratorControls() {
             <small>{`Detected genre: ${
               lasershowGeneratorStatus.activeGenre ?? "not supported"
             }`}</small>
+            <br />
           </span>
         ) : null}
-        <br />
         <small>{`Bpm: ${parseInt(currentTrackDataRef?.current?.tempo)}`}</small>
       </span>
     );
