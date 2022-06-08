@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-import SideNav from "components/shared/sidenav";
-=======
->>>>>>> development
 import React, { useEffect, useState } from "react";
 import Zones from "components/laser-settings/zones";
 import LaserNetworkSettings from "components/laser-settings/network-settings";

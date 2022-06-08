@@ -22,13 +22,9 @@ import paths from "services/shared/router-paths";
 import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
 import TheatersIcon from "@mui/icons-material/Theaters";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-<<<<<<<< HEAD:src/components/shared/sidenav/index.tsx
 import "./index.css";
-========
-import LasershowGeneratorControls from "../lasershow-generator-controls";
 import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
 import LogoutIcon from "@mui/icons-material/Logout";
->>>>>>>> development:src/components/shared/sidenav/index.jsx
 
 const drawerWidth = 240;
 
@@ -188,14 +184,8 @@ export default function SideNav({ children, pageName }: Props) {
       </Drawer>
       <Main id="menu-children" open={open}>
         <DrawerHeader />
-<<<<<<<< HEAD:src/components/shared/sidenav/index.tsx
         {children}
       </Main>
-========
-        {content}
-        <LasershowGeneratorControls />
-      </Box>
->>>>>>>> development:src/components/shared/sidenav/index.jsx
     </Box>
   );
 }
