@@ -88,10 +88,30 @@ export const toastSubject = {
     message: "Activation successful",
     id: 19,
   },
+<<<<<<< HEAD:src/services/shared/toast-messages.ts
   invalidFile: {
     message: "Invalid file uploaded",
     id: 20,
   },
+=======
+  duplicatedName: {
+    message: "An item with the same name already exists",
+    id: 20,
+  },
+  accountCreated: {
+    message:
+      "Your account is created! Activate your account by clicking the link in the email you received.",
+    id: 21,
+  },
+  noLongerAvailable: {
+    message: "The requested item is no longer available.",
+    id: 22,
+  },
+  unsafePattern: {
+    message: "The pattern is unsafe to project and will not be projected.",
+    id: 22,
+  },
+>>>>>>> development:src/services/shared/toast-messages.js
 };
 
 const calculateAutoCloseTime = (text: string) => {

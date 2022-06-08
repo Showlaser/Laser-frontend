@@ -1,6 +1,6 @@
 import { Post, Get } from "services/shared/api/api-actions";
 import { sendRequest } from "services/shared/api/api-middleware";
-import apiEndpoints from "services/shared/api/api-urls";
+import apiEndpoints from "services/shared/api/api-endpoints";
 
 export const startVote = async (voteData) => {
   return sendRequest(() => Post(apiEndpoints.vote, voteData), []).then(

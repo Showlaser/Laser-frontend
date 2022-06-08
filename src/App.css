@@ -65,3 +65,13 @@ body {
 .MuiButton-contained:hover {
   background-color: #2248a1 !important;
 }
+
+.link-btn {
+  text-decoration: none;
+  color: white;
+}
+
+.link-btn:hover {
+  color: gray;
+  transition: ease-in-out 0.3s;
+}

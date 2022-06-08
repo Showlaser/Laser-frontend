@@ -34,6 +34,7 @@ export default function PatternPage() {
             hidden
             id="raised-button-file"
             type="file"
+            accept="image/svg+xml"
             onChange={(e) => {
               if (e?.target?.files === null) {
                 return;
