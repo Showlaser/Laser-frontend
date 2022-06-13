@@ -14,7 +14,6 @@ import {
 import { getVoteData, startVote } from "services/logic/vote-logic";
 import { toCamelCase } from "services/shared/general";
 import { createGuid } from "services/shared/math";
-import { showError, toastSubject } from "services/shared/toast-messages";
 import Cookies from "universal-cookie";
 
 export default function SpotifyVote() {
@@ -62,9 +61,7 @@ export default function SpotifyVote() {
     let voteData = await response.json();
     voteData.validUntil = new Date(voteData.validUntil);
 
-    let newSocket = new WebSocket(
-      "ws://https://laser-vote-api.vdarwinkel.nl/ws"
-    );
+    let newSocket = new WebSocket("wss://laser-vote-api.vdarwinkel.nl/ws");
     newSocket.onopen = () => {
       const identifier = {
         voteDataUuid: voteData.uuid,
