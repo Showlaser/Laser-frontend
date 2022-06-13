@@ -16,7 +16,7 @@ export default function LasershowGeneratorSettings() {
     localStorage.getItem("save-generated-lasershows") !== null;
 
   useEffect(() => {
-    getAudioDevices().then((devices) => setDevices(devices));
+    getAudioDevices().then((deviceCollection) => setDevices(deviceCollection));
   }, []);
 
   const onDeviceSelect = (device) => {
