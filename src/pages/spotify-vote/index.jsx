@@ -14,6 +14,7 @@ import {
 import { getVoteData, startVote } from "services/logic/vote-logic";
 import { toCamelCase } from "services/shared/general";
 import { createGuid } from "services/shared/math";
+import { showError, toastSubject } from "services/shared/toast-messages";
 import Cookies from "universal-cookie";
 
 export default function SpotifyVote() {
@@ -61,7 +62,9 @@ export default function SpotifyVote() {
     let voteData = await response.json();
     voteData.validUntil = new Date(voteData.validUntil);
 
-    let newSocket = new WebSocket("ws://localhost:5002/ws");
+    let newSocket = new WebSocket(
+      "ws://https://laser-vote-api.vdarwinkel.nl/ws"
+    );
     newSocket.onopen = () => {
       const identifier = {
         voteDataUuid: voteData.uuid,
@@ -127,6 +130,9 @@ export default function SpotifyVote() {
     };
 
     const joinInfo = await startVote(voteData);
+    if (joinInfo?.joinCode === undefined) {
+      return;
+    }
     cookie.set(
       "vote-started",
       { joinInfo, validUntil: expirationDate },
@@ -180,8 +186,8 @@ export default function SpotifyVote() {
   const voteComponents = voteStarted ? (
     <Loading objectToLoad={joinData}>
       <p>
-        Users can join the session at http://localhost:3001/ with the following
-        codes:
+        Users can join the session at https://laser-vote.vdarwinkel.nl with the
+        following codes:
         <br />
         Join code: {joinData?.joinCode}
         <br />

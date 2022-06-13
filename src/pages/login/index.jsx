@@ -63,7 +63,7 @@ export default function Login() {
           <TextField
             required
             label="Password"
-            defaultValue="qwerty"
+            defaultValue="Thermoneter"
             type="password"
             name="password"
           />
