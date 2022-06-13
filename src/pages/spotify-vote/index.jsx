@@ -1,6 +1,6 @@
-import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import { Alert, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 import Loading from "components/shared/loading";
-import SideNav from "components/sidenav";
+import SideNav from "components/shared/sidenav";
 import SpotifyPlaylist from "components/spotify-vote/spotify-playlist";
 import VoteOverView from "components/spotify-vote/vote-overview";
 import VoteSettings from "components/spotify-vote/vote-settings";
@@ -211,7 +211,9 @@ export default function SpotifyVote() {
     accessToken !== null ? (
       voteComponents
     ) : (
-      <h1>You are not logged in to Spotify. Login in the settings page</h1>
+      <Alert severity="error">
+        You are not logged in to Spotify. Login in the settings page
+      </Alert>
     );
 
   return (

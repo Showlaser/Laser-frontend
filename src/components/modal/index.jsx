@@ -13,7 +13,9 @@ export default function Modal({ modal }) {
         >
           Ok
         </Button>
-        <Button onClick={() => modal?.onCancelClick()}>Cancel</Button>
+        <Button variant="contained" onClick={() => modal?.onCancelClick()}>
+          Cancel
+        </Button>
       </div>
     </div>
   ) : null;

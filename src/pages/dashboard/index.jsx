@@ -4,10 +4,11 @@ import {
   ListItem,
   ListItemText,
   Paper,
+  Alert,
   List,
 } from "@mui/material";
 import Loading from "components/shared/loading";
-import SideNav from "components/sidenav";
+import SideNav from "components/shared/sidenav";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { getDashboardData } from "services/logic/dashboard-logic";
@@ -57,7 +58,7 @@ export default function Dashboard() {
             <hr />
             <List>
               <b>Laser connection status</b>
-              <ListItem>
+              <ListItem key="connection-status">
                 <ListItemText
                   primary={
                     applicationStatus?.laserConnected ? (
@@ -67,16 +68,16 @@ export default function Dashboard() {
                       </span>
                     ) : (
                       <span>
-                        <span style={{ color: "red" }}>
+                        <Alert severity="error">
                           Laser is not connected, set the connection in the
                           settings page
-                        </span>
+                        </Alert>
                       </span>
                     )
                   }
                 />
               </ListItem>
-              <ListItem>
+              <ListItem key="computer-ip">
                 <ListItemText
                   primary={`Computer ip: ${applicationStatus?.computerIpAddress}`}
                 />
@@ -90,7 +91,7 @@ export default function Dashboard() {
             <hr />
             <List>
               <b>Zones</b>
-              <ListItem>
+              <ListItem key="zones">
                 <ListItemText
                   primary={`Total: ${laserSettings?.zonesLength}`}
                 />
@@ -99,7 +100,7 @@ export default function Dashboard() {
             <Divider />
             <List>
               <b>Development</b>
-              <ListItem>
+              <ListItem key="development">
                 <ListItemText
                   primary={
                     laserSettings?.developmentModeIsActive ? (
@@ -127,7 +128,7 @@ export default function Dashboard() {
               {logs
                 ?.filter((l) => l.logType === "Error")
                 ?.map((error, index) => (
-                  <ListItem>
+                  <ListItem key={error + index}>
                     <ListItemText
                       key={`error-${index}`}
                       primary={error?.message}
@@ -141,7 +142,7 @@ export default function Dashboard() {
               {logs
                 ?.filter((l) => l.logType === "Warning")
                 ?.map((warning, index) => (
-                  <ListItem>
+                  <ListItem key={warning + index}>
                     <ListItemText
                       key={`logs-${index}`}
                       primary={warning?.message}
@@ -155,7 +156,7 @@ export default function Dashboard() {
               {logs
                 ?.filter((l) => l.logType === "Info")
                 ?.map((info, index) => (
-                  <ListItem>
+                  <ListItem key={info + index}>
                     <ListItemText
                       key={`logs-${index}`}
                       primary={info?.message}
@@ -171,7 +172,7 @@ export default function Dashboard() {
             <hr />
             <List>
               <b>Total</b>
-              <ListItem>
+              <ListItem key="total">
                 <ListItemText primary={shows?.length} />
               </ListItem>
             </List>
@@ -191,7 +192,7 @@ export default function Dashboard() {
   );
 
   return (
-    <div>
+    <div style={{ marginBottom: "75px" }}>
       <SideNav content={content} settings={sideNavSettings} />
     </div>
   );

@@ -28,6 +28,7 @@ body {
 
 @keyframes fadeIn {
   from {
+    opacity: 0;
   }
 
   to {
@@ -37,6 +38,7 @@ body {
 
 @-webkit-keyframes fadeIn {
   from {
+    opacity: 0;
   }
 
   to {
@@ -53,4 +55,23 @@ body {
   opacity: 0;
   animation-name: fadeIn;
   -webkit-animation-name: fadeIn;
+}
+
+.MuiButton-contained {
+  background-color: #2660bd !important;
+  color: white !important;
+}
+
+.MuiButton-contained:hover {
+  background-color: #2248a1 !important;
+}
+
+.link-btn {
+  text-decoration: none;
+  color: white;
+}
+
+.link-btn:hover {
+  color: gray;
+  transition: ease-in-out 0.3s;
 }

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { emptyGuid } from "services/shared/math";
-import SideNav from "components/sidenav";
+import SideNav from "components/shared/sidenav";
 import "./index.css";
 import {
   getCircleTemplate,
@@ -155,7 +155,7 @@ export default function PatternEditor() {
             changesSaved={changesSaved}
           >
             <Button
-              variant="outlined"
+              variant="contained"
               disabled={patternPlaying}
               startIcon={<SendIcon />}
               onClick={play}

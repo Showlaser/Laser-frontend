@@ -23,6 +23,9 @@ import paths from "services/shared/router-paths";
 import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
 import TheatersIcon from "@mui/icons-material/Theaters";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LasershowGeneratorControls from "../lasershow-generator-controls";
+import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const drawerWidth = 240;
 
@@ -155,6 +158,11 @@ export default function SideNav({ content, settings }) {
               path: paths.SpotifyVote,
             },
             {
+              title: "Lasershow Spotify connector",
+              icon: <SettingsInputComponentIcon />,
+              path: paths.LasershowSpotifyConnector,
+            },
+            {
               title: "Laser settings",
               icon: <SettingsIcon />,
               path: paths.LaserSettings,
@@ -163,6 +171,11 @@ export default function SideNav({ content, settings }) {
               title: "Account",
               icon: <AccountCircleIcon />,
               path: paths.Account,
+            },
+            {
+              title: "Logout",
+              icon: <LogoutIcon />,
+              path: paths.Logout,
             },
           ].map((item) => (
             <Tooltip placement="right" key={item.title} title={item.title}>
@@ -180,6 +193,7 @@ export default function SideNav({ content, settings }) {
       <Box className="fade-in" component="main" sx={{ flexGrow: 1, p: 1 }}>
         <DrawerHeader />
         {content}
+        <LasershowGeneratorControls />
       </Box>
     </Box>
   );

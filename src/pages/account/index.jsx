@@ -5,69 +5,77 @@ import {
   Grid,
   Divider,
   Alert,
+  LinearProgress,
 } from "@mui/material";
+import Modal from "components/modal";
 import Loading from "components/shared/loading";
-import SideNav from "components/sidenav";
-import { useEffect, useState } from "react";
-import { getCurrentUser, updateUser } from "services/logic/user-logic";
-import { stringIsEmpty } from "services/shared/general";
+import SideNav from "components/shared/sidenav";
+import { useCallback, useEffect, useState } from "react";
+import {
+  getCurrentUser,
+  removeUser,
+  updateUser,
+} from "services/logic/user-logic";
+import { getFormDataFromEvent } from "services/shared/form-data-helper";
+import { deepClone, stringIsEmpty } from "services/shared/general";
 import { showError, toastSubject } from "services/shared/toast-messages";
 
 export default function Account() {
-  const [newPassword, setNewPassword] = useState("");
-  const [newPasswordRepeat, setNewPasswordRepeat] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [currentEmail, setCurrentEmail] = useState("");
+  const [userData, setUserData] = useState(undefined);
   const [emailChanged, setEmailChanged] = useState(false);
-  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const [submitInProgress, setSubmitInProgress] = useState(false);
+  const [, updateState] = useState();
+  const forceUpdate = useCallback(() => updateState({}), []);
+  const [modalOptions, setModalOptions] = useState({
+    title: "Remove account?",
+    show: false,
+    onOkClick: null,
+    onCancelClick: null,
+  });
 
   const sideNavSettings = { pageName: "Account" };
 
   useEffect(() => {
-    getCurrentUser().then((user) => {
-      setUsername(user.username);
-      setEmail(user.email);
-      setCurrentEmail(user.email);
-    });
+    getCurrentUser().then((user) => setUserData(user));
   }, []);
 
-  const passwordsMatch = () => {
-    return newPassword === newPasswordRepeat;
+  const closeModal = () => {
+    let modal = modalOptions;
+    modal.show = false;
+    setModalOptions(modal);
+    forceUpdate();
   };
 
-  const onUpdate = () => {
-    setButtonDisabled(true);
+  const onSubmit = (e) => {
+    e.preventDefault();
+    setSubmitInProgress(true);
+    let formData = getFormDataFromEvent(e);
     const passwordShouldBeUpdated =
-      !stringIsEmpty(newPassword) && !stringIsEmpty(newPasswordRepeat);
-    let accountModel = {
-      username,
-      password: currentPassword,
-      email,
-    };
+      !stringIsEmpty(formData.newPassword) &&
+      !stringIsEmpty(formData.newPasswordRepeat);
 
     if (passwordShouldBeUpdated) {
+      const passwordsMatch = formData.password === formData.currentPassword;
       if (!passwordsMatch()) {
         showError(toastSubject.passwordsDoNotMatch);
-        setButtonDisabled(false);
+        setSubmitInProgress(false);
         return;
       }
-      accountModel.newPassword = newPassword;
     }
 
-    updateUser(accountModel).then((result) => {
+    updateUser(formData).then((result) => {
       if (result.status === 401) {
         showError(toastSubject.invalidPassword);
       }
-      setButtonDisabled(false);
+      setSubmitInProgress(false);
     });
-    setButtonDisabled(false);
   };
 
   const content = (
-    <Loading objectToLoad={username}>
+    <Loading objectToLoad={userData}>
+      <Modal modal={modalOptions} />
       <Grid
+        key={userData?.email}
         container
         spacing={0}
         direction="column"
@@ -75,50 +83,51 @@ export default function Account() {
         justifyContent="center"
         style={{ minHeight: "70vh" }}
       >
-        <FormControl
-          style={{ width: "50%", maxWidth: "40vh" }}
-          key="user-account"
+        <form
+          onSubmit={onSubmit}
+          style={{ maxWidth: "40vh", textAlign: "center" }}
         >
           <TextField
             fullWidth
             label="Username"
-            value={username}
+            defaultValue={userData?.username}
+            name="username"
             required
-            onChange={(e) => setUsername(e.target.value)}
           />
           <TextField
             fullWidth
             label="Email"
             type="email"
-            value={email}
+            name="email"
+            defaultValue={userData?.email}
             required
             onChange={(e) => {
-              currentEmail !== e.target.value
+              userData?.email !== e.target.value
                 ? setEmailChanged(true)
                 : setEmailChanged(false);
-              setEmail(e.target.value);
             }}
           />
           <TextField
             fullWidth
             type="password"
+            name="newPassword"
             label="New password"
-            onChange={(e) => setNewPassword(e.target.value)}
           />
           <TextField
             fullWidth
+            name="repeatPassword"
             type="password"
             label="Repeat password"
-            onChange={(e) => setNewPasswordRepeat(e.target.value)}
+            name="newPasswordRepeat"
           />
           <br />
           <Divider style={{ width: "100%" }} />
           <TextField
             required
             fullWidth
+            name="password"
             type="password"
             label="Current password"
-            onChange={(e) => setCurrentPassword(e.target.value)}
           />
           <br />
           <span hidden={!emailChanged}>
@@ -129,10 +138,32 @@ export default function Account() {
             </Alert>
           </span>
           <br />
-          <Button disabled={buttonDisabled} fullWidth onClick={onUpdate}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={submitInProgress}
+            fullWidth
+            type="submit"
+          >
             Update account
           </Button>
-        </FormControl>
+          {submitInProgress ? <LinearProgress /> : null}
+          <hr style={{ width: "100%" }} />
+          <Button
+            color="error"
+            variant="text"
+            onClick={() => {
+              let options = deepClone(modalOptions);
+              options.show = true;
+              options.onCancelClick = closeModal;
+              options.onOkClick = removeUser;
+              setModalOptions(options);
+              forceUpdate();
+            }}
+          >
+            Remove account
+          </Button>
+        </form>
       </Grid>
     </Loading>
   );

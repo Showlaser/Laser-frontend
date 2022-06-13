@@ -2,7 +2,7 @@ import { BrowserRouter, Route } from "react-router-dom";
 import React from "react";
 import routerPaths from "services/shared/router-paths";
 import Dashboard from "pages/dashboard";
-import LaserSettings from "pages/laser-settings/laser-settings";
+import LaserSettings from "pages/laser-settings";
 import PatternEditor from "pages/pattern-editor";
 import AnimationEditor from "pages/animation";
 import Installation from "pages/installation";
@@ -11,6 +11,9 @@ import SpotifyVote from "pages/spotify-vote";
 import PasswordReset from "pages/password-reset";
 import Account from "pages/account";
 import AccountActivation from "pages/account-activation";
+import Registration from "pages/registration";
+import LasershowSpotifyConnector from "pages/lasershow-spotify-connector";
+import Logout from "pages/logout";
 
 function routes() {
   return (
@@ -23,6 +26,13 @@ function routes() {
       <Route exact path={routerPaths.SpotifyVote} component={SpotifyVote} />
       <Route exact path={routerPaths.ResetPassword} component={PasswordReset} />
       <Route exact path={routerPaths.Account} component={Account} />
+      <Route exact path={routerPaths.Registration} component={Registration} />
+      <Route exact path={routerPaths.Logout} component={Logout} />
+      <Route
+        exact
+        path={routerPaths.LasershowSpotifyConnector}
+        component={LasershowSpotifyConnector}
+      />
       <Route
         exact
         path={routerPaths.ActivateAccount}

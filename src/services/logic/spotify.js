@@ -1,7 +1,8 @@
 import { Get } from "services/shared/api/api-actions";
 import { sendRequest } from "services/shared/api/api-middleware";
-import apiEndpoints from "services/shared/api/api-urls";
+import apiEndpoints from "services/shared/api/api-endpoints";
 import SpotifyWebApi from "spotify-web-api-js";
+import { stringIsEmpty } from "services/shared/general";
 
 const Spotify = new SpotifyWebApi();
 
@@ -15,8 +16,20 @@ const onError = async (errorCode) => {
   const code = Number(errorCode);
   if (code === 401) {
     const refreshToken = localStorage.getItem("SpotifyRefreshToken");
-    const response = await refreshSpotifyAccessToken(refreshToken);
-    const tokens = await response.json();
+    if (refreshToken?.length < 20 || stringIsEmpty(refreshToken)) {
+      return;
+    }
+
+    const tokens = await refreshSpotifyAccessToken(refreshToken);
+    const tokensInvalid =
+      !tokens.access_token ||
+      tokens.access_token.length < 20 ||
+      !tokens.refresh_token ||
+      tokens.refresh_token.length < 20;
+    if (tokensInvalid) {
+      return;
+    }
+
     localStorage.setItem("SpotifyAccessToken", tokens.access_token);
     localStorage.setItem("SpotifyRefreshToken", tokens.refresh_token);
     Spotify.setAccessToken(tokens.access_token);
@@ -27,25 +40,28 @@ export const grandSpotifyAccess = () => {
   return sendRequest(() => Get(apiEndpoints.grandSpotifyAccess), []);
 };
 
-export const getSpotifyAccessTokens = (code) => {
-  return sendRequest(
+export const getSpotifyAccessTokens = (code) =>
+  sendRequest(
     () => Get(`${apiEndpoints.getSpotifyAccessToken}?code=${code}`),
     []
-  );
-};
+  ).then((value) => value.json());
 
 export const refreshSpotifyAccessToken = async (refreshToken) =>
   sendRequest(
     () =>
       Get(
         `${apiEndpoints.refreshSpotifyAccessToken}?refreshToken=${refreshToken}`
-      ),
+      ).then((value) => value.json()),
     []
   );
+
 const executeRequest = (request) => {
   const accessToken = localStorage.getItem("SpotifyAccessToken");
-  Spotify.setAccessToken(accessToken);
+  if (accessToken === null || accessToken === "undefined") {
+    return;
+  }
 
+  Spotify.setAccessToken(accessToken);
   return request()
     .then((data) => data)
     .catch(async (error) => {
@@ -80,3 +96,34 @@ export const getPlayerState = async () =>
   executeRequest(() =>
     Spotify.getMyCurrentPlaybackState().then((data) => data)
   );
+
+export const startPlayer = async (deviceId = null) =>
+  executeRequest(() =>
+    Spotify.play(deviceId !== null ? { device_id: deviceId } : undefined)
+  );
+
+export const pausePlayer = async () => executeRequest(() => Spotify.pause());
+
+export const skipSong = async () => executeRequest(() => Spotify.skipToNext());
+
+export const previousSong = async () =>
+  executeRequest(() => Spotify.skipToPrevious());
+
+export const getSpotifyDevices = async () =>
+  executeRequest(() => Spotify.getMyDevices());
+
+export const getDataForCurrentArtist = async (artistId) =>
+  executeRequest(() => Spotify.getArtist(artistId));
+
+export const getTrackAudioFeatures = async (trackId) =>
+  executeRequest(() => Spotify.getAudioFeaturesForTrack(trackId));
+
+export const searchSpotify = async (searchValue, limit = 50) =>
+  executeRequest(() =>
+    Spotify.search(searchValue, ["track"], {
+      limit,
+    })
+  );
+
+export const getCurrentTracksData = async (trackIds) =>
+  executeRequest(() => Spotify.getTracks(trackIds));
