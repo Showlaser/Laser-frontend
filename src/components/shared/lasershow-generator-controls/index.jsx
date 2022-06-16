@@ -146,7 +146,6 @@ export default function LasershowGeneratorControls() {
     getPlayerState().then((data) => {
       if (data) {
         setPlaying(data.is_playing);
-        console.log(data);
         playerStateRef.current = data;
       }
     });
