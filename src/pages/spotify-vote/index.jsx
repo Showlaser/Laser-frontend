@@ -5,6 +5,9 @@ import SpotifyPlaylist from "components/spotify-vote/spotify-playlist";
 import VoteOverView from "components/spotify-vote/vote-overview";
 import VoteSettings from "components/spotify-vote/vote-settings";
 import { useEffect, useState } from "react";
+import Modal from "@mui/material/Modal";
+import Button from "@mui/material/Button";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   getPlayerState,
   getPlaylistSongs,
@@ -15,6 +18,7 @@ import { getVoteData, startVote } from "services/logic/vote-logic";
 import { toCamelCase } from "services/shared/general";
 import { createGuid } from "services/shared/math";
 import Cookies from "universal-cookie";
+import QRCode from "react-qr-code";
 
 export default function SpotifyVote() {
   const cookie = new Cookies();
@@ -28,6 +32,21 @@ export default function SpotifyVote() {
   const [joinData, setJoinData] = useState(voteCookie?.joinInfo ?? undefined);
   const [voteState, setVoteState] = useState();
   const [connected, setConnected] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [qrCodeWidth, setQrCodeWidth] = useState(600);
+
+  const handleResize = () => {
+    const windowWidth = window.innerWidth;
+    let qrWidth = windowWidth * 0.8;
+    if (qrWidth > window.innerHeight) {
+      qrWidth = window.innerHeight - 100;
+    }
+
+    console.log(`window: ${windowWidth} qr: ${qrCodeWidth}`);
+    setQrCodeWidth(qrWidth);
+  };
+
+  window.addEventListener("resize", handleResize);
 
   useEffect(() => {
     if (accessToken === null) {
@@ -50,7 +69,7 @@ export default function SpotifyVote() {
         voteCookie.joinInfo.accessCode
       ).then((conn) => setConnected(conn));
     }
-  }, [voteStarted, accessToken]);
+  }, [voteStarted, accessToken, window.innerWidth]);
 
   const connectToWebsocketServer = async (joinCode, accessCode) => {
     const response = await getVoteData({ joinCode, accessCode });
@@ -182,6 +201,35 @@ export default function SpotifyVote() {
 
   const voteComponents = voteStarted ? (
     <Loading objectToLoad={joinData}>
+      <Modal
+        open={showQRCode}
+        onClose={() => setShowQRCode(false)}
+        style={{ marginLeft: "15px" }}
+      >
+        <div
+          style={{
+            textAlign: "center",
+            background: "white",
+            padding: "16px",
+            margin: "0 15px 0 0",
+          }}
+        >
+          <QRCode
+            size={qrCodeWidth}
+            value={`https://laser-vote.vdarwinkel.nl?join-code=${joinData?.joinCode}&access-code${joinData?.accessCode}`}
+          />
+          <br />
+          <Button
+            startIcon={<CloseIcon />}
+            fullWidth
+            variant="contained"
+            onClick={() => setShowQRCode(false)}
+          >
+            Close
+          </Button>
+        </div>
+      </Modal>
+
       <p>
         Users can join the session at https://laser-vote.vdarwinkel.nl with the
         following codes:
@@ -190,6 +238,9 @@ export default function SpotifyVote() {
         <br />
         Access code: {joinData?.accessCode}
       </p>
+      <Button variant="contained" onClick={() => setShowQRCode(true)}>
+        Show QR code
+      </Button>
       <FormGroup>
         <FormControlLabel
           id="play-after-song-ended-checkbox"
