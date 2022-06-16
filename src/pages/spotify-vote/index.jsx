@@ -216,7 +216,7 @@ export default function SpotifyVote() {
         >
           <QRCode
             size={qrCodeWidth}
-            value={`https://laser-vote.vdarwinkel.nl?join-code=${joinData?.joinCode}&access-code${joinData?.accessCode}`}
+            value={`https://laser-vote.vdarwinkel.nl?join-code=${joinData?.joinCode}&access-code=${joinData?.accessCode}`}
           />
           <br />
           <Button
