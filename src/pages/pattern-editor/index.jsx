@@ -16,8 +16,9 @@ import PointsForm from "components/shared/point-form";
 import { deepClone, stringIsEmpty } from "services/shared/general";
 import PointsDrawer from "components/shared/points-drawer";
 import SendIcon from "@mui/icons-material/Send";
-import { Button, Divider, TextField } from "@mui/material";
+import { Alert, Button, Divider, TextField } from "@mui/material";
 import Loading from "components/shared/loading";
+import HighPoweredBeamsWarning from "components/shared/high-powered-beams-warning";
 
 export default function PatternEditor() {
   const [selectedPatternUuid, setSelectedPatternAnimationUuid] = useState(
@@ -108,6 +109,7 @@ export default function PatternEditor() {
     <Loading objectToLoad={patterns}>
       <div id="patterns-wrapper">
         <DeleteModal modal={modalOptions} />
+        <HighPoweredBeamsWarning />
         <h2>Patterns</h2>
         <p>Patterns can be used on the lasershow page</p>
         <div id="patterns-form-wrapper">

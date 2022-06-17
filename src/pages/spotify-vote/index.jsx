@@ -42,7 +42,6 @@ export default function SpotifyVote() {
       qrWidth = window.innerHeight - 100;
     }
 
-    console.log(`window: ${windowWidth} qr: ${qrCodeWidth}`);
     setQrCodeWidth(qrWidth);
   };
 
@@ -167,10 +166,14 @@ export default function SpotifyVote() {
     const { joinCode, accessCode } = joinInfo;
     const response = await getVoteData({ joinCode, accessCode });
     if (response.status !== 200) {
-      return false;
+      return;
     }
 
-    const playPlaylistAfterSongEnded = document
+    let updatedVoteState = { ...voteState };
+    updatedVoteState.validUntil = new Date();
+    setVoteState(updatedVoteState);
+
+    const playPlaylistAfterCurrentPlayingSongEnded = document
       .getElementById("play-after-song-ended-checkbox")
       .getElementsByTagName("input")
       .item(0).checked;
@@ -180,21 +183,25 @@ export default function SpotifyVote() {
       ?.sort((a, b) => (a.votes.length > b.votes.length ? -1 : 1))
       .at(0);
 
+    if (playPlaylistAfterCurrentPlayingSongEnded) {
+      await playPlaylistAfterSongEnds(mostVotedPlaylist);
+    }
+  };
+
+  const playPlaylistAfterSongEnds = async (mostVotedPlaylist) => {
     const oldPlayerState = await getPlayerState();
 
-    if (playPlaylistAfterSongEnded) {
-      const interval = setInterval(async () => {
-        const currentPlayerState = await getPlayerState();
-        if (currentPlayerState.item.id !== oldPlayerState.item.id) {
-          playPlaylist(
-            mostVotedPlaylist.spotifyPlaylistId,
-            currentPlayerState.device.id
-          );
-          clearInterval(interval);
-        }
-      }, 2000);
-      return;
-    }
+    const interval = setInterval(async () => {
+      const currentPlayerState = await getPlayerState();
+      if (currentPlayerState.item.id !== oldPlayerState.item.id) {
+        alert("update!");
+        playPlaylist(
+          mostVotedPlaylist.spotifyPlaylistId,
+          currentPlayerState.device.id
+        );
+        clearInterval(interval);
+      }
+    }, 5000);
 
     playPlaylist(mostVotedPlaylist.spotifyPlaylistId, oldPlayerState.device.id);
   };
@@ -248,7 +255,11 @@ export default function SpotifyVote() {
           label="Play playlist after current playing song finished"
         />
       </FormGroup>
-      <VoteOverView voteCookie={voteCookie} voteState={voteState} />
+      <VoteOverView
+        voteCookie={voteCookie}
+        voteState={voteState}
+        onVoteEnded={() => onVoteEnded(joinData)}
+      />
     </Loading>
   ) : (
     <Loading objectToLoad={userPlaylists}>

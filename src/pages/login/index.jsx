@@ -29,7 +29,11 @@ export default function Login() {
           sameSite: true,
         });
 
-        window.location = routerPaths.Root;
+        const termsAndConditionsAccepted =
+          localStorage.getItem("terms-accepted");
+        window.location = termsAndConditionsAccepted
+          ? routerPaths.Root
+          : routerPaths.Disclaimer;
         return;
       } else if (result.status === 451) {
         showError(toastSubject.accountDisabled);

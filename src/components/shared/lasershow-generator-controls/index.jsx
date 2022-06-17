@@ -66,7 +66,7 @@ export default function LasershowGeneratorControls() {
     setIntervalsSet(true);
     updateData();
     updateActiveDevice();
-    setInterval(() => updateData(), 1800);
+    setInterval(() => updateData(), 2000);
     setInterval(() => updateActiveDevice(), 10000);
   }, [activeDevice]);
 

@@ -30,6 +30,7 @@ export async function sendRequest(
 ) {
   let response = await requestFunction();
   if (response.status === 401) {
+    // tokens are set by cookies
     const refreshResponse = await Post(apiEndpoints.refreshToken, null, true);
     if (
       refreshResponse.status !== 200 &&
