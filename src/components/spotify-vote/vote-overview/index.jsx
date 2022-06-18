@@ -1,11 +1,10 @@
 import { Button, Grid, List, ListItemText } from "@mui/material";
 import LinearWithValueLabel from "components/shared/progress-with-label";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { normalise } from "services/shared/math";
 import { getDifferenceBetweenTwoDatesInMinutesAndSecondsString } from "services/shared/general";
 import paths from "services/shared/router-paths";
 import Cookies from "universal-cookie";
-import { useState } from "react";
 
 export default function VoteOverView({ voteState, voteCookie, onVoteEnded }) {
   const [voteEnded, setVoteEnded] = useState(false);
@@ -22,7 +21,7 @@ export default function VoteOverView({ voteState, voteCookie, onVoteEnded }) {
         new Date()
       );
 
-      if (voteEnded) {
+      if (!voteEnded) {
         document.getElementById("countdown").innerHTML = value;
       }
     }, 1000);

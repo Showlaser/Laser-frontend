@@ -1,6 +1,6 @@
 const laserApiUrl = "http://localhost:5000/";
-const authApiUrl = "http://localhost:5001/";
-const voteApiUrl = "http://localhost:5002/";
+const authApiUrl = "https://laser-auth-api.vdarwinkel.nl/";
+const voteApiUrl = "https://laser-vote-api.vdarwinkel.nl/";
 
 const apiEndpoints = {
   pattern: `${laserApiUrl}pattern`,
