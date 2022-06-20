@@ -35,6 +35,13 @@ export default function SpotifyVote() {
   const [showQRCode, setShowQRCode] = useState(false);
   const [qrCodeWidth, setQrCodeWidth] = useState(600);
 
+  window.addEventListener("beforeunload", function (e) {
+    var confirmationMessage = "Aut play will not work!";
+
+    (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+    return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+  });
+
   const handleResize = () => {
     const windowWidth = window.innerWidth;
     let qrWidth = windowWidth * 0.8;
@@ -183,14 +190,24 @@ export default function SpotifyVote() {
       ?.sort((a, b) => (a.votes.length > b.votes.length ? -1 : 1))
       .at(0);
 
+    const oldPlayerState = await getPlayerState();
     if (playPlaylistAfterCurrentPlayingSongEnded) {
-      await playPlaylistAfterSongEnds(mostVotedPlaylist);
+      await playPlaylistAfterSongEnds(mostVotedPlaylist, oldPlayerState);
+      return;
     }
+
+    playPlaylistAfterCurrentPlayingSongEnded
+      ? await playPlaylistAfterSongEnds(mostVotedPlaylist, oldPlayerState)
+      : playPlaylist(
+          mostVotedPlaylist.spotifyPlaylistId,
+          oldPlayerState.device.id
+        );
   };
 
-  const playPlaylistAfterSongEnds = async (mostVotedPlaylist) => {
-    const oldPlayerState = await getPlayerState();
-
+  const playPlaylistAfterSongEnds = async (
+    mostVotedPlaylist,
+    oldPlayerState
+  ) => {
     const interval = setInterval(async () => {
       const currentPlayerState = await getPlayerState();
       if (currentPlayerState.item.id !== oldPlayerState.item.id) {
@@ -201,8 +218,6 @@ export default function SpotifyVote() {
         clearInterval(interval);
       }
     }, 5000);
-
-    playPlaylist(mostVotedPlaylist.spotifyPlaylistId, oldPlayerState.device.id);
   };
 
   const voteComponents = voteStarted ? (
@@ -244,6 +259,10 @@ export default function SpotifyVote() {
         <br />
         Access code: {joinData?.accessCode}
       </p>
+      <Alert style={{ width: "515px" }} severity="info">
+        Do not leave the page otherwise auto playing the playlist will not work!
+      </Alert>
+      <br />
       <Button variant="contained" onClick={() => setShowQRCode(true)}>
         Show QR code
       </Button>

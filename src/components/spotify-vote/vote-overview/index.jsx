@@ -1,13 +1,13 @@
 import { Button, Grid, List, ListItemText } from "@mui/material";
 import LinearWithValueLabel from "components/shared/progress-with-label";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { normalise } from "services/shared/math";
 import { getDifferenceBetweenTwoDatesInMinutesAndSecondsString } from "services/shared/general";
-import paths from "services/shared/router-paths";
 import Cookies from "universal-cookie";
 
 export default function VoteOverView({ voteState, voteCookie, onVoteEnded }) {
   const [voteEnded, setVoteEnded] = useState(false);
+  const voteEndedRef = useRef(false);
 
   const totalVotes = voteState?.voteablePlaylistCollection
     ?.map((p) => p?.votes?.length)
@@ -21,7 +21,7 @@ export default function VoteOverView({ voteState, voteCookie, onVoteEnded }) {
         new Date()
       );
 
-      if (!voteEnded) {
+      if (!voteEndedRef.current) {
         document.getElementById("countdown").innerHTML = value;
       }
     }, 1000);
@@ -45,18 +45,10 @@ export default function VoteOverView({ voteState, voteCookie, onVoteEnded }) {
             size="small"
             onClick={async () => {
               setVoteEnded(true);
+              voteEndedRef.current = true;
               const cookie = new Cookies();
               cookie.remove("vote-started", { path: "/vote" });
               await onVoteEnded();
-
-              const playPlaylistAfterSongEnded = document
-                .getElementById("play-after-song-ended-checkbox")
-                .getElementsByTagName("input")
-                .item(0).checked;
-
-              if (!playPlaylistAfterSongEnded) {
-                window.location = paths.SpotifyVote;
-              }
             }}
           >
             End vote session
