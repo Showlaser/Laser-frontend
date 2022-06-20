@@ -194,7 +194,6 @@ export default function SpotifyVote() {
     const interval = setInterval(async () => {
       const currentPlayerState = await getPlayerState();
       if (currentPlayerState.item.id !== oldPlayerState.item.id) {
-        alert("update!");
         playPlaylist(
           mostVotedPlaylist.spotifyPlaylistId,
           currentPlayerState.device.id
