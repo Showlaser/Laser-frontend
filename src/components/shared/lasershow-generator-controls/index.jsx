@@ -96,7 +96,7 @@ export default function LasershowGeneratorControls() {
     if (!currentArtistRef.current) {
       return;
     }
-
+    console.log(currentTrackDataRef.current);
     updateLasershowGeneratorSettings({
       genres: currentArtistRef.current.genres,
       bpm: parseInt(currentTrackDataRef.current.tempo),
