@@ -35,13 +35,6 @@ export default function SpotifyVote() {
   const [showQRCode, setShowQRCode] = useState(false);
   const [qrCodeWidth, setQrCodeWidth] = useState(600);
 
-  window.addEventListener("beforeunload", function (e) {
-    var confirmationMessage = "Aut play will not work!";
-
-    (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-    return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
-  });
-
   const handleResize = () => {
     const windowWidth = window.innerWidth;
     let qrWidth = windowWidth * 0.8;
@@ -167,6 +160,12 @@ export default function SpotifyVote() {
     setVoteStarted(true);
     setJoinData(joinInfo);
     setTimeout(() => onVoteEnded(joinInfo), voteValidTimeInMinutes * 60000);
+    window.addEventListener("beforeunload", function (e) {
+      var confirmationMessage = "Aut play will not work!";
+
+      (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+      return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+    });
   };
 
   const onVoteEnded = async (joinInfo) => {
