@@ -8,6 +8,7 @@ import { getZones } from "services/logic/zone-logic";
 import { emptyGuid } from "services/shared/math";
 import SideNav from "components/shared/sidenav";
 import LasershowGeneratorSettings from "components/laser-settings/lasershow-generator-settings";
+import ConnectionMethodSettings from "components/laser-settings/connection-method-settings";
 
 export default function LaserSettings() {
   const [zones, setZones] = useState();
@@ -38,6 +39,7 @@ export default function LaserSettings() {
       <SpotifyLogin />
       <Divider />
       <LasershowGeneratorSettings />
+      <ConnectionMethodSettings />
     </Loading>
   );
 

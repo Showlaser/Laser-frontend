@@ -16,3 +16,20 @@ export async function setSettings(ip, comPort) {
     showSuccess(toastSubject.changesSaved)
   );
 }
+
+export async function setConnectionMethod(connectionMethod, comPort) {
+  return sendRequest(
+    () =>
+      Post(
+        `${apiEndpoints.connectionMethod}?connectionMethod=${connectionMethod}&comPort=${comPort}`
+      ),
+    [],
+    showSuccess(toastSubject.changesSaved)
+  );
+}
+
+export async function getCurrentComDevice() {
+  return sendRequest(() => Get(`${apiEndpoints.currentComDevice}`), []).then(
+    (response) => response.text()
+  );
+}

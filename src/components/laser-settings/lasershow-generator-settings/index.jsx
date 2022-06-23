@@ -6,6 +6,7 @@ import {
   FormControlLabel,
   Switch,
   Alert,
+  Divider,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getAudioDevices } from "services/logic/lasershow-generation-logic";
@@ -58,6 +59,8 @@ export default function LasershowGeneratorSettings() {
           </MenuItem>
         ))}
       </Select>
+      <br />
+      <Divider />
     </div>
   );
 }

@@ -17,11 +17,13 @@ const apiEndpoints = {
   dashboard: `${laserApiUrl}dashboard`,
   settings: `${laserApiUrl}settings`,
   serial: `${laserApiUrl}settings/serial`,
+  connectionMethod: `${laserApiUrl}settings/connection-method`,
   requestPasswordReset: `${authApiUrl}user/request-password-reset`,
   resetPassword: `${authApiUrl}user/reset-password`,
   activateAccount: `${authApiUrl}user/activate`,
   lasershowGenerator: `${laserApiUrl}lasershow-generator`,
   spotifyConnector: `${laserApiUrl}spotify-connector`,
+  currentComDevice: `${laserApiUrl}settings/current-com-device`,
 };
 
 export default apiEndpoints;
