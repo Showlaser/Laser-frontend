@@ -1,5 +1,5 @@
 import "./index.css";
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import SideNav from "components/shared/sidenav";
 import TemporaryDrawer from "components/shared/drawer";
 import {
@@ -14,9 +14,8 @@ import SvgToCoordinatesConverter from "components/svg-to-coordinates-converter";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
 export default function PatternPage() {
-  const [uploadedFile, setUploadedFiles] = React.useState<any>();
-  const [forceCloseDrawer, setForceCloseDrawer] =
-    React.useState<boolean>(false);
+  const [uploadedFile, setUploadedFiles] = useState<any>();
+  const [forceCloseDrawer, setForceCloseDrawer] = useState<boolean>(false);
 
   return (
     <SideNav pageName="Pattern editor">

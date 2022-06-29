@@ -1,10 +1,19 @@
 // MIN = Minimum expected value
 // MAX = Maximium expected value
+
+import { Point } from "models/components/shared/svg-to-coordinates-converter";
+
 // Function to normalise the values (MIN / MAX could be integrated)
-export const normalise = (value, min, max) =>
+export const normalise = (value: number, min: number, max: number) =>
   ((value - min) * 100) / (max - min);
 
-export const mapNumber = (number, inMin, inMax, outMin, outMax) => {
+export const mapNumber = (
+  number: number,
+  inMin: number,
+  inMax: number,
+  outMin: number,
+  outMax: number
+) => {
   return ((number - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 };
 
@@ -18,20 +27,27 @@ export const createGuid = () => {
 
 export const emptyGuid = () => "00000000-0000-0000-0000-000000000000";
 
-export const capitalizeFirstLetter = (string) =>
+export const capitalizeFirstLetter = (string: string) =>
   string.charAt(0).toUpperCase() + string.slice(1);
 
-export const convertToMilliWatts = (maxPower, currentValue) =>
+export const convertToMilliWatts = (maxPower: number, currentValue: number) =>
   Math.round((maxPower / 255) * currentValue);
 
-export const valueIsWithinBoundaries = (value, min, max) =>
-  value <= max && value >= min;
+export const valueIsWithinBoundaries = (
+  value: number,
+  min: number,
+  max: number
+) => value <= max && value >= min;
 
-export const numberIsBetweenOrEqual = (number, min, max) => {
+export const numberIsBetweenOrEqual = (
+  number: number,
+  min: number,
+  max: number
+) => {
   return number >= min && number <= max;
 };
 
-export const rotatePoint = (point, angle) => {
+export const rotatePoint = (point: Point, angle: number): Point => {
   var radians = (Math.PI / 180) * angle,
     cos = Math.cos(radians),
     sin = Math.sin(radians),

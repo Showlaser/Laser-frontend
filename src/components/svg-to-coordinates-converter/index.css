@@ -1,6 +1,9 @@
 #svg-canvas-container {
-  width: 100%;
   text-align: center;
+  top: 0;
+  margin-top: 75px;
+  margin-left: 55%;
+  position: fixed;
 }
 
 #svg-canvas {
