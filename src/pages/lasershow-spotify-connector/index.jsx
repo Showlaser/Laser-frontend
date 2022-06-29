@@ -156,39 +156,31 @@ export default function LasershowSpotifyConnector() {
           <HelpIcon fontSize="inherit" />
         </Tooltip>
       </small>
-      <Grid
-        style={{ marginTop: "25px" }}
-        container
-        spacing={0}
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
+      <Paper
+        style={{ backgroundColor: "#363535" }}
+        sx={{
+          m: "8px 0 0 0",
+          p: "4px 6px",
+          display: "flex",
+          alignItems: "center",
+          width: 400,
+        }}
       >
-        <Paper
-          id="spotify-search-paper"
-          sx={{
-            p: "4px 6px",
-            display: "flex",
-            alignItems: "center",
-            width: 400,
-          }}
+        <Tooltip
+          title={
+            selectedLasershowUuid !== undefined
+              ? ""
+              : "Select a lasershow first!"
+          }
         >
-          <Tooltip
-            title={
-              selectedLasershowUuid !== undefined
-                ? ""
-                : "Select a lasershow first!"
-            }
-          >
-            <InputBase
-              disabled={selectedLasershowUuid === undefined}
-              sx={{ ml: 1, flex: 1 }}
-              placeholder="Search Spotify"
-              onChange={(e) => onSearchInput(e.target.value)}
-            />
-          </Tooltip>
-        </Paper>
-      </Grid>
+          <InputBase
+            disabled={selectedLasershowUuid === undefined}
+            sx={{ ml: 1, flex: 1 }}
+            placeholder="Search Spotify"
+            onChange={(e) => onSearchInput(e.target.value)}
+          />
+        </Tooltip>
+      </Paper>
       <List sx={{ width: "100%" }} disablePadding>
         {searchResults.map((searchResult, index) => {
           const songIsAlreadyConnected = existingConnectors.some(

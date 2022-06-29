@@ -47,9 +47,15 @@ export const getSpotifyAccessTokens = (code) =>
   ).then((value) => value.json());
 
 export const refreshSpotifyAccessToken = async (refreshToken) =>
-  Get(
-    `${apiEndpoints.refreshSpotifyAccessToken}?refreshToken=${refreshToken}`
-  ).then((value) => value.json());
+  sendRequest(
+    () =>
+      Get(
+        `${apiEndpoints.refreshSpotifyAccessToken}?refreshToken=${refreshToken}`
+      ).then((value) => value.json()),
+    [],
+    undefined,
+    false
+  );
 
 const executeRequest = (request) => {
   const accessToken = localStorage.getItem("SpotifyAccessToken");

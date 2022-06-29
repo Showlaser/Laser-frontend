@@ -55,8 +55,9 @@ export default function Account() {
       !stringIsEmpty(formData.newPasswordRepeat);
 
     if (passwordShouldBeUpdated) {
-      const passwordsMatch = formData.password === formData.currentPassword;
-      if (!passwordsMatch()) {
+      const passwordsMatch =
+        formData.newPasswordRepeat === formData.newPassword;
+      if (!passwordsMatch) {
         showError(toastSubject.passwordsDoNotMatch);
         setSubmitInProgress(false);
         return;

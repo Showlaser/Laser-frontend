@@ -1,10 +1,13 @@
 import { Button, MenuItem, Select, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
-import { getAvailableComDevices } from "services/logic/laser-network-settings";
+import {
+  getAvailableComDevices,
+  setSettings,
+} from "services/logic/laser-network-settings";
 
 export default function LaserNetworkSettings() {
   const [availableComPorts, setAvailableComPorts] = useState([]);
-  const [selectedComPortId, setSelectedComPortId] = useState();
+  const [selectedComPortId, setSelectedComPortId] = useState(0);
 
   useEffect(() => {
     getAvailableComDevices().then((data) => setAvailableComPorts(data));
@@ -51,7 +54,16 @@ export default function LaserNetworkSettings() {
         ))}
       </Select>
       <br />
-      <Button variant="contained" style={{ margin: "5px 0 5px 0" }}>
+      <Button
+        variant="contained"
+        style={{ margin: "5px 0 5px 0" }}
+        onClick={() =>
+          setSettings(
+            localStorage.getItem("computer-ip"),
+            availableComPorts[selectedComPortId]
+          )
+        }
+      >
         Set server ip on laser
       </Button>
     </div>

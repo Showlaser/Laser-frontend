@@ -27,6 +27,10 @@ export default function Dashboard() {
         );
       }
 
+      localStorage.setItem(
+        "development-mode-active",
+        data.laserSettings?.developmentModeIsActive
+      );
       setDashboardData(data);
       showMessages(data);
     });

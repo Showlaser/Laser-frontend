@@ -10,6 +10,7 @@ import {
   FormControlLabel,
   Alert,
   Button,
+  Input,
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import "./index.css";
@@ -57,6 +58,7 @@ export default function LasershowGeneratorControls() {
   const playerStateRef = useRef();
   const currentArtistRef = useRef();
   const currentTrackDataRef = useRef();
+  const threshHoldOffsetRef = useRef();
 
   useEffect(() => {
     if (intervalsSet || !userIsLoggedIntoSpotify) {
@@ -66,7 +68,7 @@ export default function LasershowGeneratorControls() {
     setIntervalsSet(true);
     updateData();
     updateActiveDevice();
-    setInterval(() => updateData(), 1800);
+    setInterval(() => updateData(), 2000);
     setInterval(() => updateActiveDevice(), 10000);
   }, [activeDevice]);
 
@@ -96,13 +98,13 @@ export default function LasershowGeneratorControls() {
     if (!currentArtistRef.current) {
       return;
     }
-
     updateLasershowGeneratorSettings({
       genres: currentArtistRef.current.genres,
       bpm: parseInt(currentTrackDataRef.current.tempo),
       saveLasershow: localStorage.getItem("save-generated-lasershows") !== null,
       songName: playerStateRef.current?.item?.name,
       isPlaying: playerStateRef.current?.is_playing,
+      threshHoldOffset: threshHoldOffsetRef.current,
     });
   };
 
@@ -146,7 +148,6 @@ export default function LasershowGeneratorControls() {
     getPlayerState().then((data) => {
       if (data) {
         setPlaying(data.is_playing);
-        console.log(data);
         playerStateRef.current = data;
       }
     });
@@ -257,6 +258,20 @@ export default function LasershowGeneratorControls() {
             <small>{`Detected genre: ${
               lasershowGeneratorStatus.activeGenre ?? "not supported"
             }`}</small>
+            <br />
+            <Input
+              type="number"
+              inputProps={{
+                step: "0.001",
+                min: -0.1,
+                max: 0.1,
+              }}
+              placeholder="Threshold offset"
+              onChange={(e) =>
+                (threshHoldOffsetRef.current = Number(e.target.value))
+              }
+              defaultValue={0.0}
+            />
             <br />
           </span>
         ) : null}

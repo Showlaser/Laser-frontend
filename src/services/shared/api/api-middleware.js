@@ -25,16 +25,20 @@ const handleErrorMessage = (statusCode, ignoredStatusCodes) => {
 export async function sendRequest(
   requestFunction,
   ignoredStatusCodes,
-  onSuccessToastSubject
+  onSuccessToastSubject,
+  redirectToLoginOnError = true
 ) {
   let response = await requestFunction();
   if (response.status === 401) {
+    // tokens are set by cookies
     const refreshResponse = await Post(apiEndpoints.refreshToken, null, true);
     if (
       refreshResponse.status !== 200 &&
       !window.location.href.includes("login")
     ) {
-      window.location = paths.Login;
+      if (redirectToLoginOnError) {
+        window.location = paths.Login;
+      }
       return;
     }
 

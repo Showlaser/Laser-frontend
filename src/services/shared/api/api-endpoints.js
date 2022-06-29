@@ -1,6 +1,6 @@
 const laserApiUrl = "http://localhost:5000/";
-const authApiUrl = "http://localhost:5001/";
-const voteApiUrl = "http://localhost:5002/";
+const authApiUrl = "https://laser-auth-api.vdarwinkel.nl/";
+const voteApiUrl = "https://laser-vote-api.vdarwinkel.nl/";
 
 const apiEndpoints = {
   pattern: `${laserApiUrl}pattern`,
@@ -17,11 +17,13 @@ const apiEndpoints = {
   dashboard: `${laserApiUrl}dashboard`,
   settings: `${laserApiUrl}settings`,
   serial: `${laserApiUrl}settings/serial`,
+  connectionMethod: `${laserApiUrl}settings/connection-method`,
   requestPasswordReset: `${authApiUrl}user/request-password-reset`,
   resetPassword: `${authApiUrl}user/reset-password`,
   activateAccount: `${authApiUrl}user/activate`,
   lasershowGenerator: `${laserApiUrl}lasershow-generator`,
   spotifyConnector: `${laserApiUrl}spotify-connector`,
+  currentComDevice: `${laserApiUrl}settings/current-com-device`,
 };
 
 export default apiEndpoints;

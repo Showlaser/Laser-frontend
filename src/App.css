@@ -58,12 +58,17 @@ body {
 }
 
 .MuiButton-contained {
-  background-color: #2660bd !important;
+  background-color: #2867c5 !important;
   color: white !important;
 }
 
 .MuiButton-contained:hover {
-  background-color: #2248a1 !important;
+  background-color: #1f519d !important;
+}
+
+.MuiButton-contained:disabled {
+  background-color: rgb(40, 103, 197, 0.4) !important;
+  color: white !important;
 }
 
 .link-btn {

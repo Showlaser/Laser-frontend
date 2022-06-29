@@ -5,6 +5,9 @@ import SpotifyPlaylist from "components/spotify-vote/spotify-playlist";
 import VoteOverView from "components/spotify-vote/vote-overview";
 import VoteSettings from "components/spotify-vote/vote-settings";
 import { useEffect, useState } from "react";
+import Modal from "@mui/material/Modal";
+import Button from "@mui/material/Button";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   getPlayerState,
   getPlaylistSongs,
@@ -15,6 +18,7 @@ import { getVoteData, startVote } from "services/logic/vote-logic";
 import { toCamelCase } from "services/shared/general";
 import { createGuid } from "services/shared/math";
 import Cookies from "universal-cookie";
+import QRCode from "react-qr-code";
 
 export default function SpotifyVote() {
   const cookie = new Cookies();
@@ -28,6 +32,20 @@ export default function SpotifyVote() {
   const [joinData, setJoinData] = useState(voteCookie?.joinInfo ?? undefined);
   const [voteState, setVoteState] = useState();
   const [connected, setConnected] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [qrCodeWidth, setQrCodeWidth] = useState(600);
+
+  const handleResize = () => {
+    const windowWidth = window.innerWidth;
+    let qrWidth = windowWidth * 0.8;
+    if (qrWidth > window.innerHeight) {
+      qrWidth = window.innerHeight - 100;
+    }
+
+    setQrCodeWidth(qrWidth);
+  };
+
+  window.addEventListener("resize", handleResize);
 
   useEffect(() => {
     if (accessToken === null) {
@@ -50,7 +68,7 @@ export default function SpotifyVote() {
         voteCookie.joinInfo.accessCode
       ).then((conn) => setConnected(conn));
     }
-  }, [voteStarted, accessToken]);
+  }, [voteStarted, accessToken, window.innerWidth]);
 
   const connectToWebsocketServer = async (joinCode, accessCode) => {
     const response = await getVoteData({ joinCode, accessCode });
@@ -61,7 +79,7 @@ export default function SpotifyVote() {
     let voteData = await response.json();
     voteData.validUntil = new Date(voteData.validUntil);
 
-    let newSocket = new WebSocket("ws://localhost:5002/ws");
+    let newSocket = new WebSocket("wss://laser-vote-api.vdarwinkel.nl/ws");
     newSocket.onopen = () => {
       const identifier = {
         voteDataUuid: voteData.uuid,
@@ -127,6 +145,9 @@ export default function SpotifyVote() {
     };
 
     const joinInfo = await startVote(voteData);
+    if (joinInfo?.joinCode === undefined) {
+      return;
+    }
     cookie.set(
       "vote-started",
       { joinInfo, validUntil: expirationDate },
@@ -139,16 +160,26 @@ export default function SpotifyVote() {
     setVoteStarted(true);
     setJoinData(joinInfo);
     setTimeout(() => onVoteEnded(joinInfo), voteValidTimeInMinutes * 60000);
+    window.addEventListener("beforeunload", function (e) {
+      var confirmationMessage = "Aut play will not work!";
+
+      (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+      return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+    });
   };
 
   const onVoteEnded = async (joinInfo) => {
     const { joinCode, accessCode } = joinInfo;
     const response = await getVoteData({ joinCode, accessCode });
     if (response.status !== 200) {
-      return false;
+      return;
     }
 
-    const playPlaylistAfterSongEnded = document
+    let updatedVoteState = { ...voteState };
+    updatedVoteState.validUntil = new Date();
+    setVoteState(updatedVoteState);
+
+    const playPlaylistAfterCurrentPlayingSongEnded = document
       .getElementById("play-after-song-ended-checkbox")
       .getElementsByTagName("input")
       .item(0).checked;
@@ -159,34 +190,81 @@ export default function SpotifyVote() {
       .at(0);
 
     const oldPlayerState = await getPlayerState();
-
-    if (playPlaylistAfterSongEnded) {
-      const interval = setInterval(async () => {
-        const currentPlayerState = await getPlayerState();
-        if (currentPlayerState.item.id !== oldPlayerState.item.id) {
-          playPlaylist(
-            mostVotedPlaylist.spotifyPlaylistId,
-            currentPlayerState.device.id
-          );
-          clearInterval(interval);
-        }
-      }, 2000);
+    if (playPlaylistAfterCurrentPlayingSongEnded) {
+      await playPlaylistAfterSongEnds(mostVotedPlaylist, oldPlayerState);
       return;
     }
 
-    playPlaylist(mostVotedPlaylist.spotifyPlaylistId, oldPlayerState.device.id);
+    playPlaylistAfterCurrentPlayingSongEnded
+      ? await playPlaylistAfterSongEnds(mostVotedPlaylist, oldPlayerState)
+      : playPlaylist(
+          mostVotedPlaylist.spotifyPlaylistId,
+          oldPlayerState.device.id
+        );
+  };
+
+  const playPlaylistAfterSongEnds = async (
+    mostVotedPlaylist,
+    oldPlayerState
+  ) => {
+    const interval = setInterval(async () => {
+      const currentPlayerState = await getPlayerState();
+      if (currentPlayerState.item.id !== oldPlayerState.item.id) {
+        playPlaylist(
+          mostVotedPlaylist.spotifyPlaylistId,
+          currentPlayerState.device.id
+        );
+        clearInterval(interval);
+      }
+    }, 5000);
   };
 
   const voteComponents = voteStarted ? (
     <Loading objectToLoad={joinData}>
+      <Modal
+        open={showQRCode}
+        onClose={() => setShowQRCode(false)}
+        style={{ marginLeft: "15px" }}
+      >
+        <div
+          style={{
+            textAlign: "center",
+            background: "white",
+            padding: "16px",
+            margin: "0 15px 0 0",
+          }}
+        >
+          <QRCode
+            size={qrCodeWidth}
+            value={`https://laser-vote.vdarwinkel.nl?join-code=${joinData?.joinCode}&access-code=${joinData?.accessCode}`}
+          />
+          <br />
+          <Button
+            startIcon={<CloseIcon />}
+            fullWidth
+            variant="contained"
+            onClick={() => setShowQRCode(false)}
+          >
+            Close
+          </Button>
+        </div>
+      </Modal>
+
       <p>
-        Users can join the session at http://localhost:3001/ with the following
-        codes:
+        Users can join the session at https://laser-vote.vdarwinkel.nl with the
+        following codes:
         <br />
         Join code: {joinData?.joinCode}
         <br />
         Access code: {joinData?.accessCode}
       </p>
+      <Alert style={{ width: "515px" }} severity="info">
+        Do not leave the page otherwise auto playing the playlist will not work!
+      </Alert>
+      <br />
+      <Button variant="contained" onClick={() => setShowQRCode(true)}>
+        Show QR code
+      </Button>
       <FormGroup>
         <FormControlLabel
           id="play-after-song-ended-checkbox"
@@ -194,7 +272,11 @@ export default function SpotifyVote() {
           label="Play playlist after current playing song finished"
         />
       </FormGroup>
-      <VoteOverView voteCookie={voteCookie} voteState={voteState} />
+      <VoteOverView
+        voteCookie={voteCookie}
+        voteState={voteState}
+        onVoteEnded={() => onVoteEnded(joinData)}
+      />
     </Loading>
   ) : (
     <Loading objectToLoad={userPlaylists}>

@@ -14,6 +14,7 @@ import AccountActivation from "pages/account-activation";
 import Registration from "pages/registration";
 import LasershowSpotifyConnector from "pages/lasershow-spotify-connector";
 import Logout from "pages/logout";
+import Disclaimer from "pages/disclaimer";
 
 function routes() {
   return (
@@ -25,6 +26,7 @@ function routes() {
       <Route exact path={routerPaths.Installation} component={Installation} />
       <Route exact path={routerPaths.SpotifyVote} component={SpotifyVote} />
       <Route exact path={routerPaths.ResetPassword} component={PasswordReset} />
+      <Route exact path={routerPaths.Disclaimer} component={Disclaimer} />
       <Route exact path={routerPaths.Account} component={Account} />
       <Route exact path={routerPaths.Registration} component={Registration} />
       <Route exact path={routerPaths.Logout} component={Logout} />

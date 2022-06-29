@@ -12,6 +12,7 @@ import { createGuid, emptyGuid } from "services/shared/math";
 import { deepClone, stringIsEmpty } from "services/shared/general";
 import TimelineSection from "components/shared/timeline-section";
 import Loading from "components/shared/loading";
+import HighPoweredBeamsWarning from "components/shared/high-powered-beams-warning";
 
 export default function AnimationEditor() {
   const [selectedAnimationUuid, setSelectedAnimationUuid] = useState(
@@ -112,6 +113,7 @@ export default function AnimationEditor() {
 
   const content = (
     <div id="animation">
+      <HighPoweredBeamsWarning />
       <AnimationOptions
         setAnimations={setAnimations}
         setSelectedAnimationUuid={setSelectedAnimationUuid}
