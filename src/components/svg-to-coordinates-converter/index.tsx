@@ -3,6 +3,8 @@ import { showError, toastSubject } from "services/shared/toast-messages";
 import { range } from "d3-array";
 import "./index.css";
 import {
+  Box,
+  Button,
   Checkbox,
   Divider,
   FormControl,
@@ -11,10 +13,13 @@ import {
   FormLabel,
   Grid,
   Input,
+  Modal,
   Slider,
+  Typography,
 } from "@mui/material";
 import { Point } from "models/components/shared/svg-to-coordinates-converter";
 import { rotatePoint } from "services/shared/math";
+import ToLaserProjector from "components/to-laser-projector";
 const flattenSVG = require("flatten-svg");
 
 type Props = {
@@ -23,12 +28,15 @@ type Props = {
 
 export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
   const [rawSvg, setRawSvg] = React.useState<string | ArrayBuffer | null>();
-  const [scale, setScale] = React.useState<number>(3);
-  const [numberOfPoints, setNumberOfPoints] = React.useState<number>(30);
+  const [scale, setScale] = React.useState<number>(4);
+  const [numberOfPoints, setNumberOfPoints] = React.useState<number>(200);
   const [xOffset, setXOffset] = React.useState<number>(0);
   const [yOffset, setYOffset] = React.useState<number>(0);
-  const [connectDots, setConnectDots] = React.useState<boolean>(true);
+  const [connectDots, setConnectDots] = React.useState<boolean>(false);
+  const [showPointNumber, setShowPointNumber] = React.useState<boolean>(false);
   const [rotation, setRotation] = React.useState<number>(0);
+  const [showToLaserProjector, setShowToLaserProjector] =
+    React.useState<boolean>(false);
 
   React.useEffect(() => {
     if (uploadedFile !== undefined) {
@@ -43,6 +51,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     uploadedFile,
     connectDots,
     rotation,
+    showPointNumber,
   ]);
 
   const onFileUpload = (file: File) => {
@@ -82,9 +91,12 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     }
 
     const coordinates = pathsToCoords(paths);
-    const points = mapCoordinatesToXAndYPoint(coordinates);
+    const mappedPoints = mapCoordinatesToXAndYPoint(coordinates);
+    console.log(mappedPoints);
+    const points = placePointsInCanvas(mappedPoints);
+    console.log(points);
 
-    drawDotsOnCanvas(points);
+    drawDotsOnCanvas(mappedPoints);
   };
 
   const mapCoordinatesToXAndYPoint = (coordinates: any): Point[] => {
@@ -102,22 +114,47 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     return mappedCoordinates;
   };
 
-  const drawDotsOnCanvas = (dotsToDraw: Point[]) => {
-    const screenScale = window.devicePixelRatio || 1;
-    const canvas = document.getElementById("svg-canvas") as HTMLCanvasElement;
+  const placePointsInCanvas = (points: Point[]): Point[] => {
+    let lowestY: number = 0;
+    let lowestX: number = 0;
+
+    points.forEach((point) => {
+      if (point.x < 0 || point.y < 0) {
+        if (point.y < lowestY) {
+          lowestY = point.y;
+        }
+        if (point.x < lowestX) {
+          lowestX = point.x;
+        }
+      }
+    });
+
+    if (lowestY === 0 && lowestX === 0) {
+      return points;
+    }
+
+    let centeredPoints: Point[] = [...points];
+    centeredPoints.forEach((point) => {
+      point.y -= lowestY;
+      point.x -= lowestX;
+    });
+
+    return centeredPoints;
+  };
+
+  const prepareCanvas = (
+    canvas: HTMLCanvasElement
+  ): CanvasRenderingContext2D | null => {
     canvas.width = 650;
     canvas.height = 650;
     canvas.style.width = "650";
     canvas.style.height = "650";
     const ctx = canvas.getContext("2d");
     if (ctx === null) {
-      return;
+      return null;
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const color: string = "#ffffff";
-    const dotThickness: number = 2;
-
     ctx.moveTo(0, 300);
     ctx.lineTo(600, 300);
 
@@ -129,6 +166,19 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     ctx.lineTo(300, 600);
 
     ctx.stroke();
+    return ctx;
+  };
+
+  const drawDotsOnCanvas = (dotsToDraw: Point[]) => {
+    const screenScale = window.devicePixelRatio || 1;
+    const canvas = document.getElementById("svg-canvas") as HTMLCanvasElement;
+    const ctx = prepareCanvas(canvas);
+    if (ctx === null) {
+      return;
+    }
+
+    const color: string = "#ffffff";
+    const dotThickness: number = 2;
 
     const dotsToDrawLength = dotsToDraw.length;
     for (let index = 0; index < dotsToDrawLength; index++) {
@@ -140,33 +190,14 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
             )}, ${Math.round(Math.random() * 255)})`
           : color;
       ctx.beginPath();
-      if (connectDots) {
-        const currentCoordinates = dotsToDraw[index];
-        if (index === dotsToDrawLength - 1) {
-          const firstCoordinates = dotsToDraw[0];
-          ctx.moveTo(currentCoordinates.x, currentCoordinates.y);
-          ctx.lineTo(firstCoordinates.x, firstCoordinates.y);
-        } else {
-          const nextCoordinates = dotsToDraw[index + 1];
-          ctx.moveTo(currentCoordinates.x, currentCoordinates.y);
-          ctx.lineTo(nextCoordinates.x, nextCoordinates.y);
-        }
 
-        ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      } else if (!connectDots) {
-        ctx.arc(
-          d.x * screenScale,
-          d.y * screenScale,
-          dotThickness,
-          0,
-          2 * Math.PI,
-          true
-        );
-        ctx.fill();
-        ctx.closePath();
+      if (showPointNumber) {
+        ctx.fillText(index.toString(), d.x, d.y);
       }
+
+      connectDots
+        ? drawDotsConnected(dotsToDraw, index, dotsToDrawLength, ctx)
+        : drawDots(ctx, d, screenScale, dotThickness);
     }
   };
 
@@ -203,6 +234,46 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     }, []);
   };
 
+  function drawDots(
+    ctx: CanvasRenderingContext2D,
+    d: Point,
+    screenScale: number,
+    dotThickness: number
+  ) {
+    ctx.arc(
+      d.x * screenScale,
+      d.y * screenScale,
+      dotThickness,
+      0,
+      2 * Math.PI,
+      true
+    );
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  function drawDotsConnected(
+    dotsToDraw: Point[],
+    index: number,
+    dotsToDrawLength: number,
+    ctx: CanvasRenderingContext2D
+  ) {
+    const currentCoordinates = dotsToDraw[index];
+    if (index === dotsToDrawLength - 1) {
+      const firstCoordinates = dotsToDraw[0];
+      ctx.moveTo(currentCoordinates.x, currentCoordinates.y);
+      ctx.lineTo(firstCoordinates.x, firstCoordinates.y);
+    } else {
+      const nextCoordinates = dotsToDraw[index + 1];
+      ctx.moveTo(currentCoordinates.x, currentCoordinates.y);
+      ctx.lineTo(nextCoordinates.x, nextCoordinates.y);
+    }
+
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
   function polygonize(path: any, numPoints: any) {
     //Thank you Noah!! http://bl.ocks.org/veltman/fc96dddae1711b3d756e0a13e7f09f24
 
@@ -220,9 +291,39 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     }, 0);
   };
 
+  const style = {
+    position: "absolute" as "absolute",
+    top: "20%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "90%",
+    bgcolor: "background.paper",
+    borderRadius: "2px",
+    boxShadow: 24,
+    p: 4,
+  };
+
   return (
     <Grid container spacing={3} style={{ width: "50%" }}>
       <Grid item style={{ width: "100%" }}>
+        <div>
+          <Button onClick={() => setShowToLaserProjector(true)}>
+            Project with laser
+          </Button>
+          <Modal
+            open={showToLaserProjector}
+            onClose={() => setShowToLaserProjector(false)}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              <ToLaserProjector />
+            </Box>
+          </Modal>
+        </div>
+
+        <Divider />
+        <br />
         <FormControl style={{ width: "100%" }}>
           <FormLabel htmlFor="svg-scale">Scale</FormLabel>
           <Slider
@@ -327,6 +428,15 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
               />
             }
             label="Connect dots"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={showPointNumber}
+                onChange={(e) => setShowPointNumber(e.target.checked)}
+              />
+            }
+            label="Show point number"
           />
         </FormGroup>
       </Grid>

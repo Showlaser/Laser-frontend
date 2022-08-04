@@ -4,7 +4,7 @@ import "./index.css";
 import CrudComponent from "components/shared/crud-component";
 import { deleteZone, playZone, saveZone } from "services/logic/zone-logic";
 import PointForm from "components/shared/point-form";
-import Modal from "components/modal";
+import Modal from "components/confirm-modal";
 import PointsDrawer from "components/shared/points-drawer";
 import { Grid, TextField, Button } from "@mui/material";
 import { deepClone, stringIsEmpty } from "services/shared/general";

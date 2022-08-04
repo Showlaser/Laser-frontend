@@ -1,5 +1,5 @@
 import { Button, Divider, TextField } from "@mui/material";
-import Modal from "components/modal";
+import Modal from "components/confirm-modal";
 import CrudComponent from "components/shared/crud-component";
 import { useState, React, useCallback } from "react";
 import {

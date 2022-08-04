@@ -7,7 +7,7 @@ import {
   Alert,
   LinearProgress,
 } from "@mui/material";
-import Modal from "components/modal";
+import Modal from "components/confirm-modal";
 import Loading from "components/shared/loading";
 import SideNav from "components/shared/sidenav";
 import { useCallback, useEffect, useState } from "react";

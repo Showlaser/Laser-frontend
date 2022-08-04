@@ -4,7 +4,7 @@ import AnimationTimeline from "./animation-timeline";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { deepClone, stringIsEmpty } from "services/shared/general";
 import { createGuid } from "services/shared/math";
-import Modal from "components/modal";
+import Modal from "components/confirm-modal";
 import PointsDrawer from "components/shared/points-drawer";
 
 export default function AnimationSection({
