@@ -2,24 +2,12 @@ import * as React from "react";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import { range } from "d3-array";
 import "./index.css";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormLabel,
-  Grid,
-  Input,
-  Modal,
-  Slider,
-  Typography,
-} from "@mui/material";
+import { Grid } from "@mui/material";
 import { Point } from "models/components/shared/svg-to-coordinates-converter";
-import { rotatePoint } from "services/shared/math";
-import ToLaserProjector from "components/to-laser-projector";
+import { createGuid, rotatePoint } from "services/shared/math";
+import ToLaserProjector from "components/shared/to-laser-projector";
+import TabSelector, { TabSelectorData } from "components/tabs";
+import GeneralSection from "./sections/general-section";
 const flattenSVG = require("flatten-svg");
 
 type Props = {
@@ -27,6 +15,7 @@ type Props = {
 };
 
 export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
+  const [uploadedFileName, setUploadedFileName] = React.useState<string>();
   const [rawSvg, setRawSvg] = React.useState<string | ArrayBuffer | null>();
   const [scale, setScale] = React.useState<number>(4);
   const [numberOfPoints, setNumberOfPoints] = React.useState<number>(200);
@@ -35,24 +24,15 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
   const [connectDots, setConnectDots] = React.useState<boolean>(false);
   const [showPointNumber, setShowPointNumber] = React.useState<boolean>(false);
   const [rotation, setRotation] = React.useState<number>(0);
-  const [showToLaserProjector, setShowToLaserProjector] =
-    React.useState<boolean>(false);
+  const [points, setPoints] = React.useState<Point[]>([]);
 
   React.useEffect(() => {
-    if (uploadedFile !== undefined) {
-      onFileUpload(uploadedFile);
-    }
-    setNewSvg(rawSvg);
-  }, [
-    scale,
-    numberOfPoints,
-    xOffset,
-    yOffset,
-    uploadedFile,
-    connectDots,
-    rotation,
-    showPointNumber,
-  ]);
+    onFileUpload(uploadedFile);
+  }, [uploadedFile, numberOfPoints]);
+
+  React.useEffect(() => {
+    onParametersChange();
+  }, [xOffset, yOffset, connectDots, rotation, showPointNumber, scale]);
 
   const onFileUpload = (file: File) => {
     if (file.type !== "image/svg+xml") {
@@ -64,61 +44,67 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     reader.onload = function () {
       const result = reader.result;
       setRawSvg(result);
-      setNewSvg(result);
+      const convertedPoints = svgToPoints(result);
+      setPoints(convertedPoints);
+      drawPointsOnCanvas(convertedPoints);
+      setUploadedFileName(file.name);
     };
 
     reader.readAsText(file);
   };
 
-  const setNewSvg = (svg: any) => {
+  const onParametersChange = () => drawPointsOnCanvas(points);
+
+  const svgToPoints = (svg: any): Point[] => {
     if (!svg) {
       if (!rawSvg) {
-        return;
+        return [];
       }
 
       svg = rawSvg;
     }
 
     const pathsOnly = pathologize(svg);
-
     let newDiv = document.createElement("div");
     newDiv.innerHTML = pathsOnly;
 
     let paths: any = newDiv?.getElementsByTagName("path");
     if (paths.length === 0) {
       showError(toastSubject.invalidFile);
-      return;
+      return [];
     }
 
     const coordinates = pathsToCoords(paths);
     const mappedPoints = mapCoordinatesToXAndYPoint(coordinates);
-    console.log(mappedPoints);
-    const points = placePointsInCanvas(mappedPoints);
-    console.log(points);
-
-    drawDotsOnCanvas(mappedPoints);
+    return placePointsInsideCanvas(mappedPoints);
   };
+
+  const createPoint = (x: number, y: number, orderNr: number): Point => ({
+    uuid: createGuid(),
+    colorRgb: "#ffffff",
+    connectedToPointUuid: null,
+    orderNr: orderNr,
+    x,
+    y,
+  });
 
   const mapCoordinatesToXAndYPoint = (coordinates: any): Point[] => {
     const length = coordinates.length;
     const mappedCoordinates = new Array<Point>(length);
     for (let i = 0; i < length; i++) {
-      const x: number = coordinates[i][0] - 140;
-      const y: number = coordinates[i][1] - 150;
-      let rotatedPoint: Point = rotatePoint({ x, y }, rotation);
-      rotatedPoint.x += xOffset;
-      rotatedPoint.y += yOffset;
-      mappedCoordinates[i] = rotatedPoint;
+      const x: number = coordinates[i][0];
+      const y: number = coordinates[i][1];
+      mappedCoordinates[i] = createPoint(x, y, i);
     }
 
     return mappedCoordinates;
   };
 
-  const placePointsInCanvas = (points: Point[]): Point[] => {
+  const placePointsInsideCanvas = (pointsToPlaceInCanvas: Point[]): Point[] => {
     let lowestY: number = 0;
     let lowestX: number = 0;
 
-    points.forEach((point) => {
+    pointsToPlaceInCanvas.forEach((point) => {
       if (point.x < 0 || point.y < 0) {
         if (point.y < lowestY) {
           lowestY = point.y;
@@ -130,10 +116,10 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     });
 
     if (lowestY === 0 && lowestX === 0) {
-      return points;
+      return pointsToPlaceInCanvas;
     }
 
-    let centeredPoints: Point[] = [...points];
+    let centeredPoints: Point[] = [...pointsToPlaceInCanvas];
     centeredPoints.forEach((point) => {
       point.y -= lowestY;
       point.x -= lowestX;
@@ -169,7 +155,25 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     return ctx;
   };
 
-  const drawDotsOnCanvas = (dotsToDraw: Point[]) => {
+  const drawPointsOnCanvas = (dotsToDraw: Point[]) => {
+    const dotsToDrawLength = dotsToDraw.length;
+    let updatedPoints: Point[] = [];
+
+    for (let index = 0; index < dotsToDrawLength; index++) {
+      let rotatedPoint: Point = rotatePoint(
+        { ...dotsToDraw[index] },
+        rotation,
+        0,
+        0
+      );
+
+      rotatedPoint.x += xOffset;
+      rotatedPoint.y += yOffset;
+      rotatedPoint.x *= scale;
+      rotatedPoint.y *= scale;
+      updatedPoints.push(rotatedPoint);
+    }
+
     const screenScale = window.devicePixelRatio || 1;
     const canvas = document.getElementById("svg-canvas") as HTMLCanvasElement;
     const ctx = prepareCanvas(canvas);
@@ -177,12 +181,14 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
       return;
     }
 
-    const color: string = "#ffffff";
     const dotThickness: number = 2;
 
-    const dotsToDrawLength = dotsToDraw.length;
     for (let index = 0; index < dotsToDrawLength; index++) {
-      const d: Point = dotsToDraw[index];
+      const rotatedPoint = updatedPoints[index];
+      const color: string = rotatedPoint.colorRgb
+        ? rotatedPoint.colorRgb
+        : "#ffffff";
+
       ctx.fillStyle =
         color === "random"
           ? `rgb(${Math.round(Math.random() * 255)}, ${Math.round(
@@ -192,12 +198,12 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
       ctx.beginPath();
 
       if (showPointNumber) {
-        ctx.fillText(index.toString(), d.x, d.y);
+        ctx.fillText(index.toString(), rotatedPoint.x, rotatedPoint.y);
       }
 
       connectDots
-        ? drawDotsConnected(dotsToDraw, index, dotsToDrawLength, ctx)
-        : drawDots(ctx, d, screenScale, dotThickness);
+        ? drawDotsConnected(updatedPoints, index, dotsToDrawLength, ctx)
+        : drawDots(ctx, rotatedPoint, screenScale, dotThickness);
     }
   };
 
@@ -281,7 +287,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
 
     return range(numPoints).map(function (i: any) {
       const point = path.getPointAtLength((length * i) / numPoints);
-      return [point.x * scale, point.y * scale];
+      return [point.x, point.y];
     });
   }
 
@@ -291,154 +297,42 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     }, 0);
   };
 
-  const style = {
-    position: "absolute" as "absolute",
-    top: "20%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "90%",
-    bgcolor: "background.paper",
-    borderRadius: "2px",
-    boxShadow: 24,
-    p: 4,
-  };
+  const tabSelectorData: TabSelectorData[] = [
+    {
+      tabName: "General",
+      tabChildren: (
+        <GeneralSection
+          scale={scale}
+          setScale={setScale}
+          numberOfPoints={numberOfPoints}
+          setNumberOfPoints={setNumberOfPoints}
+          xOffset={xOffset}
+          setXOffset={setXOffset}
+          yOffset={yOffset}
+          setYOffset={setYOffset}
+          rotation={rotation}
+          setRotation={setRotation}
+          connectDots={connectDots}
+          setConnectDots={setConnectDots}
+          showPointNumber={showPointNumber}
+          setShowPointNumber={setShowPointNumber}
+        />
+      ),
+    },
+    {
+      tabName: "Points",
+      tabChildren: <h1>Points</h1>,
+    },
+    {
+      tabName: "Send to laser",
+      tabChildren: <ToLaserProjector />,
+    },
+  ];
 
   return (
     <Grid container spacing={3} style={{ width: "50%" }}>
       <Grid item style={{ width: "100%" }}>
-        <div>
-          <Button onClick={() => setShowToLaserProjector(true)}>
-            Project with laser
-          </Button>
-          <Modal
-            open={showToLaserProjector}
-            onClose={() => setShowToLaserProjector(false)}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <Box sx={style}>
-              <ToLaserProjector />
-            </Box>
-          </Modal>
-        </div>
-
-        <Divider />
-        <br />
-        <FormControl style={{ width: "100%" }}>
-          <FormLabel htmlFor="svg-scale">Scale</FormLabel>
-          <Slider
-            id="svg-scale"
-            size="small"
-            value={scale}
-            onChange={(e, value) => setScale(Number(value))}
-            min={1}
-            max={10}
-            aria-label="Small"
-            valueLabelDisplay="auto"
-          />
-        </FormControl>
-        <br />
-        <FormLabel htmlFor="svg-points">Number of points</FormLabel>
-        <br />
-        <Input
-          type="number"
-          value={numberOfPoints}
-          onChange={(e) => setNumberOfPoints(Number(e.target.value))}
-        />
-        <br />
-        <FormControl style={{ width: "100%" }}>
-          <Slider
-            id="svg-points"
-            size="small"
-            value={numberOfPoints}
-            onChange={(e, value) => setNumberOfPoints(Number(value))}
-            min={1}
-            max={300}
-            aria-label="Small"
-            valueLabelDisplay="auto"
-          />
-        </FormControl>
-        <FormLabel htmlFor="svg-points">X offset</FormLabel>
-        <br />
-        <Input
-          type="number"
-          value={xOffset}
-          onChange={(e) => setXOffset(Number(e.target.value))}
-        />
-        <br />
-        <FormControl style={{ width: "100%" }}>
-          <Slider
-            id="svg-points"
-            size="small"
-            value={xOffset}
-            onChange={(e, value) => setXOffset(Number(value))}
-            min={-500}
-            max={500}
-            aria-label="Small"
-            valueLabelDisplay="auto"
-          />
-        </FormControl>
-        <FormLabel htmlFor="svg-points">Y offset</FormLabel>
-        <br />
-        <Input
-          type="number"
-          value={yOffset}
-          onChange={(e) => setYOffset(Number(e.target.value))}
-        />
-        <br />
-        <FormControl style={{ width: "100%" }}>
-          <Slider
-            id="svg-points"
-            size="small"
-            value={yOffset}
-            onChange={(e, value) => setYOffset(Number(value))}
-            min={-500}
-            max={500}
-            aria-label="Small"
-            valueLabelDisplay="auto"
-            marks={[{ value: 0, label: "0" }]}
-          />
-        </FormControl>
-        <FormLabel htmlFor="svg-points">Rotation</FormLabel>
-        <br />
-        <Input
-          type="number"
-          value={rotation}
-          onChange={(e) => setRotation(Number(e.target.value))}
-        />
-        <br />
-        <FormControl style={{ width: "100%" }}>
-          <Slider
-            id="svg-points"
-            size="small"
-            value={rotation}
-            onChange={(e, value) => setRotation(Number(value))}
-            min={-360}
-            max={360}
-            aria-label="Small"
-            valueLabelDisplay="auto"
-          />
-        </FormControl>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={connectDots}
-                onChange={(e) => setConnectDots(e.target.checked)}
-              />
-            }
-            label="Connect dots"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={showPointNumber}
-                onChange={(e) => setShowPointNumber(e.target.checked)}
-              />
-            }
-            label="Show point number"
-          />
-        </FormGroup>
+        <TabSelector data={tabSelectorData} />
       </Grid>
       <br />
       <div id="svg-canvas-container">

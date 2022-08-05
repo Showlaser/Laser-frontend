@@ -47,14 +47,21 @@ export const numberIsBetweenOrEqual = (
   return number >= min && number <= max;
 };
 
-export const rotatePoint = (point: Point, angle: number): Point => {
+export const rotatePoint = (
+  point: Point,
+  angle: number,
+  centerX: number,
+  centerY: number
+): Point => {
   var radians = (Math.PI / 180) * angle,
     cos = Math.cos(radians),
     sin = Math.sin(radians),
-    nx = cos * point.x + sin * point.y,
-    ny = cos * point.y - sin * point.x;
+    nx = cos * (point.x - centerX) + sin * (point.y - centerY) + centerX,
+    ny = cos * (point.y - centerY) - sin * (point.x - centerX) + centerY;
 
-  point.x = nx;
-  point.y = ny;
-  return point;
+  let clonedPoint: Point = { ...point };
+
+  clonedPoint.x = nx;
+  clonedPoint.y = ny;
+  return clonedPoint;
 };

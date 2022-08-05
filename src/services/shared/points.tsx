@@ -1,6 +1,6 @@
 import { createGuid } from "./math";
 
-export const getPointsPlaceHolder = (parentUuid, index) => {
+export const getPointsPlaceHolder = (parentUuid: string, index: number) => {
   return {
     uuid: createGuid(),
     patternUuid: parentUuid,

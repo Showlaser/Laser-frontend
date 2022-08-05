@@ -25,6 +25,8 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import "./index.css";
 import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
 import LogoutIcon from "@mui/icons-material/Logout";
+import FlareIcon from "@mui/icons-material/Flare";
+import { Tooltip } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -108,9 +110,19 @@ export default function SideNav({ children, pageName }: Props) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography
+            noWrap
+            variant="h6"
+            component="div"
+            style={{ marginRight: "5px" }}
+          >
             {pageName}
           </Typography>
+          {localStorage.getItem("lasers-are-playing") !== null ? (
+            <Tooltip title="Lasers are on">
+              <FlareIcon style={{ color: "red" }} />
+            </Tooltip>
+          ) : null}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -174,8 +186,12 @@ export default function SideNav({ children, pageName }: Props) {
               icon: <LogoutIcon />,
               path: paths.Logout,
             },
-          ].map((item) => (
-            <ListItem onClick={() => (window.location.href = item.path)} button>
+          ].map((item, index) => (
+            <ListItem
+              onClick={() => (window.location.href = item.path)}
+              button
+              key={`side-nav-list-item-${index}`}
+            >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.title} />
             </ListItem>
