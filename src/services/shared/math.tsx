@@ -56,8 +56,8 @@ export const rotatePoint = (
   var radians = (Math.PI / 180) * angle,
     cos = Math.cos(radians),
     sin = Math.sin(radians),
-    nx = cos * (point.x - centerX) + sin * (point.y - centerY) + centerX,
-    ny = cos * (point.y - centerY) - sin * (point.x - centerX) + centerY;
+    nx = (cos * (point.x - centerX)) + (sin * (point.y - centerY)) + centerX,
+    ny = (cos * (point.y - centerY)) - (sin * (point.x - centerX)) + centerY;
 
   let clonedPoint: Point = { ...point };
 

@@ -1,67 +1,66 @@
 import "./index.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SideNav from "components/shared/sidenav";
-import TemporaryDrawer from "components/shared/drawer";
-import {
-  IconButton,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
+import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+import { Box, SpeedDial, SpeedDialAction } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
+import ClearIcon from "@mui/icons-material/Clear";
 import SvgToCoordinatesConverter from "components/svg-to-coordinates-converter";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 export default function PatternPage() {
-  const [uploadedFile, setUploadedFiles] = useState<any>();
-  const [forceCloseDrawer, setForceCloseDrawer] = useState<boolean>(false);
+  const [uploadedFile, setUploadedFile] = useState<any>();
 
   return (
     <SideNav pageName="Pattern editor">
-      <TemporaryDrawer
-        forceClose={forceCloseDrawer}
-        location="bottom"
-        button={
-          <IconButton>
-            <MenuIcon />
-          </IconButton>
-        }
-      >
-        <span>
-          <input
-            hidden
-            id="raised-button-file"
-            type="file"
-            accept="image/svg+xml"
-            onChange={(e) => {
-              if (e?.target?.files === null) {
-                return;
-              }
-
-              setUploadedFiles(e.target.files[0]);
-              setForceCloseDrawer(true);
-            }}
-          />
-          <label htmlFor="raised-button-file">
-            <ListItem button key={"file-button"}>
-              <ListItemIcon>
-                <AttachFileIcon />
-              </ListItemIcon>
-              <ListItemText primary="Import from local file" />
-            </ListItem>
-          </label>
-        </span>
-      </TemporaryDrawer>
-      <br />
-      {uploadedFile === undefined ? (
-        <div>
-          <ArrowUpwardIcon />
-          <p>No file selected! Click the menu above to select a pattern.</p>
-        </div>
-      ) : (
+      {uploadedFile === undefined ? null : (
         <SvgToCoordinatesConverter uploadedFile={uploadedFile} />
       )}
+      <Box>
+        <input
+          hidden
+          id="raised-button-file"
+          type="file"
+          key={uploadedFile?.name}
+          accept="image/svg+xml"
+          onChange={(e) => {
+            if (e?.target?.files === null) {
+              return;
+            }
+
+            setUploadedFile(e.target.files[0]);
+          }}
+        />
+        <SpeedDial
+          ariaLabel="SpeedDial basic example"
+          sx={{ position: "absolute", bottom: 30, right: 30 }}
+          icon={
+            uploadedFile === undefined ? <SpeedDialIcon /> : <SettingsIcon />
+          }
+        >
+          {uploadedFile === undefined ? (
+            <SpeedDialAction
+              key="sd-upload"
+              icon={
+                <label
+                  htmlFor="raised-button-file"
+                  style={{ cursor: "pointer", padding: "25px" }}
+                >
+                  <AttachFileIcon style={{ marginTop: "8px" }} />
+                </label>
+              }
+              tooltipTitle="Upload local file"
+            />
+          ) : (
+            <SpeedDialAction
+              key="sd-upload-clear"
+              icon={<ClearIcon />}
+              onClick={() => setUploadedFile(undefined)}
+              tooltipTitle="Clear editor field"
+            />
+          )}
+        </SpeedDial>
+      </Box>
     </SideNav>
   );
 }

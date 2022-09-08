@@ -163,8 +163,8 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
       let rotatedPoint: Point = rotatePoint(
         { ...dotsToDraw[index] },
         rotation,
-        0,
-        0
+        xOffset,
+        yOffset
       );
 
       rotatedPoint.x += xOffset;

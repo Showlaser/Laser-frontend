@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  Button,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -41,11 +42,12 @@ export default function GeneralSection({
   setConnectDots,
   showPointNumber,
   setShowPointNumber,
-}: GeneralSectionProps) {
+}: GeneralSectionProps) {  
   return (
     <div>
       <FormControl style={{ width: "100%" }}>
-        <FormLabel htmlFor="svg-scale">Scale</FormLabel>
+        <FormLabel htmlFor="svg-scale">Scale<Button style={{marginLeft: "10px"}} onClick={() => setScale(4)}>Reset</Button>
+      </FormLabel>
         <Slider
           id="svg-scale"
           size="small"
@@ -59,7 +61,7 @@ export default function GeneralSection({
         />
       </FormControl>
       <br />
-      <FormLabel htmlFor="svg-points">Number of points</FormLabel>
+      <FormLabel htmlFor="svg-points">Number of points<Button style={{marginLeft: "10px"}} onClick={() => setNumberOfPoints(200)}>Reset</Button></FormLabel>
       <br />
       <Input
         type="number"
@@ -79,7 +81,7 @@ export default function GeneralSection({
           valueLabelDisplay="auto"
         />
       </FormControl>
-      <FormLabel htmlFor="svg-points">X offset</FormLabel>
+      <FormLabel htmlFor="svg-points">X offset<Button style={{marginLeft: "10px"}} onClick={() => setXOffset(0)}>Reset</Button></FormLabel>
       <br />
       <Input
         type="number"
@@ -99,7 +101,7 @@ export default function GeneralSection({
           valueLabelDisplay="auto"
         />
       </FormControl>
-      <FormLabel htmlFor="svg-points">Y offset</FormLabel>
+      <FormLabel htmlFor="svg-points">Y offset<Button style={{marginLeft: "10px"}} onClick={() => setYOffset(0)}>Reset</Button></FormLabel>
       <br />
       <Input
         type="number"
@@ -120,7 +122,7 @@ export default function GeneralSection({
           marks={[{ value: 0, label: "0" }]}
         />
       </FormControl>
-      <FormLabel htmlFor="svg-points">Rotation</FormLabel>
+      <FormLabel htmlFor="svg-points">Rotation<Button style={{marginLeft: "10px"}} onClick={() => setRotation(0)}>Reset</Button></FormLabel>
       <br />
       <Input
         type="number"
