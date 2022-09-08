@@ -78,14 +78,14 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
       setRawSvg(result);
       const convertedPoints = svgToPoints(result);
       setPoints(convertedPoints);
-      drawPointsOnCanvas(convertedPoints);
+      drawOnCanvas(convertedPoints);
       setUploadedFileName(file.name);
     };
 
     reader.readAsText(file);
   };
 
-  const onParametersChange = () => drawPointsOnCanvas(points);
+  const onParametersChange = () => drawOnCanvas(points);
 
   const svgToPoints = (svg: any): Point[] => {
     if (!svg) {
@@ -107,14 +107,13 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     }
 
     const coordinates = pathsToCoords(paths);
-    const mappedPoints = mapCoordinatesToXAndYPoint(coordinates);
-    return placePointsInsideCanvas(mappedPoints);
+    return mapCoordinatesToXAndYPoint(coordinates);
   };
 
   const createPoint = (x: number, y: number, orderNr: number): Point => ({
     uuid: createGuid(),
     colorRgb: "#ffffff",
-    connectedToPointUuid: null,
+    connectedToPointOrderNr: null,
     orderNr: orderNr,
     x,
     y,
@@ -130,34 +129,6 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     }
 
     return mappedCoordinates;
-  };
-
-  const placePointsInsideCanvas = (pointsToPlaceInCanvas: Point[]): Point[] => {
-    let lowestY: number = 0;
-    let lowestX: number = 0;
-
-    pointsToPlaceInCanvas.forEach((point) => {
-      if (point.x < 0 || point.y < 0) {
-        if (point.y < lowestY) {
-          lowestY = point.y;
-        }
-        if (point.x < lowestX) {
-          lowestX = point.x;
-        }
-      }
-    });
-
-    if (lowestY === 0 && lowestX === 0) {
-      return pointsToPlaceInCanvas;
-    }
-
-    let centeredPoints: Point[] = [...pointsToPlaceInCanvas];
-    centeredPoints.forEach((point) => {
-      point.y -= lowestY;
-      point.x -= lowestX;
-    });
-
-    return centeredPoints;
   };
 
   const prepareCanvas = (
@@ -187,10 +158,15 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     return ctx;
   };
 
-  const drawPointsOnCanvas = (dotsToDraw: Point[]) => {
-    const dotsToDrawLength = dotsToDraw.length;
+  const applySettingsToPoints = (
+    dotsToDrawLength: number,
+    dotsToDraw: Point[],
+    rotation: number,
+    xOffset: number,
+    yOffset: number,
+    scale: number
+  ) => {
     let updatedPoints: Point[] = [];
-
     for (let index = 0; index < dotsToDrawLength; index++) {
       let rotatedPoint: Point = rotatePoint(
         { ...dotsToDraw[index] },
@@ -205,6 +181,19 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
       rotatedPoint.y *= scale;
       updatedPoints.push(rotatedPoint);
     }
+    return updatedPoints;
+  };
+
+  const drawOnCanvas = (dotsToDraw: Point[]) => {
+    const dotsToDrawLength = dotsToDraw.length;
+    let updatedPoints: Point[] = applySettingsToPoints(
+      dotsToDrawLength,
+      dotsToDraw,
+      rotation,
+      xOffset,
+      yOffset,
+      scale
+    );
 
     const screenScale = window.devicePixelRatio || 1;
     const canvas = document.getElementById("svg-canvas") as HTMLCanvasElement;
@@ -214,24 +203,26 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     }
 
     const dotThickness: number = 2;
-
     for (let index = 0; index < dotsToDrawLength; index++) {
       const rotatedPoint = updatedPoints[index];
-      const color: string = rotatedPoint.colorRgb
+      const pointIsHighlighted = selectedPointsUuid.some(
+        (sp) => sp === rotatedPoint.uuid
+      );
+
+      let color: string = rotatedPoint.colorRgb
         ? rotatedPoint.colorRgb
         : "#ffffff";
 
+      if (pointIsHighlighted) {
+        color = "#4287f5";
+      }
+
       ctx.font = "10px sans-serif";
-      ctx.fillStyle =
-        color === "random"
-          ? `rgb(${Math.round(Math.random() * 255)}, ${Math.round(
-              Math.random() * 255
-            )}, ${Math.round(Math.random() * 255)})`
-          : color;
+      ctx.fillStyle = color;
       ctx.beginPath();
 
       if (showPointNumber) {
-        if (selectedPointsUuid.some((sp) => sp === rotatedPoint.uuid)) {
+        if (pointIsHighlighted) {
           ctx.font = "20px sans-serif";
           ctx.fillStyle = "#4287f5";
         }

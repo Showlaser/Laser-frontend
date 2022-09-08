@@ -1,10 +1,5 @@
 import * as React from "react";
 import {
-  Box,
-  Button,
-  ButtonGroup,
-  TextField,
-  Typography,
   List,
   ListItem,
   ListItemButton,
@@ -12,8 +7,16 @@ import {
   Checkbox,
   ListItemText,
 } from "@mui/material";
-import SelectList from "components/select-list";
 import { SectionProps } from "components/svg-to-coordinates-converter";
+import {
+  DataGrid,
+  GridCellEditStopParams,
+  GridCellEditStopReasons,
+  GridColDef,
+  GridRowEditStopParams,
+  GridRowEditStopReasons,
+  MuiEvent,
+} from "@mui/x-data-grid";
 
 export default function PointsSection({
   scale,
@@ -34,52 +37,48 @@ export default function PointsSection({
   selectedPointsUuid,
   setSelectedPointsUuid,
 }: SectionProps) {
-  const [checked, setChecked] = React.useState<string[]>(selectedPointsUuid);
+  const columns: GridColDef[] = [
+    { field: "order", headerName: "Point", width: 70 },
+    { field: "colorRgb", headerName: "Color Rgb", width: 130 },
+    {
+      field: "connectedTo",
+      headerName: "Connected to point",
+      width: 200,
+      editable: true,
+      type: "singleSelect",
+      valueOptions: points.map((point) => `Point ${point.orderNr}`),
+    },
+  ];
 
-  const handleToggle = (uuid: string) => () => {
-    const currentIndex = checked.findIndex((c) => c === uuid);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(uuid);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
-    setSelectedPointsUuid(newChecked);
-  };
+  const rows = points.map((point) => ({
+    id: point.uuid,
+    uuid: point.uuid,
+    order: point.orderNr,
+    color: point.colorRgb,
+    connectedTo:
+      point.connectedToPointOrderNr === null
+        ? null
+        : `Point ${point.connectedToPointOrderNr}`,
+  }));
 
   return (
-    <div>
-      <List style={{ overflowY: "scroll", maxHeight: "50vh" }}>
-        {points.map((point) => (
-          <ListItem key={point.uuid} disablePadding>
-            <ListItemButton
-              disabled={false}
-              role={undefined}
-              onClick={handleToggle(point.uuid)}
-              dense
-            >
-              <ListItemIcon>
-                <Checkbox
-                  edge="start"
-                  checked={checked.some((c) => c === point.uuid)}
-                  tabIndex={-1}
-                  disableRipple
-                  inputProps={{
-                    "aria-labelledby": `checkbox-list-label-${point.uuid}`,
-                  }}
-                />
-              </ListItemIcon>
-              <ListItemText
-                id={`checkbox-list-label-${point.uuid}`}
-                primary={`Point ${point.orderNr}`}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+    <div style={{ height: 400, width: "100%" }}>
+      <DataGrid
+        onCellEditCommit={(params: any) => {
+          console.log(params);
+        }}
+        checkboxSelection
+        disableSelectionOnClick
+        selectionModel={selectedPointsUuid}
+        onSelectionModelChange={(ids) => {
+          console.log(ids);
+          setSelectedPointsUuid(ids.map((id) => id.toString()));
+        }}
+        rows={rows}
+        columns={columns}
+        pageSize={100}
+        rowsPerPageOptions={[100]}
+      />
     </div>
   );
 }

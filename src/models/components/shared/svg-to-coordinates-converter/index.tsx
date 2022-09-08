@@ -1,7 +1,7 @@
 export type Point = {
   uuid: string;
   colorRgb: string;
-  connectedToPointUuid: string | null;
+  connectedToPointOrderNr: number | null;
   orderNr: number;
   x: number;
   y: number;
