@@ -3,6 +3,7 @@ import { Box, Button, ButtonGroup, TextField, Typography } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import SelectList from "components/select-list";
+import { SectionProps } from "components/svg-to-coordinates-converter";
 
 type Laser = {
   name: string;
@@ -10,7 +11,22 @@ type Laser = {
   online: boolean;
 };
 
-export default function ToLaserProjector() {
+export default function ToLaserProjector({
+  scale,
+  setScale,
+  numberOfPoints,
+  setNumberOfPoints,
+  xOffset,
+  setXOffset,
+  yOffset,
+  setYOffset,
+  rotation,
+  setRotation,
+  connectDots,
+  setConnectDots,
+  showPointNumber,
+  setShowPointNumber,
+}: SectionProps) {
   const [isPlaying, setIsPlaying] = React.useState<boolean>(
     localStorage.getItem("lasers-are-playing") !== null
   );

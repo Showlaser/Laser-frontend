@@ -1,31 +1,19 @@
 import * as React from "react";
 import {
+  Box,
+  Button,
+  ButtonGroup,
+  TextField,
+  Typography,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
   Checkbox,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormLabel,
-  Input,
-  Slider,
+  ListItemText,
 } from "@mui/material";
 import SelectList from "components/select-list";
-
-type GeneralSectionProps = {
-  scale: number;
-  setScale: (value: number) => void;
-  numberOfPoints: number;
-  setNumberOfPoints: (value: number) => void;
-  xOffset: number;
-  setXOffset: (value: number) => void;
-  yOffset: number;
-  setYOffset: (value: number) => void;
-  rotation: number;
-  setRotation: (value: number) => void;
-  connectDots: boolean;
-  setConnectDots: (value: boolean) => void;
-  showPointNumber: boolean;
-  setShowPointNumber: (value: boolean) => void;
-};
+import { SectionProps } from "components/svg-to-coordinates-converter";
 
 export default function PointsSection({
   scale,
@@ -42,6 +30,56 @@ export default function PointsSection({
   setConnectDots,
   showPointNumber,
   setShowPointNumber,
-}: GeneralSectionProps) {
-  return <div></div>;
+  points,
+  selectedPointsUuid,
+  setSelectedPointsUuid,
+}: SectionProps) {
+  const [checked, setChecked] = React.useState<string[]>(selectedPointsUuid);
+
+  const handleToggle = (uuid: string) => () => {
+    const currentIndex = checked.findIndex((c) => c === uuid);
+    const newChecked = [...checked];
+
+    if (currentIndex === -1) {
+      newChecked.push(uuid);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
+    setChecked(newChecked);
+    setSelectedPointsUuid(newChecked);
+  };
+
+  return (
+    <div>
+      <List style={{ overflowY: "scroll", maxHeight: "50vh" }}>
+        {points.map((point) => (
+          <ListItem key={point.uuid} disablePadding>
+            <ListItemButton
+              disabled={false}
+              role={undefined}
+              onClick={handleToggle(point.uuid)}
+              dense
+            >
+              <ListItemIcon>
+                <Checkbox
+                  edge="start"
+                  checked={checked.some((c) => c === point.uuid)}
+                  tabIndex={-1}
+                  disableRipple
+                  inputProps={{
+                    "aria-labelledby": `checkbox-list-label-${point.uuid}`,
+                  }}
+                />
+              </ListItemIcon>
+              <ListItemText
+                id={`checkbox-list-label-${point.uuid}`}
+                primary={`Point ${point.orderNr}`}
+              />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </div>
+  );
 }

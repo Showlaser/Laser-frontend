@@ -9,23 +9,7 @@ import {
   Input,
   Slider,
 } from "@mui/material";
-
-type GeneralSectionProps = {
-  scale: number;
-  setScale: (value: number) => void;
-  numberOfPoints: number;
-  setNumberOfPoints: (value: number) => void;
-  xOffset: number;
-  setXOffset: (value: number) => void;
-  yOffset: number;
-  setYOffset: (value: number) => void;
-  rotation: number;
-  setRotation: (value: number) => void;
-  connectDots: boolean;
-  setConnectDots: (value: boolean) => void;
-  showPointNumber: boolean;
-  setShowPointNumber: (value: boolean) => void;
-};
+import { SectionProps } from "components/svg-to-coordinates-converter";
 
 export default function GeneralSection({
   scale,
@@ -42,12 +26,16 @@ export default function GeneralSection({
   setConnectDots,
   showPointNumber,
   setShowPointNumber,
-}: GeneralSectionProps) {  
+}: SectionProps) {
   return (
     <div>
       <FormControl style={{ width: "100%" }}>
-        <FormLabel htmlFor="svg-scale">Scale<Button style={{marginLeft: "10px"}} onClick={() => setScale(4)}>Reset</Button>
-      </FormLabel>
+        <FormLabel htmlFor="svg-scale">
+          Scale
+          <Button style={{ marginLeft: "10px" }} onClick={() => setScale(4)}>
+            Reset
+          </Button>
+        </FormLabel>
         <Slider
           id="svg-scale"
           size="small"
@@ -61,7 +49,15 @@ export default function GeneralSection({
         />
       </FormControl>
       <br />
-      <FormLabel htmlFor="svg-points">Number of points<Button style={{marginLeft: "10px"}} onClick={() => setNumberOfPoints(200)}>Reset</Button></FormLabel>
+      <FormLabel htmlFor="svg-points">
+        Number of points
+        <Button
+          style={{ marginLeft: "10px" }}
+          onClick={() => setNumberOfPoints(200)}
+        >
+          Reset
+        </Button>
+      </FormLabel>
       <br />
       <Input
         type="number"
@@ -81,7 +77,12 @@ export default function GeneralSection({
           valueLabelDisplay="auto"
         />
       </FormControl>
-      <FormLabel htmlFor="svg-points">X offset<Button style={{marginLeft: "10px"}} onClick={() => setXOffset(0)}>Reset</Button></FormLabel>
+      <FormLabel htmlFor="svg-points">
+        X offset
+        <Button style={{ marginLeft: "10px" }} onClick={() => setXOffset(0)}>
+          Reset
+        </Button>
+      </FormLabel>
       <br />
       <Input
         type="number"
@@ -101,7 +102,12 @@ export default function GeneralSection({
           valueLabelDisplay="auto"
         />
       </FormControl>
-      <FormLabel htmlFor="svg-points">Y offset<Button style={{marginLeft: "10px"}} onClick={() => setYOffset(0)}>Reset</Button></FormLabel>
+      <FormLabel htmlFor="svg-points">
+        Y offset
+        <Button style={{ marginLeft: "10px" }} onClick={() => setYOffset(0)}>
+          Reset
+        </Button>
+      </FormLabel>
       <br />
       <Input
         type="number"
@@ -122,7 +128,12 @@ export default function GeneralSection({
           marks={[{ value: 0, label: "0" }]}
         />
       </FormControl>
-      <FormLabel htmlFor="svg-points">Rotation<Button style={{marginLeft: "10px"}} onClick={() => setRotation(0)}>Reset</Button></FormLabel>
+      <FormLabel htmlFor="svg-points">
+        Rotation
+        <Button style={{ marginLeft: "10px" }} onClick={() => setRotation(0)}>
+          Reset
+        </Button>
+      </FormLabel>
       <br />
       <Input
         type="number"

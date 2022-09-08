@@ -8,7 +8,28 @@ import { createGuid, rotatePoint } from "services/shared/math";
 import ToLaserProjector from "components/shared/to-laser-projector";
 import TabSelector, { TabSelectorData } from "components/tabs";
 import GeneralSection from "./sections/general-section";
+import PointsSection from "./sections/points-section";
 const flattenSVG = require("flatten-svg");
+
+export interface SectionProps {
+  scale: number;
+  setScale: (value: number) => void;
+  numberOfPoints: number;
+  setNumberOfPoints: (value: number) => void;
+  xOffset: number;
+  setXOffset: (value: number) => void;
+  yOffset: number;
+  setYOffset: (value: number) => void;
+  rotation: number;
+  setRotation: (value: number) => void;
+  connectDots: boolean;
+  setConnectDots: (value: boolean) => void;
+  showPointNumber: boolean;
+  setShowPointNumber: (value: boolean) => void;
+  points: Point[];
+  selectedPointsUuid: string[];
+  setSelectedPointsUuid: (value: string[]) => void;
+}
 
 type Props = {
   uploadedFile: File;
@@ -25,6 +46,9 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
   const [showPointNumber, setShowPointNumber] = React.useState<boolean>(false);
   const [rotation, setRotation] = React.useState<number>(0);
   const [points, setPoints] = React.useState<Point[]>([]);
+  const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>(
+    []
+  );
 
   React.useEffect(() => {
     onFileUpload(uploadedFile);
@@ -32,7 +56,15 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
 
   React.useEffect(() => {
     onParametersChange();
-  }, [xOffset, yOffset, connectDots, rotation, showPointNumber, scale]);
+  }, [
+    xOffset,
+    yOffset,
+    connectDots,
+    rotation,
+    showPointNumber,
+    scale,
+    selectedPointsUuid,
+  ]);
 
   const onFileUpload = (file: File) => {
     if (file.type !== "image/svg+xml") {
@@ -189,6 +221,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
         ? rotatedPoint.colorRgb
         : "#ffffff";
 
+      ctx.font = "10px sans-serif";
       ctx.fillStyle =
         color === "random"
           ? `rgb(${Math.round(Math.random() * 255)}, ${Math.round(
@@ -198,6 +231,11 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
       ctx.beginPath();
 
       if (showPointNumber) {
+        if (selectedPointsUuid.some((sp) => sp === rotatedPoint.uuid)) {
+          ctx.font = "20px sans-serif";
+          ctx.fillStyle = "#4287f5";
+        }
+
         ctx.fillText(index.toString(), rotatedPoint.x, rotatedPoint.y);
       }
 
@@ -297,35 +335,38 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     }, 0);
   };
 
+  const sectionProps = {
+    scale,
+    setScale,
+    numberOfPoints,
+    setNumberOfPoints,
+    xOffset,
+    setXOffset,
+    yOffset,
+    setYOffset,
+    rotation,
+    setRotation,
+    connectDots,
+    setConnectDots,
+    showPointNumber,
+    setShowPointNumber,
+    points,
+    selectedPointsUuid,
+    setSelectedPointsUuid,
+  };
+
   const tabSelectorData: TabSelectorData[] = [
     {
       tabName: "General",
-      tabChildren: (
-        <GeneralSection
-          scale={scale}
-          setScale={setScale}
-          numberOfPoints={numberOfPoints}
-          setNumberOfPoints={setNumberOfPoints}
-          xOffset={xOffset}
-          setXOffset={setXOffset}
-          yOffset={yOffset}
-          setYOffset={setYOffset}
-          rotation={rotation}
-          setRotation={setRotation}
-          connectDots={connectDots}
-          setConnectDots={setConnectDots}
-          showPointNumber={showPointNumber}
-          setShowPointNumber={setShowPointNumber}
-        />
-      ),
+      tabChildren: <GeneralSection {...sectionProps} />,
     },
     {
       tabName: "Points",
-      tabChildren: <h1>Points</h1>,
+      tabChildren: <PointsSection {...sectionProps} />,
     },
     {
       tabName: "Send to laser",
-      tabChildren: <ToLaserProjector />,
+      tabChildren: <ToLaserProjector {...sectionProps} />,
     },
   ];
 
