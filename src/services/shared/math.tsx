@@ -1,7 +1,7 @@
 // MIN = Minimum expected value
 // MAX = Maximium expected value
 
-import { Point } from "models/components/shared/svg-to-coordinates-converter";
+import { Point } from "models/components/shared/point";
 
 // Function to normalise the values (MIN / MAX could be integrated)
 export const normalise = (value: number, min: number, max: number) =>
@@ -56,8 +56,8 @@ export const rotatePoint = (
   var radians = (Math.PI / 180) * angle,
     cos = Math.cos(radians),
     sin = Math.sin(radians),
-    nx = (cos * (point.x - centerX)) + (sin * (point.y - centerY)) + centerX,
-    ny = (cos * (point.y - centerY)) - (sin * (point.x - centerX)) + centerY;
+    nx = cos * (point.x - centerX) + sin * (point.y - centerY) + centerX,
+    ny = cos * (point.y - centerY) - sin * (point.x - centerX) + centerY;
 
   let clonedPoint: Point = { ...point };
 

@@ -1,22 +1,11 @@
 import * as React from "react";
-import {
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  Checkbox,
-  ListItemText,
-} from "@mui/material";
 import { SectionProps } from "components/svg-to-coordinates-converter";
 import {
   DataGrid,
-  GridCellEditStopParams,
-  GridCellEditStopReasons,
+  GridCellEditCommitParams,
   GridColDef,
-  GridRowEditStopParams,
-  GridRowEditStopReasons,
-  MuiEvent,
 } from "@mui/x-data-grid";
+import { Point } from "models/components/shared/point";
 
 export default function PointsSection({
   scale,
@@ -34,14 +23,44 @@ export default function PointsSection({
   showPointNumber,
   setShowPointNumber,
   points,
+  setPoints,
   selectedPointsUuid,
   setSelectedPointsUuid,
 }: SectionProps) {
+  const updatePointProperty = (
+    points: Point[],
+    params: GridCellEditCommitParams
+  ) => {
+    let updatedPoints: Point[] = [...points];
+    const pointToUpdateIndex: number = updatedPoints.findIndex(
+      (p: Point) => p.uuid === params.id
+    );
+
+    if (pointToUpdateIndex === -1) {
+      return;
+    }
+
+    switch (params.field) {
+      case "connectedToPointOrderNr":
+        const substringIndex = params.value.indexOf("Point") + 5;
+        updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = Number(
+          params.value.substring(substringIndex)
+        );
+        break;
+      case "colorRgb":
+        updatedPoints[pointToUpdateIndex].colorRgb = params.value;
+      default:
+        break;
+    }
+
+    setPoints(updatedPoints);
+  };
+
   const columns: GridColDef[] = [
     { field: "order", headerName: "Point", width: 70 },
     { field: "colorRgb", headerName: "Color Rgb", width: 130 },
     {
-      field: "connectedTo",
+      field: "connectedToPointOrderNr",
       headerName: "Connected to point",
       width: 200,
       editable: true,
@@ -55,7 +74,7 @@ export default function PointsSection({
     uuid: point.uuid,
     order: point.orderNr,
     color: point.colorRgb,
-    connectedTo:
+    connectedToPointOrderNr:
       point.connectedToPointOrderNr === null
         ? null
         : `Point ${point.connectedToPointOrderNr}`,
@@ -64,8 +83,9 @@ export default function PointsSection({
   return (
     <div style={{ height: 400, width: "100%" }}>
       <DataGrid
-        onCellEditCommit={(params: any) => {
+        onCellEditCommit={(params: GridCellEditCommitParams) => {
           console.log(params);
+          updatePointProperty(points, params);
         }}
         checkboxSelection
         disableSelectionOnClick

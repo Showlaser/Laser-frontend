@@ -3,7 +3,7 @@ import { showError, toastSubject } from "services/shared/toast-messages";
 import { range } from "d3-array";
 import "./index.css";
 import { Grid } from "@mui/material";
-import { Point } from "models/components/shared/svg-to-coordinates-converter";
+import { Point } from "models/components/shared/point";
 import { createGuid, rotatePoint } from "services/shared/math";
 import ToLaserProjector from "components/shared/to-laser-projector";
 import TabSelector, { TabSelectorData } from "components/tabs";
@@ -27,6 +27,7 @@ export interface SectionProps {
   showPointNumber: boolean;
   setShowPointNumber: (value: boolean) => void;
   points: Point[];
+  setPoints: (points: Point[]) => void;
   selectedPointsUuid: string[];
   setSelectedPointsUuid: (value: string[]) => void;
 }
@@ -342,6 +343,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     showPointNumber,
     setShowPointNumber,
     points,
+    setPoints,
     selectedPointsUuid,
     setSelectedPointsUuid,
   };
