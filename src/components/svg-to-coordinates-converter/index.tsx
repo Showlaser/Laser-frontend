@@ -8,7 +8,7 @@ import ToLaserProjector from "components/shared/to-laser-projector";
 import TabSelector, { TabSelectorData } from "components/tabs";
 import GeneralSection from "./sections/general-section";
 import PointsSection from "./sections/points-section";
-import { svgToPoints } from "services/logic/svg-to-coordinates-converter";
+import { prepareCanvas, svgToPoints } from "services/logic/svg-to-coordinates-converter";
 
 export interface SectionProps {
   scale: number;
@@ -73,31 +73,6 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     };
 
     reader.readAsText(file);
-  };
-
-  const prepareCanvas = (canvas: HTMLCanvasElement): CanvasRenderingContext2D | null => {
-    canvas.width = 650;
-    canvas.height = 650;
-    canvas.style.width = "650";
-    canvas.style.height = "650";
-    const ctx = canvas.getContext("2d");
-    if (ctx === null) {
-      return null;
-    }
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.moveTo(0, 300);
-    ctx.lineTo(600, 300);
-
-    ctx.strokeStyle = "#706f6f";
-    ctx.lineWidth = 0.1;
-    ctx.stroke();
-
-    ctx.moveTo(300, 0);
-    ctx.lineTo(300, 600);
-
-    ctx.stroke();
-    return ctx;
   };
 
   const applySettingsToPoints = (dotsToDrawLength: number, dotsToDraw: Point[]) => {

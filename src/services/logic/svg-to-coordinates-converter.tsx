@@ -89,3 +89,28 @@ const getTotalLengthAllPaths = (paths: HTMLCollection) => {
     return prev + curr.getTotalLength();
   }, 0);
 };
+
+export const prepareCanvas = (canvas: HTMLCanvasElement): CanvasRenderingContext2D | null => {
+  canvas.width = 650;
+  canvas.height = 650;
+  canvas.style.width = "650";
+  canvas.style.height = "650";
+  const ctx = canvas.getContext("2d");
+  if (ctx === null) {
+    return null;
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.moveTo(0, 300);
+  ctx.lineTo(600, 300);
+
+  ctx.strokeStyle = "#706f6f";
+  ctx.lineWidth = 0.1;
+  ctx.stroke();
+
+  ctx.moveTo(300, 0);
+  ctx.lineTo(300, 600);
+
+  ctx.stroke();
+  return ctx;
+};
