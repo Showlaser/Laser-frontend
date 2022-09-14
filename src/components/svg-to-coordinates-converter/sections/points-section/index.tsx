@@ -53,6 +53,7 @@ export default function PointsSection({
         break;
     }
 
+    console.log(updatedPoints);
     setPoints(updatedPoints);
   };
 
@@ -83,17 +84,15 @@ export default function PointsSection({
   return (
     <div style={{ height: 400, width: "100%" }}>
       <DataGrid
-        onCellEditCommit={(params: GridCellEditCommitParams) => {
-          console.log(params);
-          updatePointProperty(points, params);
-        }}
+        onCellEditCommit={(params: GridCellEditCommitParams) =>
+          updatePointProperty(points, params)
+        }
         checkboxSelection
         disableSelectionOnClick
         selectionModel={selectedPointsUuid}
-        onSelectionModelChange={(ids) => {
-          console.log(ids);
-          setSelectedPointsUuid(ids.map((id) => id.toString()));
-        }}
+        onSelectionModelChange={(ids) =>
+          setSelectedPointsUuid(ids.map((id) => id.toString()))
+        }
         rows={rows}
         columns={columns}
         pageSize={100}

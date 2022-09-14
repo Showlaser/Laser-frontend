@@ -1,6 +1,5 @@
 import * as React from "react";
 import { showError, toastSubject } from "services/shared/toast-messages";
-import { range } from "d3-array";
 import "./index.css";
 import { Grid } from "@mui/material";
 import { Point } from "models/components/shared/point";
@@ -9,7 +8,7 @@ import ToLaserProjector from "components/shared/to-laser-projector";
 import TabSelector, { TabSelectorData } from "components/tabs";
 import GeneralSection from "./sections/general-section";
 import PointsSection from "./sections/points-section";
-const flattenSVG = require("flatten-svg");
+import { svgToPoints } from "services/logic/svg-to-coordinates-converter";
 
 export interface SectionProps {
   scale: number;
@@ -47,25 +46,15 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
   const [showPointNumber, setShowPointNumber] = React.useState<boolean>(false);
   const [rotation, setRotation] = React.useState<number>(0);
   const [points, setPoints] = React.useState<Point[]>([]);
-  const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>(
-    []
-  );
+  const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     onFileUpload(uploadedFile);
   }, [uploadedFile, numberOfPoints]);
 
   React.useEffect(() => {
-    onParametersChange();
-  }, [
-    xOffset,
-    yOffset,
-    connectDots,
-    rotation,
-    showPointNumber,
-    scale,
-    selectedPointsUuid,
-  ]);
+    drawOnCanvas(points);
+  }, [xOffset, yOffset, connectDots, rotation, showPointNumber, scale, selectedPointsUuid]);
 
   const onFileUpload = (file: File) => {
     if (file.type !== "image/svg+xml") {
@@ -77,7 +66,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     reader.onload = function () {
       const result = reader.result;
       setRawSvg(result);
-      const convertedPoints = svgToPoints(result);
+      const convertedPoints = svgToPoints(result, numberOfPoints);
       setPoints(convertedPoints);
       drawOnCanvas(convertedPoints);
       setUploadedFileName(file.name);
@@ -86,55 +75,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     reader.readAsText(file);
   };
 
-  const onParametersChange = () => drawOnCanvas(points);
-
-  const svgToPoints = (svg: any): Point[] => {
-    if (!svg) {
-      if (!rawSvg) {
-        return [];
-      }
-
-      svg = rawSvg;
-    }
-
-    const pathsOnly = pathologize(svg);
-    let newDiv = document.createElement("div");
-    newDiv.innerHTML = pathsOnly;
-
-    let paths: any = newDiv?.getElementsByTagName("path");
-    if (paths.length === 0) {
-      showError(toastSubject.invalidFile);
-      return [];
-    }
-
-    const coordinates = pathsToCoords(paths);
-    return mapCoordinatesToXAndYPoint(coordinates);
-  };
-
-  const createPoint = (x: number, y: number, orderNr: number): Point => ({
-    uuid: createGuid(),
-    colorRgb: "#ffffff",
-    connectedToPointOrderNr: null,
-    orderNr: orderNr,
-    x,
-    y,
-  });
-
-  const mapCoordinatesToXAndYPoint = (coordinates: any): Point[] => {
-    const length = coordinates.length;
-    const mappedCoordinates = new Array<Point>(length);
-    for (let i = 0; i < length; i++) {
-      const x: number = coordinates[i][0];
-      const y: number = coordinates[i][1];
-      mappedCoordinates[i] = createPoint(x, y, i);
-    }
-
-    return mappedCoordinates;
-  };
-
-  const prepareCanvas = (
-    canvas: HTMLCanvasElement
-  ): CanvasRenderingContext2D | null => {
+  const prepareCanvas = (canvas: HTMLCanvasElement): CanvasRenderingContext2D | null => {
     canvas.width = 650;
     canvas.height = 650;
     canvas.style.width = "650";
@@ -159,22 +100,10 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     return ctx;
   };
 
-  const applySettingsToPoints = (
-    dotsToDrawLength: number,
-    dotsToDraw: Point[],
-    rotation: number,
-    xOffset: number,
-    yOffset: number,
-    scale: number
-  ) => {
+  const applySettingsToPoints = (dotsToDrawLength: number, dotsToDraw: Point[]) => {
     let updatedPoints: Point[] = [];
     for (let index = 0; index < dotsToDrawLength; index++) {
-      let rotatedPoint: Point = rotatePoint(
-        { ...dotsToDraw[index] },
-        rotation,
-        xOffset,
-        yOffset
-      );
+      let rotatedPoint: Point = rotatePoint({ ...dotsToDraw[index] }, rotation, xOffset, yOffset);
 
       rotatedPoint.x += xOffset;
       rotatedPoint.y += yOffset;
@@ -187,14 +116,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
 
   const drawOnCanvas = (dotsToDraw: Point[]) => {
     const dotsToDrawLength = dotsToDraw.length;
-    let updatedPoints: Point[] = applySettingsToPoints(
-      dotsToDrawLength,
-      dotsToDraw,
-      rotation,
-      xOffset,
-      yOffset,
-      scale
-    );
+    const updatedPoints: Point[] = applySettingsToPoints(dotsToDrawLength, dotsToDraw);
 
     const screenScale = window.devicePixelRatio || 1;
     const canvas = document.getElementById("svg-canvas") as HTMLCanvasElement;
@@ -203,97 +125,58 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
       return;
     }
 
-    const dotThickness: number = 2;
     for (let index = 0; index < dotsToDrawLength; index++) {
-      const rotatedPoint = updatedPoints[index];
-      const pointIsHighlighted = selectedPointsUuid.some(
-        (sp) => sp === rotatedPoint.uuid
-      );
-
-      let color: string = rotatedPoint.colorRgb
-        ? rotatedPoint.colorRgb
-        : "#ffffff";
-
-      if (pointIsHighlighted) {
-        color = "#4287f5";
-      }
-
-      ctx.font = "10px sans-serif";
-      ctx.fillStyle = color;
-      ctx.beginPath();
-
-      if (showPointNumber) {
-        if (pointIsHighlighted) {
-          ctx.font = "20px sans-serif";
-          ctx.fillStyle = "#4287f5";
-        }
-
-        ctx.fillText(index.toString(), rotatedPoint.x, rotatedPoint.y);
-      }
-
-      connectDots
-        ? drawDotsConnected(updatedPoints, index, dotsToDrawLength, ctx)
-        : drawDots(ctx, rotatedPoint, screenScale, dotThickness);
+      const point = updatedPoints[index];
+      const pointIsHighlighted = selectedPointsUuid.some((sp) => sp === point.uuid);
+      drawDot(ctx, point, pointIsHighlighted, index, updatedPoints, dotsToDrawLength, screenScale);
     }
   };
 
-  const pathologize = (original: string) => {
-    //handles issues with pathologist not parsing text and style elements
-    const reText = /<text[\s\S]*?<\/text>/g;
-    const reStyle = /<style[\s\S]*?<\/style>/g;
-    const removedText = original.replace(reText, "");
-    const removedStyle = removedText.replace(reStyle, "");
-
-    try {
-      return flattenSVG(removedStyle);
-    } catch (e) {
-      return original;
-    }
-  };
-
-  const pathsToCoords = (paths: any) => {
-    const totalLengthAllPaths: any = getTotalLengthAllPaths(paths);
-
-    let runningPointsTotal = 0;
-    return Array.from(paths).reduce((prev: any, item: any, index) => {
-      let pointsForPath;
-      if (index + 1 === paths.length) {
-        //ensures that the total number of points = the actual requested number (because using rounding)
-        pointsForPath = numberOfPoints - runningPointsTotal;
-      } else {
-        pointsForPath = Math.round(
-          (numberOfPoints * item.getTotalLength()) / totalLengthAllPaths
-        );
-        runningPointsTotal += pointsForPath;
-      }
-      return [...prev, ...polygonize(item, pointsForPath)];
-    }, []);
-  };
-
-  function drawDots(
+  const drawDot = (
     ctx: CanvasRenderingContext2D,
-    d: Point,
-    screenScale: number,
-    dotThickness: number
-  ) {
-    ctx.arc(
-      d.x * screenScale,
-      d.y * screenScale,
-      dotThickness,
-      0,
-      2 * Math.PI,
-      true
-    );
+    point: Point,
+    pointIsHighlighted: boolean,
+    index: number,
+    updatedPoints: Point[],
+    dotsToDrawLength: number,
+    screenScale: number
+  ) => {
+    const dotThickness: number = 2;
+    let color: string = point.colorRgb ? point.colorRgb : "#ffffff";
+    if (pointIsHighlighted) {
+      color = "#4287f5";
+    }
+
+    ctx.font = "10px sans-serif";
+    ctx.fillStyle = color;
+    ctx.beginPath();
+
+    if (showPointNumber) {
+      if (pointIsHighlighted) {
+        ctx.font = "20px sans-serif";
+        ctx.fillStyle = "#4287f5";
+      }
+
+      ctx.fillText(index.toString(), point.x, point.y);
+    }
+
+    connectDots
+      ? drawDotsConnected(updatedPoints, index, dotsToDrawLength, ctx)
+      : drawDots(ctx, point, screenScale, dotThickness);
+  };
+
+  function drawDots(ctx: CanvasRenderingContext2D, d: Point, screenScale: number, dotThickness: number) {
+    ctx.arc(d.x * screenScale, d.y * screenScale, dotThickness, 0, 2 * Math.PI, true);
     ctx.fill();
     ctx.closePath();
   }
 
-  function drawDotsConnected(
+  const drawDotsConnected = (
     dotsToDraw: Point[],
     index: number,
     dotsToDrawLength: number,
     ctx: CanvasRenderingContext2D
-  ) {
+  ) => {
     const currentCoordinates = dotsToDraw[index];
     if (index === dotsToDrawLength - 1) {
       const firstCoordinates = dotsToDraw[0];
@@ -308,23 +191,6 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 2;
     ctx.stroke();
-  }
-
-  function polygonize(path: any, numPoints: any) {
-    //Thank you Noah!! http://bl.ocks.org/veltman/fc96dddae1711b3d756e0a13e7f09f24
-
-    const length = path.getTotalLength();
-
-    return range(numPoints).map(function (i: any) {
-      const point = path.getPointAtLength((length * i) / numPoints);
-      return [point.x, point.y];
-    });
-  }
-
-  const getTotalLengthAllPaths = (paths: HTMLCollection) => {
-    return Array.from(paths).reduce((prev: any, curr: any) => {
-      return prev + curr.getTotalLength();
-    }, 0);
   };
 
   const sectionProps = {
