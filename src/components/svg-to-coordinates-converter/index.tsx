@@ -3,7 +3,7 @@ import { showError, toastSubject } from "services/shared/toast-messages";
 import "./index.css";
 import { Grid } from "@mui/material";
 import { Point } from "models/components/shared/point";
-import { createGuid, rotatePoint } from "services/shared/math";
+import { rotatePoint } from "services/shared/math";
 import ToLaserProjector from "components/shared/to-laser-projector";
 import TabSelector, { TabSelectorData } from "components/tabs";
 import GeneralSection from "./sections/general-section";
@@ -21,28 +21,27 @@ export interface SectionProps {
   setYOffset: (value: number) => void;
   rotation: number;
   setRotation: (value: number) => void;
-  connectDots: boolean;
-  setConnectDots: (value: boolean) => void;
   showPointNumber: boolean;
   setShowPointNumber: (value: boolean) => void;
   points: Point[];
   setPoints: (points: Point[]) => void;
   selectedPointsUuid: string[];
   setSelectedPointsUuid: (value: string[]) => void;
+  fileName: string;
+  setFileName: (value: string) => void;
 }
 
 type Props = {
   uploadedFile: File;
+  setUploadedFile: (file: any) => void;
 };
 
-export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
-  const [uploadedFileName, setUploadedFileName] = React.useState<string>();
-  const [rawSvg, setRawSvg] = React.useState<string | ArrayBuffer | null>();
+export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFile }: Props) {
+  const [uploadedFileName, setUploadedFileName] = React.useState<string>("");
   const [scale, setScale] = React.useState<number>(4);
   const [numberOfPoints, setNumberOfPoints] = React.useState<number>(200);
   const [xOffset, setXOffset] = React.useState<number>(0);
   const [yOffset, setYOffset] = React.useState<number>(0);
-  const [connectDots, setConnectDots] = React.useState<boolean>(false);
   const [showPointNumber, setShowPointNumber] = React.useState<boolean>(false);
   const [rotation, setRotation] = React.useState<number>(0);
   const [points, setPoints] = React.useState<Point[]>([]);
@@ -54,22 +53,31 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
 
   React.useEffect(() => {
     drawOnCanvas(points);
-  }, [xOffset, yOffset, connectDots, rotation, showPointNumber, scale, selectedPointsUuid]);
+  }, [xOffset, yOffset, rotation, showPointNumber, scale, selectedPointsUuid, points]);
+
+  const onInvalidFile = () => {
+    showError(toastSubject.invalidFile);
+    setUploadedFile(undefined);
+  };
 
   const onFileUpload = (file: File) => {
     if (file.type !== "image/svg+xml") {
-      showError(toastSubject.invalidFile);
+      onInvalidFile();
       return;
     }
 
     const reader = new FileReader();
     reader.onload = function () {
       const result = reader.result;
-      setRawSvg(result);
       const convertedPoints = svgToPoints(result, numberOfPoints);
+      if (convertedPoints.length === 0) {
+        onInvalidFile();
+        return;
+      }
+
       setPoints(convertedPoints);
       drawOnCanvas(convertedPoints);
-      setUploadedFileName(file.name);
+      setUploadedFileName(file.name.substring(0, file.name.length - 4));
     };
 
     reader.readAsText(file);
@@ -103,23 +111,23 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     for (let index = 0; index < dotsToDrawLength; index++) {
       const point = updatedPoints[index];
       const pointIsHighlighted = selectedPointsUuid.some((sp) => sp === point.uuid);
-      drawDot(ctx, point, pointIsHighlighted, index, updatedPoints, dotsToDrawLength, screenScale);
+      drawPoint(ctx, point, pointIsHighlighted, index, updatedPoints, screenScale);
     }
   };
 
-  const drawDot = (
+  const drawPoint = (
     ctx: CanvasRenderingContext2D,
     point: Point,
     pointIsHighlighted: boolean,
     index: number,
     updatedPoints: Point[],
-    dotsToDrawLength: number,
     screenScale: number
   ) => {
-    const dotThickness: number = 2;
-    let color: string = point.colorRgb ? point.colorRgb : "#ffffff";
+    let dotThickness: number = 2;
+    let color: string = point.colorRgb;
     if (pointIsHighlighted) {
       color = "#4287f5";
+      dotThickness = 3;
     }
 
     ctx.font = "10px sans-serif";
@@ -135,34 +143,23 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
       ctx.fillText(index.toString(), point.x, point.y);
     }
 
-    connectDots
-      ? drawDotsConnected(updatedPoints, index, dotsToDrawLength, ctx)
-      : drawDots(ctx, point, screenScale, dotThickness);
+    if (point.connectedToPointOrderNr !== null && point.connectedToPointOrderNr >= 0) {
+      const nextPoint = updatedPoints[point.connectedToPointOrderNr];
+      drawLine(point, nextPoint, ctx);
+    } else if (point.connectedToPointOrderNr === null) {
+      drawDot(ctx, point, screenScale, dotThickness);
+    }
   };
 
-  function drawDots(ctx: CanvasRenderingContext2D, d: Point, screenScale: number, dotThickness: number) {
-    ctx.arc(d.x * screenScale, d.y * screenScale, dotThickness, 0, 2 * Math.PI, true);
+  const drawDot = (ctx: CanvasRenderingContext2D, point: Point, screenScale: number, dotThickness: number) => {
+    ctx.arc(point.x * screenScale, point.y * screenScale, dotThickness, 0, 2 * Math.PI, true);
     ctx.fill();
     ctx.closePath();
-  }
+  };
 
-  const drawDotsConnected = (
-    dotsToDraw: Point[],
-    index: number,
-    dotsToDrawLength: number,
-    ctx: CanvasRenderingContext2D
-  ) => {
-    const currentCoordinates = dotsToDraw[index];
-    if (index === dotsToDrawLength - 1) {
-      const firstCoordinates = dotsToDraw[0];
-      ctx.moveTo(currentCoordinates.x, currentCoordinates.y);
-      ctx.lineTo(firstCoordinates.x, firstCoordinates.y);
-    } else {
-      const nextCoordinates = dotsToDraw[index + 1];
-      ctx.moveTo(currentCoordinates.x, currentCoordinates.y);
-      ctx.lineTo(nextCoordinates.x, nextCoordinates.y);
-    }
-
+  const drawLine = (fromPoint: Point, toPoint: Point, ctx: CanvasRenderingContext2D) => {
+    ctx.moveTo(fromPoint.x, fromPoint.y);
+    ctx.lineTo(toPoint.x, toPoint.y);
     ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 2;
     ctx.stroke();
@@ -179,14 +176,14 @@ export default function SvgToCoordinatesConverter({ uploadedFile }: Props) {
     setYOffset,
     rotation,
     setRotation,
-    connectDots,
-    setConnectDots,
     showPointNumber,
     setShowPointNumber,
     points,
     setPoints,
     selectedPointsUuid,
     setSelectedPointsUuid,
+    fileName: uploadedFileName,
+    setFileName: setUploadedFileName,
   };
 
   const tabSelectorData: TabSelectorData[] = [

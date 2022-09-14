@@ -48,7 +48,7 @@ export const svgToPoints = (svg: any, numberOfPoints: number): Point[] => {
   let newDiv = document.createElement("div");
   newDiv.innerHTML = pathsOnly;
 
-  let paths: any = newDiv?.getElementsByTagName("path");
+  const paths: any = newDiv?.getElementsByTagName("path");
   if (paths.length === 0) {
     showError(toastSubject.invalidFile);
     return [];

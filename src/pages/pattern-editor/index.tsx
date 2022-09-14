@@ -14,7 +14,7 @@ export default function PatternPage() {
   return (
     <SideNav pageName="Pattern editor">
       {uploadedFile === undefined ? null : (
-        <SvgToCoordinatesConverter uploadedFile={uploadedFile} />
+        <SvgToCoordinatesConverter uploadedFile={uploadedFile} setUploadedFile={setUploadedFile} />
       )}
       <Box>
         <input
@@ -34,18 +34,13 @@ export default function PatternPage() {
         <SpeedDial
           ariaLabel="SpeedDial basic example"
           sx={{ position: "absolute", bottom: 30, right: 30 }}
-          icon={
-            uploadedFile === undefined ? <SpeedDialIcon /> : <SettingsIcon />
-          }
+          icon={uploadedFile === undefined ? <SpeedDialIcon /> : <SettingsIcon />}
         >
           {uploadedFile === undefined ? (
             <SpeedDialAction
               key="sd-upload"
               icon={
-                <label
-                  htmlFor="raised-button-file"
-                  style={{ cursor: "pointer", padding: "25px" }}
-                >
+                <label htmlFor="raised-button-file" style={{ cursor: "pointer", padding: "25px" }}>
                   <AttachFileIcon style={{ marginTop: "8px" }} />
                 </label>
               }
@@ -55,7 +50,11 @@ export default function PatternPage() {
             <SpeedDialAction
               key="sd-upload-clear"
               icon={<ClearIcon />}
-              onClick={() => setUploadedFile(undefined)}
+              onClick={() =>
+                window.confirm("Are you sure you want to clear the field? Unsaved changes will be lost")
+                  ? setUploadedFile(undefined)
+                  : null
+              }
               tooltipTitle="Clear editor field"
             />
           )}

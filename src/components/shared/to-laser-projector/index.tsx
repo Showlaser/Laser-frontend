@@ -22,17 +22,11 @@ export default function ToLaserProjector({
   setYOffset,
   rotation,
   setRotation,
-  connectDots,
-  setConnectDots,
   showPointNumber,
   setShowPointNumber,
 }: SectionProps) {
-  const [isPlaying, setIsPlaying] = React.useState<boolean>(
-    localStorage.getItem("lasers-are-playing") !== null
-  );
-  const [selectedLasersUuid, setSelectedLasersUuid] = React.useState<string[]>(
-    []
-  );
+  const [isPlaying, setIsPlaying] = React.useState<boolean>(localStorage.getItem("lasers-are-playing") !== null);
+  const [selectedLasersUuid, setSelectedLasersUuid] = React.useState<string[]>([]);
   const [searchValue, setSearchValue] = React.useState<string>();
   const [availableLasers, setAvailableLasers] = React.useState<Laser[]>([
     {
@@ -53,10 +47,7 @@ export default function ToLaserProjector({
         Project to laser
       </Typography>
       <ButtonGroup>
-        <TextField
-          label="Search laser"
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
+        <TextField label="Search laser" onChange={(e) => setSearchValue(e.target.value)} />
         {isPlaying ? (
           <Button
             onClick={() => {
@@ -86,9 +77,7 @@ export default function ToLaserProjector({
       </ButtonGroup>
       <SelectList
         onSelect={setSelectedLasersUuid}
-        items={availableLasers.filter((laser) =>
-          searchValue ? laser.name.includes(searchValue) : true
-        )}
+        items={availableLasers.filter((laser) => (searchValue ? laser.name.includes(searchValue) : true))}
         disabled={isPlaying}
       />
     </Box>

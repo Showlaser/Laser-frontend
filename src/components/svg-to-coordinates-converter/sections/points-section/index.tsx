@@ -1,11 +1,8 @@
-import * as React from "react";
 import { SectionProps } from "components/svg-to-coordinates-converter";
-import {
-  DataGrid,
-  GridCellEditCommitParams,
-  GridColDef,
-} from "@mui/x-data-grid";
+import { DataGrid, GridCellEditCommitParams, GridColDef } from "@mui/x-data-grid";
 import { Point } from "models/components/shared/point";
+import { TextField } from "@mui/material";
+import React, { useRef, useState } from "react";
 
 export default function PointsSection({
   scale,
@@ -18,8 +15,6 @@ export default function PointsSection({
   setYOffset,
   rotation,
   setRotation,
-  connectDots,
-  setConnectDots,
   showPointNumber,
   setShowPointNumber,
   points,
@@ -27,14 +22,11 @@ export default function PointsSection({
   selectedPointsUuid,
   setSelectedPointsUuid,
 }: SectionProps) {
-  const updatePointProperty = (
-    points: Point[],
-    params: GridCellEditCommitParams
-  ) => {
+  const [currentUuid, setCurrentUuid] = useState<string>();
+
+  const updatePointProperty = (points: Point[], params: GridCellEditCommitParams) => {
     let updatedPoints: Point[] = [...points];
-    const pointToUpdateIndex: number = updatedPoints.findIndex(
-      (p: Point) => p.uuid === params.id
-    );
+    const pointToUpdateIndex: number = updatedPoints.findIndex((p: Point) => p.uuid === params.id);
 
     if (pointToUpdateIndex === -1) {
       return;
@@ -42,10 +34,13 @@ export default function PointsSection({
 
     switch (params.field) {
       case "connectedToPointOrderNr":
-        const substringIndex = params.value.indexOf("Point") + 5;
-        updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = Number(
-          params.value.substring(substringIndex)
-        );
+        if (params.value === "None") {
+          updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = null;
+        } else {
+          const substringIndex = params.value.indexOf("Point") + 5;
+          updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = Number(params.value.substring(substringIndex));
+        }
+
         break;
       case "colorRgb":
         updatedPoints[pointToUpdateIndex].colorRgb = params.value;
@@ -53,8 +48,24 @@ export default function PointsSection({
         break;
     }
 
-    console.log(updatedPoints);
     setPoints(updatedPoints);
+  };
+
+  let inputRef = React.useRef<HTMLInputElement>(null);
+  const onCellClick = (params: any, event: any, details: any) => {
+    if (params.field === "colorRgb" && inputRef.current !== null) {
+      inputRef.current.click();
+    }
+
+    if (currentUuid !== params.id) {
+      setCurrentUuid(params.id);
+    }
+  };
+
+  const getAvailablePoints = () => {
+    let options = points.map((point) => `Point ${point.orderNr}`);
+    options.unshift("None");
+    return options;
   };
 
   const columns: GridColDef[] = [
@@ -66,7 +77,7 @@ export default function PointsSection({
       width: 200,
       editable: true,
       type: "singleSelect",
-      valueOptions: points.map((point) => `Point ${point.orderNr}`),
+      valueOptions: getAvailablePoints(),
     },
   ];
 
@@ -74,25 +85,37 @@ export default function PointsSection({
     id: point.uuid,
     uuid: point.uuid,
     order: point.orderNr,
-    color: point.colorRgb,
-    connectedToPointOrderNr:
-      point.connectedToPointOrderNr === null
-        ? null
-        : `Point ${point.connectedToPointOrderNr}`,
+    colorRgb: point.colorRgb,
+    connectedToPointOrderNr: point.connectedToPointOrderNr === null ? null : `Point ${point.connectedToPointOrderNr}`,
   }));
 
   return (
     <div style={{ height: 400, width: "100%" }}>
+      <TextField
+        style={{ display: "none" }}
+        type="color"
+        value="#ffffff"
+        inputRef={inputRef}
+        onChange={(e) => {
+          if (currentUuid === undefined) {
+            return;
+          }
+
+          let updatedPoints = [...points];
+          const index = updatedPoints.findIndex((p) => p.uuid === currentUuid);
+          if (index !== -1) {
+            updatedPoints[index].colorRgb = e.target.value;
+            setPoints(updatedPoints);
+          }
+        }}
+      />
       <DataGrid
-        onCellEditCommit={(params: GridCellEditCommitParams) =>
-          updatePointProperty(points, params)
-        }
+        onCellEditCommit={(params: GridCellEditCommitParams) => updatePointProperty(points, params)}
         checkboxSelection
         disableSelectionOnClick
         selectionModel={selectedPointsUuid}
-        onSelectionModelChange={(ids) =>
-          setSelectedPointsUuid(ids.map((id) => id.toString()))
-        }
+        onCellClick={onCellClick}
+        onSelectionModelChange={(ids) => setSelectedPointsUuid(ids.map((id) => id.toString()))}
         rows={rows}
         columns={columns}
         pageSize={100}
