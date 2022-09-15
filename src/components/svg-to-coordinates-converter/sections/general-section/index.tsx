@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  Alert,
   Button,
   Checkbox,
   FormControl,
@@ -9,6 +10,7 @@ import {
   Input,
   Slider,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import { SectionProps } from "components/svg-to-coordinates-converter";
 
@@ -30,13 +32,21 @@ export default function GeneralSection({
   points,
   setPoints,
 }: SectionProps) {
-  const toggleAllDots = (e: any) => (e.target.checked ? connectAllDots() : disconnectAllDots());
+  const [dangerousElementsEnabled, setDangerousElementsEnabled] =
+    React.useState<boolean>(false);
+  const [
+    highLightDangerousElementsCheckbox,
+    setHighLightDangerousElementsCheckbox,
+  ] = React.useState<boolean>(false);
+
+  const toggleAllDots = (e: any) =>
+    e.target.checked ? connectAllDots() : disconnectAllDots();
 
   const disconnectAllDots = () => {
     let updatedPoints = [...points];
-    const pointsLenght = points.length;
+    const pointsLength = points.length;
 
-    for (let i = 0; i < pointsLenght; i++) {
+    for (let i = 0; i < pointsLength; i++) {
       updatedPoints[i].connectedToPointOrderNr = null;
     }
 
@@ -58,12 +68,23 @@ export default function GeneralSection({
     setPoints(updatedPoints);
   };
 
+  const getTooltipText = () =>
+    dangerousElementsEnabled
+      ? "Warning changing this value will reset the made changes!"
+      : 'Enable this element by checking the "Enabled dangerous elements" checkbox';
+
   return (
     <div>
       <FormControl style={{ width: "100%", marginBottom: "10px" }}>
-        <TextField value={fileName} label="Pattern name" onChange={(e) => setFileName(e.target.value)} />
+        <TextField
+          value={fileName}
+          label="Pattern name"
+          onChange={(e) => setFileName(e.target.value)}
+        />
       </FormControl>
-      <FormControl style={{ width: "100%", marginBottom: "10px", marginTop: "10px" }}>
+      <FormControl
+        style={{ width: "100%", marginBottom: "10px", marginTop: "10px" }}
+      >
         <TextField
           label="Color"
           type="color"
@@ -85,7 +106,11 @@ export default function GeneralSection({
           Scale
           <Button
             style={{ marginLeft: "10px" }}
-            onClick={() => (window.confirm("Are you sure you want to reset this value?") ? setScale(4) : null)}
+            onClick={() =>
+              window.confirm("Are you sure you want to reset this value?")
+                ? setScale(4)
+                : null
+            }
           >
             Reset
           </Button>
@@ -103,62 +128,73 @@ export default function GeneralSection({
         />
       </FormControl>
       <br />
-      <span
-        onMouseOver={() => {
-          const element = document.getElementById("nop-warning");
-          if (element !== null) {
-            element.hidden = false;
-          }
-        }}
-        onMouseLeave={() => {
-          const element = document.getElementById("nop-warning");
-          if (element !== null) {
-            element.hidden = true;
-          }
-        }}
+      <Tooltip
+        placement="right"
+        title={getTooltipText()}
+        onMouseOver={() =>
+          !dangerousElementsEnabled
+            ? setHighLightDangerousElementsCheckbox(true)
+            : null
+        }
+        onMouseLeave={() => setHighLightDangerousElementsCheckbox(false)}
       >
-        <FormLabel htmlFor="svg-points">
-          Number of points
-          <Button
-            style={{ marginLeft: "10px" }}
-            onClick={() =>
-              window.confirm("Are you sure you want to reset this value?") ? setNumberOfPoints(200) : null
-            }
-          >
-            Reset
-          </Button>
-        </FormLabel>
-        <br />
-        <small id="nop-warning" hidden style={{ color: "red" }}>
-          Warning changing this value will reset the made changes!
-        </small>
-        <br />
-        <Input type="number" value={numberOfPoints} onChange={(e) => setNumberOfPoints(Number(e.target.value))} />
-        <br />
-        <FormControl style={{ width: "100%" }}>
-          <Slider
-            id="svg-points"
-            size="small"
+        <div>
+          <FormLabel htmlFor="svg-points" disabled={!dangerousElementsEnabled}>
+            Number of points
+            <Button
+              disabled={!dangerousElementsEnabled}
+              style={{ marginLeft: "10px" }}
+              onClick={() =>
+                window.confirm("Are you sure you want to reset this value?")
+                  ? setNumberOfPoints(200)
+                  : null
+              }
+            >
+              Reset
+            </Button>
+          </FormLabel>
+          <br />
+          <Input
+            type="number"
             value={numberOfPoints}
-            onChange={(e, value) => setNumberOfPoints(Number(value))}
-            min={1}
-            max={500}
-            aria-label="Small"
-            valueLabelDisplay="auto"
+            onChange={(e) => setNumberOfPoints(Number(e.target.value))}
+            disabled={!dangerousElementsEnabled}
           />
-        </FormControl>
-      </span>
+          <br />
+          <FormControl style={{ width: "100%" }}>
+            <Slider
+              disabled={!dangerousElementsEnabled}
+              id="svg-points"
+              size="small"
+              value={numberOfPoints}
+              onChange={(e, value) => setNumberOfPoints(Number(value))}
+              min={1}
+              max={500}
+              aria-label="Small"
+              valueLabelDisplay="auto"
+            />
+          </FormControl>
+        </div>
+      </Tooltip>
       <FormLabel htmlFor="svg-points">
         X offset
         <Button
           style={{ marginLeft: "10px" }}
-          onClick={() => (window.confirm("Are you sure you want to reset this value?") ? setXOffset(0) : null)}
+          onClick={() =>
+            window.confirm("Are you sure you want to reset this value?")
+              ? setXOffset(0)
+              : null
+          }
         >
           Reset
         </Button>
       </FormLabel>
       <br />
-      <Input type="number" value={xOffset} onChange={(e) => setXOffset(Number(e.target.value))} />
+      <Input
+        type="number"
+        value={xOffset}
+        onChange={(e) => setXOffset(Number(e.target.value))}
+      />
       <br />
       <FormControl style={{ width: "100%" }}>
         <Slider
@@ -176,13 +212,21 @@ export default function GeneralSection({
         Y offset
         <Button
           style={{ marginLeft: "10px" }}
-          onClick={() => (window.confirm("Are you sure you want to reset this value?") ? setYOffset(0) : null)}
+          onClick={() =>
+            window.confirm("Are you sure you want to reset this value?")
+              ? setYOffset(0)
+              : null
+          }
         >
           Reset
         </Button>
       </FormLabel>
       <br />
-      <Input type="number" value={yOffset} onChange={(e) => setYOffset(Number(e.target.value))} />
+      <Input
+        type="number"
+        value={yOffset}
+        onChange={(e) => setYOffset(Number(e.target.value))}
+      />
       <br />
       <FormControl style={{ width: "100%" }}>
         <Slider
@@ -201,13 +245,21 @@ export default function GeneralSection({
         Rotation
         <Button
           style={{ marginLeft: "10px" }}
-          onClick={() => (window.confirm("Are you sure you want to reset this value?") ? setRotation(0) : null)}
+          onClick={() =>
+            window.confirm("Are you sure you want to reset this value?")
+              ? setRotation(0)
+              : null
+          }
         >
           Reset
         </Button>
       </FormLabel>
       <br />
-      <Input type="number" value={rotation} onChange={(e) => setRotation(Number(e.target.value))} />
+      <Input
+        type="number"
+        value={rotation}
+        onChange={(e) => setRotation(Number(e.target.value))}
+      />
       <br />
       <FormControl style={{ width: "100%" }}>
         <Slider
@@ -222,18 +274,52 @@ export default function GeneralSection({
         />
       </FormControl>
       <FormGroup>
+        <Tooltip
+          placement="right"
+          title={getTooltipText()}
+          onMouseOver={() =>
+            !dangerousElementsEnabled
+              ? setHighLightDangerousElementsCheckbox(true)
+              : null
+          }
+          onMouseLeave={() => setHighLightDangerousElementsCheckbox(false)}
+        >
+          <FormControlLabel
+            disabled={!dangerousElementsEnabled}
+            control={
+              <Checkbox
+                checked={points.every(
+                  (p) => p.connectedToPointOrderNr !== null
+                )}
+                onChange={(e) => toggleAllDots(e)}
+              />
+            }
+            label="Connect all dots"
+          />
+        </Tooltip>
         <FormControlLabel
           control={
             <Checkbox
-              checked={points.every((p) => p.connectedToPointOrderNr !== null)}
-              onChange={(e) => toggleAllDots(e)}
+              checked={showPointNumber}
+              onChange={(e) => setShowPointNumber(e.target.checked)}
             />
           }
-          label="Connect all dots"
+          label="Show point numbers"
         />
         <FormControlLabel
-          control={<Checkbox checked={showPointNumber} onChange={(e) => setShowPointNumber(e.target.checked)} />}
-          label="Show point numbers"
+          style={{
+            backgroundColor: highLightDangerousElementsCheckbox
+              ? "rgb(128,128,128, 0.4)"
+              : "",
+            borderRadius: "5px",
+          }}
+          control={
+            <Checkbox
+              checked={dangerousElementsEnabled}
+              onChange={(e) => setDangerousElementsEnabled(e.target.checked)}
+            />
+          }
+          label="Enable dangerous elements"
         />
       </FormGroup>
     </div>
