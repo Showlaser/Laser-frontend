@@ -1,7 +1,7 @@
 import * as React from "react";
-import { showError, toastSubject } from "services/shared/toast-messages";
+import { showSuccess, showError, toastSubject } from "services/shared/toast-messages";
 import "./index.css";
-import { Grid } from "@mui/material";
+import { Grid, SpeedDial, SpeedDialAction } from "@mui/material";
 import { Point } from "models/components/shared/point";
 import { rotatePoint } from "services/shared/math";
 import ToLaserProjector from "components/shared/to-laser-projector";
@@ -9,27 +9,12 @@ import TabSelector, { TabSelectorData } from "components/tabs";
 import GeneralSection from "./sections/general-section";
 import PointsSection from "./sections/points-section";
 import { prepareCanvas, svgToPoints } from "services/logic/svg-to-coordinates-converter";
-
-export interface SectionProps {
-  scale: number;
-  setScale: (value: number) => void;
-  numberOfPoints: number;
-  setNumberOfPoints: (value: number) => void;
-  xOffset: number;
-  setXOffset: (value: number) => void;
-  yOffset: number;
-  setYOffset: (value: number) => void;
-  rotation: number;
-  setRotation: (value: number) => void;
-  showPointNumber: boolean;
-  setShowPointNumber: (value: boolean) => void;
-  points: Point[];
-  setPoints: (points: Point[]) => void;
-  selectedPointsUuid: string[];
-  setSelectedPointsUuid: (value: string[]) => void;
-  fileName: string;
-  setFileName: (value: string) => void;
-}
+import { Pattern } from "models/components/shared/pattern";
+import SettingsIcon from "@mui/icons-material/Settings";
+import SaveIcon from "@mui/icons-material/Save";
+import ClearIcon from "@mui/icons-material/Clear";
+import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+import { addItemToVersionHistory } from "services/shared/version-history";
 
 type Props = {
   uploadedFile: File;
@@ -47,8 +32,26 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
   const [points, setPoints] = React.useState<Point[]>([]);
   const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>([]);
 
+  const pattern: Pattern = {
+    name: uploadedFileName,
+    points,
+    scale,
+    xOffset,
+    yOffset,
+    rotation,
+  };
+
+  const alertUser = (e: BeforeUnloadEvent) => {
+    e.preventDefault();
+    e.returnValue = "Are you sure you want to leave the page?";
+  };
+
   React.useEffect(() => {
     onFileUpload(uploadedFile);
+    window.addEventListener("beforeunload", alertUser);
+    return () => {
+      window.removeEventListener("beforeunload", alertUser);
+    };
   }, [uploadedFile, numberOfPoints]);
 
   React.useEffect(() => {
@@ -165,6 +168,12 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
     ctx.stroke();
   };
 
+  const onSave = () => {
+    localStorage.setItem("pattern", JSON.stringify(pattern));
+    addItemToVersionHistory("Pattern editor", pattern);
+    showSuccess(toastSubject.changesSaved);
+  };
+
   const sectionProps = {
     scale,
     setScale,
@@ -210,6 +219,23 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
       <div id="svg-canvas-container">
         <canvas id="svg-canvas" />
       </div>
+      <SpeedDial
+        ariaLabel="SpeedDial basic example"
+        sx={{ position: "absolute", bottom: 30, right: 30 }}
+        icon={<SettingsIcon />}
+      >
+        <SpeedDialAction
+          key="sd-upload-clear"
+          icon={<ClearIcon />}
+          onClick={() =>
+            window.confirm("Are you sure you want to clear the field? Unsaved changes will be lost")
+              ? setUploadedFile(undefined)
+              : null
+          }
+          tooltipTitle="Clear editor field"
+        />
+        <SpeedDialAction icon={<SaveIcon />} onClick={() => onSave()} tooltipTitle="Save pattern" />
+      </SpeedDial>
     </Grid>
   );
 }

@@ -1,27 +1,11 @@
-import { SectionProps } from "components/svg-to-coordinates-converter";
 import { DataGrid, GridCellEditCommitParams, GridColDef } from "@mui/x-data-grid";
 import { Point } from "models/components/shared/point";
-import { TextField } from "@mui/material";
-import React, { useRef, useState } from "react";
+import { IconButton, TextField, Tooltip } from "@mui/material";
+import React, { useState } from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { SectionProps } from "models/components/shared/pattern";
 
-export default function PointsSection({
-  scale,
-  setScale,
-  numberOfPoints,
-  setNumberOfPoints,
-  xOffset,
-  setXOffset,
-  yOffset,
-  setYOffset,
-  rotation,
-  setRotation,
-  showPointNumber,
-  setShowPointNumber,
-  points,
-  setPoints,
-  selectedPointsUuid,
-  setSelectedPointsUuid,
-}: SectionProps) {
+export default function PointsSection({ points, setPoints, selectedPointsUuid, setSelectedPointsUuid }: SectionProps) {
   const [currentUuid, setCurrentUuid] = useState<string>();
 
   const updatePointProperty = (points: Point[], params: GridCellEditCommitParams) => {
@@ -44,6 +28,12 @@ export default function PointsSection({
         break;
       case "colorRgb":
         updatedPoints[pointToUpdateIndex].colorRgb = params.value;
+        break;
+      case "order":
+        const pointOrderToSwapIndex = updatedPoints.findIndex((p) => p.orderNr === Number(params.value));
+        updatedPoints[pointOrderToSwapIndex].orderNr = updatedPoints[pointToUpdateIndex].orderNr;
+        updatedPoints[pointToUpdateIndex].orderNr = Number(params.value);
+        break;
       default:
         break;
     }
@@ -68,26 +58,55 @@ export default function PointsSection({
     return options;
   };
 
-  const columns: GridColDef[] = [
-    { field: "order", headerName: "Point", width: 70 },
-    { field: "colorRgb", headerName: "Color Rgb", width: 130 },
-    {
-      field: "connectedToPointOrderNr",
-      headerName: "Connected to point",
-      width: 200,
-      editable: true,
-      type: "singleSelect",
-      valueOptions: getAvailablePoints(),
-    },
-  ];
+  const getColumns = () => {
+    let columns: GridColDef[] = [
+      {
+        field: "order",
+        headerName: "Point",
+        width: 70,
+        editable: true,
+        type: "singleSelect",
+        valueOptions: points.map((point) => point.orderNr.toString()),
+      },
+      { field: "colorRgb", headerName: "Color Rgb", width: 130 },
+      {
+        field: "connectedToPointOrderNr",
+        headerName: "Connected to point",
+        width: 200,
+        editable: true,
+        type: "singleSelect",
+        valueOptions: getAvailablePoints(),
+      },
+    ];
 
-  const rows = points.map((point) => ({
-    id: point.uuid,
-    uuid: point.uuid,
-    order: point.orderNr,
-    colorRgb: point.colorRgb,
-    connectedToPointOrderNr: point.connectedToPointOrderNr === null ? null : `Point ${point.connectedToPointOrderNr}`,
-  }));
+    if (selectedPointsUuid.length > 0) {
+      columns.push({
+        field: "delete",
+        width: 75,
+        sortable: false,
+        disableColumnMenu: true,
+        renderHeader: () => (
+          <Tooltip title={`Delete selected point${selectedPointsUuid.length === 1 ? "s" : ""}`}>
+            <IconButton>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        ),
+      });
+    }
+
+    return columns;
+  };
+
+  const rows = points
+    .sort((a, b) => a.orderNr - b.orderNr)
+    .map((point) => ({
+      id: point.uuid,
+      uuid: point.uuid,
+      order: point.orderNr,
+      colorRgb: point.colorRgb,
+      connectedToPointOrderNr: point.connectedToPointOrderNr === null ? null : `Point ${point.connectedToPointOrderNr}`,
+    }));
 
   return (
     <div style={{ height: 400, width: "100%" }}>
@@ -117,7 +136,7 @@ export default function PointsSection({
         onCellClick={onCellClick}
         onSelectionModelChange={(ids) => setSelectedPointsUuid(ids.map((id) => id.toString()))}
         rows={rows}
-        columns={columns}
+        columns={getColumns()}
         pageSize={100}
         rowsPerPageOptions={[100]}
       />

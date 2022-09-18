@@ -3,7 +3,7 @@ import { Box, Button, ButtonGroup, TextField, Typography } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import SelectList from "components/select-list";
-import { SectionProps } from "components/svg-to-coordinates-converter";
+import { SectionProps } from "models/components/shared/pattern";
 
 type Laser = {
   name: string;

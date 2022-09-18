@@ -7,9 +7,28 @@ import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ClearIcon from "@mui/icons-material/Clear";
 import SvgToCoordinatesConverter from "components/svg-to-coordinates-converter";
 import SettingsIcon from "@mui/icons-material/Settings";
+import SaveIcon from "@mui/icons-material/Save";
 
 export default function PatternPage() {
   const [uploadedFile, setUploadedFile] = useState<any>();
+
+  const getSpeedDialBeforeFileUpload = () => (
+    <SpeedDial
+      ariaLabel="SpeedDial basic example"
+      sx={{ position: "absolute", bottom: 30, right: 30 }}
+      icon={uploadedFile === undefined ? <SpeedDialIcon /> : <SettingsIcon />}
+    >
+      <SpeedDialAction
+        key="sd-upload"
+        icon={
+          <label htmlFor="raised-button-file" style={{ cursor: "pointer", padding: "25px" }}>
+            <AttachFileIcon style={{ marginTop: "8px" }} />
+          </label>
+        }
+        tooltipTitle="Upload local file"
+      />
+    </SpeedDial>
+  );
 
   return (
     <SideNav pageName="Pattern editor">
@@ -31,34 +50,7 @@ export default function PatternPage() {
             setUploadedFile(e.target.files[0]);
           }}
         />
-        <SpeedDial
-          ariaLabel="SpeedDial basic example"
-          sx={{ position: "absolute", bottom: 30, right: 30 }}
-          icon={uploadedFile === undefined ? <SpeedDialIcon /> : <SettingsIcon />}
-        >
-          {uploadedFile === undefined ? (
-            <SpeedDialAction
-              key="sd-upload"
-              icon={
-                <label htmlFor="raised-button-file" style={{ cursor: "pointer", padding: "25px" }}>
-                  <AttachFileIcon style={{ marginTop: "8px" }} />
-                </label>
-              }
-              tooltipTitle="Upload local file"
-            />
-          ) : (
-            <SpeedDialAction
-              key="sd-upload-clear"
-              icon={<ClearIcon />}
-              onClick={() =>
-                window.confirm("Are you sure you want to clear the field? Unsaved changes will be lost")
-                  ? setUploadedFile(undefined)
-                  : null
-              }
-              tooltipTitle="Clear editor field"
-            />
-          )}
-        </SpeedDial>
+        {uploadedFile === undefined ? getSpeedDialBeforeFileUpload() : null}
       </Box>
     </SideNav>
   );

@@ -1,6 +1,5 @@
 import * as React from "react";
 import {
-  Alert,
   Button,
   Checkbox,
   FormControl,
@@ -12,7 +11,7 @@ import {
   TextField,
   Tooltip,
 } from "@mui/material";
-import { SectionProps } from "components/svg-to-coordinates-converter";
+import { SectionProps } from "models/components/shared/pattern";
 
 export default function GeneralSection({
   scale,
@@ -32,15 +31,9 @@ export default function GeneralSection({
   points,
   setPoints,
 }: SectionProps) {
-  const [dangerousElementsEnabled, setDangerousElementsEnabled] =
-    React.useState<boolean>(false);
-  const [
-    highLightDangerousElementsCheckbox,
-    setHighLightDangerousElementsCheckbox,
-  ] = React.useState<boolean>(false);
+  const [dangerousElementsEnabled, setDangerousElementsEnabled] = React.useState<boolean>(false);
 
-  const toggleAllDots = (e: any) =>
-    e.target.checked ? connectAllDots() : disconnectAllDots();
+  const toggleAllDots = (e: any) => (e.target.checked ? connectAllDots() : disconnectAllDots());
 
   const disconnectAllDots = () => {
     let updatedPoints = [...points];
@@ -76,15 +69,9 @@ export default function GeneralSection({
   return (
     <div>
       <FormControl style={{ width: "100%", marginBottom: "10px" }}>
-        <TextField
-          value={fileName}
-          label="Pattern name"
-          onChange={(e) => setFileName(e.target.value)}
-        />
+        <TextField value={fileName} label="Pattern name" onChange={(e) => setFileName(e.target.value)} />
       </FormControl>
-      <FormControl
-        style={{ width: "100%", marginBottom: "10px", marginTop: "10px" }}
-      >
+      <FormControl style={{ width: "100%", marginBottom: "10px", marginTop: "10px" }}>
         <TextField
           label="Color"
           type="color"
@@ -106,11 +93,7 @@ export default function GeneralSection({
           Scale
           <Button
             style={{ marginLeft: "10px" }}
-            onClick={() =>
-              window.confirm("Are you sure you want to reset this value?")
-                ? setScale(4)
-                : null
-            }
+            onClick={() => (window.confirm("Are you sure you want to reset this value?") ? setScale(4) : null)}
           >
             Reset
           </Button>
@@ -128,16 +111,7 @@ export default function GeneralSection({
         />
       </FormControl>
       <br />
-      <Tooltip
-        placement="right"
-        title={getTooltipText()}
-        onMouseOver={() =>
-          !dangerousElementsEnabled
-            ? setHighLightDangerousElementsCheckbox(true)
-            : null
-        }
-        onMouseLeave={() => setHighLightDangerousElementsCheckbox(false)}
-      >
+      <Tooltip placement="right" title={getTooltipText()}>
         <div>
           <FormLabel htmlFor="svg-points" disabled={!dangerousElementsEnabled}>
             Number of points
@@ -145,9 +119,7 @@ export default function GeneralSection({
               disabled={!dangerousElementsEnabled}
               style={{ marginLeft: "10px" }}
               onClick={() =>
-                window.confirm("Are you sure you want to reset this value?")
-                  ? setNumberOfPoints(200)
-                  : null
+                window.confirm("Are you sure you want to reset this value?") ? setNumberOfPoints(200) : null
               }
             >
               Reset
@@ -180,21 +152,13 @@ export default function GeneralSection({
         X offset
         <Button
           style={{ marginLeft: "10px" }}
-          onClick={() =>
-            window.confirm("Are you sure you want to reset this value?")
-              ? setXOffset(0)
-              : null
-          }
+          onClick={() => (window.confirm("Are you sure you want to reset this value?") ? setXOffset(0) : null)}
         >
           Reset
         </Button>
       </FormLabel>
       <br />
-      <Input
-        type="number"
-        value={xOffset}
-        onChange={(e) => setXOffset(Number(e.target.value))}
-      />
+      <Input type="number" value={xOffset} onChange={(e) => setXOffset(Number(e.target.value))} />
       <br />
       <FormControl style={{ width: "100%" }}>
         <Slider
@@ -212,21 +176,13 @@ export default function GeneralSection({
         Y offset
         <Button
           style={{ marginLeft: "10px" }}
-          onClick={() =>
-            window.confirm("Are you sure you want to reset this value?")
-              ? setYOffset(0)
-              : null
-          }
+          onClick={() => (window.confirm("Are you sure you want to reset this value?") ? setYOffset(0) : null)}
         >
           Reset
         </Button>
       </FormLabel>
       <br />
-      <Input
-        type="number"
-        value={yOffset}
-        onChange={(e) => setYOffset(Number(e.target.value))}
-      />
+      <Input type="number" value={yOffset} onChange={(e) => setYOffset(Number(e.target.value))} />
       <br />
       <FormControl style={{ width: "100%" }}>
         <Slider
@@ -245,21 +201,13 @@ export default function GeneralSection({
         Rotation
         <Button
           style={{ marginLeft: "10px" }}
-          onClick={() =>
-            window.confirm("Are you sure you want to reset this value?")
-              ? setRotation(0)
-              : null
-          }
+          onClick={() => (window.confirm("Are you sure you want to reset this value?") ? setRotation(0) : null)}
         >
           Reset
         </Button>
       </FormLabel>
       <br />
-      <Input
-        type="number"
-        value={rotation}
-        onChange={(e) => setRotation(Number(e.target.value))}
-      />
+      <Input type="number" value={rotation} onChange={(e) => setRotation(Number(e.target.value))} />
       <br />
       <FormControl style={{ width: "100%" }}>
         <Slider
@@ -274,23 +222,12 @@ export default function GeneralSection({
         />
       </FormControl>
       <FormGroup>
-        <Tooltip
-          placement="right"
-          title={getTooltipText()}
-          onMouseOver={() =>
-            !dangerousElementsEnabled
-              ? setHighLightDangerousElementsCheckbox(true)
-              : null
-          }
-          onMouseLeave={() => setHighLightDangerousElementsCheckbox(false)}
-        >
+        <Tooltip placement="right" title={getTooltipText()}>
           <FormControlLabel
             disabled={!dangerousElementsEnabled}
             control={
               <Checkbox
-                checked={points.every(
-                  (p) => p.connectedToPointOrderNr !== null
-                )}
+                checked={points.every((p) => p.connectedToPointOrderNr !== null)}
                 onChange={(e) => toggleAllDots(e)}
               />
             }
@@ -298,21 +235,10 @@ export default function GeneralSection({
           />
         </Tooltip>
         <FormControlLabel
-          control={
-            <Checkbox
-              checked={showPointNumber}
-              onChange={(e) => setShowPointNumber(e.target.checked)}
-            />
-          }
+          control={<Checkbox checked={showPointNumber} onChange={(e) => setShowPointNumber(e.target.checked)} />}
           label="Show point numbers"
         />
         <FormControlLabel
-          style={{
-            backgroundColor: highLightDangerousElementsCheckbox
-              ? "rgb(128,128,128, 0.4)"
-              : "",
-            borderRadius: "5px",
-          }}
           control={
             <Checkbox
               checked={dangerousElementsEnabled}
