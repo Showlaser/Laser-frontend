@@ -29,3 +29,8 @@ export interface SectionProps {
   fileName: string;
   setFileName: (value: string) => void;
 }
+
+export type WidthAndHeight = {
+  width: number;
+  height: number;
+};

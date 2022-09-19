@@ -2,6 +2,8 @@ import { Point } from "models/components/shared/point";
 import { createGuid } from "services/shared/math";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import { range } from "d3-array";
+import { blue } from "@mui/material/colors";
+import { WidthAndHeight } from "models/components/shared/pattern";
 const flattenSVG = require("flatten-svg");
 
 const pathologize = (original: string) => {
@@ -113,4 +115,35 @@ export const prepareCanvas = (canvas: HTMLCanvasElement): CanvasRenderingContext
 
   ctx.stroke();
   return ctx;
+};
+
+export const getHeightAnWidthOfPattern = (points: Point[]): WidthAndHeight => {
+  const arrayLength = points.length;
+
+  let lowestY = points[0].y;
+  let highestY = points[arrayLength - 1].y;
+
+  let lowestX = points[arrayLength - 1].x;
+  let highestX = points[0].x;
+
+  for (let i = 0; i < arrayLength; i++) {
+    const point = points[i];
+    if (point.y < lowestY) {
+      lowestY = point.y;
+    }
+    if (point.y > highestY) {
+      highestY = point.y;
+    }
+    if (point.x < lowestX) {
+      lowestX = point.x;
+    }
+    if (point.x > highestX) {
+      highestX = point.x;
+    }
+  }
+
+  return {
+    width: highestX - lowestX,
+    height: highestY - lowestY,
+  };
 };

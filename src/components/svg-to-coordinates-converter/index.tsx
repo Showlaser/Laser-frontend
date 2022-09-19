@@ -3,17 +3,16 @@ import { showSuccess, showError, toastSubject } from "services/shared/toast-mess
 import "./index.css";
 import { Grid, SpeedDial, SpeedDialAction } from "@mui/material";
 import { Point } from "models/components/shared/point";
-import { rotatePoint } from "services/shared/math";
+import { getLargestNumber, rotatePoint } from "services/shared/math";
 import ToLaserProjector from "components/shared/to-laser-projector";
 import TabSelector, { TabSelectorData } from "components/tabs";
 import GeneralSection from "./sections/general-section";
 import PointsSection from "./sections/points-section";
-import { prepareCanvas, svgToPoints } from "services/logic/svg-to-coordinates-converter";
+import { getHeightAnWidthOfPattern, prepareCanvas, svgToPoints } from "services/logic/svg-to-coordinates-converter";
 import { Pattern } from "models/components/shared/pattern";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SaveIcon from "@mui/icons-material/Save";
 import ClearIcon from "@mui/icons-material/Clear";
-import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import { addItemToVersionHistory } from "services/shared/version-history";
 
 type Props = {
@@ -81,9 +80,22 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
       setPoints(convertedPoints);
       drawOnCanvas(convertedPoints);
       setUploadedFileName(file.name.substring(0, file.name.length - 4));
+      fitPatternInCanvas(convertedPoints);
     };
 
     reader.readAsText(file);
+  };
+
+  const fitPatternInCanvas = (convertedPoints: Point[]) => {
+    const heightAndWidth = getHeightAnWidthOfPattern(convertedPoints);
+    const widthOfCanvas = 150;
+
+    if (heightAndWidth.height > widthOfCanvas || heightAndWidth.width > widthOfCanvas) {
+      const largestNumber = getLargestNumber(heightAndWidth.height, heightAndWidth.width);
+      const percentageDifference = 100 - (widthOfCanvas / largestNumber) * 100;
+      const newScale = Math.round(((scale * (100 - percentageDifference)) / 100) * 10) / 10;
+      setScale(newScale);
+    }
   };
 
   const applySettingsToPoints = (dotsToDrawLength: number, dotsToDraw: Point[]) => {

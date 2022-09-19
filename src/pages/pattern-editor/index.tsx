@@ -4,10 +4,8 @@ import SideNav from "components/shared/sidenav";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import { Box, SpeedDial, SpeedDialAction } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
-import ClearIcon from "@mui/icons-material/Clear";
 import SvgToCoordinatesConverter from "components/svg-to-coordinates-converter";
 import SettingsIcon from "@mui/icons-material/Settings";
-import SaveIcon from "@mui/icons-material/Save";
 
 export default function PatternPage() {
   const [uploadedFile, setUploadedFile] = useState<any>();
