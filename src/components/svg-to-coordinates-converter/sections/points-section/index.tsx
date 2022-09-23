@@ -1,9 +1,10 @@
 import { DataGrid, GridCellEditCommitParams, GridColDef } from "@mui/x-data-grid";
 import { Point } from "models/components/shared/point";
-import { IconButton, TextField, Tooltip } from "@mui/material";
+import { IconButton, rgbToHex, TextField, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { SectionProps } from "models/components/shared/pattern";
+import { rgbColorStringFromPoint, setLaserPowerFromHexString } from "services/shared/converters";
 
 export default function PointsSection({ points, setPoints, selectedPointsUuid, setSelectedPointsUuid }: SectionProps) {
   const [currentUuid, setCurrentUuid] = useState<string>();
@@ -27,7 +28,9 @@ export default function PointsSection({ points, setPoints, selectedPointsUuid, s
 
         break;
       case "colorRgb":
-        updatedPoints[pointToUpdateIndex].colorRgb = params.value;
+        updatedPoints[pointToUpdateIndex] = setLaserPowerFromHexString(params.value, {
+          ...updatedPoints[pointToUpdateIndex],
+        });
         break;
       case "order":
         const pointOrderToSwapIndex = updatedPoints.findIndex((p) => p.orderNr === Number(params.value));
@@ -44,6 +47,12 @@ export default function PointsSection({ points, setPoints, selectedPointsUuid, s
   let inputRef = React.useRef<HTMLInputElement>(null);
   const onCellClick = (params: any, event: any, details: any) => {
     if (params.field === "colorRgb" && inputRef.current !== null) {
+      const point = points.find((p) => p.uuid === params.id);
+      if (point === undefined) {
+        return;
+      }
+
+      inputRef.current.value = rgbToHex(rgbColorStringFromPoint(point));
       inputRef.current.click();
     }
 
@@ -104,7 +113,7 @@ export default function PointsSection({ points, setPoints, selectedPointsUuid, s
       id: point.uuid,
       uuid: point.uuid,
       order: point.orderNr,
-      colorRgb: point.colorRgb,
+      colorRgb: rgbColorStringFromPoint(point),
       connectedToPointOrderNr: point.connectedToPointOrderNr === null ? null : `Point ${point.connectedToPointOrderNr}`,
     }));
 
@@ -113,7 +122,6 @@ export default function PointsSection({ points, setPoints, selectedPointsUuid, s
       <TextField
         style={{ display: "none" }}
         type="color"
-        value="#ffffff"
         inputRef={inputRef}
         onChange={(e) => {
           if (currentUuid === undefined) {
@@ -123,7 +131,7 @@ export default function PointsSection({ points, setPoints, selectedPointsUuid, s
           let updatedPoints = [...points];
           const index = updatedPoints.findIndex((p) => p.uuid === currentUuid);
           if (index !== -1) {
-            updatedPoints[index].colorRgb = e.target.value;
+            updatedPoints[index] = setLaserPowerFromHexString(e.target.value, { ...updatedPoints[index] });
             setPoints(updatedPoints);
           }
         }}

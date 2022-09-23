@@ -5,7 +5,7 @@ type ToastSubject = {
   id: number;
 };
 
-export const toastSubject = {
+export const toastSubject: any = {
   pointsBoundaryError: {
     message: "Select a value between or equal to -4000 and 4000",
     id: 0,
@@ -15,8 +15,7 @@ export const toastSubject = {
     id: 1,
   },
   developmentModeActive: {
-    message:
-      "Development mode active. Laser power limited to safe level without eye protection",
+    message: "Development mode active. Laser power limited to safe level without eye protection",
     id: 2,
   },
   apiBadRequest: {
@@ -80,8 +79,7 @@ export const toastSubject = {
     id: 17,
   },
   accountDisabled: {
-    message:
-      "Your account is disabled, contact the helpdesk to unblock your account",
+    message: "Your account is disabled, contact the helpdesk to unblock your account",
     id: 18,
   },
   activationSuccessful: {
@@ -97,8 +95,7 @@ export const toastSubject = {
     id: 22,
   },
   accountCreated: {
-    message:
-      "Your account is created! Activate your account by clicking the link in the email you received.",
+    message: "Your account is created! Activate your account by clicking the link in the email you received.",
     id: 23,
   },
   noLongerAvailable: {

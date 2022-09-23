@@ -3,7 +3,7 @@ import { showSuccess, showError, toastSubject } from "services/shared/toast-mess
 import "./index.css";
 import { Grid, SpeedDial, SpeedDialAction } from "@mui/material";
 import { Point } from "models/components/shared/point";
-import { getLargestNumber, rotatePoint } from "services/shared/math";
+import { getLargestNumber, rotatePoint, createGuid } from "services/shared/math";
 import ToLaserProjector from "components/shared/to-laser-projector";
 import TabSelector, { TabSelectorData } from "components/tabs";
 import GeneralSection from "./sections/general-section";
@@ -14,6 +14,8 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import SaveIcon from "@mui/icons-material/Save";
 import ClearIcon from "@mui/icons-material/Clear";
 import { addItemToVersionHistory } from "services/shared/version-history";
+import { rgbColorStringFromPoint } from "services/shared/converters";
+import { savePattern } from "services/logic/pattern-logic";
 
 type Props = {
   uploadedFile: File;
@@ -21,6 +23,7 @@ type Props = {
 };
 
 export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFile }: Props) {
+  const [uuid, setUuid] = React.useState<string>(createGuid());
   const [uploadedFileName, setUploadedFileName] = React.useState<string>("");
   const [scale, setScale] = React.useState<number>(4);
   const [numberOfPoints, setNumberOfPoints] = React.useState<number>(200);
@@ -32,6 +35,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
   const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>([]);
 
   const pattern: Pattern = {
+    uuid,
     name: uploadedFileName,
     points,
     scale,
@@ -71,7 +75,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
     const reader = new FileReader();
     reader.onload = function () {
       const result = reader.result;
-      const convertedPoints = svgToPoints(result, numberOfPoints);
+      const convertedPoints = svgToPoints(result, numberOfPoints, uuid);
       if (convertedPoints.length === 0) {
         onInvalidFile();
         return;
@@ -139,7 +143,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
     screenScale: number
   ) => {
     let dotThickness: number = 2;
-    let color: string = point.colorRgb;
+    let color: string = rgbColorStringFromPoint(point);
     if (pointIsHighlighted) {
       color = "#4287f5";
       dotThickness = 3;
@@ -180,7 +184,9 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
     ctx.stroke();
   };
 
-  const onSave = () => {
+  const onSave = async () => {
+    await savePattern(pattern);
+
     localStorage.setItem("pattern", JSON.stringify(pattern));
     addItemToVersionHistory("Pattern editor", pattern);
     showSuccess(toastSubject.changesSaved);

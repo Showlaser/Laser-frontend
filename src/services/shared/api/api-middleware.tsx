@@ -3,12 +3,12 @@ import { showError, toastSubject, showSuccess } from "../toast-messages";
 import { Post } from "./api-actions";
 import apiEndpoints from "./api-endpoints";
 
-const handleErrorMessage = (statusCode, ignoredStatusCodes) => {
+const handleErrorMessage = (statusCode: number, ignoredStatusCodes: number[]) => {
   if (ignoredStatusCodes.includes(statusCode)) {
     return;
   }
 
-  const statusCodes = {
+  const statusCodes: any = {
     400: toastSubject.apiBadRequest,
     404: toastSubject.apiNotFound,
     406: toastSubject.unsafePattern,
@@ -23,21 +23,18 @@ const handleErrorMessage = (statusCode, ignoredStatusCodes) => {
 };
 
 export async function sendRequest(
-  requestFunction,
-  ignoredStatusCodes,
-  onSuccessToastSubject,
-  redirectToLoginOnError = true
+  requestFunction: () => Promise<Response>,
+  ignoredStatusCodes: number[],
+  onSuccessToastSubject: any = null,
+  redirectToLoginOnError: boolean = true
 ) {
   let response = await requestFunction();
   if (response.status === 401) {
     // tokens are set by cookies
-    const refreshResponse = await Post(apiEndpoints.refreshToken, null, true);
-    if (
-      refreshResponse.status !== 200 &&
-      !window.location.href.includes("login")
-    ) {
+    const refreshResponse: any = await Post(apiEndpoints.refreshToken, null);
+    if (refreshResponse.status !== 200 && !window.location.href.includes("login")) {
       if (redirectToLoginOnError) {
-        window.location = paths.Login;
+        window.location.href = paths.Login;
       }
       return;
     }
@@ -49,7 +46,7 @@ export async function sendRequest(
     handleErrorMessage(response.status, ignoredStatusCodes);
     return response;
   }
-  if (onSuccessToastSubject !== undefined) {
+  if (onSuccessToastSubject !== undefined && onSuccessToastSubject !== null) {
     showSuccess(onSuccessToastSubject);
   }
   return response;

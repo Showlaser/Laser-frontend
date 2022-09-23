@@ -2,7 +2,6 @@ import { Point } from "models/components/shared/point";
 import { createGuid } from "services/shared/math";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import { range } from "d3-array";
-import { blue } from "@mui/material/colors";
 import { WidthAndHeight } from "models/components/shared/pattern";
 const flattenSVG = require("flatten-svg");
 
@@ -20,28 +19,31 @@ const pathologize = (original: string) => {
   }
 };
 
-const mapCoordinatesToXAndYPoint = (coordinates: any): Point[] => {
+const mapCoordinatesToXAndYPoint = (coordinates: any, patternUuid: string): Point[] => {
   const length = coordinates.length;
   const mappedCoordinates = new Array<Point>(length);
   for (let i = 0; i < length; i++) {
     const x: number = coordinates[i][0];
     const y: number = coordinates[i][1];
-    mappedCoordinates[i] = createPoint(x, y, i);
+    mappedCoordinates[i] = createPoint(x, y, i, patternUuid);
   }
 
   return mappedCoordinates;
 };
 
-const createPoint = (x: number, y: number, orderNr: number): Point => ({
+const createPoint = (x: number, y: number, orderNr: number, patternUuid: string): Point => ({
   uuid: createGuid(),
-  colorRgb: "#ffffff",
+  patternUuid,
+  redLaserPowerPwm: 255,
+  greenLaserPowerPwm: 255,
+  blueLaserPowerPwm: 255,
   connectedToPointOrderNr: null,
   orderNr: orderNr,
   x,
   y,
 });
 
-export const svgToPoints = (svg: any, numberOfPoints: number): Point[] => {
+export const svgToPoints = (svg: any, numberOfPoints: number, patternUuid: string): Point[] => {
   if (!svg) {
     return [];
   }
@@ -57,7 +59,7 @@ export const svgToPoints = (svg: any, numberOfPoints: number): Point[] => {
   }
 
   const coordinates = pathsToCoords(paths, numberOfPoints);
-  return mapCoordinatesToXAndYPoint(coordinates);
+  return mapCoordinatesToXAndYPoint(coordinates, patternUuid);
 };
 
 const pathsToCoords = (paths: any, numberOfPoints: number) => {

@@ -12,6 +12,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { SectionProps } from "models/components/shared/pattern";
+import { setLaserPowerFromHexString } from "services/shared/converters";
 
 export default function GeneralSection({
   scale,
@@ -81,7 +82,7 @@ export default function GeneralSection({
             const length = updatedPoints.length;
 
             for (let i = 0; i < length; i++) {
-              updatedPoints[i].colorRgb = e.target.value;
+              updatedPoints[i] = setLaserPowerFromHexString(e.target.value, { ...updatedPoints[i] });
             }
 
             setPoints(updatedPoints);

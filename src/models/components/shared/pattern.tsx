@@ -1,6 +1,7 @@
 import { Point } from "./point";
 
 export type Pattern = {
+  uuid: string;
   name: string;
   points: Point[];
   scale: number;
