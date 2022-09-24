@@ -6,7 +6,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { SectionProps } from "models/components/shared/pattern";
 import { rgbColorStringFromPoint, setLaserPowerFromHexString } from "services/shared/converters";
 
-export default function PointsSection({ points, setPoints, selectedPointsUuid, setSelectedPointsUuid }: SectionProps) {
+export default function PointsSection({
+  pattern,
+  updatePatternProperty,
+  selectedPointsUuid,
+  setSelectedPointsUuid,
+}: SectionProps) {
   const [currentUuid, setCurrentUuid] = useState<string>();
 
   const updatePointProperty = (points: Point[], params: GridCellEditCommitParams) => {
@@ -41,13 +46,13 @@ export default function PointsSection({ points, setPoints, selectedPointsUuid, s
         break;
     }
 
-    setPoints(updatedPoints);
+    updatePatternProperty("points", updatedPoints);
   };
 
   let inputRef = React.useRef<HTMLInputElement>(null);
   const onCellClick = (params: any, event: any, details: any) => {
     if (params.field === "colorRgb" && inputRef.current !== null) {
-      const point = points.find((p) => p.uuid === params.id);
+      const point = pattern.points.find((p) => p.uuid === params.id);
       if (point === undefined) {
         return;
       }
@@ -62,7 +67,7 @@ export default function PointsSection({ points, setPoints, selectedPointsUuid, s
   };
 
   const getAvailablePoints = () => {
-    let options = points.map((point) => `Point ${point.orderNr}`);
+    let options = pattern.points.map((point) => `Point ${point.orderNr}`);
     options.unshift("None");
     return options;
   };
@@ -75,7 +80,7 @@ export default function PointsSection({ points, setPoints, selectedPointsUuid, s
         width: 70,
         editable: true,
         type: "singleSelect",
-        valueOptions: points.map((point) => point.orderNr.toString()),
+        valueOptions: pattern.points.map((point) => point.orderNr.toString()),
       },
       { field: "colorRgb", headerName: "Color Rgb", width: 130 },
       {
@@ -107,7 +112,7 @@ export default function PointsSection({ points, setPoints, selectedPointsUuid, s
     return columns;
   };
 
-  const rows = points
+  const rows = pattern.points
     .sort((a, b) => a.orderNr - b.orderNr)
     .map((point) => ({
       id: point.uuid,
@@ -128,16 +133,16 @@ export default function PointsSection({ points, setPoints, selectedPointsUuid, s
             return;
           }
 
-          let updatedPoints = [...points];
+          let updatedPoints = [...pattern.points];
           const index = updatedPoints.findIndex((p) => p.uuid === currentUuid);
           if (index !== -1) {
             updatedPoints[index] = setLaserPowerFromHexString(e.target.value, { ...updatedPoints[index] });
-            setPoints(updatedPoints);
+            updatePatternProperty("points", updatedPoints);
           }
         }}
       />
       <DataGrid
-        onCellEditCommit={(params: GridCellEditCommitParams) => updatePointProperty(points, params)}
+        onCellEditCommit={(params: GridCellEditCommitParams) => updatePointProperty(pattern.points, params)}
         checkboxSelection
         disableSelectionOnClick
         selectionModel={selectedPointsUuid}

@@ -18,31 +18,37 @@ import { rgbColorStringFromPoint } from "services/shared/converters";
 import { savePattern } from "services/logic/pattern-logic";
 
 type Props = {
+  patternNamesInUse: string[];
   uploadedFile: File;
   setUploadedFile: (file: any) => void;
+  patternFromServer: Pattern | undefined;
+  clearServerPattern: () => void;
 };
 
-export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFile }: Props) {
-  const [uuid, setUuid] = React.useState<string>(createGuid());
-  const [uploadedFileName, setUploadedFileName] = React.useState<string>("");
-  const [scale, setScale] = React.useState<number>(4);
-  const [numberOfPoints, setNumberOfPoints] = React.useState<number>(200);
-  const [xOffset, setXOffset] = React.useState<number>(0);
-  const [yOffset, setYOffset] = React.useState<number>(0);
-  const [showPointNumber, setShowPointNumber] = React.useState<boolean>(false);
-  const [rotation, setRotation] = React.useState<number>(0);
-  const [points, setPoints] = React.useState<Point[]>([]);
-  const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>([]);
-
-  const pattern: Pattern = {
-    uuid,
-    name: uploadedFileName,
-    points,
-    scale,
-    xOffset,
-    yOffset,
-    rotation,
+export default function SvgToCoordinatesConverter({
+  patternNamesInUse,
+  uploadedFile,
+  setUploadedFile,
+  patternFromServer,
+  clearServerPattern,
+}: Props) {
+  const patternPlaceHolder: Pattern = {
+    uuid: createGuid(),
+    rotation: 0,
+    points: [],
+    name: "New Pattern",
+    scale: 4,
+    xOffset: 0,
+    yOffset: 0,
   };
+
+  const [pattern, setPattern] = React.useState<Pattern>(
+    patternFromServer === undefined ? patternPlaceHolder : patternFromServer
+  );
+  const [uploadedFileName, setUploadedFileName] = React.useState<string>("");
+  const [numberOfPoints, setNumberOfPoints] = React.useState<number>(200);
+  const [showPointNumber, setShowPointNumber] = React.useState<boolean>(false);
+  const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>([]);
 
   const alertUser = (e: BeforeUnloadEvent) => {
     e.preventDefault();
@@ -50,6 +56,10 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
   };
 
   React.useEffect(() => {
+    if (uploadedFile === undefined) {
+      return;
+    }
+
     onFileUpload(uploadedFile);
     window.addEventListener("beforeunload", alertUser);
     return () => {
@@ -58,12 +68,23 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
   }, [uploadedFile, numberOfPoints]);
 
   React.useEffect(() => {
-    drawOnCanvas(points);
-  }, [xOffset, yOffset, rotation, showPointNumber, scale, selectedPointsUuid, points]);
+    drawOnCanvas(pattern.points);
+  }, [showPointNumber, selectedPointsUuid, pattern]);
 
   const onInvalidFile = () => {
     showError(toastSubject.invalidFile);
     setUploadedFile(undefined);
+  };
+
+  const clearEditor = () => {
+    setUploadedFile(undefined);
+    clearServerPattern();
+  };
+
+  const updatePatternProperty = (property: string, value: any) => {
+    let updatedPattern: any = { ...pattern };
+    updatedPattern[property] = value;
+    setPattern(updatedPattern);
   };
 
   const onFileUpload = (file: File) => {
@@ -75,13 +96,13 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
     const reader = new FileReader();
     reader.onload = function () {
       const result = reader.result;
-      const convertedPoints = svgToPoints(result, numberOfPoints, uuid);
+      const convertedPoints = svgToPoints(result, numberOfPoints, pattern.uuid);
       if (convertedPoints.length === 0) {
         onInvalidFile();
         return;
       }
 
-      setPoints(convertedPoints);
+      updatePatternProperty("points", convertedPoints);
       drawOnCanvas(convertedPoints);
       setUploadedFileName(file.name.substring(0, file.name.length - 4));
       fitPatternInCanvas(convertedPoints);
@@ -97,20 +118,25 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
     if (heightAndWidth.height > widthOfCanvas || heightAndWidth.width > widthOfCanvas) {
       const largestNumber = getLargestNumber(heightAndWidth.height, heightAndWidth.width);
       const percentageDifference = 100 - (widthOfCanvas / largestNumber) * 100;
-      const newScale = Math.round(((scale * (100 - percentageDifference)) / 100) * 10) / 10;
-      setScale(newScale);
+      const newScale = Math.round(((pattern.scale * (100 - percentageDifference)) / 100) * 10) / 10;
+      updatePatternProperty("scale", newScale);
     }
   };
 
   const applySettingsToPoints = (dotsToDrawLength: number, dotsToDraw: Point[]) => {
     let updatedPoints: Point[] = [];
     for (let index = 0; index < dotsToDrawLength; index++) {
-      let rotatedPoint: Point = rotatePoint({ ...dotsToDraw[index] }, rotation, xOffset, yOffset);
+      let rotatedPoint: Point = rotatePoint(
+        { ...dotsToDraw[index] },
+        pattern.rotation,
+        pattern.xOffset,
+        pattern.yOffset
+      );
 
-      rotatedPoint.x += xOffset;
-      rotatedPoint.y += yOffset;
-      rotatedPoint.x *= scale;
-      rotatedPoint.y *= scale;
+      rotatedPoint.x += pattern.xOffset;
+      rotatedPoint.y += pattern.yOffset;
+      rotatedPoint.x *= pattern.scale;
+      rotatedPoint.y *= pattern.scale;
       updatedPoints.push(rotatedPoint);
     }
     return updatedPoints;
@@ -193,24 +219,15 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
   };
 
   const sectionProps = {
-    scale,
-    setScale,
+    patternNamesInUse,
+    pattern,
+    updatePatternProperty,
     numberOfPoints,
     setNumberOfPoints,
-    xOffset,
-    setXOffset,
-    yOffset,
-    setYOffset,
-    rotation,
-    setRotation,
     showPointNumber,
     setShowPointNumber,
-    points,
-    setPoints,
     selectedPointsUuid,
     setSelectedPointsUuid,
-    fileName: uploadedFileName,
-    setFileName: setUploadedFileName,
   };
 
   const tabSelectorData: TabSelectorData[] = [
@@ -247,7 +264,7 @@ export default function SvgToCoordinatesConverter({ uploadedFile, setUploadedFil
           icon={<ClearIcon />}
           onClick={() =>
             window.confirm("Are you sure you want to clear the field? Unsaved changes will be lost")
-              ? setUploadedFile(undefined)
+              ? clearEditor()
               : null
           }
           tooltipTitle="Clear editor field"

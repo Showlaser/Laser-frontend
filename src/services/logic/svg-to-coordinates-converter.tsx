@@ -23,8 +23,8 @@ const mapCoordinatesToXAndYPoint = (coordinates: any, patternUuid: string): Poin
   const length = coordinates.length;
   const mappedCoordinates = new Array<Point>(length);
   for (let i = 0; i < length; i++) {
-    const x: number = coordinates[i][0];
-    const y: number = coordinates[i][1];
+    const x: number = Math.round(coordinates[i][0]);
+    const y: number = Math.round(coordinates[i][1]);
     mappedCoordinates[i] = createPoint(x, y, i, patternUuid);
   }
 

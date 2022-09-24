@@ -11,20 +11,7 @@ type Laser = {
   online: boolean;
 };
 
-export default function ToLaserProjector({
-  scale,
-  setScale,
-  numberOfPoints,
-  setNumberOfPoints,
-  xOffset,
-  setXOffset,
-  yOffset,
-  setYOffset,
-  rotation,
-  setRotation,
-  showPointNumber,
-  setShowPointNumber,
-}: SectionProps) {
+export default function ToLaserProjector({ pattern, updatePatternProperty }: SectionProps) {
   const [isPlaying, setIsPlaying] = React.useState<boolean>(localStorage.getItem("lasers-are-playing") !== null);
   const [selectedLasersUuid, setSelectedLasersUuid] = React.useState<string[]>([]);
   const [searchValue, setSearchValue] = React.useState<string>();

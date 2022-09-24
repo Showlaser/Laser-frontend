@@ -11,24 +11,15 @@ export type Pattern = {
 };
 
 export interface SectionProps {
-  scale: number;
-  setScale: (value: number) => void;
+  patternNamesInUse: string[];
+  pattern: Pattern;
+  updatePatternProperty: (property: string, value: any) => void;
   numberOfPoints: number;
-  setNumberOfPoints: (value: number) => void;
-  xOffset: number;
-  setXOffset: (value: number) => void;
-  yOffset: number;
-  setYOffset: (value: number) => void;
-  rotation: number;
-  setRotation: (value: number) => void;
+  setNumberOfPoints: (count: number) => void;
   showPointNumber: boolean;
-  setShowPointNumber: (value: boolean) => void;
-  points: Point[];
-  setPoints: (points: Point[]) => void;
+  setShowPointNumber: (show: boolean) => void;
   selectedPointsUuid: string[];
-  setSelectedPointsUuid: (value: string[]) => void;
-  fileName: string;
-  setFileName: (value: string) => void;
+  setSelectedPointsUuid: (selected: string[]) => void;
 }
 
 export type WidthAndHeight = {

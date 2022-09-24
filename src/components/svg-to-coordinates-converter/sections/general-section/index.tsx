@@ -13,53 +13,45 @@ import {
 } from "@mui/material";
 import { SectionProps } from "models/components/shared/pattern";
 import { setLaserPowerFromHexString } from "services/shared/converters";
+import { showError, toastSubject } from "services/shared/toast-messages";
 
 export default function GeneralSection({
-  scale,
-  setScale,
+  patternNamesInUse,
+  pattern,
+  updatePatternProperty,
   numberOfPoints,
   setNumberOfPoints,
-  xOffset,
-  setXOffset,
-  yOffset,
-  setYOffset,
-  rotation,
-  setRotation,
   showPointNumber,
   setShowPointNumber,
-  fileName,
-  setFileName,
-  points,
-  setPoints,
 }: SectionProps) {
   const [dangerousElementsEnabled, setDangerousElementsEnabled] = React.useState<boolean>(false);
 
   const toggleAllDots = (e: any) => (e.target.checked ? connectAllDots() : disconnectAllDots());
 
   const disconnectAllDots = () => {
-    let updatedPoints = [...points];
-    const pointsLength = points.length;
+    let updatedPoints = [...pattern.points];
+    const pointsLength = pattern.points.length;
 
     for (let i = 0; i < pointsLength; i++) {
       updatedPoints[i].connectedToPointOrderNr = null;
     }
 
-    setPoints(updatedPoints);
+    updatePatternProperty("points", updatedPoints);
   };
 
   const connectAllDots = () => {
-    let updatedPoints = [...points];
-    const pointsLenght = points.length;
+    let updatedPoints = [...pattern.points];
+    const pointsLength = pattern.points.length;
 
-    for (let i = 0; i < pointsLenght; i++) {
-      if (i === points.length - 1) {
+    for (let i = 0; i < pointsLength; i++) {
+      if (i === pattern.points.length - 1) {
         updatedPoints[i].connectedToPointOrderNr = 0;
       } else {
         updatedPoints[i].connectedToPointOrderNr = i + 1;
       }
     }
 
-    setPoints(updatedPoints);
+    updatePatternProperty("points", updatedPoints);
   };
 
   const getTooltipText = () =>
@@ -70,7 +62,18 @@ export default function GeneralSection({
   return (
     <div>
       <FormControl style={{ width: "100%", marginBottom: "10px" }}>
-        <TextField value={fileName} label="Pattern name" onChange={(e) => setFileName(e.target.value)} />
+        <TextField
+          value={pattern.name}
+          label="Pattern name"
+          onChange={(e) => {
+            if (patternNamesInUse.some((patternName) => patternName === e.target.value)) {
+              showError(toastSubject.duplicatedName);
+              return;
+            }
+
+            updatePatternProperty("name", e.target.value);
+          }}
+        />
       </FormControl>
       <FormControl style={{ width: "100%", marginBottom: "10px", marginTop: "10px" }}>
         <TextField
@@ -78,14 +81,14 @@ export default function GeneralSection({
           type="color"
           value="#ffffff"
           onChange={(e) => {
-            let updatedPoints = [...points];
+            let updatedPoints = [...pattern.points];
             const length = updatedPoints.length;
 
             for (let i = 0; i < length; i++) {
               updatedPoints[i] = setLaserPowerFromHexString(e.target.value, { ...updatedPoints[i] });
             }
 
-            setPoints(updatedPoints);
+            updatePatternProperty("points", updatedPoints);
           }}
         />
       </FormControl>
@@ -94,7 +97,9 @@ export default function GeneralSection({
           Scale
           <Button
             style={{ marginLeft: "10px" }}
-            onClick={() => (window.confirm("Are you sure you want to reset this value?") ? setScale(4) : null)}
+            onClick={() =>
+              window.confirm("Are you sure you want to reset this value?") ? updatePatternProperty("scale", 4) : null
+            }
           >
             Reset
           </Button>
@@ -102,8 +107,8 @@ export default function GeneralSection({
         <Slider
           id="svg-scale"
           size="small"
-          value={scale}
-          onChange={(e, value) => setScale(Number(value))}
+          value={pattern.scale}
+          onChange={(e, value) => updatePatternProperty("scale", Number(value))}
           min={0.1}
           max={10}
           step={0.1}
@@ -153,22 +158,28 @@ export default function GeneralSection({
         X offset
         <Button
           style={{ marginLeft: "10px" }}
-          onClick={() => (window.confirm("Are you sure you want to reset this value?") ? setXOffset(0) : null)}
+          onClick={() =>
+            window.confirm("Are you sure you want to reset this value?") ? updatePatternProperty("xOffset", 0) : null
+          }
         >
           Reset
         </Button>
       </FormLabel>
       <br />
-      <Input type="number" value={xOffset} onChange={(e) => setXOffset(Number(e.target.value))} />
+      <Input
+        type="number"
+        value={pattern.xOffset}
+        onChange={(e) => updatePatternProperty("xOffset", Number(e.target.value))}
+      />
       <br />
       <FormControl style={{ width: "100%" }}>
         <Slider
           id="svg-points"
           size="small"
-          value={xOffset}
-          onChange={(e, value) => setXOffset(Number(value))}
-          min={-8000 / (scale * 10)}
-          max={8000 / (scale * 10)}
+          value={pattern.xOffset}
+          onChange={(e, value) => updatePatternProperty("xOffset", Number(value))}
+          min={-8000 / (pattern.scale * 10)}
+          max={8000 / (pattern.scale * 10)}
           aria-label="Small"
           valueLabelDisplay="auto"
         />
@@ -177,22 +188,28 @@ export default function GeneralSection({
         Y offset
         <Button
           style={{ marginLeft: "10px" }}
-          onClick={() => (window.confirm("Are you sure you want to reset this value?") ? setYOffset(0) : null)}
+          onClick={() =>
+            window.confirm("Are you sure you want to reset this value?") ? updatePatternProperty("yOffset", 0) : null
+          }
         >
           Reset
         </Button>
       </FormLabel>
       <br />
-      <Input type="number" value={yOffset} onChange={(e) => setYOffset(Number(e.target.value))} />
+      <Input
+        type="number"
+        value={pattern.yOffset}
+        onChange={(e) => updatePatternProperty("yOffset", Number(e.target.value))}
+      />
       <br />
       <FormControl style={{ width: "100%" }}>
         <Slider
           id="svg-points"
           size="small"
-          value={yOffset}
-          onChange={(e, value) => setYOffset(Number(value))}
-          min={-8000 / (scale * 10)}
-          max={8000 / (scale * 10)}
+          value={pattern.yOffset}
+          onChange={(e, value) => updatePatternProperty("yOffset", Number(value))}
+          min={-8000 / (pattern.scale * 10)}
+          max={8000 / (pattern.scale * 10)}
           aria-label="Small"
           valueLabelDisplay="auto"
           marks={[{ value: 0, label: "0" }]}
@@ -202,20 +219,26 @@ export default function GeneralSection({
         Rotation
         <Button
           style={{ marginLeft: "10px" }}
-          onClick={() => (window.confirm("Are you sure you want to reset this value?") ? setRotation(0) : null)}
+          onClick={() =>
+            window.confirm("Are you sure you want to reset this value?") ? updatePatternProperty("rotation", 0) : null
+          }
         >
           Reset
         </Button>
       </FormLabel>
       <br />
-      <Input type="number" value={rotation} onChange={(e) => setRotation(Number(e.target.value))} />
+      <Input
+        type="number"
+        value={pattern.rotation}
+        onChange={(e) => updatePatternProperty("rotation", Number(e.target.value))}
+      />
       <br />
       <FormControl style={{ width: "100%" }}>
         <Slider
           id="svg-points"
           size="small"
-          value={rotation}
-          onChange={(e, value) => setRotation(Number(value))}
+          value={pattern.rotation}
+          onChange={(e, value) => updatePatternProperty("rotation", Number(value))}
           min={-360}
           max={360}
           aria-label="Small"
@@ -228,7 +251,7 @@ export default function GeneralSection({
             disabled={!dangerousElementsEnabled}
             control={
               <Checkbox
-                checked={points.every((p) => p.connectedToPointOrderNr !== null)}
+                checked={pattern.points.every((p) => p.connectedToPointOrderNr !== null)}
                 onChange={(e) => toggleAllDots(e)}
               />
             }
