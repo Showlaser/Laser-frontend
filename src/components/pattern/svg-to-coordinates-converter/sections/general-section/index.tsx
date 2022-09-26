@@ -13,10 +13,11 @@ import {
 } from "@mui/material";
 import { SectionProps } from "models/components/shared/pattern";
 import { setLaserPowerFromHexString } from "services/shared/converters";
-import { showError, toastSubject } from "services/shared/toast-messages";
+import { showError, showWarning, toastSubject } from "services/shared/toast-messages";
 
 export default function GeneralSection({
   patternNamesInUse,
+  setPatternNameIsInUse,
   pattern,
   updatePatternProperty,
   numberOfPoints,
@@ -67,8 +68,10 @@ export default function GeneralSection({
           label="Pattern name"
           onChange={(e) => {
             if (patternNamesInUse.some((patternName) => patternName === e.target.value)) {
-              showError(toastSubject.duplicatedName);
-              return;
+              showWarning(toastSubject.duplicatedName);
+              setPatternNameIsInUse(true);
+            } else {
+              setPatternNameIsInUse(false);
             }
 
             updatePatternProperty("name", e.target.value);

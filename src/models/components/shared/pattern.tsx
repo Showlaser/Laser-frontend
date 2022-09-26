@@ -1,8 +1,11 @@
+import { createGuid } from "services/shared/math";
+import { getRandomObjectName } from "services/shared/random-object-name-generator";
 import { Point } from "./point";
 
 export type Pattern = {
   uuid: string;
   name: string;
+  image: string | null;
   points: Point[];
   scale: number;
   xOffset: number;
@@ -12,6 +15,7 @@ export type Pattern = {
 
 export interface SectionProps {
   patternNamesInUse: string[];
+  setPatternNameIsInUse: (state: boolean) => void;
   pattern: Pattern;
   updatePatternProperty: (property: string, value: any) => void;
   numberOfPoints: number;
@@ -26,3 +30,14 @@ export type WidthAndHeight = {
   width: number;
   height: number;
 };
+
+export const getPatternPlaceHolder = (): Pattern => ({
+  uuid: createGuid(),
+  image: null,
+  rotation: 0,
+  points: [],
+  name: getRandomObjectName(),
+  scale: 4,
+  xOffset: 0,
+  yOffset: 0,
+});

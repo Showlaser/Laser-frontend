@@ -1,11 +1,15 @@
 import { toast } from "react-toastify";
 
-type ToastSubject = {
+interface ToastSubject {
+  [key: string]: ToastSubjectObject;
+}
+
+type ToastSubjectObject = {
   message: string;
   id: number;
 };
 
-export const toastSubject: any = {
+export const toastSubject: ToastSubject = {
   pointsBoundaryError: {
     message: "Select a value between or equal to -4000 and 4000",
     id: 0,
@@ -113,25 +117,25 @@ const calculateAutoCloseTime = (text: string) => {
   return autoCloseTime > 3000 ? autoCloseTime : 3000;
 };
 
-export const showError = (subject: ToastSubject) => {
+export const showError = (subject: ToastSubjectObject) => {
   const { message, id } = subject;
   const time = calculateAutoCloseTime(message);
   toast.error(message, { toastId: id, autoClose: time });
 };
 
-export const showSuccess = (subject: ToastSubject) => {
+export const showSuccess = (subject: ToastSubjectObject) => {
   const { message, id } = subject;
   const time = calculateAutoCloseTime(message);
   toast.success(message, { toastId: id, autoClose: time });
 };
 
-export const showWarning = (subject: ToastSubject) => {
+export const showWarning = (subject: ToastSubjectObject) => {
   const { message, id } = subject;
   const time = calculateAutoCloseTime(message);
   toast.warning(message, { toastId: id, autoClose: time });
 };
 
-export const showInfo = (subject: ToastSubject) => {
+export const showInfo = (subject: ToastSubjectObject) => {
   const { message, id } = subject;
   const time = calculateAutoCloseTime(message);
   toast.info(message, { toastId: id, autoClose: time });

@@ -1,3 +1,5 @@
+import { Animation, animationPlaceholder } from "models/components/shared/animation";
+import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
 
 export const rgbColorStringFromPoint = (point: Point): string =>
@@ -22,4 +24,12 @@ export const setLaserPowerFromHexString = (hex: string, point: Point): Point => 
   point.greenLaserPowerPwm = rgb?.g;
   point.blueLaserPowerPwm = rgb?.b;
   return point;
+};
+
+export const convertPatternToAnimation = (pattern: Pattern): Animation => {
+  let animation: Animation = animationPlaceholder();
+  animation.name = pattern.name;
+  animation.image = pattern.image;
+  animation.points = pattern.points;
+  return animation;
 };

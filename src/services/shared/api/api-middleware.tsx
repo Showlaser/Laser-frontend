@@ -15,7 +15,6 @@ const handleErrorMessage = (statusCode: number, ignoredStatusCodes: number[]) =>
     409: toastSubject.apiDuplication,
     410: toastSubject.noLongerAvailable,
     304: toastSubject.apiNotModified,
-    500: toastSubject.apiException,
   };
 
   const subject = statusCodes[statusCode];
@@ -28,26 +27,31 @@ export async function sendRequest(
   onSuccessToastSubject: any = null,
   redirectToLoginOnError: boolean = true
 ) {
-  let response = await requestFunction();
-  if (response.status === 401) {
-    // tokens are set by cookies
-    const refreshResponse: any = await Post(apiEndpoints.refreshToken, null);
-    if (refreshResponse.status !== 200 && !window.location.href.includes("login")) {
-      if (redirectToLoginOnError) {
-        window.location.href = paths.Login;
+  let response;
+  try {
+    response = await requestFunction();
+    if (onSuccessToastSubject !== undefined && onSuccessToastSubject !== null) {
+      showSuccess(onSuccessToastSubject);
+    }
+    if (response.status === 401) {
+      // tokens are set by cookies
+      const refreshResponse: any = await Post(apiEndpoints.refreshToken, null);
+      if (refreshResponse.status !== 200 && !window.location.href.includes("login")) {
+        if (redirectToLoginOnError) {
+          window.location.href = paths.Login;
+        }
+        return;
       }
-      return;
+
+      response = await requestFunction();
     }
 
-    response = await requestFunction();
-  }
-
-  if (response.status !== 200) {
-    handleErrorMessage(response.status, ignoredStatusCodes);
+    if (response.status !== 200) {
+      handleErrorMessage(response.status, ignoredStatusCodes);
+      return response;
+    }
     return response;
+  } catch (error) {
+    showError(toastSubject.apiUnavailable);
   }
-  if (onSuccessToastSubject !== undefined && onSuccessToastSubject !== null) {
-    showSuccess(onSuccessToastSubject);
-  }
-  return response;
 }

@@ -2,39 +2,33 @@ import "./index.css";
 import React, { useEffect, useState } from "react";
 import SideNav from "components/shared/sidenav";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-import {
-  Box,
-  Card,
-  CardActionArea,
-  CardContent,
-  CardMedia,
-  Divider,
-  Grid,
-  IconButton,
-  InputBase,
-  Modal,
-  Paper,
-  SpeedDial,
-  SpeedDialAction,
-  Typography,
-} from "@mui/material";
+import { Box, SpeedDial, SpeedDialAction } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
-import SvgToCoordinatesConverter from "components/svg-to-coordinates-converter";
+import SvgToCoordinatesConverter from "components/pattern/svg-to-coordinates-converter";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
-import CloseIcon from "@mui/icons-material/Close";
 import { Pattern } from "models/components/shared/pattern";
 import { getPatterns } from "services/logic/pattern-logic";
+import CardOverview from "components/shared/card-overview";
 
 export default function PatternPage() {
   const [uploadedFile, setUploadedFile] = useState<any>();
-  const [availablePatterns, setAvailablePatterns] = useState<Pattern[]>([]);
+  const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [patternSearchValue, setPatternSearchValue] = useState<string>("");
-  const [selectedPattern, setSelectedPattern] = useState<Pattern | undefined>(undefined);
+  const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
+
+  useEffect(() => {
+    if (availablePatterns === undefined) {
+      getPatterns().then((patterns) => setAvailablePatterns(patterns));
+    }
+  }, [availablePatterns]);
 
   const onOpenModalClick = async () => {
     const patterns = await getPatterns();
+    if (patterns === undefined) {
+      return;
+    }
+
     setAvailablePatterns(patterns);
     setModalOpen(true);
   };
@@ -43,7 +37,7 @@ export default function PatternPage() {
     <SpeedDial
       ariaLabel="SpeedDial basic example"
       sx={{ position: "absolute", bottom: 30, right: 30 }}
-      icon={uploadedFile === undefined && selectedPattern === undefined ? <SpeedDialIcon /> : <SettingsIcon />}
+      icon={uploadedFile === undefined && selectedPattern === null ? <SpeedDialIcon /> : <SettingsIcon />}
     >
       <SpeedDialAction
         key="sd-upload"
@@ -56,7 +50,7 @@ export default function PatternPage() {
       />
       <SpeedDialAction
         key="sd-saved-file"
-        tooltipTitle="Get saved file"
+        tooltipTitle="Get saved pattern"
         onClick={() => onOpenModalClick()}
         icon={
           <label style={{ cursor: "pointer", padding: "25px" }}>
@@ -67,85 +61,35 @@ export default function PatternPage() {
     </SpeedDial>
   );
 
-  const getPatternCards = () =>
-    availablePatterns.length === 0 ? null : (
-      <Box style={{ margin: "30px" }} sx={{ flexDirection: "row", flexWrap: "wrap" }}>
-        {availablePatterns
-          .filter((pattern) => (patternSearchValue.length > 0 ? pattern.name.includes(patternSearchValue) : true))
-          .map((pattern) => (
-            <Card sx={{ width: "20%", minWidth: "30vh" }}>
-              <CardActionArea
-                onClick={() => {
-                  setModalOpen(false);
-                  setSelectedPattern(pattern);
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  height="140"
-                  alt="pattern image"
-                  src="https://cms-assets.tutsplus.com/cdn-cgi/image/width=850/uploads/users/1251/posts/37005/image-upload/tutsplus_animejs_canvas_fireworks.png"
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {pattern.name}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          ))}
-      </Box>
-    );
-
   return (
     <SideNav pageName="Pattern editor">
-      {uploadedFile === undefined && selectedPattern === undefined ? null : (
+      {uploadedFile === undefined && selectedPattern === null ? null : (
         <SvgToCoordinatesConverter
-          patternNamesInUse={availablePatterns.map((pattern) =>
-            pattern.uuid !== selectedPattern?.uuid ? pattern.name : ""
-          )}
+          patternNamesInUse={
+            availablePatterns?.map((pattern) => (pattern.uuid !== selectedPattern?.uuid ? pattern.name : "")) ?? []
+          }
           uploadedFile={uploadedFile}
           setUploadedFile={setUploadedFile}
           patternFromServer={selectedPattern}
-          clearServerPattern={() => setSelectedPattern(undefined)}
+          clearServerPattern={() => setSelectedPattern(null)}
         />
       )}
-      <Modal
-        open={modalOpen}
-        onKeyDown={(e) => {
-          if (e.key === "Escape") {
-            setModalOpen(false);
-          }
-        }}
-      >
-        <Box style={{ textAlign: "center", marginTop: "40px" }}>
-          <IconButton style={{ marginLeft: "95%", marginBottom: "0px" }} onClick={() => setModalOpen(false)}>
-            <CloseIcon />
-          </IconButton>
-          <Typography variant="h5" style={{ marginBottom: "20px", marginTop: "10px" }}>
-            Saved patterns
-          </Typography>
-          <Divider />
-          <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center">
-            <Paper
-              sx={{
-                backgroundColor: "#2E2E2E",
-                width: "30%",
-                m: "8px 0 0 0",
-                p: "4px 6px",
-                display: "flex",
-              }}
-            >
-              <InputBase
-                sx={{ ml: 1, flex: 1 }}
-                placeholder="Search pattern"
-                onChange={(e) => setPatternSearchValue(e.target.value)}
-              />
-            </Paper>
-          </Grid>
-          {getPatternCards()}
-        </Box>
-      </Modal>
+      <CardOverview
+        closeOverview={() => setModalOpen(false)}
+        show={modalOpen}
+        items={
+          availablePatterns?.map((pattern) => ({
+            name: pattern.name,
+            image: pattern.image,
+            onCardClick: () => {
+              setModalOpen(false);
+              setSelectedPattern(pattern);
+            },
+          })) ?? []
+        }
+        onEmptyMessageTitle="No saved patterns"
+        onEmptyMessageDescription="Create a new pattern"
+      />
       <Box>
         <input
           hidden
@@ -161,7 +105,7 @@ export default function PatternPage() {
             setUploadedFile(e.target.files[0]);
           }}
         />
-        {uploadedFile === undefined && selectedPattern === undefined ? getSpeedDial() : null}
+        {uploadedFile === undefined && selectedPattern === null ? getSpeedDial() : null}
       </Box>
     </SideNav>
   );
