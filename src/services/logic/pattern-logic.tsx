@@ -4,7 +4,7 @@ import apiEndpoints from "services/shared/api/api-endpoints";
 import { toastSubject } from "services/shared/toast-messages";
 import { Pattern } from "models/components/shared/pattern";
 
-export const getPatterns = async () => {
+export const getPatterns = async (): Promise<Pattern[]> => {
   const value = await sendRequest(() => Get(apiEndpoints.pattern), [200]);
   return value?.json();
 };

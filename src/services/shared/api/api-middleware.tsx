@@ -15,6 +15,7 @@ const handleErrorMessage = (statusCode: number, ignoredStatusCodes: number[]) =>
     409: toastSubject.apiDuplication,
     410: toastSubject.noLongerAvailable,
     304: toastSubject.apiNotModified,
+    500: toastSubject.apiException,
   };
 
   const subject = statusCodes[statusCode];

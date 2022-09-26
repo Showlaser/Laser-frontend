@@ -1,12 +1,5 @@
 import * as React from "react";
-import {
-  Checkbox,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+import { Checkbox, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 
 type Item = {
   uuid: string;
@@ -19,11 +12,7 @@ type SelectListProps = {
   onSelect: (uuidCollection: string[]) => void;
 };
 
-export default function SelectList({
-  items,
-  disabled,
-  onSelect,
-}: SelectListProps) {
+export default function SelectList({ items, disabled, onSelect }: SelectListProps) {
   const [checked, setChecked] = React.useState<string[]>([]);
 
   const handleToggle = (uuid: string) => () => {
@@ -44,12 +33,7 @@ export default function SelectList({
     <List>
       {items.map((item) => (
         <ListItem key={item.uuid} disablePadding>
-          <ListItemButton
-            disabled={disabled}
-            role={undefined}
-            onClick={handleToggle(item.uuid)}
-            dense
-          >
+          <ListItemButton disabled={disabled} role={undefined} onClick={handleToggle(item.uuid)} dense>
             <ListItemIcon>
               <Checkbox
                 edge="start"
@@ -61,10 +45,7 @@ export default function SelectList({
                 }}
               />
             </ListItemIcon>
-            <ListItemText
-              id={`checkbox-list-label-${item.uuid}`}
-              primary={item.name}
-            />
+            <ListItemText id={`checkbox-list-label-${item.uuid}`} primary={item.name} />
           </ListItemButton>
         </ListItem>
       ))}

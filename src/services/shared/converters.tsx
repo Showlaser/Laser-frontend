@@ -30,6 +30,6 @@ export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   let animation: Animation = animationPlaceholder();
   animation.name = pattern.name;
   animation.image = pattern.image;
-  animation.points = pattern.points;
+  animation.pattern = pattern;
   return animation;
 };

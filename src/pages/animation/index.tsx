@@ -12,7 +12,7 @@ import { Pattern } from "models/components/shared/pattern";
 import { getPatterns } from "services/logic/pattern-logic";
 import { getAnimations } from "services/logic/animation-logic";
 import { convertPatternToAnimation } from "services/shared/converters";
-import { AnimationEffect } from "components/animation/animation-effect";
+import { AnimationEffectEditor } from "components/animation/animation-effect";
 
 export default function AnimationPage() {
   const [selectedAnimation, setSelectedAnimation] = useState<Animation | null>(null);
@@ -24,7 +24,11 @@ export default function AnimationPage() {
   useEffect(() => {
     if (availableAnimations === null && availablePatterns === null) {
       getPatterns().then((patterns) => setAvailablePatterns(patterns ?? []));
-      getAnimations().then((a) => setAvailableAnimations(a ?? []));
+      getAnimations().then((response) => {
+        if (response?.status === 200) {
+          response.json().then((animations) => setAvailableAnimations(animations));
+        }
+      });
     }
   }, []);
 
@@ -60,7 +64,7 @@ export default function AnimationPage() {
   return (
     <SideNav pageName="Animation editor">
       <div>
-        {selectedAnimation === null ? getSpeedDial() : <AnimationEffect animation={selectedAnimation} />}
+        {selectedAnimation === null ? getSpeedDial() : <AnimationEffectEditor animation={selectedAnimation} />}
         {convertPatternModalOpen ? (
           <CardOverview
             closeOverview={() => setConvertPatternModalOpen(false)}
@@ -73,7 +77,7 @@ export default function AnimationPage() {
                 image: pattern.image,
                 onCardClick: () => {
                   setConvertPatternModalOpen(false);
-                  let availableAnimationsToUpdate = availableAnimations;
+                  let availableAnimationsToUpdate = availableAnimations ?? [];
                   const convertedAnimation = convertPatternToAnimation(pattern);
                   availableAnimations?.push(convertedAnimation);
                   setAvailableAnimations(availableAnimationsToUpdate);
