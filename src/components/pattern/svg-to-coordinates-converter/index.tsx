@@ -39,7 +39,6 @@ export default function SvgToCoordinatesConverter({
   const [pattern, setPattern] = React.useState<Pattern>(
     patternFromServer === null ? patternPlaceHolder : patternFromServer
   );
-  const [uploadedFileName, setUploadedFileName] = React.useState<string>("");
   const [numberOfPoints, setNumberOfPoints] = React.useState<number>(200);
   const [showPointNumber, setShowPointNumber] = React.useState<boolean>(false);
   const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>([]);
@@ -100,7 +99,6 @@ export default function SvgToCoordinatesConverter({
       }
 
       updatePatternProperty("points", convertedPoints);
-      setUploadedFileName(file.name.substring(0, file.name.length - 4));
       fitPatternInCanvas(convertedPoints);
     };
 
@@ -187,19 +185,20 @@ export default function SvgToCoordinatesConverter({
   ];
 
   return (
-    <Grid container spacing={3} style={{ width: "50%" }}>
-      <Grid item style={{ width: "100%" }}>
+    <Grid container direction="row" spacing={2}>
+      <Grid item xs={6.5}>
         <TabSelector data={tabSelectorData} />
       </Grid>
-      <br />
-      <PointsDrawer
-        selectedPointsUuid={selectedPointsUuid}
-        showPointNumber={showPointNumber}
-        pointsToDraw={pointsToDraw}
-      />
+      <Grid item sx={{ marginLeft: "40px" }}>
+        <PointsDrawer
+          selectedPointsUuid={selectedPointsUuid}
+          showPointNumber={showPointNumber}
+          pointsToDraw={pointsToDraw}
+        />
+      </Grid>
       <SpeedDial
         ariaLabel="SpeedDial basic example"
-        sx={{ position: "absolute", bottom: 30, right: 30 }}
+        sx={{ position: "fixed", bottom: 30, right: 30 }}
         icon={<SettingsIcon />}
       >
         <SpeedDialAction

@@ -1,28 +1,26 @@
 import { createGuid } from "services/shared/math";
 import { Pattern, getPatternPlaceHolder } from "./pattern";
-import { Point } from "./point";
 
 export enum AnimationEffects {
   Enlarge,
   Reduce,
 }
 
-export type PatternAnimation = {
-  uuid: string;
-  animationUuid: string;
-  startTimeMs: number;
-  endTimeMs: number;
-  effect: AnimationEffects;
-  effectSpeed: number;
-  effectProgress: number;
+export type AnimationKeyFrame = {
+  timeMs: number;
+  propertyEdited: string;
+  propertyValue: string | number;
 };
+
+export type AnimationEffect = {};
 
 export type Animation = {
   uuid: string;
   name: string;
   image: string | null;
   pattern: Pattern;
-  patternAnimations: PatternAnimation[];
+  animationKeyFrames: AnimationKeyFrame[];
+  animationEffects: AnimationEffect[];
 };
 
 export const animationPlaceholder = (): Animation => ({
@@ -30,5 +28,6 @@ export const animationPlaceholder = (): Animation => ({
   name: "Placeholder animation",
   image: null,
   pattern: getPatternPlaceHolder(),
-  patternAnimations: [],
+  animationKeyFrames: [],
+  animationEffects: [],
 });

@@ -1,17 +1,4 @@
-import {
-  Button,
-  Divider,
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  Slider,
-  TextField,
-} from "@mui/material";
+import { Button, FormControl, FormLabel, Grid, Input, MenuItem, Select, Slider } from "@mui/material";
 import SelectList from "components/select-list";
 import PointsDrawer from "components/shared/points-drawer";
 import { Animation, AnimationEffects } from "models/components/shared/animation";
@@ -20,11 +7,15 @@ import React from "react";
 import { createGuid, rotatePoint } from "services/shared/math";
 
 type Props = {
-  animation: Animation;
+  animation: Animation | null;
 };
 
 export function AnimationEffectEditor({ animation }: Props) {
-  const applySettingsToPoints = (dotsToDraw: Point[]) => {
+  const applySettingsToPoints = (dotsToDraw: Point[] | undefined | null) => {
+    if (animation === null || dotsToDraw === null || dotsToDraw === undefined) {
+      return null;
+    }
+
     const dotsToDrawLength = dotsToDraw.length;
     let updatedPoints: Point[] = [];
     for (let index = 0; index < dotsToDrawLength; index++) {
@@ -44,8 +35,7 @@ export function AnimationEffectEditor({ animation }: Props) {
     return updatedPoints;
   };
 
-  const effectsInAnimation = animation.patternAnimations.map((pa) => ({ uuid: pa.uuid, name: pa.effect.toString() }));
-  const pointsToDraw = applySettingsToPoints([...animation.pattern.points]);
+  const pointsToDraw = applySettingsToPoints(animation?.pattern?.points);
 
   return (
     <Grid container spacing={3} style={{ width: "50%" }}>

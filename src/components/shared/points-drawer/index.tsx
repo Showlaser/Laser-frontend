@@ -6,7 +6,7 @@ import { rgbColorStringFromPoint } from "services/shared/converters";
 type Props = {
   selectedPointsUuid?: string[];
   showPointNumber?: boolean;
-  pointsToDraw: Point[];
+  pointsToDraw: Point[] | null;
 };
 
 export default function PointsDrawer({ selectedPointsUuid, showPointNumber, pointsToDraw }: Props) {
@@ -14,9 +14,12 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
     drawOnCanvas(pointsToDraw);
   }, [pointsToDraw]);
 
-  const drawOnCanvas = (dotsToDraw: Point[]) => {
-    const dotsToDrawLength = dotsToDraw.length;
+  const drawOnCanvas = (dotsToDraw: Point[] | null) => {
+    if (dotsToDraw === null) {
+      return;
+    }
 
+    const dotsToDrawLength = dotsToDraw.length;
     const screenScale = window.devicePixelRatio || 1;
     const canvas = document.getElementById("svg-canvas") as HTMLCanvasElement;
     const ctx = prepareCanvas(canvas);

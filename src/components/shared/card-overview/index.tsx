@@ -84,12 +84,7 @@ export default function CardOverview({
               .map((item) => (
                 <Card sx={{ width: "20%", minWidth: "30vh" }} key={item.name + "card-overview"}>
                   <CardActionArea onClick={() => item.onCardClick(item)}>
-                    <CardMedia
-                      component="img"
-                      height="140"
-                      alt="pattern image"
-                      src="https://cms-assets.tutsplus.com/cdn-cgi/image/width=850/uploads/users/1251/posts/37005/image-upload/tutsplus_animejs_canvas_fireworks.png"
-                    />
+                    <CardMedia component="img" height="300" alt="pattern image" src={item.image ?? ""} />
                     <CardContent>
                       <Typography gutterBottom variant="h5" component="div">
                         {item.name}

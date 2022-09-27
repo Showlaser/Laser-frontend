@@ -13,6 +13,8 @@ import { getPatterns } from "services/logic/pattern-logic";
 import { getAnimations } from "services/logic/animation-logic";
 import { convertPatternToAnimation } from "services/shared/converters";
 import { AnimationEffectEditor } from "components/animation/animation-effect";
+import AnimationKeyFrameEditor from "components/animation/animation-keyframe-editor";
+import EditorSelector from "components/animation/editor-selector";
 
 export default function AnimationPage() {
   const [selectedAnimation, setSelectedAnimation] = useState<Animation | null>(null);
@@ -20,6 +22,7 @@ export default function AnimationPage() {
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
   const [convertPatternModalOpen, setConvertPatternModalOpen] = useState<boolean>(false);
   const [animationsModalOpen, setAnimationsModalOpen] = useState<boolean>(false);
+  const [selectedEditor, setSelectedEditor] = useState<string | null>(null);
 
   useEffect(() => {
     if (availableAnimations === null && availablePatterns === null) {
@@ -61,10 +64,27 @@ export default function AnimationPage() {
     </SpeedDial>
   );
 
+  const getSelectedEditor = () => {
+    if (
+      selectedEditor === null &&
+      selectedAnimation?.animationKeyFrames.length === 0 &&
+      selectedAnimation.animationEffects.length === 0
+    ) {
+      return (
+        <EditorSelector setSelectedEditor={(editor) => setSelectedEditor(editor)} selectedEditor={selectedEditor} />
+      );
+    }
+    if (selectedEditor === "keyframe-editor") {
+      return <AnimationKeyFrameEditor animation={selectedAnimation} />;
+    } else if (selectedEditor === "effects-editor") {
+      return <AnimationEffectEditor animation={selectedAnimation} />;
+    }
+  };
+
   return (
     <SideNav pageName="Animation editor">
       <div>
-        {selectedAnimation === null ? getSpeedDial() : <AnimationEffectEditor animation={selectedAnimation} />}
+        {selectedAnimation === null ? getSpeedDial() : getSelectedEditor()}
         {convertPatternModalOpen ? (
           <CardOverview
             closeOverview={() => setConvertPatternModalOpen(false)}
