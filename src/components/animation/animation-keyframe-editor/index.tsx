@@ -2,7 +2,7 @@ import { Button, FormLabel, Grid, Input, InputLabel, MenuItem, Select } from "@m
 import PointsDrawer from "components/shared/points-drawer";
 import { Animation, AnimationKeyFrame } from "models/components/shared/animation";
 import React, { useEffect, useState } from "react";
-import { mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
+import { createGuid, mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
 import "./index.css";
 
 type Props = {
@@ -13,7 +13,7 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
   const [timelinePositionMs, setTimelinePositionMs] = useState<number>(0);
   const [selectableStepsIndex, setSelectableStepsIndex] = useState<number>(0);
   let maxRange = 0;
-  const [selectedKeyFrameIndex, setSelectedKeyFrameIndex] = useState<number>(0);
+  const [selectedKeyFrameUuid, setSelectedKeyFrameUuid] = useState<string>("");
   const [scale, setScale] = useState<number>(0);
   const [xOffset, setXOffset] = useState<number>(0);
   const [yOffset, setYOffset] = useState<number>(0);
@@ -29,14 +29,14 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
   // TODO remove test code
   if (animation !== null) {
     animation.animationKeyFrames = [
-      { timeMs: 500, propertyEdited: "scale", propertyValue: 0.8 },
-      { timeMs: 499, propertyEdited: "scale", propertyValue: 0.6 },
-      { timeMs: 499, propertyEdited: "xOffset", propertyValue: 0 },
-      { timeMs: 500, propertyEdited: "xOffset", propertyValue: 20 },
-      { timeMs: 499, propertyEdited: "yOffset", propertyValue: 20 },
-      { timeMs: 500, propertyEdited: "yOffset", propertyValue: 50 },
-      { timeMs: 499, propertyEdited: "rotation", propertyValue: 20 },
-      { timeMs: 500, propertyEdited: "rotation", propertyValue: 50 },
+      { uuid: "f38dbe41-8e97-4150-ae7c-3a57f17e36ef", timeMs: 500, propertyEdited: "scale", propertyValue: 0.8 },
+      { uuid: "4c299c26-1398-4b82-a709-74a56a9dffa3", timeMs: 499, propertyEdited: "scale", propertyValue: 0.6 },
+      { uuid: "1a672ae3-68eb-492b-8481-4649d37c885b", timeMs: 499, propertyEdited: "xOffset", propertyValue: 0 },
+      { uuid: "a0f9a978-a4ed-401a-9f10-fd5568c8e128", timeMs: 500, propertyEdited: "xOffset", propertyValue: 20 },
+      { uuid: "81ab7872-b421-470e-a95f-49c72400824f", timeMs: 499, propertyEdited: "yOffset", propertyValue: 20 },
+      { uuid: "cd356410-79df-4910-bf3f-d1d4afab8843", timeMs: 500, propertyEdited: "yOffset", propertyValue: 50 },
+      { uuid: "63121cac-ccaa-4757-a07d-7f6222048173", timeMs: 499, propertyEdited: "rotation", propertyValue: 20 },
+      { uuid: "e4ba69b6-bdd8-4a2d-8c33-601de0ca50a2", timeMs: 500, propertyEdited: "rotation", propertyValue: 50 },
     ];
   }
   // end of test code
@@ -72,7 +72,7 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
     const minRange = timelinePositionMs;
     maxRange = (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
 
-    const stepsCorrection = [-20, -25, -20, -25];
+    const stepsCorrection = [0, -25, -25, -25];
     let xPos = 100;
     for (let i = minRange; i < maxRange + 1; i += selectableSteps[selectableStepsIndex]) {
       ctx.fillText(i.toString(), xPos + stepsCorrection[selectableStepsIndex], 645);
@@ -114,6 +114,7 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
       return;
     }
 
+    const stepsCorrection = [20, 1, 1, 1];
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     keyFrames.forEach((keyFrame) => {
       const keyFrameProperty = keyFramesPropertiesPosition.find((p) => p.property === keyFrame.propertyEdited);
@@ -124,9 +125,10 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
       const y = keyFrameProperty.yPosition;
       const x = mapNumber(keyFrame.timeMs, timelinePositionMs, maxRange, 80, 650);
 
+      const isSelected = keyFrame.uuid === selectedKeyFrameUuid;
       ctx.beginPath();
-      ctx.arc(x, y, 4, 0, 2 * Math.PI);
-      ctx.fillStyle = "whitesmoke";
+      ctx.arc(x + stepsCorrection[selectableStepsIndex], y, isSelected ? 6 : 4, 0, 2 * Math.PI);
+      ctx.fillStyle = isSelected ? "#4287f5" : "white";
       ctx.fill();
     });
   };
@@ -149,19 +151,18 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
       return;
     }
 
-    const clickedKeyFrameIndex = animation?.animationKeyFrames.findIndex((keyFrame) => {
+    const selectedKeyFrame = animation?.animationKeyFrames.find((keyFrame) => {
       const min = (mappedX - selectableSteps[selectableStepsIndex] / 5 - 1) | 0;
       const thisKeyFrameIsClicked =
         keyFrame.timeMs >= min && keyFrame.timeMs === mappedX && keyFrame.propertyEdited === propertyClicked.property;
       return thisKeyFrameIsClicked;
     });
 
-    if (clickedKeyFrameIndex === undefined) {
+    if (selectedKeyFrame === undefined) {
       return;
     }
 
-    const selectedKeyFrame = animation?.animationKeyFrames[selectedKeyFrameIndex];
-    setSelectedKeyFrameIndex(clickedKeyFrameIndex);
+    setSelectedKeyFrameUuid(selectedKeyFrame.uuid);
 
     switch (selectedKeyFrame?.propertyEdited) {
       case "scale":
@@ -220,7 +221,7 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
 
   return (
     <Grid container direction="row" spacing={2}>
-      <Grid item xs={1.1}>
+      <Grid item xs={2}>
         <FormLabel htmlFor="animation-scale">
           Scale
           <Button

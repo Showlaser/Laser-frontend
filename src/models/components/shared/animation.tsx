@@ -7,6 +7,7 @@ export enum AnimationEffects {
 }
 
 export type AnimationKeyFrame = {
+  uuid: string;
   timeMs: number;
   propertyEdited: string;
   propertyValue: string | number;
