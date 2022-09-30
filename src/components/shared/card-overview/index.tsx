@@ -3,8 +3,8 @@ import {
   CardActionArea,
   CardContent,
   CardMedia,
-  Divider,
   Grid,
+  Grow,
   IconButton,
   InputBase,
   Modal,
@@ -78,20 +78,31 @@ export default function CardOverview({
             <p>{onEmptyMessageDescription}</p>
           </div>
         ) : (
-          <Box style={{ margin: "30px" }} sx={{ flexDirection: "row", flexWrap: "wrap" }}>
+          <Box
+            style={{ margin: "30px", overflowY: "scroll" }}
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "wrap",
+              height: `${window.innerHeight - 200}px`,
+              alignContent: "flex-start",
+            }}
+          >
             {items
               .filter((item) => (searchValue.length > 0 ? item.name.toLowerCase().includes(searchValue) : true))
-              .map((item) => (
-                <Card sx={{ width: "20%", minWidth: "30vh" }} key={item.name + "card-overview"}>
-                  <CardActionArea onClick={() => item.onCardClick(item)}>
-                    <CardMedia component="img" height="300" alt="pattern image" src={item.image ?? ""} />
-                    <CardContent>
-                      <Typography gutterBottom variant="h5" component="div">
-                        {item.name}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
+              .map((item, index) => (
+                <Grow in={items.length > 0} timeout={1400 * index > 2500 ? 2500 : 1400 * index}>
+                  <Card sx={{ width: "20%", minWidth: "30vh", margin: 1 }} key={item.name + "card-overview"}>
+                    <CardActionArea onClick={() => item.onCardClick(item)}>
+                      <CardMedia component="img" height="300" alt="pattern image" src={item.image ?? ""} />
+                      <CardContent>
+                        <Typography gutterBottom variant="h5" component="div">
+                          {item.name}
+                        </Typography>
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
+                </Grow>
               ))}
           </Box>
         )}

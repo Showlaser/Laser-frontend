@@ -1,4 +1,4 @@
-import { Button, Divider, FormControl, Grid, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { Button, Divider, Fade, FormControl, Grid, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import React, { useState } from "react";
 
 type Props = {
@@ -53,7 +53,9 @@ export default function EditorSelector({ setSelectedEditor, selectedEditor }: Pr
             <MenuItem value="keyframe-editor">Keyframe editor</MenuItem>
           </Select>
           <br />
-          {getEditorInfo()}
+          <Fade in={selectValue !== ""}>
+            <span>{getEditorInfo()}</span>
+          </Fade>
           <Button disabled={selectValue === ""} variant="contained" onClick={() => setSelectedEditor(selectValue)}>
             Use this editor
           </Button>
