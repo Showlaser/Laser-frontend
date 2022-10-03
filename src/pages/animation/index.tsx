@@ -83,9 +83,9 @@ export default function AnimationPage() {
 
   return (
     <SideNav pageName="Animation editor">
-      <div>
+      <>
         {selectedAnimation === null ? getSpeedDial() : getSelectedEditor()}
-        {convertPatternModalOpen ? (
+        {convertPatternModalOpen && (
           <CardOverview
             closeOverview={() => setConvertPatternModalOpen(false)}
             show={convertPatternModalOpen}
@@ -106,8 +106,8 @@ export default function AnimationPage() {
               })) ?? []
             }
           />
-        ) : null}
-        {animationsModalOpen ? (
+        )}
+        {animationsModalOpen && (
           <CardOverview
             closeOverview={() => setAnimationsModalOpen(false)}
             show={animationsModalOpen}
@@ -124,8 +124,8 @@ export default function AnimationPage() {
               })) ?? []
             }
           />
-        ) : null}
-      </div>
+        )}
+      </>
     </SideNav>
   );
 }

@@ -5,6 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import SideNav from "components/shared/sidenav";
 
 function App() {
   const theme = React.useMemo(
@@ -44,14 +45,10 @@ function App() {
 
   return (
     <div className="App">
-      <ToastContainer
-        autoClose={6000}
-        position="bottom-center"
-        transition={Slide}
-        theme="dark"
-      />
+      <ToastContainer autoClose={6000} position="bottom-center" transition={Slide} theme="dark" />
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <SideNav />
         <Routes />
       </ThemeProvider>
     </div>

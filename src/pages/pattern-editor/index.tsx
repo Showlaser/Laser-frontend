@@ -62,7 +62,7 @@ export default function PatternPage() {
   );
 
   return (
-    <SideNav pageName="Pattern editor">
+    <>
       {uploadedFile === undefined && selectedPattern === null ? null : (
         <SvgToCoordinatesConverter
           patternNamesInUse={
@@ -107,6 +107,6 @@ export default function PatternPage() {
         />
         {uploadedFile === undefined && selectedPattern === null ? getSpeedDial() : null}
       </Box>
-    </SideNav>
+    </>
   );
 }

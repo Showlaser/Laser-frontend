@@ -26,7 +26,7 @@ import "./index.css";
 import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
 import LogoutIcon from "@mui/icons-material/Logout";
 import FlareIcon from "@mui/icons-material/Flare";
-import { Tooltip } from "@mui/material";
+import SpotifyController from "../spotify-controller";
 
 const drawerWidth = 240;
 
@@ -80,11 +80,11 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 type Props = {
-  children: React.ReactNode;
   pageName: string;
+  children: React.ReactNode;
 };
 
-export default function SideNav({ children, pageName }: Props) {
+export default function SideNav({ pageName, children }: Props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -98,7 +98,6 @@ export default function SideNav({ children, pageName }: Props) {
 
   return (
     <Box sx={{ display: "flex" }}>
-      <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
           <IconButton
@@ -110,19 +109,10 @@ export default function SideNav({ children, pageName }: Props) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography
-            noWrap
-            variant="h6"
-            component="div"
-            style={{ marginRight: "5px" }}
-          >
+          <Typography noWrap variant="h6" component="div" style={{ marginRight: "5px" }}>
             {pageName}
           </Typography>
-          {localStorage.getItem("lasers-are-playing") !== null ? (
-            <Tooltip title="Lasers are on">
-              <FlareIcon style={{ color: "red" }} />
-            </Tooltip>
-          ) : null}
+          <SpotifyController />
         </Toolbar>
       </AppBar>
       <Drawer
@@ -140,11 +130,7 @@ export default function SideNav({ children, pageName }: Props) {
       >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "ltr" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
+            {theme.direction === "ltr" ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
         <Divider />
@@ -187,11 +173,7 @@ export default function SideNav({ children, pageName }: Props) {
               path: paths.Logout,
             },
           ].map((item, index) => (
-            <ListItem
-              onClick={() => (window.location.href = item.path)}
-              button
-              key={`side-nav-list-item-${index}`}
-            >
+            <ListItem onClick={() => (window.location.href = item.path)} button key={`side-nav-list-item-${index}`}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.title} />
             </ListItem>
@@ -199,7 +181,6 @@ export default function SideNav({ children, pageName }: Props) {
         </List>
       </Drawer>
       <Main id="menu-children" open={open}>
-        <DrawerHeader />
         {children}
       </Main>
     </Box>
