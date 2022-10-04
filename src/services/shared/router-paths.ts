@@ -1,6 +1,6 @@
 const paths = {
   Root: "/",
-  LaserSettings: "/laser-settings",
+  Settings: "/settings",
   Zones: "/zones",
   PatternEditor: "/pattern-editor",
   LasershowEditor: "/lasershow-editor",

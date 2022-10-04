@@ -98,20 +98,20 @@ export default function SideNav({ pageName, children }: Props) {
     <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          <Grid container style={{ marginTop: "2px" }}>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{ mr: 2, ...(open && { display: "none" }) }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Grid item xs={9} style={{ marginTop: "10px" }}>
+          <Grid container>
+            <Grid item xs style={{ marginTop: "15px" }}>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
+                sx={{ mr: 2, ...(open && { display: "none" }) }}
+              >
+                <MenuIcon />
+              </IconButton>
               {pageName}
             </Grid>
-            <Grid item xs>
+            <Grid justifySelf="right">
               <SpotifyController />
             </Grid>
           </Grid>
@@ -160,9 +160,9 @@ export default function SideNav({ pageName, children }: Props) {
               path: paths.LasershowSpotifyConnector,
             },
             {
-              title: "Laser settings",
+              title: "Settings",
               icon: <SettingsIcon />,
-              path: paths.LaserSettings,
+              path: paths.Settings,
             },
             {
               title: "Account",

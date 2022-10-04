@@ -1,10 +1,6 @@
 import { Button } from "@mui/material";
-import { useEffect } from "react";
-import {
-  getCodeFromResponse,
-  getSpotifyAccessTokens,
-  grandSpotifyAccess,
-} from "services/logic/spotify";
+import React, { useEffect } from "react";
+import { getCodeFromResponse, getSpotifyAccessTokens, grandSpotifyAccess } from "services/logic/spotify";
 import paths from "services/shared/router-paths";
 
 export default function SpotifyLogin() {
@@ -17,39 +13,37 @@ export default function SpotifyLogin() {
     getSpotifyAccessTokens(code).then((tokens) => {
       localStorage.setItem("SpotifyAccessToken", tokens.access_token);
       localStorage.setItem("SpotifyRefreshToken", tokens.refresh_token);
-      window.location = paths.LaserSettings;
+      window.location.href = paths.Settings;
     });
   }, []);
 
   const login = () => {
     grandSpotifyAccess().then((response) =>
-      response.text().then((responseText) => (window.location = responseText))
+      response?.text().then((responseText) => (window.location.href = responseText))
     );
   };
 
   const removeSpotifyTokens = () => {
     localStorage.removeItem("SpotifyAccessToken");
     localStorage.removeItem("SpotifyRefreshToken");
-    window.location = paths.LaserSettings;
+    window.location.href = paths.Settings;
   };
 
+  const accessTokenAvailable: boolean = localStorage.getItem("SpotifyAccessToken") !== null;
+
   return (
-    <div>
+    <>
       <h2>Spotify</h2>
-      {localStorage.getItem("SpotifyAccessToken")?.length > 10 ? (
+      {accessTokenAvailable ? (
         <span>
           <p>You are logged in to Spotify</p>
           <Button onClick={removeSpotifyTokens}>Logout of Spotify</Button>
         </span>
       ) : (
-        <Button
-          variant="contained"
-          style={{ backgroundColor: "#1DB954" }}
-          onClick={login}
-        >
+        <Button variant="contained" style={{ backgroundColor: "#1DB954" }} onClick={login}>
           Login to Spotify
         </Button>
       )}
-    </div>
+    </>
   );
 }
