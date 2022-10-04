@@ -19,7 +19,7 @@ export default function SpotifyController() {
   }, []);
 
   return (
-    <div style={{ width: "20%" }}>
+    <>
       <small>Spotify controller</small>
       <IconButton>
         <SkipPreviousIcon />
@@ -28,7 +28,7 @@ export default function SpotifyController() {
       <IconButton>
         <SkipNextIcon />
       </IconButton>
-      <LinearProgress style={{ width: "100%" }} variant="determinate" value={normalise(progress, 0, 120)} />
-    </div>
+      <LinearProgress variant="determinate" value={normalise(progress, 0, 120)} />
+    </>
   );
 }

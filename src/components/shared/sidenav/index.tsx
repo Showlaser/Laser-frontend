@@ -2,11 +2,9 @@ import * as React from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -25,8 +23,8 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import "./index.css";
 import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
 import LogoutIcon from "@mui/icons-material/Logout";
-import FlareIcon from "@mui/icons-material/Flare";
 import SpotifyController from "../spotify-controller";
+import { Grid } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -100,19 +98,23 @@ export default function SideNav({ pageName, children }: Props) {
     <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ mr: 2, ...(open && { display: "none" }) }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography noWrap variant="h6" component="div" style={{ marginRight: "5px" }}>
-            {pageName}
-          </Typography>
-          <SpotifyController />
+          <Grid container style={{ marginTop: "2px" }}>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={{ mr: 2, ...(open && { display: "none" }) }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Grid item xs={9} style={{ marginTop: "10px" }}>
+              {pageName}
+            </Grid>
+            <Grid item xs>
+              <SpotifyController />
+            </Grid>
+          </Grid>
         </Toolbar>
       </AppBar>
       <Drawer
