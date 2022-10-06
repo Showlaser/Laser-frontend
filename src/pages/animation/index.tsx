@@ -39,7 +39,7 @@ export default function AnimationPage() {
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
   const [convertPatternModalOpen, setConvertPatternModalOpen] = useState<boolean>(false);
   const [animationsModalOpen, setAnimationsModalOpen] = useState<boolean>(false);
-  const [selectedEditor, setSelectedEditor] = useState<string | null>("keyframe-editor");
+  const [selectedEditor, setSelectedEditor] = useState<string | null>(null);
 
   // TODO remove default values in state
 
@@ -92,6 +92,11 @@ export default function AnimationPage() {
       return (
         <EditorSelector setSelectedEditor={(editor) => setSelectedEditor(editor)} selectedEditor={selectedEditor} />
       );
+    }
+    if (selectedAnimation?.animationKeyFrames.length ?? 0 > 1) {
+      return <AnimationKeyFrameEditor animation={selectedAnimation} setSelectedAnimation={setSelectedAnimation} />;
+    } else if (selectedAnimation?.animationEffects.length ?? 0 > 1) {
+      return <AnimationEffectEditor animation={selectedAnimation} />;
     }
     if (selectedEditor === "keyframe-editor") {
       return <AnimationKeyFrameEditor animation={selectedAnimation} setSelectedAnimation={setSelectedAnimation} />;

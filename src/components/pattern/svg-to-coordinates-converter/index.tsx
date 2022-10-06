@@ -1,6 +1,5 @@
 import * as React from "react";
 import { showSuccess, showError, toastSubject } from "services/shared/toast-messages";
-import "./index.css";
 import { Grid, SpeedDial, SpeedDialAction } from "@mui/material";
 import { Point } from "models/components/shared/point";
 import { getLargestNumber, rotatePoint, createGuid } from "services/shared/math";
@@ -14,9 +13,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import SaveIcon from "@mui/icons-material/Save";
 import ClearIcon from "@mui/icons-material/Clear";
 import { addItemToVersionHistory } from "services/shared/version-history";
-import { rgbColorStringFromPoint } from "services/shared/converters";
 import { savePattern } from "services/logic/pattern-logic";
-import { getRandomObjectName } from "services/shared/random-object-name-generator";
 import PointsDrawer from "components/shared/points-drawer";
 
 type Props = {

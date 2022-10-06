@@ -84,9 +84,5 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
     ctx.stroke();
   };
 
-  return (
-    <div id="svg-canvas-container">
-      <canvas id="svg-canvas" />
-    </div>
-  );
+  return <canvas className="canvas" id="svg-canvas" />;
 }

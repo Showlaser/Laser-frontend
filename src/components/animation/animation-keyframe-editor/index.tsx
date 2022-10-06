@@ -1,10 +1,20 @@
-import { Button, FormLabel, Grid, Input, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  Divider,
+  FormLabel,
+  Grid,
+  IconButton,
+  Input,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Tooltip,
+} from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
 import { Animation, AnimationKeyFrame } from "models/components/shared/animation";
 import React, { useEffect, useState } from "react";
 import { createGuid, mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
-import "./index.css";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 type Props = {
   animation: Animation | null;
   setSelectedAnimation: (animation: Animation | null) => void;
@@ -257,6 +267,10 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
       return;
     }
 
+    if (!window.confirm("Are you sure you want to remove this keyframe")) {
+      return;
+    }
+
     const indexToRemove = updatedAnimation.animationKeyFrames.findIndex(
       (kf: AnimationKeyFrame) => kf.uuid === keyFrame.uuid
     );
@@ -288,88 +302,102 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
     return selectedKeyFrame?.propertyValue;
   };
 
+  const onRemove = () => {
+    if (selectedKeyFrameUuid === "") {
+      return;
+    }
+
+    setSelectedKeyFrameUuid("");
+    let updatedAnimation: any = { ...animation };
+    const selectedKeyFrameIndex = animation?.animationKeyFrames.findIndex((kf) => kf.uuid === selectedKeyFrameUuid);
+    if (
+      updatedAnimation === undefined ||
+      selectedKeyFrameIndex === undefined ||
+      updatedAnimation?.animationKeyFrames === undefined
+    ) {
+      return;
+    }
+
+    updatedAnimation.animationKeyFrames.splice(selectedKeyFrameIndex, 1);
+    setSelectedAnimation(updatedAnimation);
+  };
+
   return (
     <Grid container direction="row" spacing={2} key={selectedKeyFrameUuid}>
       <Grid item xs={2}>
-        <FormLabel htmlFor="animation-scale">
-          Scale
-          <Button
-            style={{ marginLeft: "10px" }}
-            onClick={() => (window.confirm("Are you sure you want to remove this keyframe?") ? null : null)}
-          >
-            Remove
-          </Button>
-        </FormLabel>
-        <br />
-        <Input
-          id="animation-scale"
-          type="number"
-          inputProps={{ min: 0.1, max: 10, step: 0.1 }}
-          value={getPropertyValue("scale")}
-          onChange={(e) => updateProperty(Number(e.target.value))}
-        />
-        <br />
-        <div style={{ marginTop: "90px" }}>
-          <FormLabel htmlFor="animation-xoffset">
-            X offset
-            <Button
-              style={{ marginLeft: "10px" }}
-              onClick={() => (window.confirm("Are you sure you want to remove this keyframe?") ? null : null)}
-            >
-              Remove
-            </Button>
-          </FormLabel>
+        <Paper style={{ padding: "15px", paddingTop: "2px" }}>
+          <p>Animation properties</p>
+          <Divider style={{ marginBottom: "10px" }} />
+          <FormLabel htmlFor="animation-scale">Scale</FormLabel>
           <br />
           <Input
-            id="animation-xoffset"
+            id="animation-scale"
             type="number"
-            inputProps={{ min: -200, max: 200 }}
-            value={getPropertyValue("xOffset")}
+            inputProps={{ min: 0.1, max: 10, step: 0.1 }}
+            value={getPropertyValue("scale")}
             onChange={(e) => updateProperty(Number(e.target.value))}
           />
-        </div>
+          <br />
+          <div style={{ marginTop: "60px" }}>
+            <FormLabel htmlFor="animation-xoffset">X offset</FormLabel>
+            <br />
+            <Input
+              id="animation-xoffset"
+              type="number"
+              inputProps={{ min: -200, max: 200 }}
+              value={getPropertyValue("xOffset")}
+              onChange={(e) => updateProperty(Number(e.target.value))}
+            />
+          </div>
+          <br />
+          <div style={{ marginTop: "60px" }}>
+            <FormLabel htmlFor="animation-yoffset">Y offset</FormLabel>
+            <br />
+            <Input
+              id="animation-yoffset"
+              type="number"
+              inputProps={{ min: -200, max: 200 }}
+              value={getPropertyValue("yOffset")}
+              onChange={(e) => updateProperty(Number(e.target.value))}
+            />
+          </div>
+          <div style={{ marginTop: "70px" }}>
+            <FormLabel htmlFor="animation-rotation">Rotation</FormLabel>
+            <br />
+            <Input
+              id="animation-rotation"
+              type="number"
+              inputProps={{ min: -360, max: 360 }}
+              value={getPropertyValue("rotation")}
+              onChange={(e) => updateProperty(Number(e.target.value))}
+            />
+          </div>
+          <br />
+          <Divider />
+          <Tooltip title="Remove keyframe" placement="right">
+            <IconButton
+              disabled={selectedKeyFrameUuid === ""}
+              style={{ marginLeft: "10px" }}
+              onClick={() => (window.confirm("Are you sure you want to remove this keyframe?") ? onRemove() : null)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </Paper>
         <br />
-        <div style={{ marginTop: "50px" }}>
-          <FormLabel htmlFor="animation-yoffset">
-            Y offset
-            <Button
-              style={{ marginLeft: "10px" }}
-              onClick={() => (window.confirm("Are you sure you want to remove this keyframe?") ? null : null)}
-            >
-              Remove
-            </Button>
-          </FormLabel>
+        <Paper style={{ padding: "15px", paddingTop: "2px" }}>
+          <p>Animation info</p>
+          <Divider />
+          <small>
+            Animation duration: {Math.max(...(animation?.animationKeyFrames?.map((ak) => ak?.timeMs) ?? []))}
+          </small>
           <br />
-          <Input
-            id="animation-yoffset"
-            type="number"
-            inputProps={{ min: -200, max: 200 }}
-            value={getPropertyValue("yOffset")}
-            onChange={(e) => updateProperty(Number(e.target.value))}
-          />
-        </div>
-        <div style={{ marginTop: "70px" }}>
-          <FormLabel htmlFor="animation-rotation">
-            Rotation
-            <Button
-              style={{ marginLeft: "10px" }}
-              onClick={() => (window.confirm("Are you sure you want to remove this keyframe?") ? null : null)}
-            >
-              Remove
-            </Button>
-          </FormLabel>
-          <br />
-          <Input
-            id="animation-rotation"
-            type="number"
-            inputProps={{ min: -360, max: 360 }}
-            value={getPropertyValue("rotation")}
-            onChange={(e) => updateProperty(Number(e.target.value))}
-          />
-        </div>
+          <small>Total keyframes: {animation?.animationKeyFrames?.length}</small>
+        </Paper>
       </Grid>
       <Grid item xs>
         <canvas
+          className="canvas"
           id="svg-keyframe-canvas"
           onClick={onCanvasClick}
           onMouseMove={showMouseXAxis}
