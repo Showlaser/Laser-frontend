@@ -204,10 +204,32 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
       return;
     }
 
+    const propertyInYPosition = keyFramesPropertiesPosition.find((prop) =>
+      numberIsBetweenOrEqual(prop.yPosition, mouseYPosition - 20, mouseYPosition + 20)
+    );
     const mappedX: number = mapNumber(mouseXPosition, 80, 650, timelinePositionMs, maxRange) | 0;
+    const hoveredKeyFrame = animation?.animationKeyFrames.find((keyFrame) => {
+      const min = (mappedX - selectableSteps[selectableStepsIndex] / 5 - 1) | 0;
+      const thisKeyFrameIsHoveredOver =
+        keyFrame.timeMs >= min &&
+        keyFrame.timeMs === mappedX &&
+        keyFrame.propertyEdited === propertyInYPosition?.property;
+
+      return thisKeyFrameIsHoveredOver;
+    });
+
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     drawLine(mouseXPosition, 0, mouseXPosition, 650, ctx);
-    writeText(mouseXPosition, mouseYPosition, mappedX.toString() + " x", ctx);
+    if (hoveredKeyFrame === undefined) {
+      writeText(mouseXPosition, mouseYPosition, mappedX.toString() + " x", ctx);
+    } else {
+      writeText(
+        mouseXPosition,
+        mouseYPosition,
+        `${hoveredKeyFrame.propertyEdited}: ${hoveredKeyFrame.propertyValue}`,
+        ctx
+      );
+    }
   };
 
   const onMouseScroll = (e: any) => {
