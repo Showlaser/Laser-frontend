@@ -7,17 +7,14 @@ import "./index.css";
 
 type Props = {
   animation: Animation | null;
+  setSelectedAnimation: (animation: Animation | null) => void;
 };
 
-export default function AnimationKeyFrameEditor({ animation }: Props) {
+export default function AnimationKeyFrameEditor({ animation, setSelectedAnimation }: Props) {
   const [timelinePositionMs, setTimelinePositionMs] = useState<number>(0);
   const [selectableStepsIndex, setSelectableStepsIndex] = useState<number>(0);
   let maxRange = 0;
   const [selectedKeyFrameUuid, setSelectedKeyFrameUuid] = useState<string>("");
-  const [scale, setScale] = useState<number>(0);
-  const [xOffset, setXOffset] = useState<number>(0);
-  const [yOffset, setYOffset] = useState<number>(0);
-  const [rotation, setRotation] = useState<number>(0);
   const selectableSteps = [1, 10, 100, 1000];
   const keyFramesPropertiesPosition = [
     { property: "scale", yPosition: 80 },
@@ -26,24 +23,9 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
     { property: "rotation", yPosition: 500 },
   ];
 
-  // TODO remove test code
-  if (animation !== null) {
-    animation.animationKeyFrames = [
-      { uuid: "f38dbe41-8e97-4150-ae7c-3a57f17e36ef", timeMs: 5000, propertyEdited: "scale", propertyValue: 0.8 },
-      { uuid: "4c299c26-1398-4b82-a709-74a56a9dffa3", timeMs: 4990, propertyEdited: "scale", propertyValue: 0.6 },
-      { uuid: "1a672ae3-68eb-492b-8481-4649d37c885b", timeMs: 4990, propertyEdited: "xOffset", propertyValue: 0 },
-      { uuid: "a0f9a978-a4ed-401a-9f10-fd5568c8e128", timeMs: 5000, propertyEdited: "xOffset", propertyValue: 20 },
-      { uuid: "81ab7872-b421-470e-a95f-49c72400824f", timeMs: 4990, propertyEdited: "yOffset", propertyValue: 20 },
-      { uuid: "cd356410-79df-4910-bf3f-d1d4afab8843", timeMs: 5000, propertyEdited: "yOffset", propertyValue: 50 },
-      { uuid: "63121cac-ccaa-4757-a07d-7f6222048173", timeMs: 4990, propertyEdited: "rotation", propertyValue: 20 },
-      { uuid: "e4ba69b6-bdd8-4a2d-8c33-601de0ca50a2", timeMs: 5000, propertyEdited: "rotation", propertyValue: 50 },
-    ];
-  }
-  // end of test code
-
   useEffect(() => {
     drawTimelineOnCanvas();
-  }, [selectableStepsIndex, timelinePositionMs, selectedKeyFrameUuid]);
+  }, [selectableStepsIndex, timelinePositionMs, selectedKeyFrameUuid, animation]);
 
   const prepareCanvas = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
     canvas.width = 650;
@@ -140,6 +122,38 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
     });
   };
 
+  const createNewKeyframe = (y: number, timeMs: number) => {
+    const propertyEdited = getPropertyFromYPosition(y) ?? "";
+    const keyFrame = {
+      uuid: createGuid(),
+      timeMs,
+      propertyEdited,
+      propertyValue: 0,
+    };
+
+    let updatedAnimation: any = { ...animation };
+    if (updatedAnimation?.animationKeyFrames === undefined) {
+      return;
+    }
+
+    updatedAnimation.animationKeyFrames.push(keyFrame);
+    setSelectedAnimation(updatedAnimation);
+    setSelectedKeyFrameUuid(keyFrame.uuid);
+  };
+
+  const getKeyFrameFromMousePosition = (x: number, y: number) => {
+    const propertyClicked = getPropertyFromYPosition(y);
+
+    const selectedKeyFrame = animation?.animationKeyFrames.find((keyFrame) => {
+      const min = (x - selectableSteps[selectableStepsIndex] / 5 - 1) | 0;
+      const thisKeyFrameIsClicked =
+        keyFrame.timeMs >= min && keyFrame.timeMs === x && keyFrame.propertyEdited === propertyClicked;
+      return thisKeyFrameIsClicked;
+    });
+
+    return selectedKeyFrame;
+  };
+
   const onCanvasClick = (event: any) => {
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
@@ -150,49 +164,23 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
 
     const mappedX: number = mapNumber(x, 80, 650, timelinePositionMs, maxRange) | 0;
     const y = event.clientY - rect.top;
-    const propertyClicked = keyFramesPropertiesPosition.find((p) =>
-      numberIsBetweenOrEqual(y, p.yPosition - 20, p.yPosition + 20)
-    );
+    const propertyClicked = getPropertyFromYPosition(y);
 
     if (propertyClicked === undefined) {
       return;
     }
 
-    const selectedKeyFrame = animation?.animationKeyFrames.find((keyFrame) => {
-      const min = (mappedX - selectableSteps[selectableStepsIndex] / 5 - 1) | 0;
-      const thisKeyFrameIsClicked =
-        keyFrame.timeMs >= min && keyFrame.timeMs === mappedX && keyFrame.propertyEdited === propertyClicked.property;
-      return thisKeyFrameIsClicked;
-    });
-
+    const selectedKeyFrame = getKeyFrameFromMousePosition(mappedX, y);
     if (selectedKeyFrame === undefined) {
+      createNewKeyframe(y, mappedX);
       return;
     }
 
     setSelectedKeyFrameUuid(selectedKeyFrame.uuid);
-    resetPropertyState();
-    switch (selectedKeyFrame?.propertyEdited) {
-      case "scale":
-        setScale(Number(selectedKeyFrame.propertyValue));
-        break;
-      case "xOffset":
-        setXOffset(Number(selectedKeyFrame.propertyValue));
-        break;
-      case "yOffset":
-        setYOffset(Number(selectedKeyFrame.propertyValue));
-        break;
-      case "rotation":
-        setRotation(Number(selectedKeyFrame.propertyValue));
-        break;
-    }
   };
 
-  const resetPropertyState = () => {
-    setScale(0);
-    setXOffset(0);
-    setYOffset(0);
-    setRotation(0);
-  };
+  const getPropertyFromYPosition = (y: number) =>
+    keyFramesPropertiesPosition.find((prop) => numberIsBetweenOrEqual(prop.yPosition, y - 20, y + 20))?.property;
 
   const showMouseXAxis = (event: any) => {
     drawTimelineOnCanvas();
@@ -204,19 +192,8 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
       return;
     }
 
-    const propertyInYPosition = keyFramesPropertiesPosition.find((prop) =>
-      numberIsBetweenOrEqual(prop.yPosition, mouseYPosition - 20, mouseYPosition + 20)
-    );
     const mappedX: number = mapNumber(mouseXPosition, 80, 650, timelinePositionMs, maxRange) | 0;
-    const hoveredKeyFrame = animation?.animationKeyFrames.find((keyFrame) => {
-      const min = (mappedX - selectableSteps[selectableStepsIndex] / 5 - 1) | 0;
-      const thisKeyFrameIsHoveredOver =
-        keyFrame.timeMs >= min &&
-        keyFrame.timeMs === mappedX &&
-        keyFrame.propertyEdited === propertyInYPosition?.property;
-
-      return thisKeyFrameIsHoveredOver;
-    });
+    const hoveredKeyFrame = getKeyFrameFromMousePosition(mappedX, mouseYPosition);
 
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     drawLine(mouseXPosition, 0, mouseXPosition, 650, ctx);
@@ -248,7 +225,6 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
     if (mouseXPosition < 80 || selectableStepsIndex === newSelectableStepsIndex) {
       return;
     }
-    setSelectableStepsIndex(newSelectableStepsIndex);
 
     const xCorrection = [3, 40, 350, 3000];
     let timelinePosition: number =
@@ -258,10 +234,62 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
     }
 
     setTimelinePositionMs(timelinePosition);
+    setSelectableStepsIndex(newSelectableStepsIndex);
+  };
+
+  const onMiddleMouseClick = (e: any) => {
+    if (e.button !== 1) {
+      return;
+    }
+
+    e.preventDefault();
+
+    const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
+    const rect = canvas.getBoundingClientRect();
+    const mouseXPosition = e.clientX - rect.left;
+    const mouseYPosition = e.clientY - rect.top;
+    const mappedX: number = mapNumber(mouseXPosition, 80, 650, timelinePositionMs, maxRange) | 0;
+
+    const keyFrame = getKeyFrameFromMousePosition(mappedX, mouseYPosition);
+    let updatedAnimation: any = { ...animation };
+
+    if (animation === undefined || keyFrame === undefined) {
+      return;
+    }
+
+    const indexToRemove = updatedAnimation.animationKeyFrames.findIndex(
+      (kf: AnimationKeyFrame) => kf.uuid === keyFrame.uuid
+    );
+    updatedAnimation.animationKeyFrames.splice(indexToRemove, 1);
+    setSelectedAnimation(updatedAnimation);
+  };
+
+  const updateProperty = (value: string | number) => {
+    const selectedKeyFrameIndex = animation?.animationKeyFrames.findIndex((kf) => kf.uuid === selectedKeyFrameUuid);
+    let updatedAnimation: any = { ...animation };
+    if (
+      updatedAnimation === undefined ||
+      selectedKeyFrameIndex === undefined ||
+      updatedAnimation?.animationKeyFrames === undefined
+    ) {
+      return;
+    }
+
+    updatedAnimation.animationKeyFrames[selectedKeyFrameIndex].propertyValue = value;
+    setSelectedAnimation(updatedAnimation);
+  };
+
+  const getPropertyValue = (property: String) => {
+    const selectedKeyFrame = animation?.animationKeyFrames.find((kf) => {
+      const value = kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property;
+      return value;
+    });
+
+    return selectedKeyFrame?.propertyValue;
   };
 
   return (
-    <Grid container direction="row" spacing={2}>
+    <Grid container direction="row" spacing={2} key={selectedKeyFrameUuid}>
       <Grid item xs={2}>
         <FormLabel htmlFor="animation-scale">
           Scale
@@ -277,8 +305,8 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
           id="animation-scale"
           type="number"
           inputProps={{ min: 0.1, max: 10, step: 0.1 }}
-          value={scale}
-          onChange={(e) => setScale(Number(e.target.value))}
+          value={getPropertyValue("scale")}
+          onChange={(e) => updateProperty(Number(e.target.value))}
         />
         <br />
         <div style={{ marginTop: "90px" }}>
@@ -296,8 +324,8 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
             id="animation-xoffset"
             type="number"
             inputProps={{ min: -200, max: 200 }}
-            value={xOffset}
-            onChange={(e) => setXOffset(Number(e.target.value))}
+            defaultValue={getPropertyValue("xOffset")}
+            onChange={(e) => updateProperty(Number(e.target.value))}
           />
         </div>
         <br />
@@ -316,8 +344,8 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
             id="animation-yoffset"
             type="number"
             inputProps={{ min: -200, max: 200 }}
-            value={yOffset}
-            onChange={(e) => setYOffset(Number(e.target.value))}
+            defaultValue={getPropertyValue("yOffset")}
+            onChange={(e) => updateProperty(Number(e.target.value))}
           />
         </div>
         <div style={{ marginTop: "70px" }}>
@@ -335,18 +363,19 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
             id="animation-rotation"
             type="number"
             inputProps={{ min: -360, max: 360 }}
-            value={rotation}
-            onChange={(e) => setRotation(Number(e.target.value))}
+            defaultValue={getPropertyValue("rotation")}
+            onChange={(e) => updateProperty(Number(e.target.value))}
           />
         </div>
       </Grid>
       <Grid item xs>
         <canvas
           id="svg-keyframe-canvas"
-          onClick={(e) => onCanvasClick(e)}
+          onClick={onCanvasClick}
           onMouseMove={showMouseXAxis}
-          onMouseLeave={() => drawTimelineOnCanvas()}
+          onMouseLeave={drawTimelineOnCanvas}
           onWheel={onMouseScroll}
+          onMouseDown={onMiddleMouseClick}
         />
         <Grid container direction="row" spacing={2}>
           <Grid item xs={2.6}>
