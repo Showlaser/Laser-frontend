@@ -324,7 +324,7 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
             id="animation-xoffset"
             type="number"
             inputProps={{ min: -200, max: 200 }}
-            defaultValue={getPropertyValue("xOffset")}
+            value={getPropertyValue("xOffset")}
             onChange={(e) => updateProperty(Number(e.target.value))}
           />
         </div>
@@ -344,7 +344,7 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
             id="animation-yoffset"
             type="number"
             inputProps={{ min: -200, max: 200 }}
-            defaultValue={getPropertyValue("yOffset")}
+            value={getPropertyValue("yOffset")}
             onChange={(e) => updateProperty(Number(e.target.value))}
           />
         </div>
@@ -363,7 +363,7 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
             id="animation-rotation"
             type="number"
             inputProps={{ min: -360, max: 360 }}
-            defaultValue={getPropertyValue("rotation")}
+            value={getPropertyValue("rotation")}
             onChange={(e) => updateProperty(Number(e.target.value))}
           />
         </div>
