@@ -29,21 +29,21 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
   // TODO remove test code
   if (animation !== null) {
     animation.animationKeyFrames = [
-      { uuid: "f38dbe41-8e97-4150-ae7c-3a57f17e36ef", timeMs: 500, propertyEdited: "scale", propertyValue: 0.8 },
-      { uuid: "4c299c26-1398-4b82-a709-74a56a9dffa3", timeMs: 499, propertyEdited: "scale", propertyValue: 0.6 },
-      { uuid: "1a672ae3-68eb-492b-8481-4649d37c885b", timeMs: 499, propertyEdited: "xOffset", propertyValue: 0 },
-      { uuid: "a0f9a978-a4ed-401a-9f10-fd5568c8e128", timeMs: 500, propertyEdited: "xOffset", propertyValue: 20 },
-      { uuid: "81ab7872-b421-470e-a95f-49c72400824f", timeMs: 499, propertyEdited: "yOffset", propertyValue: 20 },
-      { uuid: "cd356410-79df-4910-bf3f-d1d4afab8843", timeMs: 500, propertyEdited: "yOffset", propertyValue: 50 },
-      { uuid: "63121cac-ccaa-4757-a07d-7f6222048173", timeMs: 499, propertyEdited: "rotation", propertyValue: 20 },
-      { uuid: "e4ba69b6-bdd8-4a2d-8c33-601de0ca50a2", timeMs: 500, propertyEdited: "rotation", propertyValue: 50 },
+      { uuid: "f38dbe41-8e97-4150-ae7c-3a57f17e36ef", timeMs: 5000, propertyEdited: "scale", propertyValue: 0.8 },
+      { uuid: "4c299c26-1398-4b82-a709-74a56a9dffa3", timeMs: 4990, propertyEdited: "scale", propertyValue: 0.6 },
+      { uuid: "1a672ae3-68eb-492b-8481-4649d37c885b", timeMs: 4990, propertyEdited: "xOffset", propertyValue: 0 },
+      { uuid: "a0f9a978-a4ed-401a-9f10-fd5568c8e128", timeMs: 5000, propertyEdited: "xOffset", propertyValue: 20 },
+      { uuid: "81ab7872-b421-470e-a95f-49c72400824f", timeMs: 4990, propertyEdited: "yOffset", propertyValue: 20 },
+      { uuid: "cd356410-79df-4910-bf3f-d1d4afab8843", timeMs: 5000, propertyEdited: "yOffset", propertyValue: 50 },
+      { uuid: "63121cac-ccaa-4757-a07d-7f6222048173", timeMs: 4990, propertyEdited: "rotation", propertyValue: 20 },
+      { uuid: "e4ba69b6-bdd8-4a2d-8c33-601de0ca50a2", timeMs: 5000, propertyEdited: "rotation", propertyValue: 50 },
     ];
   }
   // end of test code
 
   useEffect(() => {
     drawTimelineOnCanvas();
-  }, [selectableStepsIndex, timelinePositionMs]);
+  }, [selectableStepsIndex, timelinePositionMs, selectedKeyFrameUuid]);
 
   const prepareCanvas = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
     canvas.width = 650;
@@ -61,6 +61,13 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
     ctx.lineTo(toX, toY);
     ctx.strokeStyle = "rgb(90, 90, 90, 0.7)";
     ctx.stroke();
+  };
+
+  const writeText = (x: number, y: number, text: string, ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.font = "12px sans-serif";
+    ctx.fillStyle = "whitesmoke";
+    ctx.fillText(text, x, y);
   };
 
   const drawTimeStepsAndKeyframes = (canvas: HTMLCanvasElement) => {
@@ -133,7 +140,7 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
     });
   };
 
-  const getClickPosition = (event: any) => {
+  const onCanvasClick = (event: any) => {
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     let x = event.clientX - rect.left;
@@ -163,7 +170,7 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
     }
 
     setSelectedKeyFrameUuid(selectedKeyFrame.uuid);
-
+    resetPropertyState();
     switch (selectedKeyFrame?.propertyEdited) {
       case "scale":
         setScale(Number(selectedKeyFrame.propertyValue));
@@ -180,6 +187,13 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
     }
   };
 
+  const resetPropertyState = () => {
+    setScale(0);
+    setXOffset(0);
+    setYOffset(0);
+    setRotation(0);
+  };
+
   const showMouseXAxis = (event: any) => {
     drawTimelineOnCanvas();
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
@@ -193,30 +207,35 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
     const mappedX: number = mapNumber(mouseXPosition, 80, 650, timelinePositionMs, maxRange) | 0;
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     drawLine(mouseXPosition, 0, mouseXPosition, 650, ctx);
-    ctx.beginPath();
-    ctx.font = "12px sans-serif";
-    ctx.fillStyle = "whitesmoke";
-    ctx.fillText(mappedX.toString() + " x", mouseXPosition, mouseYPosition);
+    writeText(mouseXPosition, mouseYPosition, mappedX.toString() + " x", ctx);
   };
 
   const onMouseScroll = (e: any) => {
-    const scrollDown = e.deltaY > 0;
-    if (scrollDown && selectableStepsIndex < selectableSteps.length - 1) {
-      setSelectableStepsIndex(selectableStepsIndex + 1);
-    } else if (!scrollDown && selectableStepsIndex > 0) {
-      setSelectableStepsIndex(selectableStepsIndex - 1);
-    }
-
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     const mouseXPosition = e.clientX - rect.left;
-    if (mouseXPosition < 80 || selectableStepsIndex === 0 || selectableStepsIndex === selectableSteps.length - 1) {
-      return;
+
+    const scrollDown = e.deltaY > 0;
+    let newSelectableStepsIndex = selectableStepsIndex;
+    if (scrollDown && selectableStepsIndex < selectableSteps.length - 1) {
+      newSelectableStepsIndex += 1;
+    } else if (!scrollDown && selectableStepsIndex > 0) {
+      newSelectableStepsIndex -= 1;
     }
 
-    const mappedX: number =
-      mapNumber(mouseXPosition, 80, 650, timelinePositionMs / selectableSteps[selectableStepsIndex], maxRange) | 0;
-    setTimelinePositionMs(mappedX);
+    if (mouseXPosition < 80 || selectableStepsIndex === newSelectableStepsIndex) {
+      return;
+    }
+    setSelectableStepsIndex(newSelectableStepsIndex);
+
+    const xCorrection = [3, 40, 350, 3000];
+    let timelinePosition: number =
+      (mapNumber(mouseXPosition, 80, 650, timelinePositionMs, maxRange) - xCorrection[newSelectableStepsIndex]) | 0;
+    if (timelinePosition < 0) {
+      timelinePosition = 0;
+    }
+
+    setTimelinePositionMs(timelinePosition);
   };
 
   return (
@@ -302,7 +321,7 @@ export default function AnimationKeyFrameEditor({ animation }: Props) {
       <Grid item xs>
         <canvas
           id="svg-keyframe-canvas"
-          onClick={(e) => getClickPosition(e)}
+          onClick={(e) => onCanvasClick(e)}
           onMouseMove={showMouseXAxis}
           onMouseLeave={() => drawTimelineOnCanvas()}
           onWheel={onMouseScroll}

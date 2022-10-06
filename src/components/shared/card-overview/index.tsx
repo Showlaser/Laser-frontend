@@ -91,7 +91,7 @@ export default function CardOverview({
             {items
               .filter((item) => (searchValue.length > 0 ? item.name.toLowerCase().includes(searchValue) : true))
               .map((item, index) => (
-                <Grow in={items.length > 0} timeout={1400 * index > 2500 ? 2500 : 1400 * index}>
+                <Grow in={items.length > 0} timeout={1400 * index > 2500 ? 2500 : 1400 * index} key={`card ${index}`}>
                   <Card sx={{ width: "20%", minWidth: "30vh", margin: 1 }} key={item.name + "card-overview"}>
                     <CardActionArea onClick={() => item.onCardClick(item)}>
                       <CardMedia component="img" height="300" alt="pattern image" src={item.image ?? ""} />
