@@ -1,10 +1,16 @@
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Divider,
   FormLabel,
   Grid,
   IconButton,
   Input,
   InputLabel,
+  List,
+  ListItemButton,
+  ListItemText,
   MenuItem,
   Paper,
   Select,
@@ -15,6 +21,10 @@ import { Animation, AnimationKeyFrame } from "models/components/shared/animation
 import React, { useEffect, useState } from "react";
 import { createGuid, mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
+
 type Props = {
   animation: Animation | null;
   setSelectedAnimation: (animation: Animation | null) => void;
@@ -23,9 +33,11 @@ type Props = {
 export default function AnimationKeyFrameEditor({ animation, setSelectedAnimation }: Props) {
   const [timelinePositionMs, setTimelinePositionMs] = useState<number>(0);
   const [selectableStepsIndex, setSelectableStepsIndex] = useState<number>(0);
-  let maxRange = 0;
+  let stepsToDrawMaxRange = 0;
   const [selectedKeyFrameUuid, setSelectedKeyFrameUuid] = useState<string>("");
-  const selectableSteps = [1, 10, 100, 1000];
+  const [playAnimation, setPlayAnimation] = useState<boolean>(false);
+  const selectableSteps = [10, 100, 1000, 10000];
+  const xCorrection = [20, 350, 3000, 8000];
   const keyFramesPropertiesPosition = [
     { property: "scale", yPosition: 80 },
     { property: "xOffset", yPosition: 220 },
@@ -35,7 +47,16 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
 
   useEffect(() => {
     drawTimelineOnCanvas();
-  }, [selectableStepsIndex, timelinePositionMs, selectedKeyFrameUuid, animation]);
+    let interval: NodeJS.Timeout;
+    if (playAnimation) {
+      interval = setInterval(
+        () => setTimelinePositionMs(timelinePositionMs + selectableSteps[selectableStepsIndex]),
+        1
+      );
+    }
+
+    return () => clearInterval(interval);
+  }, [playAnimation, selectableStepsIndex, timelinePositionMs, selectedKeyFrameUuid, animation]);
 
   const prepareCanvas = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
     canvas.width = 650;
@@ -69,24 +90,24 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
     ctx.fillStyle = "whitesmoke";
 
     const minRange = timelinePositionMs;
-    maxRange = (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
+    stepsToDrawMaxRange = (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
 
-    const stepsCorrection = [0, -25, -25, -25];
+    const stepCorrection = -25;
     let xPos = 100;
-    for (let i = minRange; i < maxRange + 1; i += selectableSteps[selectableStepsIndex]) {
-      ctx.fillText(i.toString(), xPos + stepsCorrection[selectableStepsIndex], 645);
+    for (let i = minRange; i < stepsToDrawMaxRange + 1; i += selectableSteps[selectableStepsIndex]) {
+      ctx.fillText(i.toString(), xPos + stepCorrection, 645);
       xPos += 55;
     }
 
     const keyFramesInRange = animation?.animationKeyFrames.filter((keyframe) =>
-      numberIsBetweenOrEqual(keyframe.timeMs, minRange, maxRange)
+      numberIsBetweenOrEqual(keyframe.timeMs, minRange, stepsToDrawMaxRange)
     );
 
     if (keyFramesInRange === undefined) {
       return;
     }
 
-    drawKeyFrames(keyFramesInRange, maxRange, canvas);
+    drawKeyFrames(keyFramesInRange, canvas);
   };
 
   const drawProperties = (canvas: HTMLCanvasElement) => {
@@ -108,12 +129,12 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
     drawTimeStepsAndKeyframes(canvas);
   };
 
-  const drawKeyFrames = (keyFrames: AnimationKeyFrame[], maxRange: number, canvas: HTMLCanvasElement) => {
+  const drawKeyFrames = (keyFrames: AnimationKeyFrame[], canvas: HTMLCanvasElement) => {
     if (keyFrames.length === 0) {
       return;
     }
 
-    const stepsCorrection = [20, 1, 1, 1];
+    const stepsCorrection = [-2, 1, 1, 1, 1];
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     keyFrames.forEach((keyFrame) => {
       const keyFrameProperty = keyFramesPropertiesPosition.find((p) => p.property === keyFrame.propertyEdited);
@@ -122,7 +143,7 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
       }
 
       const y = keyFrameProperty.yPosition;
-      const x = mapNumber(keyFrame.timeMs, timelinePositionMs, maxRange, 80, 650);
+      const x = mapNumber(keyFrame.timeMs, timelinePositionMs, stepsToDrawMaxRange, 80, 650);
 
       const isSelected = keyFrame.uuid === selectedKeyFrameUuid;
       ctx.beginPath();
@@ -164,6 +185,11 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
     return selectedKeyFrame;
   };
 
+  const mapXPositionToStepsXPosition = (x: number) => {
+    const step = selectableSteps[selectableStepsIndex];
+    return Math.round(x / step) * step;
+  };
+
   const onCanvasClick = (event: any) => {
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
@@ -172,7 +198,9 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
       x = 85;
     }
 
-    const mappedX: number = mapNumber(x, 80, 650, timelinePositionMs, maxRange) | 0;
+    const mappedX: number = mapNumber(x, 80, 650, timelinePositionMs, stepsToDrawMaxRange) | 0;
+    const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
+
     const y = event.clientY - rect.top;
     const propertyClicked = getPropertyFromYPosition(y);
 
@@ -180,9 +208,9 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
       return;
     }
 
-    const selectedKeyFrame = getKeyFrameFromMousePosition(mappedX, y);
+    const selectedKeyFrame = getKeyFrameFromMousePosition(mappedXToStep, y);
     if (selectedKeyFrame === undefined) {
-      createNewKeyframe(y, mappedX);
+      createNewKeyframe(y, mappedXToStep);
       return;
     }
 
@@ -202,13 +230,14 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
       return;
     }
 
-    const mappedX: number = mapNumber(mouseXPosition, 80, 650, timelinePositionMs, maxRange) | 0;
-    const hoveredKeyFrame = getKeyFrameFromMousePosition(mappedX, mouseYPosition);
+    const mappedX: number = mapNumber(mouseXPosition, 80, 650, timelinePositionMs, stepsToDrawMaxRange) | 0;
+    const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
+    const hoveredKeyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
 
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     drawLine(mouseXPosition, 0, mouseXPosition, 650, ctx);
     if (hoveredKeyFrame === undefined) {
-      writeText(mouseXPosition, mouseYPosition, mappedX.toString() + " x", ctx);
+      writeText(mouseXPosition, mouseYPosition, mappedXToStep.toString() + " x", ctx);
     } else {
       writeText(
         mouseXPosition,
@@ -236,9 +265,10 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
       return;
     }
 
-    const xCorrection = [3, 40, 350, 3000];
     let timelinePosition: number =
-      (mapNumber(mouseXPosition, 80, 650, timelinePositionMs, maxRange) - xCorrection[newSelectableStepsIndex]) | 0;
+      (mapNumber(mouseXPosition, 80, 650, timelinePositionMs, stepsToDrawMaxRange) -
+        xCorrection[newSelectableStepsIndex]) |
+      0;
     if (timelinePosition < 0) {
       timelinePosition = 0;
     }
@@ -258,9 +288,10 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
     const rect = canvas.getBoundingClientRect();
     const mouseXPosition = e.clientX - rect.left;
     const mouseYPosition = e.clientY - rect.top;
-    const mappedX: number = mapNumber(mouseXPosition, 80, 650, timelinePositionMs, maxRange) | 0;
+    const mappedX: number = mapNumber(mouseXPosition, 80, 650, timelinePositionMs, stepsToDrawMaxRange) | 0;
+    const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
 
-    const keyFrame = getKeyFrameFromMousePosition(mappedX, mouseYPosition);
+    const keyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
     let updatedAnimation: any = { ...animation };
 
     if (animation === undefined || keyFrame === undefined) {
@@ -322,6 +353,8 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
     setSelectedAnimation(updatedAnimation);
   };
 
+  const getPointsToDrawByTimelinePosition = () => {};
+
   return (
     <Grid container direction="row" spacing={2} key={selectedKeyFrameUuid}>
       <Grid item xs={2}>
@@ -375,13 +408,15 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
           <br />
           <Divider />
           <Tooltip title="Remove keyframe" placement="right">
-            <IconButton
-              disabled={selectedKeyFrameUuid === ""}
-              style={{ marginLeft: "10px" }}
-              onClick={() => (window.confirm("Are you sure you want to remove this keyframe?") ? onRemove() : null)}
-            >
-              <DeleteIcon />
-            </IconButton>
+            <span>
+              <IconButton
+                disabled={selectedKeyFrameUuid === ""}
+                style={{ marginLeft: "10px" }}
+                onClick={() => (window.confirm("Are you sure you want to remove this keyframe?") ? onRemove() : null)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </span>
           </Tooltip>
         </Paper>
         <br />
@@ -393,6 +428,29 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
           </small>
           <br />
           <small>Total keyframes: {animation?.animationKeyFrames?.length}</small>
+          <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>All points</AccordionSummary>
+              <AccordionDetails>
+                <List>
+                  {animation?.animationKeyFrames?.map((keyFrame) => (
+                    <ListItemButton
+                      key={`${keyFrame.uuid}-points`}
+                      onClick={() => {
+                        setTimelinePositionMs(keyFrame.timeMs - xCorrection[selectableStepsIndex]);
+                        setSelectedKeyFrameUuid(keyFrame.uuid);
+                      }}
+                    >
+                      <ListItemText
+                        primary={`Time ms: ${keyFrame.timeMs}`}
+                        secondary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
+                      />
+                    </ListItemButton>
+                  ))}
+                </List>
+              </AccordionDetails>
+            </Accordion>
+          </div>
         </Paper>
       </Grid>
       <Grid item xs>
@@ -411,6 +469,7 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
             <Input
               id="timeline-position-ms"
               value={timelinePositionMs}
+              onKeyDown={(e) => e.preventDefault()}
               onChange={(e) => setTimelinePositionMs(Number(e.target.value))}
               type="number"
               inputProps={{ min: 0, step: selectableSteps[selectableStepsIndex] }}
@@ -429,6 +488,21 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
                 </MenuItem>
               ))}
             </Select>
+            <span style={{ marginLeft: "10px" }}>
+              {playAnimation ? (
+                <Tooltip title="Pause animation">
+                  <IconButton onClick={() => setPlayAnimation(false)}>
+                    <PauseIcon />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <Tooltip title="Start animation">
+                  <IconButton onClick={() => setPlayAnimation(true)}>
+                    <PlayArrowIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </span>
           </Grid>
         </Grid>
       </Grid>

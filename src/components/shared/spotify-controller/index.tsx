@@ -2,6 +2,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Button,
   FormControlLabel,
   IconButton,
   LinearProgress,
@@ -22,12 +23,15 @@ import {
   skipSong,
   startPlayer,
 } from "services/logic/spotify";
+import paths from "services/shared/router-paths";
 
 export default function SpotifyController() {
   const [, updateState] = React.useState({});
   const forceUpdate = React.useCallback(() => updateState({}), []);
 
   const [accordionIsOpen, setAccordionIsOpen] = useState<boolean>(false);
+  const userIsLoggedIntoSpotify =
+    localStorage.getItem("SpotifyAccessToken") !== null && localStorage.getItem("SpotifyAccessToken") !== "undefined";
 
   const playerRef = useRef<any>();
   const songDataRef = useRef<any>();
@@ -66,6 +70,30 @@ export default function SpotifyController() {
     forceUpdate();
   };
 
+  const getComponentsByLoginState = () => {
+    if (userIsLoggedIntoSpotify) {
+      return (
+        <>
+          <FormControlLabel control={<Switch key="lgc-switch" />} label="Enable lasershow generation" />
+          <br />
+          <small>{`Bpm: ${parseInt(songDataRef?.current?.tempo)}`}</small>
+          <br />
+          <small>{`Song: ${playerRef.current?.item?.name}`}</small>
+          <LinearProgress
+            variant="determinate"
+            value={mapNumber(playerRef?.current?.progress_ms, 0, playerRef?.current?.item?.duration_ms, 0, 100)}
+          />
+        </>
+      );
+    } else {
+      return (
+        <Button variant="contained" onClick={() => (window.location.href = paths.Settings)}>
+          Login to Spotify to use this component
+        </Button>
+      );
+    }
+  };
+
   return (
     <Accordion expanded={accordionIsOpen}>
       <AccordionSummary
@@ -89,17 +117,7 @@ export default function SpotifyController() {
           </IconButton>
         </span>
       </AccordionSummary>
-      <AccordionDetails>
-        <FormControlLabel control={<Switch key="lgc-switch" />} label="Enable lasershow generation" />
-        <br />
-        <small>{`Bpm: ${parseInt(songDataRef?.current?.tempo)}`}</small>
-        <br />
-        <small>{`Song: ${playerRef.current?.item?.name}`}</small>
-        <LinearProgress
-          variant="determinate"
-          value={mapNumber(playerRef?.current?.progress_ms, 0, playerRef?.current?.item?.duration_ms, 0, 100)}
-        />
-      </AccordionDetails>
+      <AccordionDetails>{getComponentsByLoginState()}</AccordionDetails>
     </Accordion>
   );
 }
