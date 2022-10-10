@@ -20,7 +20,8 @@ export default function AnimationPage() {
   const animation: Animation = {
     uuid: "14c87f62-39d9-4bac-a51a-477aaf37f73c",
     animationKeyFrames: [
-      { uuid: "f38dbe41-8e97-4150-ae7c-3a57f17e36ef", timeMs: 5000, propertyEdited: "scale", propertyValue: 0.8 },
+      { uuid: "7e636af4-c32d-4da5-8f08-712c88d543b6", timeMs: 4970, propertyEdited: "scale", propertyValue: 0.2 },
+      { uuid: "f38dbe41-8e97-4150-ae7c-3a57f17e36ef", timeMs: 4980, propertyEdited: "scale", propertyValue: 0.8 },
       { uuid: "4c299c26-1398-4b82-a709-74a56a9dffa3", timeMs: 4990, propertyEdited: "scale", propertyValue: 0.6 },
       { uuid: "1a672ae3-68eb-492b-8481-4649d37c885b", timeMs: 4990, propertyEdited: "xOffset", propertyValue: 0 },
       { uuid: "a0f9a978-a4ed-401a-9f10-fd5568c8e128", timeMs: 5000, propertyEdited: "xOffset", propertyValue: 20 },
