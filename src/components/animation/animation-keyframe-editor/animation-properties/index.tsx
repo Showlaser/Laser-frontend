@@ -28,7 +28,6 @@ type Props = {
   setTimelinePositionMs: any;
   xCorrection: number[];
   selectableStepsIndex: number;
-  timelinePositionMs: number;
 };
 
 export default function AnimationProperties({
@@ -39,7 +38,6 @@ export default function AnimationProperties({
   setTimelinePositionMs,
   xCorrection,
   selectableStepsIndex,
-  timelinePositionMs,
 }: Props) {
   const updateProperty = (value: string | number) => {
     const selectedKeyFrameIndex = animation?.animationKeyFrames.findIndex((kf) => kf.uuid === selectedKeyFrameUuid);
