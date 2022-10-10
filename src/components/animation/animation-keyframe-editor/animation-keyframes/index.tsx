@@ -147,7 +147,7 @@ export default function AnimationKeyFrames({
 
       const isSelected = keyFrame.uuid === selectedKeyFrameUuid;
       ctx.beginPath();
-      ctx.arc(x + stepsCorrection[selectableStepsIndex], y, isSelected ? 6 : 4, 0, 2 * Math.PI);
+      ctx.arc(x + stepsCorrection[selectableStepsIndex], y, isSelected ? 8 : 6, 0, 2 * Math.PI);
       ctx.fillStyle = isSelected ? "#4287f5" : "white";
       ctx.fill();
     });
