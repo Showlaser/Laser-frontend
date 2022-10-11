@@ -1,6 +1,7 @@
 import { Animation, animationPlaceholder } from "models/components/shared/animation";
 import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
+import { rotatePoint } from "./math";
 
 export const rgbColorStringFromPoint = (point: Point): string =>
   `rgb(${point.redLaserPowerPwm},${point.greenLaserPowerPwm},${point.blueLaserPowerPwm})`;
@@ -32,4 +33,25 @@ export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   animation.image = pattern.image;
   animation.pattern = pattern;
   return animation;
+};
+
+export const convertKeyFrameValuesToPoint = (
+  scale: number,
+  xOffset: number,
+  yOffset: number,
+  rotation: number,
+  points: Point[]
+) => {
+  const pointsLength = points.length;
+  let updatedPoints: Point[] = [];
+  for (let index = 0; index < pointsLength; index++) {
+    let rotatedPoint: Point = rotatePoint({ ...points[index] }, rotation, xOffset, yOffset);
+
+    rotatedPoint.x += xOffset;
+    rotatedPoint.y += yOffset;
+    rotatedPoint.x *= scale;
+    rotatedPoint.y *= scale;
+    updatedPoints.push(rotatedPoint);
+  }
+  return updatedPoints;
 };

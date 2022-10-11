@@ -1,5 +1,7 @@
-import { createGuid } from "services/shared/math";
+import { convertKeyFrameValuesToPoint } from "services/shared/converters";
+import { createGuid, rotatePoint } from "services/shared/math";
 import { Pattern, getPatternPlaceHolder } from "./pattern";
+import { Point } from "./point";
 
 export enum AnimationEffects {
   Enlarge,
@@ -10,7 +12,7 @@ export type AnimationKeyFrame = {
   uuid: string;
   timeMs: number;
   propertyEdited: string;
-  propertyValue: string | number;
+  propertyValue: number;
 };
 
 export type AnimationEffect = {};
@@ -32,3 +34,14 @@ export const animationPlaceholder = (): Animation => ({
   animationKeyFrames: [],
   animationEffects: [],
 });
+
+export const generateKeyFramesFromAnimation = (animation: Animation): AnimationKeyFrame[] => {
+  const { pattern } = animation;
+  return convertKeyFrameValuesToPoint(
+    pattern.scale,
+    pattern.xOffset,
+    pattern.yOffset,
+    pattern.rotation,
+    pattern.points
+  );
+};

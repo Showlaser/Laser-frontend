@@ -15,6 +15,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { addItemToVersionHistory } from "services/shared/version-history";
 import { savePattern } from "services/logic/pattern-logic";
 import PointsDrawer from "components/shared/points-drawer";
+import { convertKeyFrameValuesToPoint } from "services/shared/converters";
 
 type Props = {
   patternNamesInUse: string[];
@@ -60,7 +61,13 @@ export default function SvgToCoordinatesConverter({
   }, [uploadedFile, numberOfPoints]);
 
   React.useEffect(() => {
-    const updatedPoints: Point[] = applySettingsToPoints(pattern.points.length, pattern.points);
+    const updatedPoints: Point[] = convertKeyFrameValuesToPoint(
+      pattern.scale,
+      pattern.xOffset,
+      pattern.yOffset,
+      pattern.rotation,
+      pattern.points
+    );
     setPointToDraw(updatedPoints);
   }, [showPointNumber, selectedPointsUuid, pattern]);
 
@@ -112,25 +119,6 @@ export default function SvgToCoordinatesConverter({
       const newScale = Math.round(((pattern.scale * (100 - percentageDifference)) / 100) * 10) / 10;
       updatePatternProperty("scale", newScale);
     }
-  };
-
-  const applySettingsToPoints = (dotsToDrawLength: number, dotsToDraw: Point[]) => {
-    let updatedPoints: Point[] = [];
-    for (let index = 0; index < dotsToDrawLength; index++) {
-      let rotatedPoint: Point = rotatePoint(
-        { ...dotsToDraw[index] },
-        pattern.rotation,
-        pattern.xOffset,
-        pattern.yOffset
-      );
-
-      rotatedPoint.x += pattern.xOffset;
-      rotatedPoint.y += pattern.yOffset;
-      rotatedPoint.x *= pattern.scale;
-      rotatedPoint.y *= pattern.scale;
-      updatedPoints.push(rotatedPoint);
-    }
-    return updatedPoints;
   };
 
   const onSave = async () => {
