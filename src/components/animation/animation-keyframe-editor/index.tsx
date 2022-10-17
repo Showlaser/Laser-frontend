@@ -7,6 +7,7 @@ import AnimationProperties from "./animation-properties";
 import AnimationKeyFrames from "./animation-keyframes";
 import { Point } from "models/components/shared/point";
 import { rotatePoint } from "services/shared/math";
+import { applyParametersToPoints } from "services/shared/converters";
 
 type PreviousNextAndCurrentKeyFramePerProperty = {
   previous: AnimationKeyFrame[];
@@ -30,24 +31,28 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
     {
       property: "scale",
       type: "float",
+      default: 4,
       min: 0.1,
       max: 10,
     },
     {
       property: "xOffset",
       type: "int",
+      default: 0,
       min: -200,
       max: 200,
     },
     {
       property: "yOffset",
       type: "int",
+      default: 0,
       min: -200,
       max: 200,
     },
     {
       property: "rotation",
       type: "int",
+      default: 0,
       min: -360,
       max: 360,
     },
@@ -62,7 +67,7 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
     return () => clearInterval(interval);
   }, [playAnimation, selectableStepsIndex, timelinePositionMs, selectedKeyFrameUuid, animation]);
 
-  const getPreviousKeyFramesByPropertySorted = (property: string) =>
+  const getNextKeyFramesByPropertySorted = (property: string) =>
     animation?.animationKeyFrames
       .filter((ak) => ak.timeMs > timelinePositionMs && ak.propertyEdited === property)
       .sort((a, b) => a.timeMs - b.timeMs);
@@ -87,7 +92,7 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
         previousNextAndCurrentKeyFramePerProperty.previous.push(previous);
       }
 
-      const next = getPreviousKeyFramesByPropertySorted(propertySetting.property)?.at(0);
+      const next = getNextKeyFramesByPropertySorted(propertySetting.property)?.at(0);
       if (next !== undefined) {
         previousNextAndCurrentKeyFramePerProperty.next.push(next);
       }
@@ -104,8 +109,13 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
       return [];
     }
 
+    console.log(timelinePositionMs);
+
     let points: Point[] = [...pattern.points];
-    const pointsLength = points.length;
+    let valuesPerProperty = propertiesSettings.map((propertiesSetting) => ({
+      property: propertiesSetting.property,
+      value: propertiesSetting.default,
+    }));
 
     for (let i = 0; i < 4; i++) {
       const currentPropertySetting = propertiesSettings[i];
@@ -119,9 +129,23 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
       const nextKeyFrame = previousNextAndCurrentKeyFrames.next.find(
         (kf) => kf.propertyEdited === currentPropertySetting.property
       );
+
+      const valuesPerPropertyIndex = valuesPerProperty.findIndex(
+        (vpp) => vpp.property === currentPropertySetting.property
+      );
+      if (valuesPerPropertyIndex !== -1 && previousKeyFrame !== undefined && nextKeyFrame !== undefined) {
+        valuesPerProperty[valuesPerPropertyIndex].value = calculateNewValueByKeyFrames(previousKeyFrame, nextKeyFrame);
+      } else if (valuesPerPropertyIndex !== -1 && previousKeyFrame !== undefined) {
+        valuesPerProperty[valuesPerPropertyIndex].value = previousKeyFrame.propertyValue;
+      }
     }
 
-    return points;
+    const scale = valuesPerProperty.find((vpp) => vpp.property === "scale")?.value ?? 4;
+    const xOffset = valuesPerProperty.find((vpp) => vpp.property === "xOffset")?.value ?? 0;
+    const yOffset = valuesPerProperty.find((vpp) => vpp.property === "yOffset")?.value ?? 0;
+    const rotation = valuesPerProperty.find((vpp) => vpp.property === "rotation")?.value ?? 0;
+
+    return applyParametersToPoints(scale, xOffset, yOffset, rotation, points);
   };
 
   const calculateNewValueByKeyFrames = (previousKeyFrame: AnimationKeyFrame, nextKeyFrame: AnimationKeyFrame) => {
@@ -130,6 +154,7 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
     const differenceBetweenPreviousAndNewPropertyValue = previousKeyFrame.propertyValue - nextKeyFrame.propertyValue;
     const conversionValue = differenceBetweenNextKeyFrameAndTimelinePosition / timeDifferenceBetweenKeyFrames;
     const newPropertyValue = differenceBetweenPreviousAndNewPropertyValue * conversionValue;
+    return newPropertyValue;
   };
 
   const getPointsToDraw = () => {

@@ -7,15 +7,14 @@ import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import CardOverview from "components/shared/card-overview";
-import { Animation, AnimationKeyFrame } from "models/components/shared/animation";
-import { getPatternPlaceHolder, Pattern } from "models/components/shared/pattern";
+import { Animation } from "models/components/shared/animation";
 import { getPatterns } from "services/logic/pattern-logic";
 import { getAnimations } from "services/logic/animation-logic";
 import { convertPatternToAnimation } from "services/shared/converters";
 import { AnimationEffectEditor } from "components/animation/animation-effect";
 import AnimationKeyFrameEditor from "components/animation/animation-keyframe-editor";
 import EditorSelector from "components/animation/editor-selector";
-import { createGuid } from "services/shared/math";
+import { Pattern } from "models/components/shared/pattern";
 
 export default function AnimationPage() {
   const [selectedAnimation, setSelectedAnimation] = useState<Animation | null>(null);
@@ -30,7 +29,7 @@ export default function AnimationPage() {
       getPatterns().then((patterns) => setAvailablePatterns(patterns ?? []));
       getAnimations().then((response) => {
         if (response?.status === 200) {
-          response.json().then((animations) => setAvailableAnimations(animations));
+          response.json().then((animations: Animation[]) => setAvailableAnimations(animations));
         }
       });
     }

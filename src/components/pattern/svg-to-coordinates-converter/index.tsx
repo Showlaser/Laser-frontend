@@ -2,12 +2,12 @@ import * as React from "react";
 import { showSuccess, showError, toastSubject } from "services/shared/toast-messages";
 import { Grid, SpeedDial, SpeedDialAction } from "@mui/material";
 import { Point } from "models/components/shared/point";
-import { getLargestNumber, rotatePoint, createGuid } from "services/shared/math";
+import { getLargestNumber } from "services/shared/math";
 import ToLaserProjector from "components/shared/to-laser-projector";
 import TabSelector, { TabSelectorData } from "components/tabs";
 import GeneralSection from "./sections/general-section";
 import PointsSection from "./sections/points-section";
-import { getHeightAnWidthOfPattern, prepareCanvas, svgToPoints } from "services/logic/svg-to-coordinates-converter";
+import { getHeightAnWidthOfPattern, svgToPoints } from "services/logic/svg-to-coordinates-converter";
 import { Pattern, getPatternPlaceHolder } from "models/components/shared/pattern";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SaveIcon from "@mui/icons-material/Save";
@@ -15,7 +15,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { addItemToVersionHistory } from "services/shared/version-history";
 import { savePattern } from "services/logic/pattern-logic";
 import PointsDrawer from "components/shared/points-drawer";
-import { convertKeyFrameValuesToPoint } from "services/shared/converters";
+import { applyParametersToPoints } from "services/shared/converters";
 
 type Props = {
   patternNamesInUse: string[];
@@ -61,7 +61,7 @@ export default function SvgToCoordinatesConverter({
   }, [uploadedFile, numberOfPoints]);
 
   React.useEffect(() => {
-    const updatedPoints: Point[] = convertKeyFrameValuesToPoint(
+    const updatedPoints: Point[] = applyParametersToPoints(
       pattern.scale,
       pattern.xOffset,
       pattern.yOffset,

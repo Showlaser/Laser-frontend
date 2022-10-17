@@ -55,6 +55,8 @@ export default function AnimationKeyFrames({
     xCorrection,
   ]);
 
+  console.log(animation);
+
   const getPropertyFromYPosition = (y: number) =>
     keyFramesPropertiesPosition.find((prop) => numberIsBetweenOrEqual(prop.yPosition, y - 20, y + 20))?.property;
 

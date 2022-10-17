@@ -1,7 +1,7 @@
 import { Animation, animationPlaceholder } from "models/components/shared/animation";
 import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
-import { rotatePoint } from "./math";
+import { createGuid, rotatePoint } from "./math";
 
 export const rgbColorStringFromPoint = (point: Point): string =>
   `rgb(${point.redLaserPowerPwm},${point.greenLaserPowerPwm},${point.blueLaserPowerPwm})`;
@@ -32,10 +32,40 @@ export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   animation.name = pattern.name;
   animation.image = pattern.image;
   animation.pattern = pattern;
+
+  const keyFrames = [
+    {
+      uuid: createGuid(),
+      timeMs: 100,
+      propertyEdited: "scale",
+      propertyValue: 0.7,
+    },
+    {
+      uuid: createGuid(),
+      timeMs: 150,
+      propertyEdited: "xOffset",
+      propertyValue: 100,
+    },
+    {
+      uuid: createGuid(),
+      timeMs: 200,
+      propertyEdited: "yOffset",
+      propertyValue: 200,
+    },
+    {
+      uuid: createGuid(),
+      timeMs: 250,
+      propertyEdited: "rotation",
+      propertyValue: 180,
+    },
+  ];
+
+  animation.animationKeyFrames = keyFrames;
+  //TODO remove this placeholder code
   return animation;
 };
 
-export const convertKeyFrameValuesToPoint = (
+export const applyParametersToPoints = (
   scale: number,
   xOffset: number,
   yOffset: number,
