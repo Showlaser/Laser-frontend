@@ -145,7 +145,7 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
     const yOffset = valuesPerProperty.find((vpp) => vpp.property === "yOffset")?.value ?? 0;
     const rotation = valuesPerProperty.find((vpp) => vpp.property === "rotation")?.value ?? 0;
 
-    return applyParametersToPoints(scale, xOffset, yOffset, rotation, points);
+    return applyParametersToPoints(scale, xOffset, yOffset, rotation, {...points});
   };
 
   const calculateNewValueByKeyFrames = (previousKeyFrame: AnimationKeyFrame, nextKeyFrame: AnimationKeyFrame) => {
