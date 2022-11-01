@@ -7,7 +7,7 @@ export const rgbColorStringFromPoint = (point: Point): string =>
   `rgb(${point.redLaserPowerPwm},${point.greenLaserPowerPwm},${point.blueLaserPowerPwm})`;
 
 const hexToRgb = (hex: string) => {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (result === null) {
     throw new Error("Invalid hex supplied");
   }
@@ -32,36 +32,7 @@ export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   animation.name = pattern.name;
   animation.image = pattern.image;
   animation.pattern = pattern;
-
-  const keyFrames = [
-    {
-      uuid: createGuid(),
-      timeMs: 100,
-      propertyEdited: "scale",
-      propertyValue: 0.7,
-    },
-    {
-      uuid: createGuid(),
-      timeMs: 150,
-      propertyEdited: "xOffset",
-      propertyValue: 100,
-    },
-    {
-      uuid: createGuid(),
-      timeMs: 200,
-      propertyEdited: "yOffset",
-      propertyValue: 200,
-    },
-    {
-      uuid: createGuid(),
-      timeMs: 250,
-      propertyEdited: "rotation",
-      propertyValue: 180,
-    },
-  ];
-
-  animation.animationKeyFrames = keyFrames;
-  //TODO remove this placeholder code
+  animation.animationKeyFrames = [];
   return animation;
 };
 

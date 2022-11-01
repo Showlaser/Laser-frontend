@@ -15,3 +15,34 @@ export const removeAnimation = async (uuid: string) =>
 
 export const playAnimation = async (animation: Animation) =>
   sendRequest(() => Post(apiEndpoints.animation + "/play", animation), []);
+
+export const propertiesSettings = [
+  {
+    property: "scale",
+    type: "float",
+    default: 4,
+    min: 0.1,
+    max: 10,
+  },
+  {
+    property: "xOffset",
+    type: "int",
+    default: 0,
+    min: -200,
+    max: 200,
+  },
+  {
+    property: "yOffset",
+    type: "int",
+    default: 0,
+    min: -200,
+    max: 200,
+  },
+  {
+    property: "rotation",
+    type: "int",
+    default: 0,
+    min: -360,
+    max: 360,
+  },
+];

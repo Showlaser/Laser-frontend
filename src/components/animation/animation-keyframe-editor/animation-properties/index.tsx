@@ -19,6 +19,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Animation } from "models/components/shared/animation";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
+import { propertiesSettings } from "services/logic/animation-logic";
 
 type Props = {
   animation: Animation | null;
@@ -39,6 +40,8 @@ export default function AnimationProperties({
   xCorrection,
   selectableStepsIndex,
 }: Props) {
+  const selectedKeyFrame = animation?.animationKeyFrames?.find((kf) => kf.uuid === selectedKeyFrameUuid);
+
   const updateProperty = (value: string | number) => {
     const selectedKeyFrameIndex = animation?.animationKeyFrames.findIndex((kf) => kf.uuid === selectedKeyFrameUuid);
     let updatedAnimation: any = { ...animation };
@@ -55,11 +58,10 @@ export default function AnimationProperties({
     setSelectedAnimation(updatedAnimation);
   };
 
-  const getPropertyValue = (property: String) => {
-    const selectedKeyFrame = animation?.animationKeyFrames.find((kf) => {
-      const value = kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property;
-      return value;
-    });
+  const getPropertyValue = (property: string) => {
+    const selectedKeyFrame = animation?.animationKeyFrames.find(
+      (kf) => kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property
+    );
 
     return selectedKeyFrame?.propertyValue;
   };
@@ -195,6 +197,7 @@ export default function AnimationProperties({
           inputProps={{ min: 0.1, max: 10, step: 0.1 }}
           value={getPropertyValue("scale")}
           onChange={(e) => updateProperty(Number(e.target.value))}
+          disabled={selectedKeyFrame?.propertyEdited !== "scale"}
         />
         {nextKeyFrameButton("scale")}
         <br />
@@ -207,6 +210,7 @@ export default function AnimationProperties({
             inputProps={{ min: -200, max: 200 }}
             value={getPropertyValue("xOffset")}
             onChange={(e) => updateProperty(Number(e.target.value))}
+            disabled={selectedKeyFrame?.propertyEdited !== "xOffset"}
           />
           {nextKeyFrameButton("xOffset")}
         </div>
@@ -220,6 +224,7 @@ export default function AnimationProperties({
             inputProps={{ min: -200, max: 200 }}
             value={getPropertyValue("yOffset")}
             onChange={(e) => updateProperty(Number(e.target.value))}
+            disabled={selectedKeyFrame?.propertyEdited !== "yOffset"}
           />
           {nextKeyFrameButton("yOffset")}
         </div>
@@ -232,6 +237,7 @@ export default function AnimationProperties({
             inputProps={{ min: -360, max: 360 }}
             value={getPropertyValue("rotation")}
             onChange={(e) => updateProperty(Number(e.target.value))}
+            disabled={selectedKeyFrame?.propertyEdited !== "rotation"}
           />
           {nextKeyFrameButton("rotation")}
         </div>

@@ -5,6 +5,7 @@ import { createGuid, mapNumber, numberIsBetweenOrEqual } from "services/shared/m
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { propertiesSettings } from "services/logic/animation-logic";
 
 type Props = {
   animation: Animation | null;
@@ -54,8 +55,6 @@ export default function AnimationKeyFrames({
     selectedKeyFrameUuid,
     xCorrection,
   ]);
-
-  console.log(animation);
 
   const getPropertyFromYPosition = (y: number) =>
     keyFramesPropertiesPosition.find((prop) => numberIsBetweenOrEqual(prop.yPosition, y - 20, y + 20))?.property;
@@ -295,7 +294,7 @@ export default function AnimationKeyFrames({
       uuid: createGuid(),
       timeMs,
       propertyEdited,
-      propertyValue: 0,
+      propertyValue: propertiesSettings.find((ps) => ps.property === propertyEdited)?.default ?? 0,
     };
 
     let updatedAnimation: any = { ...animation };

@@ -6,12 +6,13 @@ import React, { useEffect, useState } from "react";
 import AnimationProperties from "./animation-properties";
 import AnimationKeyFrames from "./animation-keyframes";
 import { Point } from "models/components/shared/point";
-import { rotatePoint } from "services/shared/math";
+import { mapNumber } from "services/shared/math";
 import { applyParametersToPoints } from "services/shared/converters";
+import { propertiesSettings } from "services/logic/animation-logic";
 
-type PreviousNextAndCurrentKeyFramePerProperty = {
+type PreviousCurrentAndNextKeyFramePerProperty = {
   previous: AnimationKeyFrame[];
-  current: AnimationKeyFrame | undefined;
+  current: AnimationKeyFrame[];
   next: AnimationKeyFrame[];
 };
 
@@ -27,36 +28,6 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
   const [playAnimation, setPlayAnimation] = useState<boolean>(false);
   const selectableSteps = [10, 100, 1000, 10000];
   const xCorrection = [20, 350, 3000, 8000];
-  const propertiesSettings = [
-    {
-      property: "scale",
-      type: "float",
-      default: 4,
-      min: 0.1,
-      max: 10,
-    },
-    {
-      property: "xOffset",
-      type: "int",
-      default: 0,
-      min: -200,
-      max: 200,
-    },
-    {
-      property: "yOffset",
-      type: "int",
-      default: 0,
-      min: -200,
-      max: 200,
-    },
-    {
-      property: "rotation",
-      type: "int",
-      default: 0,
-      min: -360,
-      max: 360,
-    },
-  ];
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -77,12 +48,12 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
       .filter((ak) => ak.timeMs < timelinePositionMs && ak.propertyEdited === property)
       .sort((a, b) => b.timeMs - a.timeMs);
 
-  const getCurrentKeyFrame = () => animation?.animationKeyFrames.find((ak) => ak.timeMs === timelinePositionMs);
+  const getCurrentKeyFrame = () => animation?.animationKeyFrames.filter((ak) => ak.timeMs === timelinePositionMs);
 
-  const getPreviousAndNextKeyFramePerProperty = (): PreviousNextAndCurrentKeyFramePerProperty => {
-    let previousNextAndCurrentKeyFramePerProperty: PreviousNextAndCurrentKeyFramePerProperty = {
+  const getPreviousCurrentAndNextKeyFramePerProperty = (): PreviousCurrentAndNextKeyFramePerProperty => {
+    let previousNextAndCurrentKeyFramePerProperty: PreviousCurrentAndNextKeyFramePerProperty = {
       previous: [],
-      current: getCurrentKeyFrame(),
+      current: getCurrentKeyFrame() ?? [],
       next: [],
     };
 
@@ -102,14 +73,12 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
   };
 
   const getPointsByTimelinePosition = (
-    previousNextAndCurrentKeyFrames: PreviousNextAndCurrentKeyFramePerProperty
+    previousNextAndCurrentKeyFrames: PreviousCurrentAndNextKeyFramePerProperty
   ): Point[] => {
     const pattern = animation?.pattern;
     if (pattern?.points === undefined) {
       return [];
     }
-
-    console.log(timelinePositionMs);
 
     let points: Point[] = [...pattern.points];
     let valuesPerProperty = propertiesSettings.map((propertiesSetting) => ({
@@ -119,13 +88,15 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
 
     for (let i = 0; i < 4; i++) {
       const currentPropertySetting = propertiesSettings[i];
-      const currentKeyFrameIsAvailable =
-        previousNextAndCurrentKeyFrames?.current?.propertyEdited === currentPropertySetting.property &&
-        previousNextAndCurrentKeyFrames.current !== undefined;
+      const currentKeyFrame = previousNextAndCurrentKeyFrames.current.find(
+        (kf) => kf.propertyEdited === currentPropertySetting.property
+      );
+      const currentKeyFrameIsAvailable = currentKeyFrame !== undefined;
 
       const previousKeyFrame = currentKeyFrameIsAvailable
-        ? previousNextAndCurrentKeyFrames.current
+        ? currentKeyFrame
         : previousNextAndCurrentKeyFrames.previous.find((kf) => kf.propertyEdited === currentPropertySetting.property);
+
       const nextKeyFrame = previousNextAndCurrentKeyFrames.next.find(
         (kf) => kf.propertyEdited === currentPropertySetting.property
       );
@@ -137,6 +108,7 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
         valuesPerProperty[valuesPerPropertyIndex].value = calculateNewValueByKeyFrames(previousKeyFrame, nextKeyFrame);
       } else if (valuesPerPropertyIndex !== -1 && previousKeyFrame !== undefined) {
         valuesPerProperty[valuesPerPropertyIndex].value = previousKeyFrame.propertyValue;
+        console.log(previousKeyFrame.propertyEdited + ": " + previousKeyFrame.propertyValue);
       }
     }
 
@@ -145,21 +117,24 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
     const yOffset = valuesPerProperty.find((vpp) => vpp.property === "yOffset")?.value ?? 0;
     const rotation = valuesPerProperty.find((vpp) => vpp.property === "rotation")?.value ?? 0;
 
-    return applyParametersToPoints(scale, xOffset, yOffset, rotation, {...points});
+    return applyParametersToPoints(scale, xOffset, yOffset, rotation, [...points]);
   };
 
   const calculateNewValueByKeyFrames = (previousKeyFrame: AnimationKeyFrame, nextKeyFrame: AnimationKeyFrame) => {
-    const timeDifferenceBetweenKeyFrames = nextKeyFrame.timeMs - previousKeyFrame.timeMs;
-    const differenceBetweenNextKeyFrameAndTimelinePosition = nextKeyFrame.timeMs - timelinePositionMs;
-    const differenceBetweenPreviousAndNewPropertyValue = previousKeyFrame.propertyValue - nextKeyFrame.propertyValue;
-    const conversionValue = differenceBetweenNextKeyFrameAndTimelinePosition / timeDifferenceBetweenKeyFrames;
-    const newPropertyValue = differenceBetweenPreviousAndNewPropertyValue * conversionValue;
+    const newPropertyValue = mapNumber(
+      timelinePositionMs,
+      previousKeyFrame.timeMs,
+      nextKeyFrame.timeMs,
+      previousKeyFrame.propertyValue,
+      nextKeyFrame.propertyValue
+    );
+
     return newPropertyValue;
   };
 
   const getPointsToDraw = () => {
-    const previousAndNextKeyFrames = getPreviousAndNextKeyFramePerProperty();
-    const points = getPointsByTimelinePosition(previousAndNextKeyFrames);
+    const previousCurrentAndNextKeyFrames = getPreviousCurrentAndNextKeyFramePerProperty();
+    const points = getPointsByTimelinePosition(previousCurrentAndNextKeyFrames);
     return points;
   };
 
@@ -197,7 +172,4 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
       </Grid>
     </Grid>
   );
-}
-function createGuid(): string {
-  throw new Error("Function not implemented.");
 }
