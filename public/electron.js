@@ -1,7 +1,11 @@
 const path = require("path");
-
 const { app, BrowserWindow } = require("electron");
+const { spawn } = require("node:child_process");
 const isDev = require("electron-is-dev");
+const bat = spawn("cmd.exe", [
+  "/c",
+  "D:/Deze Pc/Documenten/Projecten/Laser projector/Pc software/LaserAPI/LaserAPI/bin/Release/net6.0-windows10.0.22621.0/LaserApi.exe",
+]);
 
 function createWindow() {
   // Create the browser window.
@@ -18,12 +22,28 @@ function createWindow() {
 
   // and load the index.html of the app.
   // win.loadFile("index.html");
-  win.loadURL(
-    isDev
-      ? "http://localhost:3000"
-      : `file://${path.join(__dirname, "../build/index.html")}`
-  );
+  win.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`);
 }
+
+bat.stdout.on("data", (data) => {
+  console.log(data.toString());
+});
+
+bat.stderr.on("data", (data) => {
+  console.error(data.toString());
+});
+
+bat.on("exit", (code) => {
+  console.log(`Child exited with code ${code}`);
+});
+
+// SSL/TSL: this is the self signed certificate support
+app.on("certificate-error", (event, webContents, url, error, certificate, callback) => {
+  // On certificate error we disable default behaviour (stop loading the page)
+  // and we then say "it is all fine - true" to the callback
+  event.preventDefault();
+  callback(true);
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

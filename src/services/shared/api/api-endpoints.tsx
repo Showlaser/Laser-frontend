@@ -1,4 +1,4 @@
-const laserApiUrl = "http://localhost:5000/";
+const laserApiUrl = "http://localhost:5004/";
 const authApiUrl = "https://laser-auth-api.vdarwinkel.nl/";
 const voteApiUrl = "https://laser-vote-api.vdarwinkel.nl/";
 
