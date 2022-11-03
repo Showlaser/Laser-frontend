@@ -9,23 +9,15 @@ export const addUser = async (data) => {
 };
 
 export const getCurrentUser = async () => {
-  return sendRequest(() => Get(apiEndpoints.user), []).then((value) =>
-    value.json()
-  );
+  return sendRequest(() => Get(apiEndpoints.user), []).then((value) => value.json());
 };
 
 export const updateUser = async (user) => {
-  return sendRequest(
-    () => Put(apiEndpoints.user, user),
-    [401],
-    toastSubject.changesSaved
-  );
+  return sendRequest(() => Put(apiEndpoints.user, user), [401], toastSubject.changesSaved);
 };
 
 export const removeUser = async () => {
-  return sendRequest(
-    () => Delete(apiEndpoints.user),
-    [401],
-    toastSubject.changesSaved
-  ).then(() => (window.location = paths.Login));
+  return sendRequest(() => Delete(apiEndpoints.user), [401], toastSubject.changesSaved).then(
+    () => (window.location.href = paths.Login)
+  );
 };

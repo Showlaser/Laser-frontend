@@ -108,7 +108,6 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
         valuesPerProperty[valuesPerPropertyIndex].value = calculateNewValueByKeyFrames(previousKeyFrame, nextKeyFrame);
       } else if (valuesPerPropertyIndex !== -1 && previousKeyFrame !== undefined) {
         valuesPerProperty[valuesPerPropertyIndex].value = previousKeyFrame.propertyValue;
-        console.log(previousKeyFrame.propertyEdited + ": " + previousKeyFrame.propertyValue);
       }
     }
 

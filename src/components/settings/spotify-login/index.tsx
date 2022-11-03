@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import React, { useEffect } from "react";
-import { getCodeFromResponse, getSpotifyAccessTokens, grandSpotifyAccess } from "services/logic/spotify";
+import { getSpotifyAccessTokens, grandSpotifyAccess } from "services/logic/spotify";
+import { getCodeFromResponse } from "services/shared/general";
 import paths from "services/shared/router-paths";
 
 export default function SpotifyLogin() {

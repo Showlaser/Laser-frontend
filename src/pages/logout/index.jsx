@@ -4,7 +4,7 @@ import Cookies from "universal-cookie";
 export default function Logout() {
   const cookie = new Cookies();
   cookie.remove("LoggedIn");
-  window.location = paths.Login;
+  window.location.href = paths.Login;
 
   return null;
 }

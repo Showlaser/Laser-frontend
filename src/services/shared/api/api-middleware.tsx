@@ -39,7 +39,8 @@ export async function sendRequest(
       const refreshResponse: any = await Post(apiEndpoints.refreshToken, null);
       if (refreshResponse.status !== 200 && !window.location.href.includes("login")) {
         if (redirectToLoginOnError) {
-          window.location.href = paths.Login;
+          const redirectTo = window.location.href;
+          window.location.href = `${paths.Login}?redirect=${redirectTo}`;
         }
         return;
       }

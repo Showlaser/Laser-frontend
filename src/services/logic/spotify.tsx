@@ -7,12 +7,6 @@ import { SpotifyTokens } from "models/components/shared/spotify-tokens";
 
 const Spotify = new SpotifyWebApi();
 
-export const getCodeFromResponse = () => {
-  const urlData = window.location.search;
-  const indexOfData = urlData.indexOf("=");
-  return urlData.substring(indexOfData + 1, urlData.length);
-};
-
 const onError = async (errorCode: any) => {
   const code = Number(errorCode);
   if (code === 401) {

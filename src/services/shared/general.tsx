@@ -59,3 +59,9 @@ export const getUrlCode = () => {
   const indexOfData = urlData.indexOf("=");
   return urlData.substring(indexOfData + 1, urlData.length);
 };
+
+export const getCodeFromResponse = () => {
+  const urlData = window.location.search;
+  const indexOfData = urlData.indexOf("=");
+  return urlData.substring(indexOfData + 1, urlData.length);
+};

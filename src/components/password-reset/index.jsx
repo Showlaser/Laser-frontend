@@ -20,7 +20,7 @@ export default function ResetPassword({ code }) {
         if (result.status === 404) {
           showError(toastSubject.invalidCode);
         } else if (result.status === 200) {
-          setTimeout(() => (window.location = paths.Login), 3000);
+          setTimeout(() => (window.location.href = paths.Login), 3000);
         }
       });
       setButtonDisabled(false);
@@ -33,12 +33,7 @@ export default function ResetPassword({ code }) {
 
   return (
     <FormControl>
-      <TextField
-        fullWidth
-        type="password"
-        label="New password"
-        onChange={(e) => setNewPassword(e.target.value)}
-      />
+      <TextField fullWidth type="password" label="New password" onChange={(e) => setNewPassword(e.target.value)} />
       <TextField
         fullWidth
         type="password"
@@ -46,12 +41,7 @@ export default function ResetPassword({ code }) {
         onChange={(e) => setNewPasswordRepeat(e.target.value)}
       />
       <br />
-      <Button
-        variant="contained"
-        disabled={buttonDisabled}
-        fullWidth
-        onClick={onReset}
-      >
+      <Button variant="contained" disabled={buttonDisabled} fullWidth onClick={onReset}>
         Reset password
       </Button>
     </FormControl>
