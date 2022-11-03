@@ -2,6 +2,7 @@ const path = require("path");
 const { app, BrowserWindow } = require("electron");
 const { spawn } = require("node:child_process");
 const isDev = require("electron-is-dev");
+const axios = require("axios");
 const bat = spawn("cmd.exe", [
   "/c",
   "D:/Deze Pc/Documenten/Projecten/Laser projector/Pc software/LaserAPI/LaserAPI/bin/Release/net6.0-windows10.0.22621.0/LaserApi.exe",
@@ -37,14 +38,6 @@ bat.on("exit", (code) => {
   console.log(`Child exited with code ${code}`);
 });
 
-// SSL/TSL: this is the self signed certificate support
-app.on("certificate-error", (event, webContents, url, error, certificate, callback) => {
-  // On certificate error we disable default behaviour (stop loading the page)
-  // and we then say "it is all fine - true" to the callback
-  event.preventDefault();
-  callback(true);
-});
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -55,6 +48,8 @@ app.whenReady().then(createWindow);
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
+    console.log("Closing API");
+    axios.get("http://localhost:5004/system/close");
     app.quit();
   }
 });

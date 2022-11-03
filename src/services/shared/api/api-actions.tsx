@@ -1,5 +1,5 @@
 export const Get = async (endpoint: string): Promise<Response> =>
-  await fetch(endpoint, {
+  fetch(endpoint, {
     method: "GET",
     mode: "cors",
     cache: "no-cache",
@@ -9,7 +9,7 @@ export const Get = async (endpoint: string): Promise<Response> =>
   });
 
 export const Post = async (endpoint: string, data: any = null): Promise<Response> =>
-  await fetch(endpoint, {
+  fetch(endpoint, {
     method: "POST",
     mode: "cors",
     cache: "no-cache",
@@ -23,7 +23,7 @@ export const Post = async (endpoint: string, data: any = null): Promise<Response
   });
 
 export const Put = async (endpoint: string, data: any = null): Promise<Response> =>
-  await fetch(endpoint, {
+  fetch(endpoint, {
     method: "PUT",
     mode: "cors",
     cache: "no-cache",
@@ -37,7 +37,7 @@ export const Put = async (endpoint: string, data: any = null): Promise<Response>
   });
 
 export const Delete = async (endpoint: string, data: any = null): Promise<Response> =>
-  await fetch(endpoint, {
+  fetch(endpoint, {
     method: "DELETE",
     mode: "cors",
     cache: "no-cache",
