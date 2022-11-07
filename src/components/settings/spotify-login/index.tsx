@@ -1,10 +1,12 @@
-import { Button } from "@mui/material";
-import React, { useEffect } from "react";
+import { Button, Icon } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { getSpotifyAccessTokens, grandSpotifyAccess } from "services/logic/spotify";
 import { getCodeFromResponse } from "services/shared/general";
-import paths from "services/shared/router-paths";
 
 export default function SpotifyLogin() {
+  const accessTokenAvailable: boolean = localStorage.getItem("SpotifyAccessToken") !== null;
+  const [loggedIn, setLoggedIn] = useState<boolean>(accessTokenAvailable);
+
   useEffect(() => {
     const code = getCodeFromResponse();
     if (code?.length < 10) {
@@ -14,7 +16,7 @@ export default function SpotifyLogin() {
     getSpotifyAccessTokens(code).then((tokens) => {
       localStorage.setItem("SpotifyAccessToken", tokens.access_token);
       localStorage.setItem("SpotifyRefreshToken", tokens.refresh_token);
-      window.location.href = paths.Settings;
+      setLoggedIn(true);
     });
   }, []);
 
@@ -27,15 +29,16 @@ export default function SpotifyLogin() {
   const removeSpotifyTokens = () => {
     localStorage.removeItem("SpotifyAccessToken");
     localStorage.removeItem("SpotifyRefreshToken");
-    window.location.href = paths.Settings;
+    setLoggedIn(false);
   };
-
-  const accessTokenAvailable: boolean = localStorage.getItem("SpotifyAccessToken") !== null;
 
   return (
     <>
-      <h2>Spotify</h2>
-      {accessTokenAvailable ? (
+      <h2>
+        <img src="icons/spotify-icon.svg" style={{ maxWidth: "20px", marginRight: "5px" }} />
+        Spotify
+      </h2>
+      {loggedIn ? (
         <span>
           <p>You are logged in to Spotify</p>
           <Button onClick={removeSpotifyTokens}>Logout of Spotify</Button>

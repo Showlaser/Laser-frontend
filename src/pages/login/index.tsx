@@ -1,6 +1,6 @@
 import { Button, Divider, FormControl, Grid, LinearProgress, TextField } from "@mui/material";
 import { login } from "services/logic/login-logic";
-import { getCodeFromResponse, getFormDataObject } from "services/shared/general";
+import { getCodeFromResponse, getFormDataObject, stringIsEmpty } from "services/shared/general";
 import paths from "services/shared/router-paths";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import Cookies from "universal-cookie";
@@ -22,9 +22,13 @@ export default function Login() {
           sameSite: true,
         });
 
-        const redirectTo = getCodeFromResponse() ?? paths.Root;
+        let redirectUrl = getCodeFromResponse();
+        if (stringIsEmpty(redirectUrl)) {
+          redirectUrl = paths.Root;
+        }
+
         const termsAndConditionsAccepted = localStorage.getItem("terms-accepted");
-        window.location.href = termsAndConditionsAccepted ? redirectTo : paths.Disclaimer;
+        window.location.href = termsAndConditionsAccepted ? redirectUrl : paths.Disclaimer;
         return;
       } else if (result?.status === 451) {
         showError(toastSubject.accountDisabled);

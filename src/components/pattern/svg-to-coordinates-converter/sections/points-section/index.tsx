@@ -101,7 +101,7 @@ export default function PointsSection({
         disableColumnMenu: true,
         renderHeader: () => (
           <Tooltip title={`Delete selected point${selectedPointsUuid.length === 1 ? "s" : ""}`}>
-            <IconButton>
+            <IconButton onClick={deleteSelectedPoints}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>
@@ -110,6 +110,12 @@ export default function PointsSection({
     }
 
     return columns;
+  };
+
+  const deleteSelectedPoints = () => {
+    const newPoints = pattern.points.filter((pp) => !selectedPointsUuid.some((spu) => spu === pp.uuid));
+    newPoints.forEach((np, index) => (np.orderNr = index));
+    updatePatternProperty("points", newPoints);
   };
 
   const rows = pattern.points
