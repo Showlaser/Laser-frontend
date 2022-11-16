@@ -12,7 +12,7 @@ export const mapNumber = (number: number, inMin: number, inMax: number, outMin: 
 
 export const createGuid = () => {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
+    const r = (Math.random() * 16) | 0,
       v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
@@ -31,17 +31,60 @@ export const numberIsBetweenOrEqual = (number: number, min: number, max: number)
   return number >= min && number <= max;
 };
 
+export const calculateCenterOfPoints = (points: Point[]): { x: number; y: number } => {
+  const pointsLength = points.length;
+  if (pointsLength === 0) {
+    return { x: 0, y: 0 };
+  }
+
+  const firstPoint = points[0];
+  const lastPoint = points[pointsLength - 1];
+
+  if (firstPoint.x !== lastPoint.x || firstPoint.y !== lastPoint.y) {
+    points.push(firstPoint);
+  }
+
+  let twiceArea = 0;
+  let x = 0;
+  let y = 0;
+  const nPts = pointsLength;
+  let p1: Point | null = null;
+  let p2: Point | null = null;
+  let f: number | null = null;
+
+  for (let i = 0, j = nPts - 1; i < nPts; j = i++) {
+    p1 = points[i];
+    p2 = points[j];
+    f = (p1.y - firstPoint.y) * (p2.x - firstPoint.x) - (p2.y - firstPoint.y) * (p1.x - firstPoint.x);
+    twiceArea += f;
+    x += (p1.x + p2.x - 2 * firstPoint.x) * f;
+    y += (p1.y + p2.y - 2 * firstPoint.y) * f;
+  }
+  f = twiceArea * 3;
+
+  let xResult = Math.round(x / f + firstPoint.x);
+  let yResult = Math.round(y / f + firstPoint.y);
+
+  if (Number.isNaN(xResult)) {
+    xResult = 0;
+  }
+  if (Number.isNaN(yResult)) {
+    yResult = 0;
+  }
+  return { x: xResult, y: yResult };
+};
+
 export const rotatePoint = (point: Point, angle: number, centerX: number, centerY: number): Point => {
-  var radians = (Math.PI / 180) * angle,
+  const correctedAngle = angle > 0 ? -Math.abs(angle) : Math.abs(angle); // positive is now clockwise
+  const radians = (Math.PI / 180) * correctedAngle,
     cos = Math.cos(radians),
     sin = Math.sin(radians),
     nx = cos * (point.x - centerX) + sin * (point.y - centerY) + centerX,
     ny = cos * (point.y - centerY) - sin * (point.x - centerX) + centerY;
 
   let clonedPoint: Point = { ...point };
-
-  clonedPoint.x = nx;
-  clonedPoint.y = ny;
+  clonedPoint.x = Math.round(nx);
+  clonedPoint.y = Math.round(ny);
   return clonedPoint;
 };
 

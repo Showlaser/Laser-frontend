@@ -1,7 +1,7 @@
 import { Animation, animationPlaceholder } from "models/components/shared/animation";
 import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
-import { createGuid, rotatePoint } from "./math";
+import { calculateCenterOfPoints, mapNumber, rotatePoint } from "./math";
 
 export const rgbColorStringFromPoint = (point: Point): string =>
   `rgb(${point.redLaserPowerPwm},${point.greenLaserPowerPwm},${point.blueLaserPowerPwm})`;
@@ -44,15 +44,33 @@ export const applyParametersToPoints = (
   points: Point[]
 ) => {
   const pointsLength = points.length;
-  let updatedPoints: Point[] = [];
-  for (let index = 0; index < pointsLength; index++) {
-    let rotatedPoint: Point = rotatePoint({ ...points[index] }, rotation, xOffset, yOffset);
+  let updatedPoints: Point[] = [...points];
+  const centerOfPattern = calculateCenterOfPoints(points);
+  const xCenter = centerOfPattern.x;
+  const yCenter = centerOfPattern.y;
+
+  for (let i = 0; i < pointsLength; i++) {
+    let rotatedPoint: Point = rotatePoint(updatedPoints[i], rotation, xCenter, yCenter);
 
     rotatedPoint.x += xOffset;
-    rotatedPoint.y += yOffset;
+    rotatedPoint.y -= yOffset;
     rotatedPoint.x *= scale;
     rotatedPoint.y *= scale;
-    updatedPoints.push(rotatedPoint);
+    updatedPoints[i] = rotatedPoint;
   }
   return updatedPoints;
+};
+
+export const convertPointsToCanvasSize = (points: Point[]) => {
+  let mappedPoints: Point[] = [];
+  const pointsLength = points.length;
+
+  for (let i = 0; i < pointsLength; i++) {
+    let point = { ...points[i] };
+    point.x = mapNumber(point.x, -4000, 4000, 0, 650);
+    point.y = mapNumber(point.y, -4000, 4000, 0, 650);
+    mappedPoints.push(point);
+  }
+
+  return mappedPoints;
 };

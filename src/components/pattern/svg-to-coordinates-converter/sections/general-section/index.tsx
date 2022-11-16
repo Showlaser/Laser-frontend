@@ -113,7 +113,7 @@ export default function GeneralSection({
           value={pattern.scale}
           onChange={(e, value) => updatePatternProperty("scale", Number(value))}
           min={0.1}
-          max={10}
+          max={100}
           step={0.1}
           aria-label="Small"
           valueLabelDisplay="auto"
@@ -180,9 +180,9 @@ export default function GeneralSection({
           id="svg-points"
           size="small"
           value={pattern.xOffset}
-          onChange={(e, value) => updatePatternProperty("xOffset", Number(value))}
-          min={-8000 / (pattern.scale * 10)}
-          max={8000 / (pattern.scale * 10)}
+          onChange={(e, value) => updatePatternProperty("xOffset", Math.round(Number(value)))}
+          min={-8000 / (pattern.scale * 1.4)}
+          max={8000 / (pattern.scale * 1.4)}
           aria-label="Small"
           valueLabelDisplay="auto"
         />
@@ -210,9 +210,9 @@ export default function GeneralSection({
           id="svg-points"
           size="small"
           value={pattern.yOffset}
-          onChange={(e, value) => updatePatternProperty("yOffset", Number(value))}
-          min={-8000 / (pattern.scale * 10)}
-          max={8000 / (pattern.scale * 10)}
+          onChange={(e, value) => updatePatternProperty("yOffset", Math.round(Number(value)))}
+          min={-8000 / (pattern.scale * 1.4)}
+          max={8000 / (pattern.scale * 1.4)}
           aria-label="Small"
           valueLabelDisplay="auto"
           marks={[{ value: 0, label: "0" }]}

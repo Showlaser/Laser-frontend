@@ -7,7 +7,7 @@ import ToLaserProjector from "components/shared/to-laser-projector";
 import TabSelector, { TabSelectorData } from "components/tabs";
 import GeneralSection from "./sections/general-section";
 import PointsSection from "./sections/points-section";
-import { getHeightAnWidthOfPattern, svgToPoints } from "services/logic/svg-to-coordinates-converter";
+import { svgToPoints } from "services/logic/svg-to-coordinates-converter";
 import { Pattern, getPatternPlaceHolder } from "models/components/shared/pattern";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SaveIcon from "@mui/icons-material/Save";
@@ -66,7 +66,7 @@ export default function SvgToCoordinatesConverter({
       pattern.xOffset,
       pattern.yOffset,
       pattern.rotation,
-      pattern.points
+      [...pattern.points]
     );
     setPointToDraw(updatedPoints);
   }, [showPointNumber, selectedPointsUuid, pattern]);
@@ -103,22 +103,9 @@ export default function SvgToCoordinatesConverter({
       }
 
       updatePatternProperty("points", convertedPoints);
-      fitPatternInCanvas(convertedPoints);
     };
 
     reader.readAsText(file);
-  };
-
-  const fitPatternInCanvas = (convertedPoints: Point[]) => {
-    const heightAndWidth = getHeightAnWidthOfPattern(convertedPoints);
-    const widthOfCanvas = 150;
-
-    if (heightAndWidth.height > widthOfCanvas || heightAndWidth.width > widthOfCanvas) {
-      const largestNumber = getLargestNumber(heightAndWidth.height, heightAndWidth.width);
-      const percentageDifference = 100 - (widthOfCanvas / largestNumber) * 100;
-      const newScale = Math.round(((pattern.scale * (100 - percentageDifference)) / 100) * 10) / 10;
-      updatePatternProperty("scale", newScale);
-    }
   };
 
   const onSave = async () => {

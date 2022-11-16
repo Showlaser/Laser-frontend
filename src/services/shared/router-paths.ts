@@ -17,6 +17,7 @@ const paths = {
   LasershowSpotifyConnector: "/lasershow-spotify-connector",
   Disclaimer: "/disclaimer",
   Logout: "/logout",
+  CanvasTest: "/canvas-test",
 };
 
 export default paths;

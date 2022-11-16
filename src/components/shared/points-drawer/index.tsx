@@ -1,7 +1,7 @@
 import { Point } from "models/components/shared/point";
 import React, { useEffect } from "react";
 import { prepareCanvas } from "services/logic/svg-to-coordinates-converter";
-import { rgbColorStringFromPoint } from "services/shared/converters";
+import { convertPointsToCanvasSize, rgbColorStringFromPoint } from "services/shared/converters";
 
 type Props = {
   selectedPointsUuid?: string[];
@@ -19,7 +19,8 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
       return;
     }
 
-    const dotsToDrawLength = dotsToDraw.length;
+    const points = convertPointsToCanvasSize(dotsToDraw);
+    const dotsToDrawLength = points.length;
     const screenScale = window.devicePixelRatio || 1;
     const canvas = document.getElementById("svg-canvas") as HTMLCanvasElement;
     const ctx = prepareCanvas(canvas);
@@ -28,9 +29,9 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
     }
 
     for (let index = 0; index < dotsToDrawLength; index++) {
-      const point = dotsToDraw[index];
+      const point = points[index];
       const pointIsHighlighted = selectedPointsUuid?.some((sp) => sp === point.uuid) ?? false;
-      drawPoint(ctx, point, pointIsHighlighted, index, dotsToDraw, screenScale);
+      drawPoint(ctx, point, pointIsHighlighted, index, points, screenScale);
     }
   };
 
