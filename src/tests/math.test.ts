@@ -1,4 +1,4 @@
-import { calculateCenterOfPoints, rotatePoint } from "services/shared/math";
+import { calculateCenterOfPoints, rotatePoints } from "services/shared/math";
 import { generatePointsTestSet, getPointsTestSet } from "./helper";
 
 test("calculateCenterOfPoints line center y test", () => {
@@ -52,8 +52,8 @@ test("calculateCenterOfPoints bottom triangle test", () => {
 });
 
 test("rotatePoint test", () => {
-  const testPoint = generatePointsTestSet([{ x: -1000, y: 0 }])[0];
-  const rotatedTestPoint = rotatePoint(testPoint, 90, 0, 0);
+  const testPoint = generatePointsTestSet([{ x: -1000, y: 0 }]);
+  const rotatedTestPoint = rotatePoints(testPoint, 90, 0, 0)[0];
   expect(rotatedTestPoint.x).toBe(-0);
   expect(rotatedTestPoint.y).toBe(-1000);
 });

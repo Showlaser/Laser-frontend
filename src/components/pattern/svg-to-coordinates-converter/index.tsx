@@ -2,7 +2,6 @@ import * as React from "react";
 import { showSuccess, showError, toastSubject } from "services/shared/toast-messages";
 import { Grid, SpeedDial, SpeedDialAction } from "@mui/material";
 import { Point } from "models/components/shared/point";
-import { getLargestNumber } from "services/shared/math";
 import ToLaserProjector from "components/shared/to-laser-projector";
 import TabSelector, { TabSelectorData } from "components/tabs";
 import GeneralSection from "./sections/general-section";
@@ -15,7 +14,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { addItemToVersionHistory } from "services/shared/version-history";
 import { savePattern } from "services/logic/pattern-logic";
 import PointsDrawer from "components/shared/points-drawer";
-import { applyParametersToPoints } from "services/shared/converters";
+import { applyParametersToPointsForCanvas } from "services/shared/converters";
 
 type Props = {
   patternNamesInUse: string[];
@@ -61,14 +60,14 @@ export default function SvgToCoordinatesConverter({
   }, [uploadedFile, numberOfPoints]);
 
   React.useEffect(() => {
-    const updatedPoints: Point[] = applyParametersToPoints(
+    const pointsToDraw: Point[] = applyParametersToPointsForCanvas(
       pattern.scale,
       pattern.xOffset,
       pattern.yOffset,
       pattern.rotation,
-      [...pattern.points]
+      pattern.points
     );
-    setPointToDraw(updatedPoints);
+    setPointToDraw(pointsToDraw);
   }, [showPointNumber, selectedPointsUuid, pattern]);
 
   const onInvalidFile = () => {

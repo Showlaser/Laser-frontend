@@ -74,19 +74,24 @@ export const calculateCenterOfPoints = (points: Point[]): { x: number; y: number
   return { x: xResult, y: yResult };
 };
 
-export const rotatePoint = (point: Point, angle: number, centerX: number, centerY: number): Point => {
-  const correctedAngle = angle > 0 ? -Math.abs(angle) : Math.abs(angle); // positive is now clockwise
-  const radians = (Math.PI / 180) * correctedAngle,
-    cos = Math.cos(radians),
-    sin = Math.sin(radians),
-    nx = cos * (point.x - centerX) + sin * (point.y - centerY) + centerX,
-    ny = cos * (point.y - centerY) - sin * (point.x - centerX) + centerY;
-
-  let clonedPoint: Point = { ...point };
-  clonedPoint.x = Math.round(nx);
-  clonedPoint.y = Math.round(ny);
-  return clonedPoint;
-};
-
 export const getLargestNumber = (numberOne: number, numberTwo: number): number =>
   numberOne > numberTwo ? numberOne : numberTwo;
+
+export const rotatePoints = (points: Point[], rotation: number, centerX: number, centerY: number) => {
+  const radians = (Math.PI / 180) * rotation,
+    cos = Math.cos(radians),
+    sin = Math.sin(radians);
+
+  let rotatedPoints: Point[] = [];
+  const pointsLength = points.length;
+  for (let i = 0; i < pointsLength; i++) {
+    let point = { ...points[i] };
+    const x = cos * (point.x - centerX) + sin * (point.y - centerY) + centerX;
+    const y = cos * (point.y - centerY) - sin * (point.x - centerX) + centerY;
+    point.x = x;
+    point.y = y;
+    rotatedPoints.push(point);
+  }
+
+  return rotatedPoints;
+};

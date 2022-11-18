@@ -65,6 +65,9 @@ export default function AnimationPage() {
   );
 
   const getSelectedEditor = () => {
+    if (selectedAnimation === null) {
+      return;
+    }
     if (
       selectedEditor === null &&
       selectedAnimation?.animationKeyFrames.length === 0 &&
@@ -74,7 +77,7 @@ export default function AnimationPage() {
         <EditorSelector setSelectedEditor={(editor) => setSelectedEditor(editor)} selectedEditor={selectedEditor} />
       );
     }
-    if (selectedAnimation?.animationKeyFrames.length ?? 0 > 1) {
+    if (selectedAnimation.animationKeyFrames.length > 1) {
       return <AnimationKeyFrameEditor animation={selectedAnimation} setSelectedAnimation={setSelectedAnimation} />;
     } else if (selectedAnimation?.animationEffects.length ?? 0 > 1) {
       return <AnimationEffectEditor animation={selectedAnimation} />;

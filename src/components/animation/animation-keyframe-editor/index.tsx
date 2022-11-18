@@ -7,7 +7,7 @@ import AnimationProperties from "./animation-properties";
 import AnimationKeyFrames from "./animation-keyframes";
 import { Point } from "models/components/shared/point";
 import { mapNumber } from "services/shared/math";
-import { applyParametersToPoints } from "services/shared/converters";
+import { applyParametersToPointsForCanvas } from "services/shared/converters";
 import { propertiesSettings } from "services/logic/animation-logic";
 
 type PreviousCurrentAndNextKeyFramePerProperty = {
@@ -116,7 +116,7 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
     const yOffset = valuesPerProperty.find((vpp) => vpp.property === "yOffset")?.value ?? 0;
     const rotation = valuesPerProperty.find((vpp) => vpp.property === "rotation")?.value ?? 0;
 
-    return applyParametersToPoints(scale, xOffset, yOffset, rotation, [...points]);
+    return applyParametersToPointsForCanvas(scale, xOffset, yOffset, rotation, [...points]);
   };
 
   const calculateNewValueByKeyFrames = (previousKeyFrame: AnimationKeyFrame, nextKeyFrame: AnimationKeyFrame) => {

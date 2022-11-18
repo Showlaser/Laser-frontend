@@ -181,8 +181,8 @@ export default function GeneralSection({
           size="small"
           value={pattern.xOffset}
           onChange={(e, value) => updatePatternProperty("xOffset", Math.round(Number(value)))}
-          min={-8000 / (pattern.scale * 1.4)}
-          max={8000 / (pattern.scale * 1.4)}
+          min={-4000}
+          max={4000}
           aria-label="Small"
           valueLabelDisplay="auto"
         />
@@ -211,8 +211,8 @@ export default function GeneralSection({
           size="small"
           value={pattern.yOffset}
           onChange={(e, value) => updatePatternProperty("yOffset", Math.round(Number(value)))}
-          min={-8000 / (pattern.scale * 1.4)}
-          max={8000 / (pattern.scale * 1.4)}
+          min={-4000}
+          max={4000}
           aria-label="Small"
           valueLabelDisplay="auto"
           marks={[{ value: 0, label: "0" }]}

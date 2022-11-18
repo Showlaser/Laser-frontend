@@ -207,7 +207,7 @@ export default function AnimationProperties({
           <Input
             id="animation-xoffset"
             type="number"
-            inputProps={{ min: -200, max: 200 }}
+            inputProps={{ min: -4000, max: 4000 }}
             value={getPropertyValue("xOffset")}
             onChange={(e) => updateProperty(Number(e.target.value))}
             disabled={selectedKeyFrame?.propertyEdited !== "xOffset"}
@@ -221,7 +221,7 @@ export default function AnimationProperties({
           <Input
             id="animation-yoffset"
             type="number"
-            inputProps={{ min: -200, max: 200 }}
+            inputProps={{ min: -4000, max: 4000 }}
             value={getPropertyValue("yOffset")}
             onChange={(e) => updateProperty(Number(e.target.value))}
             disabled={selectedKeyFrame?.propertyEdited !== "yOffset"}

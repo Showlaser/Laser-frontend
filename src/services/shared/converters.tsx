@@ -1,7 +1,8 @@
 import { Animation, animationPlaceholder } from "models/components/shared/animation";
 import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
-import { calculateCenterOfPoints, mapNumber, rotatePoint } from "./math";
+import { generatePointsTestSet } from "tests/helper";
+import { calculateCenterOfPoints, mapNumber, rotatePoints } from "./math";
 
 export const rgbColorStringFromPoint = (point: Point): string =>
   `rgb(${point.redLaserPowerPwm},${point.greenLaserPowerPwm},${point.blueLaserPowerPwm})`;
@@ -36,7 +37,7 @@ export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   return animation;
 };
 
-export const applyParametersToPoints = (
+export const applyParametersToPointsForCanvas = (
   scale: number,
   xOffset: number,
   yOffset: number,
@@ -44,21 +45,31 @@ export const applyParametersToPoints = (
   points: Point[]
 ) => {
   const pointsLength = points.length;
-  let updatedPoints: Point[] = [...points];
-  const centerOfPattern = calculateCenterOfPoints(points);
-  const xCenter = centerOfPattern.x;
-  const yCenter = centerOfPattern.y;
-
+  let pointsWithOffsetApplied = [];
   for (let i = 0; i < pointsLength; i++) {
-    let rotatedPoint: Point = rotatePoint(updatedPoints[i], rotation, xCenter, yCenter);
-
-    rotatedPoint.x += xOffset;
-    rotatedPoint.y -= yOffset;
-    rotatedPoint.x *= scale;
-    rotatedPoint.y *= scale;
-    updatedPoints[i] = rotatedPoint;
+    let point = { ...points[i] };
+    point.x *= scale;
+    point.y *= scale;
+    point.x += xOffset;
+    point.y -= yOffset;
+    pointsWithOffsetApplied.push(point);
   }
-  return updatedPoints;
+
+  const centerOfPattern = calculateCenterOfPoints(pointsWithOffsetApplied);
+  const centerX = centerOfPattern.x;
+  const centerY = centerOfPattern.y;
+
+  let rotatedPoints = rotatePoints(pointsWithOffsetApplied, rotation, centerX, centerY);
+  rotatedPoints.push(
+    generatePointsTestSet([
+      {
+        x: centerX,
+        y: centerY,
+      },
+    ])[0]
+  );
+
+  return convertPointsToCanvasSize(rotatedPoints);
 };
 
 export const convertPointsToCanvasSize = (points: Point[]) => {

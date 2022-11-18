@@ -2,40 +2,17 @@ import { Button, FormControl, FormLabel, Grid, Input, MenuItem, Select, Slider }
 import SelectList from "components/select-list";
 import PointsDrawer from "components/shared/points-drawer";
 import { Animation, AnimationEffects } from "models/components/shared/animation";
-import { Point } from "models/components/shared/point";
 import React from "react";
-import { createGuid, rotatePoint } from "services/shared/math";
+import { applyParametersToPointsForCanvas } from "services/shared/converters";
+import { createGuid } from "services/shared/math";
 
 type Props = {
-  animation: Animation | null;
+  animation: Animation;
 };
 
 export function AnimationEffectEditor({ animation }: Props) {
-  const applySettingsToPoints = (dotsToDraw: Point[] | undefined | null) => {
-    if (animation === null || dotsToDraw === null || dotsToDraw === undefined) {
-      return null;
-    }
-
-    const dotsToDrawLength = dotsToDraw.length;
-    let updatedPoints: Point[] = [];
-    for (let index = 0; index < dotsToDrawLength; index++) {
-      let rotatedPoint: Point = rotatePoint(
-        { ...dotsToDraw[index] },
-        animation.pattern.rotation,
-        animation.pattern.xOffset,
-        animation.pattern.yOffset
-      );
-
-      rotatedPoint.x += animation.pattern.xOffset;
-      rotatedPoint.y += animation.pattern.yOffset;
-      rotatedPoint.x *= animation.pattern.scale;
-      rotatedPoint.y *= animation.pattern.scale;
-      updatedPoints.push(rotatedPoint);
-    }
-    return updatedPoints;
-  };
-
-  const pointsToDraw = applySettingsToPoints(animation?.pattern?.points);
+  const { scale, xOffset, yOffset, rotation, points } = animation.pattern;
+  const pointsToDraw = applyParametersToPointsForCanvas(scale, xOffset, yOffset, rotation, points);
 
   return (
     <Grid container spacing={3} style={{ width: "50%" }}>
