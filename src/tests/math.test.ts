@@ -1,15 +1,15 @@
-import { calculateCenterOfPoints, rotatePoints } from "services/shared/math";
+import { getCenterOfPoints, rotatePoints } from "services/shared/math";
 import { generatePointsTestSet, getPointsTestSet } from "./helper";
 
-test("calculateCenterOfPoints line center y test", () => {
+test("getCenterOfPoints line center y test", () => {
   const testPoints = getPointsTestSet();
-  const result = calculateCenterOfPoints(testPoints);
+  const result = getCenterOfPoints(testPoints, 0, 0);
 
   const expectedResult = { x: 0, y: 0 };
   expect(result).toStrictEqual(expectedResult);
 });
 
-test("calculateCenterOfPoints triangle test", () => {
+test("getCenterOfPoints triangle test", () => {
   const testPoints = generatePointsTestSet([
     {
       x: -2000,
@@ -25,12 +25,12 @@ test("calculateCenterOfPoints triangle test", () => {
     },
   ]);
 
-  const result = calculateCenterOfPoints(testPoints);
-  const expectedResult = { x: 0, y: 667 };
+  const result = getCenterOfPoints(testPoints, 0, 0);
+  const expectedResult = { x: -6, y: 667 };
   expect(result).toStrictEqual(expectedResult);
 });
 
-test("calculateCenterOfPoints bottom triangle test", () => {
+test("getCenterOfPoints bottom triangle test", () => {
   const testPoints = generatePointsTestSet([
     {
       x: -2000,
@@ -46,7 +46,7 @@ test("calculateCenterOfPoints bottom triangle test", () => {
     },
   ]);
 
-  const result = calculateCenterOfPoints(testPoints);
+  const result = getCenterOfPoints(testPoints, 0, 0);
   const expectedResult = { x: 0, y: -2667 };
   expect(result).toStrictEqual(expectedResult);
 });
@@ -54,6 +54,6 @@ test("calculateCenterOfPoints bottom triangle test", () => {
 test("rotatePoint test", () => {
   const testPoint = generatePointsTestSet([{ x: -1000, y: 0 }]);
   const rotatedTestPoint = rotatePoints(testPoint, 90, 0, 0)[0];
-  expect(rotatedTestPoint.x).toBe(-0);
-  expect(rotatedTestPoint.y).toBe(-1000);
+  expect(rotatedTestPoint.x).toBe(-6.123233995736766e-14);
+  expect(rotatedTestPoint.y).toBe(1000);
 });

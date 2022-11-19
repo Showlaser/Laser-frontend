@@ -186,7 +186,10 @@ export default function AnimationProperties({
 
   return (
     <>
-      <Paper style={{ padding: "15px", paddingTop: "2px" }}>
+      <Paper
+        style={{ padding: "15px", paddingTop: "2px" }}
+        key={`${animation?.pattern.scale}-${animation?.pattern.xOffset}-${animation?.pattern.yOffset}-${animation?.pattern.rotation}`}
+      >
         <p>Animation properties</p>
         <Divider style={{ marginBottom: "10px" }} />
         <FormLabel htmlFor="animation-scale">Scale</FormLabel>
@@ -195,7 +198,7 @@ export default function AnimationProperties({
           id="animation-scale"
           type="number"
           inputProps={{ min: 0.1, max: 10, step: 0.1 }}
-          value={getPropertyValue("scale")}
+          defaultValue={getPropertyValue("scale")}
           onChange={(e) => updateProperty(Number(e.target.value))}
           disabled={selectedKeyFrame?.propertyEdited !== "scale"}
         />
@@ -208,7 +211,7 @@ export default function AnimationProperties({
             id="animation-xoffset"
             type="number"
             inputProps={{ min: -4000, max: 4000 }}
-            value={getPropertyValue("xOffset")}
+            defaultValue={getPropertyValue("xOffset")}
             onChange={(e) => updateProperty(Number(e.target.value))}
             disabled={selectedKeyFrame?.propertyEdited !== "xOffset"}
           />
@@ -222,7 +225,7 @@ export default function AnimationProperties({
             id="animation-yoffset"
             type="number"
             inputProps={{ min: -4000, max: 4000 }}
-            value={getPropertyValue("yOffset")}
+            defaultValue={getPropertyValue("yOffset")}
             onChange={(e) => updateProperty(Number(e.target.value))}
             disabled={selectedKeyFrame?.propertyEdited !== "yOffset"}
           />
@@ -235,7 +238,7 @@ export default function AnimationProperties({
             id="animation-rotation"
             type="number"
             inputProps={{ min: -360, max: 360 }}
-            value={getPropertyValue("rotation")}
+            defaultValue={getPropertyValue("rotation")}
             onChange={(e) => updateProperty(Number(e.target.value))}
             disabled={selectedKeyFrame?.propertyEdited !== "rotation"}
           />

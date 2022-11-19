@@ -15,8 +15,6 @@ import LasershowSpotifyConnector from "pages/lasershow-spotify-connector";
 import Logout from "pages/logout";
 import Disclaimer from "pages/disclaimer";
 import Settings from "pages/settings";
-import CanvasTest from "pages/canvas-test";
-import CanvasTestOld from "pages/canvas-test-old";
 
 function routes() {
   return (
@@ -35,8 +33,6 @@ function routes() {
       <Route exact path={routerPaths.LasershowSpotifyConnector} component={LasershowSpotifyConnector} />
       <Route exact path={routerPaths.ActivateAccount} component={AccountActivation} />
       <Route exact path={routerPaths.AnimationEditor} component={AnimationEditor} />
-      <Route exact path={routerPaths.CanvasTest} component={CanvasTest} />
-      <Route exact path={routerPaths.CanvasTestOld} component={CanvasTestOld} />
     </BrowserRouter>
   );
 }

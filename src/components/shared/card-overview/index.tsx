@@ -1,4 +1,5 @@
 import {
+  Button,
   Card,
   CardActionArea,
   CardContent,
@@ -16,6 +17,7 @@ import React, { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 
 type CardOverviewItems = {
+  uuid: string;
   name: string;
   image: string | null;
   onCardClick: (item: any) => void;
@@ -25,16 +27,18 @@ type CardOverviewProps = {
   show: boolean;
   closeOverview: () => void;
   items: CardOverviewItems[];
-  onEmptyMessageTitle: string;
-  onEmptyMessageDescription: string;
+  onNoItemsMessageTitle: string;
+  onNoItemsDescription: string;
+  onDeleteClick: (uuid: string) => void;
 };
 
 export default function CardOverview({
   show,
   closeOverview,
   items,
-  onEmptyMessageTitle,
-  onEmptyMessageDescription,
+  onNoItemsMessageTitle: onEmptyMessageTitle,
+  onNoItemsDescription: onEmptyMessageDescription,
+  onDeleteClick,
 }: CardOverviewProps) {
   const [searchValue, setSearchValue] = useState<string>("");
 
@@ -101,6 +105,7 @@ export default function CardOverview({
                         </Typography>
                       </CardContent>
                     </CardActionArea>
+                    <Button onClick={() => onDeleteClick(item.uuid)}>Delete</Button>
                   </Card>
                 </Grow>
               ))}

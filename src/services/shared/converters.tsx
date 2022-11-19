@@ -2,7 +2,7 @@ import { Animation, animationPlaceholder } from "models/components/shared/animat
 import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
 import { generatePointsTestSet } from "tests/helper";
-import { calculateCenterOfPoints, mapNumber, rotatePoints } from "./math";
+import { getCenterOfPoints, mapNumber, rotatePoints } from "./math";
 
 export const rgbColorStringFromPoint = (point: Point): string =>
   `rgb(${point.redLaserPowerPwm},${point.greenLaserPowerPwm},${point.blueLaserPowerPwm})`;
@@ -55,20 +55,11 @@ export const applyParametersToPointsForCanvas = (
     pointsWithOffsetApplied.push(point);
   }
 
-  const centerOfPattern = calculateCenterOfPoints(pointsWithOffsetApplied);
+  const centerOfPattern = getCenterOfPoints(pointsWithOffsetApplied, xOffset, yOffset);
   const centerX = centerOfPattern.x;
   const centerY = centerOfPattern.y;
 
-  let rotatedPoints = rotatePoints(pointsWithOffsetApplied, rotation, centerX, centerY);
-  rotatedPoints.push(
-    generatePointsTestSet([
-      {
-        x: centerX,
-        y: centerY,
-      },
-    ])[0]
-  );
-
+  const rotatedPoints = rotatePoints(pointsWithOffsetApplied, rotation, centerX, centerY);
   return convertPointsToCanvasSize(rotatedPoints);
 };
 

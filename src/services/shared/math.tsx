@@ -31,54 +31,12 @@ export const numberIsBetweenOrEqual = (number: number, min: number, max: number)
   return number >= min && number <= max;
 };
 
-export const calculateCenterOfPoints = (points: Point[]): { x: number; y: number } => {
-  const pointsLength = points.length;
-  if (pointsLength === 0) {
-    return { x: 0, y: 0 };
-  }
-
-  const firstPoint = points[0];
-  const lastPoint = points[pointsLength - 1];
-
-  if (firstPoint.x !== lastPoint.x || firstPoint.y !== lastPoint.y) {
-    points.push(firstPoint);
-  }
-
-  let twiceArea = 0;
-  let x = 0;
-  let y = 0;
-  const nPts = pointsLength;
-  let p1: Point | null = null;
-  let p2: Point | null = null;
-  let f: number | null = null;
-
-  for (let i = 0, j = nPts - 1; i < nPts; j = i++) {
-    p1 = points[i];
-    p2 = points[j];
-    f = (p1.y - firstPoint.y) * (p2.x - firstPoint.x) - (p2.y - firstPoint.y) * (p1.x - firstPoint.x);
-    twiceArea += f;
-    x += (p1.x + p2.x - 2 * firstPoint.x) * f;
-    y += (p1.y + p2.y - 2 * firstPoint.y) * f;
-  }
-  f = twiceArea * 3;
-
-  let xResult = Math.round(x / f + firstPoint.x);
-  let yResult = Math.round(y / f + firstPoint.y);
-
-  if (Number.isNaN(xResult)) {
-    xResult = 0;
-  }
-  if (Number.isNaN(yResult)) {
-    yResult = 0;
-  }
-  return { x: xResult, y: yResult };
-};
-
 export const getLargestNumber = (numberOne: number, numberTwo: number): number =>
   numberOne > numberTwo ? numberOne : numberTwo;
 
 export const rotatePoints = (points: Point[], rotation: number, centerX: number, centerY: number) => {
-  const radians = (Math.PI / 180) * rotation,
+  const correctRotation = rotation < 0 ? Math.abs(rotation) : -Math.abs(rotation);
+  const radians = (Math.PI / 180) * correctRotation,
     cos = Math.cos(radians),
     sin = Math.sin(radians);
 
@@ -94,4 +52,23 @@ export const rotatePoints = (points: Point[], rotation: number, centerX: number,
   }
 
   return rotatedPoints;
+};
+
+export const getCenterOfPoints = (points: Point[], xOffset: number, yOffset: number): { x: number; y: number } => {
+  const pointsLength = points.length;
+  if (pointsLength === 0) {
+    return { x: 0, y: 0 };
+  }
+
+  const sortedXAxis = points.sort((a, b) => a.x - b.x);
+  const left = sortedXAxis[0].x;
+  const right = sortedXAxis[pointsLength - 1].x;
+
+  const sortedYAxis = points.sort((a, b) => a.y - b.y);
+  const bottom = sortedYAxis[0].y;
+  const top = sortedYAxis[pointsLength - 1].y;
+
+  const centerX = (right - left) / 2 + xOffset;
+  const centerY = (top - bottom) / 2 - yOffset;
+  return { x: centerX, y: centerY };
 };

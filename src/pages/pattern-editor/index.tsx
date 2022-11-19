@@ -2,13 +2,13 @@ import "./index.css";
 import React, { useEffect, useState } from "react";
 import SideNav from "components/shared/sidenav";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-import { Box, SpeedDial, SpeedDialAction } from "@mui/material";
+import { Box, Button, Divider, Grid, Modal, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SvgToCoordinatesConverter from "components/pattern/svg-to-coordinates-converter";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { Pattern } from "models/components/shared/pattern";
-import { getPatterns } from "services/logic/pattern-logic";
+import { getPatterns, removePattern } from "services/logic/pattern-logic";
 import CardOverview from "components/shared/card-overview";
 
 export default function PatternPage() {
@@ -16,6 +16,10 @@ export default function PatternPage() {
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
+  const [modalOptions, setModalOptions] = useState<any>({
+    show: false,
+    onDelete: null,
+  });
 
   useEffect(() => {
     if (availablePatterns === undefined) {
@@ -61,8 +65,42 @@ export default function PatternPage() {
     </SpeedDial>
   );
 
+  const onDelete = async (uuid: string) => {
+    const result = await removePattern(uuid);
+    if (result?.status === 200 && availablePatterns !== null) {
+      let patterns = [...availablePatterns];
+      const patternIndex = patterns.findIndex((p) => p.uuid === uuid);
+      patterns.splice(patternIndex, 1);
+      setAvailablePatterns(patterns);
+    }
+  };
+
   return (
     <SideNav pageName="Pattern editor">
+      <Modal open={modalOptions.show}>
+        <Grid
+          container
+          spacing={0}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          style={{ minHeight: "100vh" }}
+        >
+          <Paper sx={{ textAlign: "left", width: "60%", padding: "5px 20px 5px 20px" }}>
+            <h3>Are you sure you want to delete this item?</h3>
+            <Divider />
+            <br />
+            <div style={{ float: "right" }}>
+              <Button variant="text" onClick={() => setModalOptions({ show: false, onDelete: null })}>
+                Cancel
+              </Button>
+              <Button variant="contained" color="primary" onClick={modalOptions.onDelete} style={{ marginLeft: "5px" }}>
+                Ok
+              </Button>
+            </div>
+          </Paper>
+        </Grid>
+      </Modal>
       {uploadedFile === undefined && selectedPattern === null ? null : (
         <SvgToCoordinatesConverter
           patternNamesInUse={
@@ -77,8 +115,10 @@ export default function PatternPage() {
       <CardOverview
         closeOverview={() => setModalOpen(false)}
         show={modalOpen}
+        onDeleteClick={(uuid) => setModalOptions({ show: true, onDelete: () => onDelete(uuid) })}
         items={
           availablePatterns?.map((pattern) => ({
+            uuid: pattern.uuid,
             name: pattern.name,
             image: pattern.image,
             onCardClick: () => {
@@ -87,8 +127,8 @@ export default function PatternPage() {
             },
           })) ?? []
         }
-        onEmptyMessageTitle="No saved patterns"
-        onEmptyMessageDescription="Create a new pattern"
+        onNoItemsMessageTitle="No saved patterns"
+        onNoItemsDescription="Create a new pattern"
       />
       <Box>
         <input
