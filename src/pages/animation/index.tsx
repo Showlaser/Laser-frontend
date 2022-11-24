@@ -11,11 +11,8 @@ import { Animation } from "models/components/shared/animation";
 import { getPatterns, removePattern } from "services/logic/pattern-logic";
 import { getAnimations, removeAnimation } from "services/logic/animation-logic";
 import { convertPatternToAnimation } from "services/shared/converters";
-import { AnimationEffectEditor } from "components/animation/animation-effect";
 import AnimationKeyFrameEditor from "components/animation/animation-keyframe-editor";
-import EditorSelector from "components/animation/editor-selector";
 import { Pattern } from "models/components/shared/pattern";
-import { removeUser } from "services/logic/user-logic";
 
 export default function AnimationPage() {
   const [selectedAnimation, setSelectedAnimation] = useState<Animation | null>(null);
@@ -23,7 +20,6 @@ export default function AnimationPage() {
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
   const [convertPatternModalOpen, setConvertPatternModalOpen] = useState<boolean>(false);
   const [animationsModalOpen, setAnimationsModalOpen] = useState<boolean>(false);
-  const [selectedEditor, setSelectedEditor] = useState<string | null>(null);
   const [modalOptions, setModalOptions] = useState<any>({
     show: false,
     onDelete: null,
@@ -68,31 +64,6 @@ export default function AnimationPage() {
       />
     </SpeedDial>
   );
-
-  const getSelectedEditor = () => {
-    if (selectedAnimation === null) {
-      return;
-    }
-    if (
-      selectedEditor === null &&
-      selectedAnimation?.animationKeyFrames.length === 0 &&
-      selectedAnimation.animationEffects.length === 0
-    ) {
-      return (
-        <EditorSelector setSelectedEditor={(editor) => setSelectedEditor(editor)} selectedEditor={selectedEditor} />
-      );
-    }
-    if (selectedAnimation.animationKeyFrames.length > 1) {
-      return <AnimationKeyFrameEditor animation={selectedAnimation} setSelectedAnimation={setSelectedAnimation} />;
-    } else if (selectedAnimation?.animationEffects.length ?? 0 > 1) {
-      return <AnimationEffectEditor animation={selectedAnimation} />;
-    }
-    if (selectedEditor === "keyframe-editor") {
-      return <AnimationKeyFrameEditor animation={selectedAnimation} setSelectedAnimation={setSelectedAnimation} />;
-    } else if (selectedEditor === "effects-editor") {
-      return <AnimationEffectEditor animation={selectedAnimation} />;
-    }
-  };
 
   const onPatternDelete = async (uuid: string) => {
     const result = await removePattern(uuid);
@@ -150,7 +121,11 @@ export default function AnimationPage() {
             </Paper>
           </Grid>
         </Modal>
-        {selectedAnimation === null ? getSpeedDial() : getSelectedEditor()}
+        {selectedAnimation === null ? (
+          getSpeedDial()
+        ) : (
+          <AnimationKeyFrameEditor animation={selectedAnimation} setSelectedAnimation={setSelectedAnimation} />
+        )}
         {convertPatternModalOpen && (
           <CardOverview
             closeOverview={() => setConvertPatternModalOpen(false)}

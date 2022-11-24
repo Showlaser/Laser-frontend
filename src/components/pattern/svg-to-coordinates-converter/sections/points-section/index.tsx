@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { SectionProps } from "models/components/shared/pattern";
 import { rgbColorStringFromPoint, setLaserPowerFromHexString } from "services/shared/converters";
+import { showError, toastSubject } from "services/shared/toast-messages";
 
 export default function PointsSection({
   pattern,
@@ -31,6 +32,22 @@ export default function PointsSection({
           updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = Number(params.value.substring(substringIndex));
         }
 
+        break;
+      case "x":
+        const x = Number(params.value);
+        if (x > 4000 || x < -4000) {
+          showError(toastSubject.pointsBoundaryError);
+          break;
+        }
+        updatedPoints[pointToUpdateIndex].x = x;
+        break;
+      case "y":
+        const y = Number(params.value);
+        if (y > 4000 || y < -4000) {
+          showError(toastSubject.pointsBoundaryError);
+          break;
+        }
+        updatedPoints[pointToUpdateIndex].y = y;
         break;
       case "colorRgb":
         updatedPoints[pointToUpdateIndex] = setLaserPowerFromHexString(params.value, {
@@ -82,6 +99,22 @@ export default function PointsSection({
         type: "singleSelect",
         valueOptions: pattern.points.map((point) => point.orderNr.toString()),
       },
+      {
+        field: "x",
+        headerName: "X",
+        width: 90,
+        editable: true,
+        type: "number",
+        valueOptions: pattern.points.map((point) => point.x.toString()),
+      },
+      {
+        field: "y",
+        headerName: "Y",
+        width: 90,
+        editable: true,
+        type: "number",
+        valueOptions: pattern.points.map((point) => point.y.toString()),
+      },
       { field: "colorRgb", headerName: "Color Rgb", width: 130 },
       {
         field: "connectedToPointOrderNr",
@@ -124,6 +157,8 @@ export default function PointsSection({
       id: point.uuid,
       uuid: point.uuid,
       order: point.orderNr,
+      x: point.x,
+      y: point.y,
       colorRgb: rgbColorStringFromPoint(point),
       connectedToPointOrderNr: point.connectedToPointOrderNr === null ? null : `Point ${point.connectedToPointOrderNr}`,
     }));
@@ -159,6 +194,7 @@ export default function PointsSection({
         pageSize={100}
         rowsPerPageOptions={[100]}
       />
+      <small>*Changes are shown after pressing enter on edit field</small>
     </div>
   );
 }
