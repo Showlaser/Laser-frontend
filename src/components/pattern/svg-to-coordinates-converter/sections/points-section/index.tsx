@@ -1,19 +1,40 @@
-import { DataGrid, GridCellEditCommitParams, GridColDef } from "@mui/x-data-grid";
+import { GridCellEditCommitParams } from "@mui/x-data-grid";
 import { Point } from "models/components/shared/point";
-import { IconButton, rgbToHex, TextField, Tooltip } from "@mui/material";
+import {
+  Checkbox,
+  Divider,
+  FormControl,
+  Grow,
+  IconButton,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemIcon,
+  MenuItem,
+  rgbToHex,
+  Select,
+  TablePagination,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { SectionProps } from "models/components/shared/pattern";
 import { rgbColorStringFromPoint, setLaserPowerFromHexString } from "services/shared/converters";
 import { showError, toastSubject } from "services/shared/toast-messages";
+import { numberIsBetweenOrEqual } from "services/shared/math";
+import AddIcon from "@mui/icons-material/Add";
+import { getPointsPlaceHolder } from "services/shared/points";
 
 export default function PointsSection({
   pattern,
+  setPattern,
   updatePatternProperty,
   selectedPointsUuid,
   setSelectedPointsUuid,
 }: SectionProps) {
-  const [currentUuid, setCurrentUuid] = useState<string>();
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(25);
 
   const updatePointProperty = (points: Point[], params: GridCellEditCommitParams) => {
     let updatedPoints: Point[] = [...points];
@@ -66,135 +87,133 @@ export default function PointsSection({
     updatePatternProperty("points", updatedPoints);
   };
 
-  let inputRef = React.useRef<HTMLInputElement>(null);
-  const onCellClick = (params: any, event: any, details: any) => {
-    if (params.field === "colorRgb" && inputRef.current !== null) {
-      const point = pattern.points.find((p) => p.uuid === params.id);
-      if (point === undefined) {
-        return;
-      }
-
-      inputRef.current.value = rgbToHex(rgbColorStringFromPoint(point));
-      inputRef.current.click();
-    }
-
-    if (currentUuid !== params.id) {
-      setCurrentUuid(params.id);
-    }
-  };
-
-  const getAvailablePoints = () => {
-    let options = pattern.points.map((point) => `Point ${point.orderNr}`);
-    options.unshift("None");
-    return options;
-  };
-
-  const getColumns = () => {
-    let columns: GridColDef[] = [
-      {
-        field: "order",
-        headerName: "Point",
-        width: 70,
-        editable: true,
-        type: "singleSelect",
-        valueOptions: pattern.points.map((point) => point.orderNr.toString()),
-      },
-      {
-        field: "x",
-        headerName: "X",
-        width: 90,
-        editable: true,
-        type: "number",
-        valueOptions: pattern.points.map((point) => point.x.toString()),
-      },
-      {
-        field: "y",
-        headerName: "Y",
-        width: 90,
-        editable: true,
-        type: "number",
-        valueOptions: pattern.points.map((point) => point.y.toString()),
-      },
-      { field: "colorRgb", headerName: "Color Rgb", width: 130 },
-      {
-        field: "connectedToPointOrderNr",
-        headerName: "Connected to point",
-        width: 200,
-        editable: true,
-        type: "singleSelect",
-        valueOptions: getAvailablePoints(),
-      },
-    ];
-
-    if (selectedPointsUuid.length > 0) {
-      columns.push({
-        field: "delete",
-        width: 75,
-        sortable: false,
-        disableColumnMenu: true,
-        renderHeader: () => (
-          <Tooltip title={`Delete selected point${selectedPointsUuid.length === 1 ? "s" : ""}`}>
-            <IconButton onClick={deleteSelectedPoints}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        ),
-      });
-    }
-
-    return columns;
-  };
-
   const deleteSelectedPoints = () => {
     const newPoints = pattern.points.filter((pp) => !selectedPointsUuid.some((spu) => spu === pp.uuid));
     newPoints.forEach((np, index) => (np.orderNr = index));
     updatePatternProperty("points", newPoints);
+
+    const selectedPoints = selectedPointsUuid.filter((spu) => newPoints.some((np) => np.uuid === spu));
+    setSelectedPointsUuid(selectedPoints);
   };
 
-  const rows = pattern.points
+  const onToggle = (pointUuid: string, checked: boolean) => {
+    let selectedPoints = [...selectedPointsUuid];
+
+    if (!checked) {
+      const pointIndex = selectedPoints.findIndex((sp) => sp === pointUuid);
+      if (pointIndex === -1) {
+        return;
+      }
+
+      selectedPoints.splice(pointIndex, 1);
+      setSelectedPointsUuid(selectedPoints);
+      return;
+    }
+
+    selectedPoints.push(pointUuid);
+    setSelectedPointsUuid(selectedPoints);
+  };
+
+  const getItemsEndIndex = () =>
+    currentPage * itemsPerPage + itemsPerPage > pattern?.points.length
+      ? pattern?.points.length
+      : currentPage * itemsPerPage + itemsPerPage - 1;
+
+  const pointsToRender = [...pattern?.points]
     .sort((a, b) => a.orderNr - b.orderNr)
-    .map((point) => ({
-      id: point.uuid,
-      uuid: point.uuid,
-      order: point.orderNr,
-      x: point.x,
-      y: point.y,
-      colorRgb: rgbColorStringFromPoint(point),
-      connectedToPointOrderNr: point.connectedToPointOrderNr === null ? null : `Point ${point.connectedToPointOrderNr}`,
-    }));
+    .filter((p) => numberIsBetweenOrEqual(p.orderNr, currentPage * itemsPerPage, getItemsEndIndex()));
+
+  const addPoint = () => {
+    let updatedPattern = { ...pattern };
+    const newPoint = getPointsPlaceHolder(updatedPattern.uuid, updatedPattern.points.length);
+    updatedPattern.points.push(newPoint);
+    setPattern(updatedPattern);
+  };
+
+  const toggleAllPoints = (checked: boolean) =>
+    checked ? setSelectedPointsUuid(pattern.points.map((p) => p.uuid)) : setSelectedPointsUuid([]);
+
+  const connectablePoints = [...pattern?.points]
+    .sort((a, b) => a.orderNr - b.orderNr)
+    .map((p) => <MenuItem value={p.orderNr} key={`sp-${p.orderNr}`}>{`Point ${p.orderNr + 1}`}</MenuItem>);
+
+  const onRowsPerPageChange = (itemsPerRow: number) => {
+    setItemsPerPage(itemsPerRow);
+    setCurrentPage(0);
+  };
 
   return (
-    <div style={{ height: 400, width: "100%" }}>
-      <TextField
-        style={{ display: "none" }}
-        type="color"
-        inputRef={inputRef}
-        onChange={(e) => {
-          if (currentUuid === undefined) {
-            return;
-          }
-
-          let updatedPoints = [...pattern.points];
-          const index = updatedPoints.findIndex((p) => p.uuid === currentUuid);
-          if (index !== -1) {
-            updatedPoints[index] = setLaserPowerFromHexString(e.target.value, { ...updatedPoints[index] });
-            updatePatternProperty("points", updatedPoints);
-          }
-        }}
+    <>
+      <div style={{ marginLeft: "4px" }}>
+        <Tooltip title="Select all">
+          <Checkbox
+            checked={selectedPointsUuid.length === pattern.points.length && pattern.points.length > 0}
+            onClick={(e: any) => toggleAllPoints(e.target.checked)}
+          />
+        </Tooltip>
+        <Tooltip title="Add point">
+          <IconButton onClick={addPoint}>
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Delete selected points">
+          <IconButton onClick={deleteSelectedPoints}>
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+        <Divider />
+      </div>
+      <div style={{ height: 400, width: "100%", overflowY: "scroll" }}>
+        <List>
+          {pointsToRender.map((point, index) => (
+            <Grow in={true} timeout={800} key={`point-${index}`}>
+              <ListItem>
+                <ListItemIcon onClick={(e: any) => onToggle(point.uuid, e.target.checked)}>
+                  <Checkbox
+                    edge="start"
+                    checked={selectedPointsUuid.some((sp) => sp === point.uuid)}
+                    tabIndex={-1}
+                    disableRipple
+                    inputProps={{ "aria-labelledby": `points-label-${index}` }}
+                  />
+                </ListItemIcon>
+                <label>{`Point ${point.orderNr + 1}`}</label>
+                <TextField
+                  style={{ marginLeft: "35px" }}
+                  value={point.x}
+                  placeholder="x"
+                  type="number"
+                  inputProps={{ min: -4000, max: 4000 }}
+                  label="X"
+                />
+                <TextField
+                  style={{ marginLeft: "35px" }}
+                  value={point.y}
+                  placeholder="y"
+                  type="number"
+                  inputProps={{ min: -4000, max: 4000 }}
+                  label="Y"
+                />
+                <FormControl style={{ marginLeft: "35px", width: "125px" }}>
+                  <small style={{ color: "rgba(255, 255, 255, 0.7)" }}>Connected to</small>
+                  <Select value={point.connectedToPointOrderNr} label="Connected to">
+                    {connectablePoints}
+                  </Select>
+                </FormControl>
+              </ListItem>
+            </Grow>
+          ))}
+        </List>
+      </div>
+      <TablePagination
+        component="div"
+        count={pattern?.points.length}
+        page={currentPage}
+        onPageChange={(e: any, page: number) => setCurrentPage(page)}
+        onRowsPerPageChange={(e: any) => onRowsPerPageChange(Number(e.target.value))}
+        rowsPerPage={itemsPerPage}
+        rowsPerPageOptions={[25, 50]}
       />
-      <DataGrid
-        onCellEditCommit={(params: GridCellEditCommitParams) => updatePointProperty(pattern.points, params)}
-        checkboxSelection
-        disableSelectionOnClick
-        selectionModel={selectedPointsUuid}
-        onCellClick={onCellClick}
-        onSelectionModelChange={(ids) => setSelectedPointsUuid(ids.map((id) => id.toString()))}
-        rows={rows}
-        columns={getColumns()}
-        pageSize={100}
-        rowsPerPageOptions={[100]}
-      />
-      <small>*Changes are shown after pressing enter on edit field</small>
-    </div>
+    </>
   );
 }

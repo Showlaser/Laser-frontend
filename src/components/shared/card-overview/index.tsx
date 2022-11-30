@@ -15,6 +15,7 @@ import {
 import { Box } from "@mui/system";
 import React, { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import { OnTrue } from "../on-true";
 
 type CardOverviewItems = {
   uuid: string;
@@ -56,25 +57,27 @@ export default function CardOverview({
           <CloseIcon />
         </IconButton>
         <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center">
-          <Paper
-            sx={{
-              backgroundColor: "#2E2E2E",
-              width: "30%",
-              m: "8px 0 0 0",
-              p: "4px 6px",
-              display: "flex",
-            }}
-          >
-            <InputBase
-              value={searchValue}
-              sx={{ ml: 1, flex: 1 }}
-              placeholder="Search items"
-              onChange={(e) => setSearchValue(e.target.value.toLocaleLowerCase())}
-            />
-            <IconButton type="button" sx={{ p: "10px" }} aria-label="search" onClick={() => setSearchValue("")}>
-              <CloseIcon />
-            </IconButton>
-          </Paper>
+          <OnTrue onTrue={items?.length > 0}>
+            <Paper
+              sx={{
+                backgroundColor: "#2E2E2E",
+                width: "30%",
+                m: "8px 0 0 0",
+                p: "4px 6px",
+                display: "flex",
+              }}
+            >
+              <InputBase
+                value={searchValue}
+                sx={{ ml: 1, flex: 1 }}
+                placeholder="Search items"
+                onChange={(e) => setSearchValue(e.target.value.toLocaleLowerCase())}
+              />
+              <IconButton type="button" sx={{ p: "10px" }} aria-label="search" onClick={() => setSearchValue("")}>
+                <CloseIcon />
+              </IconButton>
+            </Paper>
+          </OnTrue>
         </Grid>
         {items.length === 0 ? (
           <div>
@@ -105,7 +108,9 @@ export default function CardOverview({
                         </Typography>
                       </CardContent>
                     </CardActionArea>
-                    <Button onClick={() => onDeleteClick(item.uuid)}>Delete</Button>
+                    <Button fullWidth onClick={() => onDeleteClick(item.uuid)}>
+                      Delete
+                    </Button>
                   </Card>
                 </Grow>
               ))}

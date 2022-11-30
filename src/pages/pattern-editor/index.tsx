@@ -7,9 +7,11 @@ import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SvgToCoordinatesConverter from "components/pattern/svg-to-coordinates-converter";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
-import { Pattern } from "models/components/shared/pattern";
+import { getPatternPlaceHolder, Pattern } from "models/components/shared/pattern";
 import { getPatterns, removePattern } from "services/logic/pattern-logic";
 import CardOverview from "components/shared/card-overview";
+import AddIcon from "@mui/icons-material/Add";
+import { OnTrue } from "components/shared/on-true";
 
 export default function PatternPage() {
   const [uploadedFile, setUploadedFile] = useState<any>();
@@ -43,6 +45,16 @@ export default function PatternPage() {
       sx={{ position: "absolute", bottom: 30, right: 30 }}
       icon={uploadedFile === undefined && selectedPattern === null ? <SpeedDialIcon /> : <SettingsIcon />}
     >
+      <SpeedDialAction
+        key="sd-new-file"
+        tooltipTitle="Create a new pattern"
+        onClick={() => setSelectedPattern(getPatternPlaceHolder())}
+        icon={
+          <label style={{ cursor: "pointer", padding: "25px" }}>
+            <AddIcon style={{ marginTop: "8px" }} />
+          </label>
+        }
+      ></SpeedDialAction>
       <SpeedDialAction
         key="sd-upload"
         tooltipTitle="Upload local file"
@@ -101,7 +113,7 @@ export default function PatternPage() {
           </Paper>
         </Grid>
       </Modal>
-      {uploadedFile === undefined && selectedPattern === null ? null : (
+      <OnTrue onTrue={uploadedFile !== undefined || selectedPattern !== null}>
         <SvgToCoordinatesConverter
           patternNamesInUse={
             availablePatterns?.map((pattern) => (pattern.uuid !== selectedPattern?.uuid ? pattern.name : "")) ?? []
@@ -111,7 +123,7 @@ export default function PatternPage() {
           patternFromServer={selectedPattern}
           clearServerPattern={() => setSelectedPattern(null)}
         />
-      )}
+      </OnTrue>
       <CardOverview
         closeOverview={() => setModalOpen(false)}
         show={modalOpen}

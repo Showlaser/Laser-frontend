@@ -131,6 +131,7 @@ export default function SvgToCoordinatesConverter({
     patternNamesInUse,
     setPatternNameIsInUse,
     pattern,
+    setPattern,
     updatePatternProperty,
     numberOfPoints,
     setNumberOfPoints,

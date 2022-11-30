@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, Grow, Tab, Tabs } from "@mui/material";
 import * as React from "react";
 import TabPanel from "./tab-panel";
 
@@ -30,21 +30,15 @@ export default function TabSelector({ data }: TabSelectorProps) {
           aria-label="basic tabs example"
         >
           {data.map((tab, index) => (
-            <Tab
-              key={tab.tabName + index}
-              label={tab.tabName}
-              {...a11yProps(index)}
-            />
+            <Tab key={tab.tabName + index} label={tab.tabName} {...a11yProps(index)} />
           ))}
         </Tabs>
       </Box>
       {data.map((tab, index) => (
-        <TabPanel
-          key={`tab-panel-${index}`}
-          value={selectedTabIndex}
-          index={index}
-        >
-          {tab.tabChildren}
+        <TabPanel key={`tab-panel-${index}`} value={selectedTabIndex} index={index}>
+          <Grow in={true} timeout={800}>
+            <span>{tab?.tabChildren}</span>
+          </Grow>
         </TabPanel>
       ))}
     </Box>
