@@ -166,42 +166,40 @@ export default function PointsSection({
       <div style={{ height: 400, width: "100%", overflowY: "scroll" }}>
         <List>
           {pointsToRender.map((point, index) => (
-            <Grow in={true} timeout={800} key={`point-${index}`}>
-              <ListItem>
-                <ListItemIcon onClick={(e: any) => onToggle(point.uuid, e.target.checked)}>
-                  <Checkbox
-                    edge="start"
-                    checked={selectedPointsUuid.some((sp) => sp === point.uuid)}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{ "aria-labelledby": `points-label-${index}` }}
-                  />
-                </ListItemIcon>
-                <label>{`Point ${point.orderNr + 1}`}</label>
-                <TextField
-                  style={{ marginLeft: "35px" }}
-                  value={point.x}
-                  placeholder="x"
-                  type="number"
-                  inputProps={{ min: -4000, max: 4000 }}
-                  label="X"
+            <ListItem>
+              <ListItemIcon onClick={(e: any) => onToggle(point.uuid, e.target.checked)}>
+                <Checkbox
+                  edge="start"
+                  checked={selectedPointsUuid.some((sp) => sp === point.uuid)}
+                  tabIndex={-1}
+                  disableRipple
+                  inputProps={{ "aria-labelledby": `points-label-${index}` }}
                 />
-                <TextField
-                  style={{ marginLeft: "35px" }}
-                  value={point.y}
-                  placeholder="y"
-                  type="number"
-                  inputProps={{ min: -4000, max: 4000 }}
-                  label="Y"
-                />
-                <FormControl style={{ marginLeft: "35px", width: "125px" }}>
-                  <small style={{ color: "rgba(255, 255, 255, 0.7)" }}>Connected to</small>
-                  <Select value={point.connectedToPointOrderNr} label="Connected to">
-                    {connectablePoints}
-                  </Select>
-                </FormControl>
-              </ListItem>
-            </Grow>
+              </ListItemIcon>
+              <label>{`Point ${point.orderNr + 1}`}</label>
+              <TextField
+                style={{ marginLeft: "35px" }}
+                value={point.x}
+                placeholder="x"
+                type="number"
+                inputProps={{ min: -4000, max: 4000 }}
+                label="X"
+              />
+              <TextField
+                style={{ marginLeft: "35px" }}
+                value={point.y}
+                placeholder="y"
+                type="number"
+                inputProps={{ min: -4000, max: 4000 }}
+                label="Y"
+              />
+              <FormControl style={{ marginLeft: "35px", width: "125px" }}>
+                <small style={{ color: "rgba(255, 255, 255, 0.7)" }}>Connected to</small>
+                <Select value={point.connectedToPointOrderNr} label="Connected to">
+                  {connectablePoints}
+                </Select>
+              </FormControl>
+            </ListItem>
           ))}
         </List>
       </div>

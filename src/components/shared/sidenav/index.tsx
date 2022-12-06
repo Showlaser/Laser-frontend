@@ -99,7 +99,7 @@ export default function SideNav({ pageName, children }: Props) {
       <AppBar position="fixed" open={open}>
         <Toolbar>
           <Grid container>
-            <Grid item xs style={{ marginTop: "15px" }}>
+            <Grid item xs style={{ marginTop: "3px" }}>
               <IconButton
                 color="inherit"
                 aria-label="open drawer"

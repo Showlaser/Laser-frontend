@@ -1,20 +1,22 @@
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Button,
+  Divider,
+  Fade,
   FormControlLabel,
+  Grid,
   IconButton,
   LinearProgress,
+  Menu,
   Switch,
+  Tooltip,
+  Zoom,
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import { mapNumber } from "services/shared/math";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   getPlayerState,
   getTrackAudioFeatures,
@@ -24,66 +26,84 @@ import {
   startPlayer,
 } from "services/logic/spotify";
 import paths from "services/shared/router-paths";
+import MusicNoteIcon from "@mui/icons-material/MusicNote";
 
 export default function SpotifyController() {
-  const [, updateState] = React.useState({});
-  const forceUpdate = React.useCallback(() => updateState({}), []);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [songData, setSongData] = React.useState<any>({});
+  const [player, setPlayer] = React.useState<any>({});
+  const open = Boolean(anchorEl);
 
-  const [accordionIsOpen, setAccordionIsOpen] = useState<boolean>(false);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const userIsLoggedIntoSpotify =
     localStorage.getItem("SpotifyAccessToken") !== null && localStorage.getItem("SpotifyAccessToken") !== "undefined";
 
-  const playerRef = useRef<any>();
-  const songDataRef = useRef<any>();
-
   useEffect(() => {
-    getData();
-    const interval = setInterval(getData, 4000);
+    const interval = setInterval(() => getData(), 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [player, songData]);
 
   const getData = async () => {
-    await getPlayerStatus();
-    await getTrackData();
-    forceUpdate();
+    const menuClosed = document.getElementById("spotify-controller-menu") === null;
+    if (menuClosed) {
+      return;
+    }
+
+    const playerResult = await getPlayerStatus();
+    if (playerResult?.item?.id !== songData?.id) {
+      const trackResult = await getTrackData(playerResult);
+      setSongData(trackResult);
+    }
+
+    setPlayer(playerResult);
   };
 
-  const getPlayerStatus = async () => {
-    const result = await getPlayerState();
-    playerRef.current = result;
-  };
+  const getPlayerStatus = async () => await getPlayerState();
 
-  const getTrackData = async () => {
-    const result = await getTrackAudioFeatures(playerRef.current?.item?.id ?? "");
-    songDataRef.current = result;
-  };
+  const getTrackData = async (playerResult: any) => await getTrackAudioFeatures(playerResult?.item?.id ?? "");
 
   const onPlay = async () => {
     await startPlayer();
-    playerRef.current.is_playing = true;
-    forceUpdate();
   };
 
   const onPause = async () => {
     await pausePlayer();
-    playerRef.current.is_playing = false;
-    forceUpdate();
   };
 
   const getComponentsByLoginState = () => {
     if (userIsLoggedIntoSpotify) {
       return (
-        <>
-          <FormControlLabel control={<Switch key="lgc-switch" />} label="Enable lasershow generation" />
-          <br />
-          <small>{`Bpm: ${parseInt(songDataRef?.current?.tempo)}`}</small>
-          <br />
-          <small>{`Song: ${playerRef.current?.item?.name}`}</small>
-          <LinearProgress
-            variant="determinate"
-            value={mapNumber(playerRef?.current?.progress_ms, 0, playerRef?.current?.item?.duration_ms, 0, 100)}
-          />
-        </>
+        <div style={{ padding: "20px" }}>
+          <Fade in={open} timeout={1000}>
+            <span>
+              <FormControlLabel control={<Switch key="lgc-switch" />} label="Enable lasershow generation" />
+              <br />
+              <small>{`Bpm: ${parseInt(songData?.tempo)}`}</small>
+              <br />
+              <small>{`Song: ${player?.item?.name}`}</small>
+              <br />
+              <IconButton onClick={previousSong} size="small">
+                <SkipPreviousIcon />
+              </IconButton>
+              <IconButton size="small" onClick={() => (player?.is_playing ? onPause() : onPlay())}>
+                {player?.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
+              </IconButton>
+              <IconButton size="small" onClick={skipSong}>
+                <SkipNextIcon />
+              </IconButton>
+              <LinearProgress
+                variant="determinate"
+                value={mapNumber(player?.progress_ms, 0, player?.item?.duration_ms, 0, 100)}
+              />
+            </span>
+          </Fade>
+        </div>
       );
     } else {
       return (
@@ -95,29 +115,29 @@ export default function SpotifyController() {
   };
 
   return (
-    <Accordion expanded={accordionIsOpen}>
-      <AccordionSummary
-        style={{ cursor: "default" }}
-        expandIcon={
-          <IconButton onClick={() => setAccordionIsOpen(!accordionIsOpen)}>
-            <ExpandMoreIcon />
-          </IconButton>
-        }
+    <>
+      <Tooltip title="Spotify / lasershow generator controller">
+        <IconButton onClick={handleClick} area-haspopup="true" id="spotify-controller-button">
+          <MusicNoteIcon />
+        </IconButton>
+      </Tooltip>
+      <Menu
+        id="spotify-controller-menu"
+        anchorEl={anchorEl}
+        open={open}
+        area-labelledby="spotify-controller-button"
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
       >
-        <span>
-          <small>Spotify / lasershow generator controller</small>
-          <IconButton onClick={previousSong}>
-            <SkipPreviousIcon />
-          </IconButton>
-          <IconButton onClick={() => (playerRef?.current?.is_playing ? onPause() : onPlay())}>
-            {playerRef?.current?.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
-          </IconButton>
-          <IconButton onClick={skipSong}>
-            <SkipNextIcon />
-          </IconButton>
-        </span>
-      </AccordionSummary>
-      <AccordionDetails>{getComponentsByLoginState()}</AccordionDetails>
-    </Accordion>
+        {getComponentsByLoginState()}{" "}
+      </Menu>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import { Button, Icon } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { getSpotifyAccessTokens, grandSpotifyAccess } from "services/logic/spotify";
 import { getCodeFromResponse } from "services/shared/general";
+import paths from "services/shared/router-paths";
 
 export default function SpotifyLogin() {
   const accessTokenAvailable: boolean = localStorage.getItem("SpotifyAccessToken") !== null;
@@ -18,6 +19,8 @@ export default function SpotifyLogin() {
       localStorage.setItem("SpotifyRefreshToken", tokens.refresh_token);
       setLoggedIn(true);
     });
+
+    window.history.replaceState(null, "Laser controller", paths.Settings);
   }, []);
 
   const login = () => {
