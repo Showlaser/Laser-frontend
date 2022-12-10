@@ -6,6 +6,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { propertiesSettings } from "services/logic/animation-logic";
+import { canvasPxSize } from "services/shared/config";
 
 type Props = {
   animation: Animation | null;
@@ -60,10 +61,10 @@ export default function AnimationKeyFrames({
     keyFramesPropertiesPosition.find((prop) => numberIsBetweenOrEqual(prop.yPosition, y - 20, y + 20))?.property;
 
   const prepareCanvas = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
-    canvas.width = 650;
-    canvas.height = 650;
-    canvas.style.width = "650";
-    canvas.style.height = "650";
+    canvas.width = canvasPxSize;
+    canvas.height = canvasPxSize;
+    canvas.style.width = canvasPxSize.toString();
+    canvas.style.height = canvasPxSize.toString();
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -115,9 +116,9 @@ export default function AnimationKeyFrames({
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     ctx.fillStyle = "whitesmoke";
 
-    drawLine(80, 650, 80, 0, ctx);
+    drawLine(80, canvasPxSize, 80, 0, ctx);
     keyFramesPropertiesPosition.forEach((keyframe) => {
-      drawLine(80, keyframe.yPosition, 650, keyframe.yPosition, ctx);
+      drawLine(80, keyframe.yPosition, canvasPxSize, keyframe.yPosition, ctx);
       ctx.font = "16px sans-serif";
       ctx.fillText(keyframe.property, 5, keyframe.yPosition);
     });
@@ -144,7 +145,7 @@ export default function AnimationKeyFrames({
       }
 
       const y = keyFrameProperty.yPosition;
-      const x = mapNumber(keyFrame.timeMs, timelinePositionMs, stepsToDrawMaxRange, 80, 650);
+      const x = mapNumber(keyFrame.timeMs, timelinePositionMs, stepsToDrawMaxRange, 80, canvasPxSize);
 
       const isSelected = keyFrame.uuid === selectedKeyFrameUuid;
       ctx.beginPath();
@@ -172,7 +173,7 @@ export default function AnimationKeyFrames({
     }
 
     let timelinePosition: number =
-      (mapNumber(mouseXPosition, 80, 650, timelinePositionMs, stepsToDrawMaxRange) -
+      (mapNumber(mouseXPosition, 80, canvasPxSize, timelinePositionMs, stepsToDrawMaxRange) -
         xCorrection[newSelectableStepsIndex]) |
       0;
     if (timelinePosition < 0) {
@@ -194,7 +195,7 @@ export default function AnimationKeyFrames({
     const rect = canvas.getBoundingClientRect();
     const mouseXPosition = e.clientX - rect.left;
     const mouseYPosition = e.clientY - rect.top;
-    const mappedX: number = mapNumber(mouseXPosition, 80, 650, timelinePositionMs, stepsToDrawMaxRange) | 0;
+    const mappedX: number = mapNumber(mouseXPosition, 80, canvasPxSize, timelinePositionMs, stepsToDrawMaxRange) | 0;
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
 
     const keyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
@@ -221,16 +222,16 @@ export default function AnimationKeyFrames({
     const rect = canvas.getBoundingClientRect();
     const mouseXPosition = event.clientX - rect.left;
     const mouseYPosition = event.clientY - rect.top;
-    if (mouseXPosition < 80 || mouseXPosition > 650) {
+    if (mouseXPosition < 80 || mouseXPosition > canvasPxSize) {
       return;
     }
 
-    const mappedX: number = mapNumber(mouseXPosition, 80, 650, timelinePositionMs, stepsToDrawMaxRange) | 0;
+    const mappedX: number = mapNumber(mouseXPosition, 80, canvasPxSize, timelinePositionMs, stepsToDrawMaxRange) | 0;
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
     const hoveredKeyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
 
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-    drawLine(mouseXPosition, 0, mouseXPosition, 650, ctx);
+    drawLine(mouseXPosition, 0, mouseXPosition, canvasPxSize, ctx);
     if (hoveredKeyFrame === undefined) {
       writeText(mouseXPosition, mouseYPosition, mappedXToStep.toString() + " x", ctx);
     } else {
@@ -251,7 +252,7 @@ export default function AnimationKeyFrames({
       x = 85;
     }
 
-    const mappedX: number = mapNumber(x, 80, 650, timelinePositionMs, stepsToDrawMaxRange) | 0;
+    const mappedX: number = mapNumber(x, 80, canvasPxSize, timelinePositionMs, stepsToDrawMaxRange) | 0;
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
 
     const y = event.clientY - rect.top;

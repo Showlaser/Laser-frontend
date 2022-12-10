@@ -182,7 +182,7 @@ export default function SideNav({ pageName, children }: Props) {
           ))}
         </List>
       </Drawer>
-      <Main id="menu-children" open={open}>
+      <Main id="menu-children" open={open} style={{ marginTop: "50px" }}>
         {children}
       </Main>
     </Box>

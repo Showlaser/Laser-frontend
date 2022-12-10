@@ -3,7 +3,7 @@ import SelectList from "components/select-list";
 import PointsDrawer from "components/shared/points-drawer";
 import { Animation, AnimationEffects } from "models/components/shared/animation";
 import React from "react";
-import { applyParametersToPointsForCanvas } from "services/shared/converters";
+import { applyParametersToPointsForCanvasByPattern } from "services/shared/converters";
 import { createGuid } from "services/shared/math";
 
 type Props = {
@@ -11,8 +11,7 @@ type Props = {
 };
 
 export function AnimationEffectEditor({ animation }: Props) {
-  const { scale, xOffset, yOffset, rotation, points } = animation.pattern;
-  const pointsToDraw = applyParametersToPointsForCanvas(scale, xOffset, yOffset, rotation, points);
+  const pointsToDraw = applyParametersToPointsForCanvasByPattern(animation.pattern);
 
   return (
     <Grid container spacing={3} style={{ width: "50%" }}>

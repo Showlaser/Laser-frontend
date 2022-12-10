@@ -2,6 +2,7 @@ import { Point } from "models/components/shared/point";
 import { createGuid } from "services/shared/math";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import { range } from "d3-array";
+import { canvasPxSize } from "services/shared/config";
 const flattenSVG = require("flatten-svg");
 
 const pathologize = (original: string) => {
@@ -94,10 +95,10 @@ const getTotalLengthAllPaths = (paths: HTMLCollection) => {
 };
 
 export const prepareCanvas = (canvas: HTMLCanvasElement): CanvasRenderingContext2D | null => {
-  canvas.width = 650;
-  canvas.height = 650;
-  canvas.style.width = "650";
-  canvas.style.height = "650";
+  canvas.width = canvasPxSize;
+  canvas.height = canvasPxSize;
+  canvas.style.width = canvasPxSize.toString();
+  canvas.style.height = canvasPxSize.toString();
   const ctx = canvas.getContext("2d");
   if (ctx === null) {
     return null;
@@ -105,14 +106,14 @@ export const prepareCanvas = (canvas: HTMLCanvasElement): CanvasRenderingContext
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.moveTo(0, 325);
-  ctx.lineTo(650, 325);
+  ctx.lineTo(canvasPxSize, 325);
 
   ctx.strokeStyle = "#706f6f";
   ctx.lineWidth = 0.1;
   ctx.stroke();
 
   ctx.moveTo(325, 0);
-  ctx.lineTo(325, 650);
+  ctx.lineTo(325, canvasPxSize);
 
   ctx.stroke();
   return ctx;

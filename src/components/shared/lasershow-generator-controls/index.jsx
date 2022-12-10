@@ -40,19 +40,15 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 export default function LasershowGeneratorControls() {
   const userIsLoggedIntoSpotify =
-    localStorage.getItem("SpotifyAccessToken") !== null &&
-    localStorage.getItem("SpotifyAccessToken") !== "undefined";
-  const [open, setOpen] = useState(
-    localStorage.getItem("show-spotify-controls") !== null
-  );
+    localStorage.getItem("SpotifyAccessToken") !== null && localStorage.getItem("SpotifyAccessToken") !== "undefined";
+  const [open, setOpen] = useState(localStorage.getItem("show-spotify-controls") !== null);
   const [playing, setPlaying] = useState(false);
   const [activeDevice, setActiveDevice] = useState();
   const [lasershowGeneratorStatus, setLasershowGeneratorStatus] = useState({
     isActive: false,
   });
   const [intervalsSet, setIntervalsSet] = useState(false);
-  const [generatorSubmitInProgress, setGeneratorSubmitInProgress] =
-    useState(false);
+  const [generatorSubmitInProgress, setGeneratorSubmitInProgress] = useState(false);
   const selectedAudioDevice = localStorage.getItem("selected-audio-device");
 
   const playerStateRef = useRef();
@@ -89,9 +85,7 @@ export default function LasershowGeneratorControls() {
   };
 
   const updateGeneratorStatus = () => {
-    getLasershowGeneratorStatus().then((status) =>
-      setLasershowGeneratorStatus(status)
-    );
+    getLasershowGeneratorStatus().then((status) => setLasershowGeneratorStatus(status));
   };
 
   const updateGeneratorSettings = () => {
@@ -130,18 +124,13 @@ export default function LasershowGeneratorControls() {
   };
 
   const updateArtistData = () => {
-    if (
-      !playerStateRef.current ||
-      playerStateRef.current.item.id === currentTrackDataRef.current?.id
-    ) {
+    if (!playerStateRef.current || playerStateRef.current.item.id === currentTrackDataRef.current?.id) {
       return;
     }
 
-    getDataForCurrentArtist(playerStateRef.current.item.artists.at(0).id).then(
-      (data) => {
-        currentArtistRef.current = data;
-      }
-    );
+    getDataForCurrentArtist(playerStateRef.current.item.artists.at(0).id).then((data) => {
+      currentArtistRef.current = data;
+    });
   };
 
   const updateSpotifyPlayerState = () => {
@@ -164,16 +153,12 @@ export default function LasershowGeneratorControls() {
           },
           selectedAudioDevice
         ).then(() => setGeneratorSubmitInProgress(false))
-      : stopLasershowGeneration().then(() =>
-          setGeneratorSubmitInProgress(false)
-        );
+      : stopLasershowGeneration().then(() => setGeneratorSubmitInProgress(false));
   };
 
   const toggleControls = () => {
     setOpen(!open);
-    open
-      ? localStorage.removeItem("show-spotify-controls")
-      : localStorage.setItem("show-spotify-controls", "");
+    open ? localStorage.removeItem("show-spotify-controls") : localStorage.setItem("show-spotify-controls", "");
   };
 
   const getPlayOrPauseButton = () =>
@@ -189,26 +174,17 @@ export default function LasershowGeneratorControls() {
 
   const renderComponentByLoggedInAndDeviceState = () => {
     if (!userIsLoggedIntoSpotify) {
-      return (
-        <Alert severity="error">
-          You are not logged in to Spotify. Login in the settings page
-        </Alert>
-      );
+      return <Alert severity="error">You are not logged in to Spotify. Login in the settings page</Alert>;
     }
 
     if (selectedAudioDevice === null) {
-      return (
-        <Alert severity="error">
-          No audio device selected! Set an device in the settings page.
-        </Alert>
-      );
+      return <Alert severity="error">No audio device selected! Set an device in the settings page.</Alert>;
     }
 
     if (!activeDevice) {
       return (
         <Alert severity="error">
-          No active device found! Play a song through Spotify and refresh the
-          page or wait a few seconds.
+          No active device found! Play a song through Spotify and refresh the page or wait a few seconds.
         </Alert>
       );
     }
@@ -227,9 +203,7 @@ export default function LasershowGeneratorControls() {
             }
             label="Enable lasershow generation"
           />
-          {generatorSubmitInProgress ? (
-            <LinearProgress style={{ width: "250px" }} />
-          ) : null}
+          {generatorSubmitInProgress ? <LinearProgress style={{ width: "250px" }} /> : null}
         </FormGroup>
         <br />
         <ButtonGroup>
@@ -243,21 +217,13 @@ export default function LasershowGeneratorControls() {
         </ButtonGroup>
         <LinearProgress
           variant="determinate"
-          value={mapNumber(
-            playerStateRef.current?.progress_ms,
-            0,
-            playerStateRef.current?.item?.duration_ms,
-            0,
-            100
-          )}
+          value={mapNumber(playerStateRef.current?.progress_ms, 0, playerStateRef.current?.item?.duration_ms, 0, 100)}
         />
         <small>{`Active device: ${activeDevice.name}`}</small>
         <br />
         {lasershowGeneratorStatus.isActive ? (
           <span>
-            <small>{`Detected genre: ${
-              lasershowGeneratorStatus.activeGenre ?? "not supported"
-            }`}</small>
+            <small>{`Detected genre: ${lasershowGeneratorStatus.activeGenre ?? "not supported"}`}</small>
             <br />
             <Input
               type="number"
@@ -267,9 +233,7 @@ export default function LasershowGeneratorControls() {
                 max: 0.1,
               }}
               placeholder="Threshold offset"
-              onChange={(e) =>
-                (threshHoldOffsetRef.current = Number(e.target.value))
-              }
+              onChange={(e) => (threshHoldOffsetRef.current = Number(e.target.value))}
               defaultValue={0.0}
             />
             <br />
@@ -282,20 +246,16 @@ export default function LasershowGeneratorControls() {
 
   return (
     <div id="lasershow-generator-controls">
-      <Accordion
-        expanded={open}
-        style={{ boxShadow: "0 2px 10px rgba(0, 0, 0, 0.8)" }}
-      >
+      <Accordion expanded={open} style={{ boxShadow: "0 2px 10px rgba(0, 0, 0, 0.8)" }}>
         <AccordionSummary onClick={toggleControls}>
           {open ? (
             <span>
               <Button>
-                Close Spotify / laser generator controls{" "}
-                <KeyboardArrowDownIcon />
+                Close Spotify / laser generator controls <KeyboardArrowDownIcon />
               </Button>
             </span>
           ) : (
-            <span className="fade-in">
+            <span>
               <Button>
                 Open Spotify / laser generator controls <KeyboardArrowUpIcon />
               </Button>
@@ -312,9 +272,7 @@ export default function LasershowGeneratorControls() {
             </span>
           )}
         </AccordionSummary>
-        <AccordionDetails>
-          {renderComponentByLoggedInAndDeviceState()}
-        </AccordionDetails>
+        <AccordionDetails>{renderComponentByLoggedInAndDeviceState()}</AccordionDetails>
       </Accordion>
     </div>
   );

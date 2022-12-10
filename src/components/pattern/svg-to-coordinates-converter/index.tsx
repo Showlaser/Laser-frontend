@@ -14,7 +14,9 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { addItemToVersionHistory } from "services/shared/version-history";
 import { savePattern } from "services/logic/pattern-logic";
 import PointsDrawer from "components/shared/points-drawer";
-import { applyParametersToPointsForCanvas } from "services/shared/converters";
+import { applyParametersToPointsForCanvasByPattern } from "services/shared/converters";
+import { getCenterOfPoints } from "services/shared/math";
+import { canvasPxSize } from "services/shared/config";
 
 type Props = {
   patternNamesInUse: string[];
@@ -24,7 +26,7 @@ type Props = {
   clearServerPattern: () => void;
 };
 
-export default function SvgToCoordinatesConverter({
+export default function PatternEditor({
   patternNamesInUse,
   uploadedFile,
   setUploadedFile,
@@ -41,6 +43,7 @@ export default function SvgToCoordinatesConverter({
   const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>([]);
   const [patternNameIsInUse, setPatternNameIsInUse] = React.useState<boolean>(false);
   const [pointsToDraw, setPointToDraw] = React.useState<Point[]>([]);
+  const [keepPatternCentered, setKeepPatternCentered] = React.useState<boolean>(false);
 
   const alertUser = (e: BeforeUnloadEvent) => {
     e.preventDefault();
@@ -60,13 +63,7 @@ export default function SvgToCoordinatesConverter({
   }, [uploadedFile, numberOfPoints]);
 
   React.useEffect(() => {
-    const pointsToDraw: Point[] = applyParametersToPointsForCanvas(
-      pattern.scale,
-      pattern.xOffset,
-      pattern.yOffset,
-      pattern.rotation,
-      pattern.points
-    );
+    const pointsToDraw: Point[] = applyParametersToPointsForCanvasByPattern(pattern);
     setPointToDraw(pointsToDraw);
   }, [showPointNumber, selectedPointsUuid, pattern]);
 

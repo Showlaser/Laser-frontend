@@ -88,6 +88,10 @@ export default function PointsSection({
   };
 
   const deleteSelectedPoints = () => {
+    if (selectedPointsUuid.length < 1) {
+      return;
+    }
+
     const newPoints = pattern.points.filter((pp) => !selectedPointsUuid.some((spu) => spu === pp.uuid));
     newPoints.forEach((np, index) => (np.orderNr = index));
     updatePatternProperty("points", newPoints);
@@ -152,12 +156,12 @@ export default function PointsSection({
           />
         </Tooltip>
         <Tooltip title="Add point">
-          <IconButton onClick={addPoint}>
+          <IconButton onClick={addPoint} style={{ color: "#4e61cf" }}>
             <AddIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Delete selected points">
-          <IconButton onClick={deleteSelectedPoints}>
+          <IconButton onClick={deleteSelectedPoints} style={{ color: "#d13126" }}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -204,6 +208,7 @@ export default function PointsSection({
         </List>
       </div>
       <TablePagination
+        style={{ color: "whitesmoke" }}
         component="div"
         count={pattern?.points.length}
         page={currentPage}

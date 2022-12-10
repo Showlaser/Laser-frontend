@@ -121,7 +121,7 @@ export default function GeneralSection({
       </FormControl>
       <br />
       <Tooltip placement="right" title={getTooltipText()}>
-        <div>
+        <>
           <FormLabel htmlFor="svg-points" disabled={!dangerousElementsEnabled}>
             Number of points
             <Button
@@ -155,7 +155,7 @@ export default function GeneralSection({
               valueLabelDisplay="auto"
             />
           </FormControl>
-        </div>
+        </>
       </Tooltip>
       <FormLabel htmlFor="svg-points">
         X offset

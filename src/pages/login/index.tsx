@@ -1,10 +1,11 @@
-import { Button, Divider, FormControl, Grid, LinearProgress, TextField } from "@mui/material";
+import { Button, FormControl, Grid, LinearProgress, TextField } from "@mui/material";
 import { login } from "services/logic/login-logic";
 import { getCodeFromResponse, getFormDataObject, stringIsEmpty } from "services/shared/general";
 import paths from "services/shared/router-paths";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import Cookies from "universal-cookie";
 import React, { useState } from "react";
+import "./index.css";
 
 export default function Login() {
   const [submitInProgress, setSubmitInProgress] = useState(false);
@@ -40,15 +41,8 @@ export default function Login() {
   };
 
   return (
-    <Grid
-      container
-      spacing={0}
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      style={{ minHeight: "70vh" }}
-    >
-      <form onSubmit={onSubmit}>
+    <Grid id="login-wrapper" container spacing={0} direction="column" alignItems="center">
+      <form id="login" onSubmit={onSubmit}>
         <FormControl>
           <h1>Login</h1>
           <TextField required autoComplete="off" defaultValue="vincent" label="Username" name="username" />
@@ -59,7 +53,7 @@ export default function Login() {
             Login
           </Button>
           {submitInProgress ? <LinearProgress /> : null}
-          <Divider />
+          <br />
           <a className="link-btn" href={paths.Register}>
             Register
           </a>

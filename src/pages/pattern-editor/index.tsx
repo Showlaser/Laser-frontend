@@ -4,7 +4,7 @@ import SideNav from "components/shared/sidenav";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import { Box, Button, Divider, Grid, Modal, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
-import SvgToCoordinatesConverter from "components/pattern/svg-to-coordinates-converter";
+import PatternEditor from "components/pattern/svg-to-coordinates-converter";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { getPatternPlaceHolder, Pattern } from "models/components/shared/pattern";
@@ -114,7 +114,7 @@ export default function PatternPage() {
         </Grid>
       </Modal>
       <OnTrue onTrue={uploadedFile !== undefined || selectedPattern !== null}>
-        <SvgToCoordinatesConverter
+        <PatternEditor
           patternNamesInUse={
             availablePatterns?.map((pattern) => (pattern.uuid !== selectedPattern?.uuid ? pattern.name : "")) ?? []
           }

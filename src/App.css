@@ -26,49 +26,37 @@ body {
   transform: scale(1.1) !important;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@-webkit-keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-.fade-in {
-  animation-duration: 0.8s;
-  animation-fill-mode: both;
-  -webkit-animation-duration: 0.8s;
-  -webkit-animation-fill-mode: both;
-
-  opacity: 0;
-  animation-name: fadeIn;
-  -webkit-animation-name: fadeIn;
-}
-
 .MuiButton-contained {
-  background-color: #2867c5 !important;
+  background-color: #3747a5 !important;
   color: white !important;
 }
 
 .MuiButton-contained:hover {
-  background-color: #1f519d !important;
+  background-color: #2537a1 !important;
 }
 
 .MuiButton-contained:disabled {
-  background-color: rgb(40, 103, 197, 0.4) !important;
+  background-color: rgb(37, 55, 161, 0.4) !important;
   color: white !important;
+}
+
+.css-1r7avug-MuiButtonBase-root-MuiTab-root.Mui-selected,
+.MuiButton-textPrimary,
+.css-1e6ud36-MuiButtonBase-root-MuiCheckbox-root {
+  color: #4262ca !important;
+}
+
+.css-155afqr-MuiButtonBase-root-MuiFab-root-MuiSpeedDial-fab {
+  background-color: #3747a5 !important;
+  color: rgb(225, 225, 225) !important;
+}
+
+.css-3sx0hq-MuiTabs-indicator {
+  background-color: #293cab !important;
+}
+
+.MuiButton-textPrimary:disabled {
+  color: rgb(78, 97, 207, 0.6) !important;
 }
 
 .link-btn {

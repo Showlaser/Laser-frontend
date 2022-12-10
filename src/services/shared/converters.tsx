@@ -1,7 +1,7 @@
 import { Animation, animationPlaceholder } from "models/components/shared/animation";
 import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
-import { generatePointsTestSet } from "tests/helper";
+import { canvasPxSize } from "./config";
 import { getCenterOfPoints, mapNumber, rotatePoints } from "./math";
 
 export const rgbColorStringFromPoint = (point: Point): string =>
@@ -37,13 +37,16 @@ export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   return animation;
 };
 
+export const applyParametersToPointsForCanvasByPattern = (pattern: Pattern): Point[] =>
+  applyParametersToPointsForCanvas(pattern.scale, pattern.xOffset, pattern.yOffset, pattern.rotation, pattern.points);
+
 export const applyParametersToPointsForCanvas = (
   scale: number,
   xOffset: number,
   yOffset: number,
   rotation: number,
   points: Point[]
-) => {
+): Point[] => {
   const pointsLength = points.length;
   let pointsWithOffsetApplied = [];
   for (let i = 0; i < pointsLength; i++) {
@@ -69,8 +72,8 @@ export const convertPointsToCanvasSize = (points: Point[]) => {
 
   for (let i = 0; i < pointsLength; i++) {
     let point = { ...points[i] };
-    point.x = mapNumber(point.x, -4000, 4000, 0, 650);
-    point.y = mapNumber(point.y, -4000, 4000, 0, 650);
+    point.x = mapNumber(point.x, -4000, 4000, 0, canvasPxSize);
+    point.y = mapNumber(point.y, -4000, 4000, 0, canvasPxSize);
     mappedPoints.push(point);
   }
 
