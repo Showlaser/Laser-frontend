@@ -1,5 +1,5 @@
 const paths = {
-  Root: "/",
+  Dashboard: "/",
   Settings: "/settings",
   Zones: "/zones",
   PatternEditor: "/pattern-editor",

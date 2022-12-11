@@ -45,7 +45,7 @@ export default function SpotifyController() {
     localStorage.getItem("SpotifyAccessToken") !== null && localStorage.getItem("SpotifyAccessToken") !== "undefined";
 
   useEffect(() => {
-    const interval = setInterval(() => getData(), 1000);
+    const interval = setInterval(() => getData(), 2000);
     return () => clearInterval(interval);
   }, [player, songData]);
 

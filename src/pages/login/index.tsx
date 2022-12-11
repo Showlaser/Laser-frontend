@@ -25,7 +25,7 @@ export default function Login() {
 
         let redirectUrl = getCodeFromResponse();
         if (stringIsEmpty(redirectUrl)) {
-          redirectUrl = paths.Root;
+          redirectUrl = paths.Dashboard;
         }
 
         const termsAndConditionsAccepted = localStorage.getItem("terms-accepted");

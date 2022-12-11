@@ -1,7 +1,6 @@
 import { BrowserRouter, Route } from "react-router-dom";
 import React from "react";
 import routerPaths from "services/shared/router-paths";
-import Dashboard from "pages/dashboard";
 import PatternEditor from "pages/pattern-editor";
 import AnimationEditor from "pages/animation";
 import Installation from "pages/installation";
@@ -15,12 +14,13 @@ import LasershowSpotifyConnector from "pages/lasershow-spotify-connector";
 import Logout from "pages/logout";
 import Disclaimer from "pages/disclaimer";
 import Settings from "pages/settings";
+import Dashboard from "pages/dashboard";
 
 function routes() {
   return (
     <BrowserRouter>
       <Route exact path={routerPaths.Login} component={Login} />
-      <Route exact path={routerPaths.Root} component={Dashboard} />
+      <Route exact path={routerPaths.Dashboard} component={Dashboard} />
       <Route exact path={routerPaths.Settings} component={Settings} />
       <Route exact path={routerPaths.PatternEditor} component={PatternEditor} />
       <Route exact path={routerPaths.Installation} component={Installation} />

@@ -13,6 +13,7 @@ import { getAnimations, removeAnimation } from "services/logic/animation-logic";
 import { convertPatternToAnimation } from "services/shared/converters";
 import AnimationKeyFrameEditor from "components/animation/animation-keyframe-editor";
 import { Pattern } from "models/components/shared/pattern";
+import DeleteModal from "components/shared/delete-modal";
 
 export default function AnimationPage() {
   const [selectedAnimation, setSelectedAnimation] = useState<Animation | null>(null);
@@ -91,87 +92,57 @@ export default function AnimationPage() {
 
   return (
     <SideNav pageName="Animation editor">
-      <>
-        <Modal open={modalOptions.show}>
-          <Grid
-            container
-            spacing={0}
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-            style={{ minHeight: "100vh" }}
-          >
-            <Paper sx={{ textAlign: "left", width: "60%", padding: "5px 20px 5px 20px" }}>
-              <h3>Are you sure you want to delete this item?</h3>
-              <Divider />
-              <br />
-              <div style={{ float: "right" }}>
-                <Button variant="text" onClick={() => setModalOptions({ show: false, onDelete: null })}>
-                  Cancel
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={modalOptions.onDelete}
-                  style={{ marginLeft: "5px" }}
-                >
-                  Ok
-                </Button>
-              </div>
-            </Paper>
-          </Grid>
-        </Modal>
-        {selectedAnimation === null ? (
-          getSpeedDial()
-        ) : (
-          <AnimationKeyFrameEditor animation={selectedAnimation} setSelectedAnimation={setSelectedAnimation} />
-        )}
-        {convertPatternModalOpen && (
-          <CardOverview
-            closeOverview={() => setConvertPatternModalOpen(false)}
-            show={convertPatternModalOpen}
-            onNoItemsMessageTitle="No patterns saved"
-            onNoItemsDescription="Create a new pattern in the pattern editor"
-            onDeleteClick={(uuid) => setModalOptions({ show: true, onDelete: () => onPatternDelete(uuid) })}
-            items={
-              availablePatterns?.map((pattern) => ({
-                uuid: pattern.uuid,
-                name: pattern.name,
-                image: pattern.image,
-                onCardClick: () => {
-                  setConvertPatternModalOpen(false);
-                  let availableAnimationsToUpdate = availableAnimations ?? [];
-                  const convertedAnimation = convertPatternToAnimation(pattern);
+      <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
+      {selectedAnimation === null ? (
+        getSpeedDial()
+      ) : (
+        <AnimationKeyFrameEditor animation={selectedAnimation} setSelectedAnimation={setSelectedAnimation} />
+      )}
+      {convertPatternModalOpen && (
+        <CardOverview
+          closeOverview={() => setConvertPatternModalOpen(false)}
+          show={convertPatternModalOpen}
+          onNoItemsMessageTitle="No patterns saved"
+          onNoItemsDescription="Create a new pattern in the pattern editor"
+          onDeleteClick={(uuid) => setModalOptions({ show: true, onDelete: () => onPatternDelete(uuid) })}
+          items={
+            availablePatterns?.map((pattern) => ({
+              uuid: pattern.uuid,
+              name: pattern.name,
+              image: pattern.image,
+              onCardClick: () => {
+                setConvertPatternModalOpen(false);
+                let availableAnimationsToUpdate = availableAnimations ?? [];
+                const convertedAnimation = convertPatternToAnimation(pattern);
 
-                  availableAnimations?.push(convertedAnimation);
-                  setAvailableAnimations(availableAnimationsToUpdate);
-                  setSelectedAnimation(convertedAnimation);
-                },
-              })) ?? []
-            }
-          />
-        )}
-        {animationsModalOpen && (
-          <CardOverview
-            closeOverview={() => setAnimationsModalOpen(false)}
-            show={animationsModalOpen}
-            onNoItemsMessageTitle="No animations saved"
-            onNoItemsDescription="Create a new animation"
-            onDeleteClick={(uuid) => setModalOptions({ show: true, onDelete: () => onAnimationDelete(uuid) })}
-            items={
-              availableAnimations?.map((animation) => ({
-                uuid: animation.uuid,
-                name: animation.name,
-                image: animation.image,
-                onCardClick: () => {
-                  setAnimationsModalOpen(false);
-                  setSelectedAnimation(animation);
-                },
-              })) ?? []
-            }
-          />
-        )}
-      </>
+                availableAnimations?.push(convertedAnimation);
+                setAvailableAnimations(availableAnimationsToUpdate);
+                setSelectedAnimation(convertedAnimation);
+              },
+            })) ?? []
+          }
+        />
+      )}
+      {animationsModalOpen && (
+        <CardOverview
+          closeOverview={() => setAnimationsModalOpen(false)}
+          show={animationsModalOpen}
+          onNoItemsMessageTitle="No animations saved"
+          onNoItemsDescription="Create a new animation"
+          onDeleteClick={(uuid) => setModalOptions({ show: true, onDelete: () => onAnimationDelete(uuid) })}
+          items={
+            availableAnimations?.map((animation) => ({
+              uuid: animation.uuid,
+              name: animation.name,
+              image: animation.image,
+              onCardClick: () => {
+                setAnimationsModalOpen(false);
+                setSelectedAnimation(animation);
+              },
+            })) ?? []
+          }
+        />
+      )}
     </SideNav>
   );
 }

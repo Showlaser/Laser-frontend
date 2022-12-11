@@ -11,19 +11,22 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
+import React from "react";
 import { useState } from "react";
 
-export default function SpotifyPlaylist({
-  userPlaylists,
-  onVoteStart,
-  voteStarted,
-}) {
-  const [checked, setChecked] = useState([]);
+type Props = {
+  userPlaylists: any;
+  onVoteStart: any;
+  voteStarted: boolean;
+};
+
+export default function SpotifyPlaylist({ userPlaylists, onVoteStart, voteStarted }: Props) {
+  const [selectedPlaylistIds, setSelectedPlaylistIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleToggle = (value) => () => {
-    const currentIndex = checked.findIndex((e) => e === value);
-    const newChecked = [...checked];
+  const handleToggle = (value: string) => () => {
+    const currentIndex = selectedPlaylistIds.findIndex((e) => e === value);
+    const newChecked = [...selectedPlaylistIds];
 
     if (currentIndex === -1) {
       newChecked.push(value);
@@ -31,12 +34,12 @@ export default function SpotifyPlaylist({
       newChecked.splice(currentIndex, 1);
     }
 
-    setChecked(newChecked);
+    setSelectedPlaylistIds(newChecked);
   };
 
   const startVote = async () => {
     setIsLoading(true);
-    await onVoteStart(checked);
+    await onVoteStart(selectedPlaylistIds);
     setIsLoading(false);
   };
 
@@ -45,36 +48,24 @@ export default function SpotifyPlaylist({
       <h3>Playlists</h3>
       <small>Select the playlists to vote on</small>
       <Divider />
-      <List
-        style={{ maxHeight: "50vh", overflow: "auto" }}
-        sx={{ width: "100%" }}
-      >
-        {userPlaylists?.map((playlist, index) => {
+      <List style={{ maxHeight: "50vh", overflow: "auto" }} sx={{ width: "100%" }}>
+        {userPlaylists?.map((playlist: any, index: number) => {
           const labelId = `checkbox-list-label-${index}`;
 
           return (
             <ListItem key={index} disablePadding>
-              <ListItemButton
-                role={undefined}
-                onClick={handleToggle(playlist?.id)}
-                dense
-              >
+              <ListItemButton role={undefined} onClick={handleToggle(playlist?.id)} dense>
                 <ListItemIcon>
                   <Checkbox
                     edge="start"
-                    checked={
-                      checked.findIndex((e) => e === playlist?.id) !== -1
-                    }
+                    checked={selectedPlaylistIds.findIndex((e) => e === playlist?.id) !== -1}
                     tabIndex={-1}
                     disableRipple
                     inputProps={{ "aria-labelledby": labelId }}
                   />
                 </ListItemIcon>
                 <ListItemAvatar>
-                  <Avatar
-                    alt="Spotify image"
-                    src={playlist?.images?.at(0)?.url}
-                  />
+                  <Avatar alt="Spotify image" src={playlist?.images?.at(0)?.url} />
                 </ListItemAvatar>
                 <ListItemText id={labelId} primary={playlist?.name} />
               </ListItemButton>
@@ -83,11 +74,7 @@ export default function SpotifyPlaylist({
         })}
       </List>
       <br />
-      <Button
-        disabled={isLoading || voteStarted}
-        variant="contained"
-        onClick={startVote}
-      >
+      <Button fullWidth disabled={isLoading || voteStarted} variant="contained" onClick={startVote}>
         Start vote
       </Button>
       {isLoading ? <LinearProgress /> : null}

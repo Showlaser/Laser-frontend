@@ -1,10 +1,14 @@
 import { Alert, TextField } from "@mui/material";
-import { useState } from "react";
+import React, { useState } from "react";
 import { getSpotifyDevices } from "services/logic/spotify";
 
-export default function VoteSettings({ setVoteValidTimeInMinutes }) {
-  const [activeDevice, setActiveDevice] = useState();
-  const [intervalSet, setIntervalSet] = useState(false);
+type Props = {
+  setVoteValidTimeInMinutes: (timeInMinutes: number) => void;
+};
+
+export default function VoteSettings({ setVoteValidTimeInMinutes }: Props) {
+  const [activeDevice, setActiveDevice] = useState<SpotifyApi.UserDevice>();
+  const [intervalSet, setIntervalSet] = useState<boolean>(false);
 
   const updateActiveDevice = () => {
     getSpotifyDevices().then((data) => {
@@ -17,11 +21,11 @@ export default function VoteSettings({ setVoteValidTimeInMinutes }) {
     });
   };
 
-  useState(() => {
+  React.useEffect(() => {
     updateActiveDevice();
     if (!activeDevice && !intervalSet) {
       const interval = setInterval(() => {
-        if (setActiveDevice) {
+        if (activeDevice !== undefined) {
           clearInterval(interval);
         }
         updateActiveDevice();
@@ -34,10 +38,7 @@ export default function VoteSettings({ setVoteValidTimeInMinutes }) {
   return (
     <div>
       {!activeDevice ? (
-        <Alert severity="error">
-          No active device found! Play a song through Spotify and refresh the
-          page.
-        </Alert>
+        <Alert severity="error">No active device found! Play a song through Spotify and refresh the page.</Alert>
       ) : null}
       <h3>Vote settings</h3>
       <TextField

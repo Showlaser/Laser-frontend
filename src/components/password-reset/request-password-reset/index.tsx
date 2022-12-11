@@ -1,4 +1,5 @@
 import { TextField, Button, FormControl, Alert } from "@mui/material";
+import React from "react";
 import { useState } from "react";
 import { requestPasswordReset } from "services/logic/password-reset-logic";
 
@@ -8,7 +9,7 @@ export default function RequestPasswordReset() {
 
   const resetPassword = () => {
     requestPasswordReset(email).then((response) => {
-      if (response.status === 200) {
+      if (response?.status === 200) {
         setPasswordResetRequested(true);
       }
     });
@@ -17,8 +18,7 @@ export default function RequestPasswordReset() {
   return passwordResetRequested ? (
     <div>
       <Alert severity="success">
-        Check your email to reset your password. Check the spam folder if you
-        did not receive an email.
+        Check your email to reset your password. Check the spam folder if you did not receive an email.
       </Alert>
     </div>
   ) : (

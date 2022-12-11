@@ -8,7 +8,7 @@ export default function AccountActivation() {
     const code = getUrlCode();
     if (!stringIsEmpty(code)) {
       activateAccount(code).then((result) => {
-        if (result.status !== 200) {
+        if (result?.status !== 200) {
           showError(toastSubject.invalidCode);
         }
       });

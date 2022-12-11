@@ -4,25 +4,35 @@ import { useEffect, useState, useRef } from "react";
 import { normalise } from "services/shared/math";
 import { getDifferenceBetweenTwoDatesInMinutesAndSecondsString } from "services/shared/general";
 import Cookies from "universal-cookie";
+import React from "react";
+import { VoteData } from "models/components/shared/Spotify";
 
-export default function VoteOverView({ voteState, voteCookie, onVoteEnded }) {
+type Props = {
+  voteState: VoteData | undefined;
+  voteCookie: any;
+  onVoteEnded: () => void;
+};
+
+export default function VoteOverView({ voteState, voteCookie, onVoteEnded }: Props) {
   const [voteEnded, setVoteEnded] = useState(false);
   const voteEndedRef = useRef(false);
 
-  const totalVotes = voteState?.voteablePlaylistCollection
+  const totalVotes = voteState?.votablePlaylistCollection
     ?.map((p) => p?.votes?.length)
     .reduce((partialSum, a) => partialSum + a, 0);
 
   useEffect(() => {
     const validUntilDate = new Date(voteCookie?.validUntil);
     setInterval(() => {
-      const value = getDifferenceBetweenTwoDatesInMinutesAndSecondsString(
-        validUntilDate,
-        new Date()
-      );
+      const value = getDifferenceBetweenTwoDatesInMinutesAndSecondsString(validUntilDate, new Date());
 
       if (!voteEndedRef.current) {
-        document.getElementById("countdown").innerHTML = value;
+        const countDown = document.getElementById("countdown");
+        if (countDown === null) {
+          return;
+        }
+
+        countDown.innerHTML = value;
       }
     }, 1000);
   }, []);
@@ -61,8 +71,8 @@ export default function VoteOverView({ voteState, voteCookie, onVoteEnded }) {
       )}
 
       <List style={{ width: "90%", maxWidth: "70vh" }}>
-        {voteState?.voteablePlaylistCollection?.map((playlist) => {
-          const value = normalise(playlist?.votes?.length, 0, totalVotes);
+        {voteState?.votablePlaylistCollection?.map((playlist) => {
+          const value = normalise(playlist?.votes?.length, 0, Number(totalVotes));
           return (
             <span key={playlist?.uuid}>
               <ListItemText primary={playlist?.playlistName} />

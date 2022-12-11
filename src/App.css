@@ -26,39 +26,6 @@ body {
   transform: scale(1.1) !important;
 }
 
-.MuiButton-contained {
-  background-color: #3747a5 !important;
-  color: white !important;
-}
-
-.MuiButton-contained:hover {
-  background-color: #2537a1 !important;
-}
-
-.MuiButton-contained:disabled {
-  background-color: rgb(37, 55, 161, 0.4) !important;
-  color: white !important;
-}
-
-.css-1r7avug-MuiButtonBase-root-MuiTab-root.Mui-selected,
-.MuiButton-textPrimary,
-.css-1e6ud36-MuiButtonBase-root-MuiCheckbox-root {
-  color: #4262ca !important;
-}
-
-.css-155afqr-MuiButtonBase-root-MuiFab-root-MuiSpeedDial-fab {
-  background-color: #3747a5 !important;
-  color: rgb(225, 225, 225) !important;
-}
-
-.css-3sx0hq-MuiTabs-indicator {
-  background-color: #293cab !important;
-}
-
-.MuiButton-textPrimary:disabled {
-  color: rgb(78, 97, 207, 0.6) !important;
-}
-
 .link-btn {
   text-decoration: none;
   color: white;

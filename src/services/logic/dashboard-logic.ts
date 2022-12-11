@@ -3,7 +3,5 @@ import { sendRequest } from "services/shared/api/api-middleware";
 import apiEndpoints from "services/shared/api/api-endpoints";
 
 export async function getDashboardData() {
-  return sendRequest(() => Get(apiEndpoints.dashboard), []).then((value) =>
-    value.json()
-  );
+  return sendRequest(() => Get(apiEndpoints.dashboard), []).then((value) => value?.json());
 }

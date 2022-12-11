@@ -6,6 +6,10 @@ import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
+interface Events {
+  onKeyDown: (e: React.KeyboardEvent) => void;
+}
+
 function App() {
   const theme = React.useMemo(
     () =>
@@ -18,6 +22,9 @@ function App() {
               paper: "#2b2b2b",
             },
           },
+          primary: {
+            main: "#485cdb",
+          },
         },
         components: {
           MuiSelect: {
@@ -28,13 +35,6 @@ function App() {
           MuiTextField: {
             defaultProps: {
               variant: "standard",
-            },
-          },
-          MuiSlider: {
-            styleOverrides: {
-              root: {
-                color: "#2660bd",
-              },
             },
           },
         },

@@ -19,8 +19,7 @@ export default function Installation() {
       nr: 1,
       text: "Cloud",
       icon: <CloudIcon />,
-      description:
-        "Save data in the cloud. This option is the best if large amounts of data is stored.",
+      description: "Save data in the cloud. This option is the best if large amounts of data is stored.",
     },
     {
       nr: 2,
@@ -34,10 +33,7 @@ export default function Installation() {
   return (
     <div id="installation">
       <h2>Storage option</h2>
-      <p>
-        Configure how you want to store your data. You can change this setting
-        later.
-      </p>
+      <p>Configure how you want to store your data. You can change this setting later.</p>
       {selectedId !== -1 ? <b>{options[selectedId].text} selected</b> : null}
       <Box
         sx={{
@@ -50,13 +46,10 @@ export default function Installation() {
         }}
       >
         {options.map((option) => (
-          <Card
-            className="installation-card"
-            onClick={() => setSelectedId(option.nr)}
-          >
+          <Card className="installation-card" onClick={() => setSelectedId(option.nr)}>
             <CardContent
               style={{
-                backgroundColor: selectedId === option.nr ? "gray" : null,
+                backgroundColor: selectedId === option.nr ? "gray" : undefined,
               }}
             >
               {option.icon}

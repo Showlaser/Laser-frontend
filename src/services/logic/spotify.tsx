@@ -3,7 +3,7 @@ import { sendRequest } from "services/shared/api/api-middleware";
 import apiEndpoints from "services/shared/api/api-endpoints";
 import SpotifyWebApi from "spotify-web-api-js";
 import { stringIsEmpty } from "services/shared/general";
-import { SpotifyTokens } from "models/components/shared/spotify-tokens";
+import { SpotifyTokens } from "models/components/shared/Spotify";
 
 const Spotify = new SpotifyWebApi();
 
@@ -68,52 +68,52 @@ const executeRequest = async (request: () => any) => {
     });
 };
 
-export const getUserPlaylists = () => {
-  return executeRequest(() => Spotify.getUserPlaylists());
-};
+export const getUserPlaylists = (): Promise<SpotifyApi.PagingObject<SpotifyApi.PlaylistObjectSimplified>> =>
+  executeRequest(() => Spotify.getUserPlaylists());
 
-export const getPlaylistSongs = (selectedPlaylistId: string) => {
-  return executeRequest(() =>
+export const getPlaylistSongs = (selectedPlaylistId: string): Promise<SpotifyApi.TrackObjectFull[]> =>
+  executeRequest(() =>
     Spotify.getPlaylistTracks(selectedPlaylistId).then((data) => {
       const items = data.items;
       return items.map((track) => track.track);
     })
   );
-};
 
-export const playPlaylist = (id: string, deviceToPlayId: string) => {
-  return executeRequest(() =>
+export const playPlaylist = (id: string, deviceToPlayId: string): Promise<void> =>
+  executeRequest(() =>
     Spotify.play({
       context_uri: `spotify:playlist:${id}`,
       device_id: deviceToPlayId,
     })
   );
-};
 
-export const getPlayerState = async () =>
+export const getPlayerState = (): Promise<SpotifyApi.CurrentlyPlayingObject> =>
   executeRequest(() => Spotify.getMyCurrentPlaybackState().then((data) => data));
 
-export const startPlayer = async (deviceId = null) =>
+export const startPlayer = (deviceId = null): Promise<void> =>
   executeRequest(() => Spotify.play(deviceId !== null ? { device_id: deviceId } : undefined));
 
-export const pausePlayer = async () => executeRequest(() => Spotify.pause());
+export const pausePlayer = (): Promise<void> => executeRequest(() => Spotify.pause());
 
-export const skipSong = () => executeRequest(() => Spotify.skipToNext());
+export const skipSong = (): Promise<void> => executeRequest(() => Spotify.skipToNext());
 
-export const previousSong = () => executeRequest(() => Spotify.skipToPrevious());
+export const previousSong = (): Promise<void> => executeRequest(() => Spotify.skipToPrevious());
 
-export const getSpotifyDevices = async () => executeRequest(() => Spotify.getMyDevices());
+export const getSpotifyDevices = async (): Promise<SpotifyApi.UserDevicesResponse> =>
+  executeRequest(() => Spotify.getMyDevices());
 
-export const getDataForCurrentArtist = async (artistId: string) => executeRequest(() => Spotify.getArtist(artistId));
+export const getDataForCurrentArtist = (artistId: string): Promise<SpotifyApi.ArtistObjectFull> =>
+  executeRequest(() => Spotify.getArtist(artistId));
 
-export const getTrackAudioFeatures = async (trackId: string) =>
+export const getTrackAudioFeatures = async (trackId: string): Promise<SpotifyApi.AudioFeaturesObject> =>
   executeRequest(() => Spotify.getAudioFeaturesForTrack(trackId));
 
-export const searchSpotify = async (searchValue: string, limit = 50) =>
+export const searchSpotify = async (searchValue: string, limit: number = 50): Promise<SpotifyApi.SearchResponse> =>
   executeRequest(() =>
     Spotify.search(searchValue, ["track"], {
       limit,
     })
   );
 
-export const getCurrentTracksData = async (trackIds: string[]) => executeRequest(() => Spotify.getTracks(trackIds));
+export const getCurrentTracksData = async (trackIds: string[]): Promise<SpotifyApi.MultipleTracksResponse> =>
+  executeRequest(() => Spotify.getTracks(trackIds));

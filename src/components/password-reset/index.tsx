@@ -1,10 +1,15 @@
 import { Button, FormControl, TextField } from "@mui/material";
+import React from "react";
 import { useState } from "react";
 import { resetPassword } from "services/logic/password-reset-logic";
 import paths from "services/shared/router-paths";
 import { showError, toastSubject } from "services/shared/toast-messages";
 
-export default function ResetPassword({ code }) {
+type Props = {
+  code: string;
+};
+
+export default function ResetPassword({ code }: Props) {
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordRepeat, setNewPasswordRepeat] = useState("");
   const [buttonDisabled, setButtonDisabled] = useState(false);
@@ -17,9 +22,9 @@ export default function ResetPassword({ code }) {
     setButtonDisabled(true);
     if (passwordsMatch()) {
       resetPassword(code, newPassword).then((result) => {
-        if (result.status === 404) {
+        if (result?.status === 404) {
           showError(toastSubject.invalidCode);
-        } else if (result.status === 200) {
+        } else if (result?.status === 200) {
           setTimeout(() => (window.location.href = paths.Login), 3000);
         }
       });

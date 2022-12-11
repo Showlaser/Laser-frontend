@@ -24,7 +24,16 @@ import "./index.css";
 import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SpotifyController from "../spotify-controller";
-import { Grid } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  AccordionSummaryProps,
+  Grid,
+  ListItemButton,
+} from "@mui/material";
+import Button from "@mui/material/Button";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const drawerWidth = 240;
 
@@ -98,21 +107,32 @@ export default function SideNav({ pageName, children }: Props) {
     <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          <Grid container>
-            <Grid item xs style={{ marginTop: "3px" }}>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-                sx={{ mr: 2, ...(open && { display: "none" }) }}
-              >
-                <MenuIcon />
-              </IconButton>
-              {pageName}
+          <Grid container direction="row" spacing={2} alignItems="center">
+            <Grid item xs>
+              <Grid display="flex" justifyContent="flex-start" alignItems="center">
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={handleDrawerOpen}
+                  edge="start"
+                  sx={{ mr: 2, ...(open && { display: "none" }) }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                {pageName}
+              </Grid>
             </Grid>
-            <Grid justifySelf="right">
-              <SpotifyController />
+            <Grid item xs container direction="column">
+              <Grid display="flex" justifyContent="center">
+                <Button fullWidth color="error" onClick={() => alert("I do nothing, so no emergency stop! 🙃")}>
+                  Emergency stop
+                </Button>
+              </Grid>
+            </Grid>
+            <Grid item xs container direction="column">
+              <Grid display="flex" justifyContent="flex-end">
+                <SpotifyController />
+              </Grid>
             </Grid>
           </Grid>
         </Toolbar>
@@ -138,7 +158,7 @@ export default function SideNav({ pageName, children }: Props) {
         <Divider />
         <List>
           {[
-            { title: "Dashboard", icon: <DashboardIcon />, path: paths.Root },
+            { title: "Dashboard", icon: <DashboardIcon />, path: paths.Dashboard },
             {
               title: "Animation editor",
               icon: <TheatersIcon />,
@@ -175,10 +195,10 @@ export default function SideNav({ pageName, children }: Props) {
               path: paths.Logout,
             },
           ].map((item, index) => (
-            <ListItem onClick={() => (window.location.href = item.path)} button key={`side-nav-list-item-${index}`}>
+            <ListItemButton onClick={() => (window.location.href = item.path)} key={`side-nav-list-item-${index}`}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.title} />
-            </ListItem>
+            </ListItemButton>
           ))}
         </List>
       </Drawer>

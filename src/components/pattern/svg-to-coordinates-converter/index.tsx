@@ -15,8 +15,6 @@ import { addItemToVersionHistory } from "services/shared/version-history";
 import { savePattern } from "services/logic/pattern-logic";
 import PointsDrawer from "components/shared/points-drawer";
 import { applyParametersToPointsForCanvasByPattern } from "services/shared/converters";
-import { getCenterOfPoints } from "services/shared/math";
-import { canvasPxSize } from "services/shared/config";
 
 type Props = {
   patternNamesInUse: string[];
@@ -43,7 +41,6 @@ export default function PatternEditor({
   const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>([]);
   const [patternNameIsInUse, setPatternNameIsInUse] = React.useState<boolean>(false);
   const [pointsToDraw, setPointToDraw] = React.useState<Point[]>([]);
-  const [keepPatternCentered, setKeepPatternCentered] = React.useState<boolean>(false);
 
   const alertUser = (e: BeforeUnloadEvent) => {
     e.preventDefault();
@@ -153,8 +150,15 @@ export default function PatternEditor({
     },
   ];
 
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.ctrlKey && e.key === "s") {
+      e.preventDefault();
+      onSave();
+    }
+  };
+
   return (
-    <Grid container direction="row" spacing={2}>
+    <Grid style={{ outline: "none" }} container tabIndex={0} onKeyDown={onKeyDown} direction="row" spacing={2}>
       <Grid item xs={6.5}>
         <TabSelector data={tabSelectorData} />
       </Grid>
@@ -180,7 +184,7 @@ export default function PatternEditor({
           }
           tooltipTitle="Clear editor field"
         />
-        <SpeedDialAction icon={<SaveIcon />} onClick={() => onSave()} tooltipTitle="Save pattern" />
+        <SpeedDialAction icon={<SaveIcon />} onClick={() => onSave()} tooltipTitle="Save pattern (ctrl + s)" />
       </SpeedDial>
     </Grid>
   );
