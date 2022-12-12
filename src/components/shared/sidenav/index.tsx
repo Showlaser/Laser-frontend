@@ -10,7 +10,6 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -24,16 +23,9 @@ import "./index.css";
 import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SpotifyController from "../spotify-controller";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  AccordionSummaryProps,
-  Grid,
-  ListItemButton,
-} from "@mui/material";
+import { Grid, ListItemButton } from "@mui/material";
 import Button from "@mui/material/Button";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Link } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -87,8 +79,8 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 type Props = {
-  pageName: string;
-  children: React.ReactNode;
+  pageName?: string;
+  children?: React.ReactNode;
 };
 
 export default function SideNav({ pageName, children }: Props) {
@@ -196,7 +188,7 @@ export default function SideNav({ pageName, children }: Props) {
               path: paths.Logout,
             },
           ].map((item, index) => (
-            <ListItemButton onClick={() => (window.location.href = item.path)} key={`side-nav-list-item-${index}`}>
+            <ListItemButton key={`side-nav-list-item-${index}`} component={Link} to={item.path}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.title} />
             </ListItemButton>

@@ -91,7 +91,7 @@ export default function AnimationPage() {
   };
 
   return (
-    <SideNav pageName="Animation editor">
+    <SideNav pageName="Animation">
       <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
       {selectedAnimation === null ? (
         getSpeedDial()
