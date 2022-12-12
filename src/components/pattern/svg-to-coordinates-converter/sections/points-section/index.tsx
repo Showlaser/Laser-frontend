@@ -1,17 +1,13 @@
-import { GridCellEditCommitParams } from "@mui/x-data-grid";
 import { Point } from "models/components/shared/point";
 import {
   Checkbox,
   Divider,
   FormControl,
-  Grow,
   IconButton,
-  InputLabel,
   List,
   ListItem,
   ListItemIcon,
   MenuItem,
-  rgbToHex,
   Select,
   TablePagination,
   TextField,
@@ -36,7 +32,7 @@ export default function PointsSection({
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsPerPage, setItemsPerPage] = useState<number>(25);
 
-  const updatePointProperty = (points: Point[], params: GridCellEditCommitParams) => {
+  /*const updatePointProperty = (points: Point[], params: GridCellEditCommitParams) => {
     let updatedPoints: Point[] = [...points];
     const pointToUpdateIndex: number = updatedPoints.findIndex((p: Point) => p.uuid === params.id);
 
@@ -85,7 +81,7 @@ export default function PointsSection({
     }
 
     updatePatternProperty("points", updatedPoints);
-  };
+  };*/
 
   const deleteSelectedPoints = () => {
     if (selectedPointsUuid.length < 1) {

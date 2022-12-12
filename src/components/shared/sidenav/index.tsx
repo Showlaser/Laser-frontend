@@ -144,6 +144,7 @@ export default function SideNav({ pageName, children }: Props) {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
+            backgroundColor: "#22334f",
           },
         }}
         variant="persistent"
