@@ -20,7 +20,7 @@ export const propertiesSettings = [
   {
     property: "scale",
     type: "float",
-    default: 4,
+    default: 1,
     min: 0.1,
     max: 10,
   },

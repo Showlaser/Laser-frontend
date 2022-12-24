@@ -111,7 +111,7 @@ export default function AnimationKeyFrameEditor({ animation, setSelectedAnimatio
       }
     }
 
-    const scale = valuesPerProperty.find((vpp) => vpp.property === "scale")?.value ?? 4;
+    const scale = valuesPerProperty.find((vpp) => vpp.property === "scale")?.value ?? 1;
     const xOffset = valuesPerProperty.find((vpp) => vpp.property === "xOffset")?.value ?? 0;
     const yOffset = valuesPerProperty.find((vpp) => vpp.property === "yOffset")?.value ?? 0;
     const rotation = valuesPerProperty.find((vpp) => vpp.property === "rotation")?.value ?? 0;
