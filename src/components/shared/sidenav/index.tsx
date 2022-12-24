@@ -26,6 +26,7 @@ import SpotifyController from "../spotify-controller";
 import { Grid, ListItemButton } from "@mui/material";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
+import { showError, toastSubject } from "services/shared/toast-messages";
 
 const drawerWidth = 240;
 
@@ -116,7 +117,7 @@ export default function SideNav({ pageName, children }: Props) {
             </Grid>
             <Grid item xs container direction="column">
               <Grid display="flex" justifyContent="center">
-                <Button fullWidth color="error" onClick={() => alert("I do nothing, so no emergency stop! 🙃")}>
+                <Button fullWidth color="error" onClick={() => showError(toastSubject.NotImplemented)}>
                   Emergency stop
                 </Button>
               </Grid>
@@ -136,7 +137,6 @@ export default function SideNav({ pageName, children }: Props) {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
-            backgroundColor: "#22334f",
           },
         }}
         variant="persistent"

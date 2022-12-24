@@ -1,16 +1,4 @@
-import {
-  Button,
-  Divider,
-  Fade,
-  FormControlLabel,
-  Grid,
-  IconButton,
-  LinearProgress,
-  Menu,
-  Switch,
-  Tooltip,
-  Zoom,
-} from "@mui/material";
+import { Button, Fade, FormControlLabel, IconButton, LinearProgress, Link, Menu, Switch, Tooltip } from "@mui/material";
 import React, { useEffect } from "react";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
@@ -107,7 +95,7 @@ export default function SpotifyController() {
       );
     } else {
       return (
-        <Button variant="contained" onClick={() => (window.location.href = paths.Settings)}>
+        <Button variant="contained" href={paths.Settings}>
           Login to Spotify to use this component
         </Button>
       );

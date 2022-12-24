@@ -60,15 +60,8 @@ export const getCenterOfPoints = (points: Point[], xOffset: number, yOffset: num
     return { x: 0, y: 0 };
   }
 
-  const sortedXAxis = points.sort((a, b) => a.x - b.x);
-  const left = sortedXAxis[0].x;
-  const right = sortedXAxis[pointsLength - 1].x;
+  const centerX = points.map((p) => p.x).reduce((previousX, currentX) => previousX + currentX) / pointsLength;
+  const centerY = points.map((p) => p.y).reduce((previousY, currentX) => previousY + currentX) / pointsLength;
 
-  const sortedYAxis = points.sort((a, b) => a.y - b.y);
-  const bottom = sortedYAxis[0].y;
-  const top = sortedYAxis[pointsLength - 1].y;
-
-  const centerX = (right - left) / 2 + xOffset;
-  const centerY = (top - bottom) / 2 - yOffset;
   return { x: centerX, y: centerY };
 };

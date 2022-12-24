@@ -32,26 +32,26 @@ export default function PointsSection({
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsPerPage, setItemsPerPage] = useState<number>(25);
 
-  /*const updatePointProperty = (points: Point[], params: GridCellEditCommitParams) => {
-    let updatedPoints: Point[] = [...points];
-    const pointToUpdateIndex: number = updatedPoints.findIndex((p: Point) => p.uuid === params.id);
+  const updatePointProperty = (pointToUpdate: Point, value: any, property: string) => {
+    let updatedPoints: Point[] = [...pattern.points];
+    const pointToUpdateIndex: number = updatedPoints.findIndex((p: Point) => p.uuid === pointToUpdate.uuid);
 
     if (pointToUpdateIndex === -1) {
       return;
     }
 
-    switch (params.field) {
+    switch (property) {
       case "connectedToPointOrderNr":
-        if (params.value === "None") {
+        if (value === "None") {
           updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = null;
         } else {
-          const substringIndex = params.value.indexOf("Point") + 5;
-          updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = Number(params.value.substring(substringIndex));
+          const substringIndex = value.indexOf("Point") + 5;
+          updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = Number(value.substring(substringIndex));
         }
 
         break;
       case "x":
-        const x = Number(params.value);
+        const x = Number(value);
         if (x > 4000 || x < -4000) {
           showError(toastSubject.pointsBoundaryError);
           break;
@@ -59,7 +59,7 @@ export default function PointsSection({
         updatedPoints[pointToUpdateIndex].x = x;
         break;
       case "y":
-        const y = Number(params.value);
+        const y = Number(value);
         if (y > 4000 || y < -4000) {
           showError(toastSubject.pointsBoundaryError);
           break;
@@ -67,21 +67,21 @@ export default function PointsSection({
         updatedPoints[pointToUpdateIndex].y = y;
         break;
       case "colorRgb":
-        updatedPoints[pointToUpdateIndex] = setLaserPowerFromHexString(params.value, {
+        updatedPoints[pointToUpdateIndex] = setLaserPowerFromHexString(value, {
           ...updatedPoints[pointToUpdateIndex],
         });
         break;
       case "order":
-        const pointOrderToSwapIndex = updatedPoints.findIndex((p) => p.orderNr === Number(params.value));
+        const pointOrderToSwapIndex = updatedPoints.findIndex((p) => p.orderNr === Number(value));
         updatedPoints[pointOrderToSwapIndex].orderNr = updatedPoints[pointToUpdateIndex].orderNr;
-        updatedPoints[pointToUpdateIndex].orderNr = Number(params.value);
+        updatedPoints[pointToUpdateIndex].orderNr = Number(value);
         break;
       default:
         break;
     }
 
     updatePatternProperty("points", updatedPoints);
-  };*/
+  };
 
   const deleteSelectedPoints = () => {
     if (selectedPointsUuid.length < 1) {
@@ -179,7 +179,8 @@ export default function PointsSection({
               <label>{`Point ${point.orderNr + 1}`}</label>
               <TextField
                 style={{ marginLeft: "35px" }}
-                value={point.x}
+                defaultValue={point.x}
+                onChange={(e) => updatePointProperty(point, e.target.value, "x")}
                 placeholder="x"
                 type="number"
                 inputProps={{ min: -4000, max: 4000 }}
@@ -187,7 +188,8 @@ export default function PointsSection({
               />
               <TextField
                 style={{ marginLeft: "35px" }}
-                value={point.y}
+                defaultValue={point.y}
+                onChange={(e) => updatePointProperty(point, e.target.value, "y")}
                 placeholder="y"
                 type="number"
                 inputProps={{ min: -4000, max: 4000 }}
@@ -195,7 +197,11 @@ export default function PointsSection({
               />
               <FormControl style={{ marginLeft: "35px", width: "125px" }}>
                 <small style={{ color: "rgba(255, 255, 255, 0.7)" }}>Connected to</small>
-                <Select value={point.connectedToPointOrderNr} label="Connected to">
+                <Select
+                  value={point.connectedToPointOrderNr}
+                  label="Connected to"
+                  onChange={(e) => updatePointProperty(point, e.target.value, "orderNr")}
+                >
                   {connectablePoints}
                 </Select>
               </FormControl>

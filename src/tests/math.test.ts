@@ -51,6 +51,23 @@ test("getCenterOfPoints bottom triangle test", () => {
   expect(result).toStrictEqual(expectedResult);
 });
 
+test("getCenterOfPoints two points test", () => {
+  const testPoints = generatePointsTestSet([
+    {
+      x: 0,
+      y: 1000,
+    },
+    {
+      x: 0,
+      y: -1000,
+    },
+  ]);
+
+  const result = getCenterOfPoints(testPoints, 0, 0);
+  const expectedResult = { x: -0, y: 0 };
+  expect(result).toStrictEqual(expectedResult);
+});
+
 test("rotatePoint test", () => {
   const testPoint = generatePointsTestSet([{ x: -1000, y: 0 }]);
   const rotatedTestPoint = rotatePoints(testPoint, 90, 0, 0)[0];

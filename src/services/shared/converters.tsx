@@ -54,7 +54,7 @@ export const applyParametersToPointsForCanvas = (
     point.x *= scale;
     point.y *= scale;
     point.x += xOffset;
-    point.y -= yOffset;
+    point.y += yOffset;
     pointsWithOffsetApplied.push(point);
   }
 
@@ -73,7 +73,7 @@ export const convertPointsToCanvasSize = (points: Point[]) => {
   for (let i = 0; i < pointsLength; i++) {
     let point = { ...points[i] };
     point.x = mapNumber(point.x, -4000, 4000, 0, canvasPxSize);
-    point.y = mapNumber(point.y, -4000, 4000, 0, canvasPxSize);
+    point.y = mapNumber(point.y, -4000, 4000, canvasPxSize, 0);
     mappedPoints.push(point);
   }
 

@@ -38,7 +38,7 @@ export const getPatternPlaceHolder = (): Pattern => ({
   rotation: 0,
   points: [],
   name: getRandomObjectName(),
-  scale: 4,
+  scale: 1,
   xOffset: 0,
   yOffset: 0,
 });

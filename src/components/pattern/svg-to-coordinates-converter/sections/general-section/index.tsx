@@ -101,7 +101,7 @@ export default function GeneralSection({
           <Button
             style={{ marginLeft: "10px" }}
             onClick={() =>
-              window.confirm("Are you sure you want to reset this value?") ? updatePatternProperty("scale", 4) : null
+              window.confirm("Are you sure you want to reset this value?") ? updatePatternProperty("scale", 1) : null
             }
           >
             Reset
