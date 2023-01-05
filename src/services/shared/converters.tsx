@@ -1,10 +1,11 @@
+import { rgbToHex } from "@mui/material";
 import { Animation, animationPlaceholder } from "models/components/shared/animation";
 import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
 import { canvasPxSize } from "./config";
 import { getCenterOfPoints, mapNumber, rotatePoints } from "./math";
 
-export const rgbColorStringFromPoint = (point: Point): string =>
+export const getRgbColorStringFromPoint = (point: Point): string =>
   `rgb(${point.redLaserPowerPwm},${point.greenLaserPowerPwm},${point.blueLaserPowerPwm})`;
 
 const hexToRgb = (hex: string) => {
@@ -19,6 +20,8 @@ const hexToRgb = (hex: string) => {
     b: parseInt(result[3], 16),
   };
 };
+
+export const getHexColorStringFromPoint = (point: Point): string => rgbToHex(getRgbColorStringFromPoint(point));
 
 export const setLaserPowerFromHexString = (hex: string, point: Point): Point => {
   const rgb = hexToRgb(hex);

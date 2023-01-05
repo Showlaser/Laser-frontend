@@ -1,13 +1,17 @@
 import { Point } from "models/components/shared/point";
 import {
+  Alert,
   Checkbox,
   Divider,
+  Fade,
   FormControl,
+  hexToRgb,
   IconButton,
   List,
   ListItem,
   ListItemIcon,
   MenuItem,
+  rgbToHex,
   Select,
   TablePagination,
   TextField,
@@ -16,11 +20,16 @@ import {
 import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { SectionProps } from "models/components/shared/pattern";
-import { rgbColorStringFromPoint, setLaserPowerFromHexString } from "services/shared/converters";
+import {
+  getHexColorStringFromPoint,
+  getRgbColorStringFromPoint,
+  setLaserPowerFromHexString,
+} from "services/shared/converters";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import { numberIsBetweenOrEqual } from "services/shared/math";
 import AddIcon from "@mui/icons-material/Add";
 import { getPointsPlaceHolder } from "services/shared/points";
+import { OnTrue } from "components/shared/on-true";
 
 export default function PointsSection({
   pattern,
@@ -31,6 +40,7 @@ export default function PointsSection({
 }: SectionProps) {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsPerPage, setItemsPerPage] = useState<number>(25);
+  const [showColorWarning, setShowColorWarning] = React.useState<boolean>(false);
 
   const updatePointProperty = (pointToUpdate: Point, value: any, property: string) => {
     let updatedPoints: Point[] = [...pattern.points];
@@ -90,9 +100,11 @@ export default function PointsSection({
 
     const newPoints = pattern.points.filter((pp) => !selectedPointsUuid.some((spu) => spu === pp.uuid));
     newPoints.forEach((np, index) => (np.orderNr = index));
-    updatePatternProperty("points", newPoints);
 
     const selectedPoints = selectedPointsUuid.filter((spu) => newPoints.some((np) => np.uuid === spu));
+    const pageNumberToSet = Math.floor((newPoints.length - 1) / itemsPerPage);
+    setCurrentPage(pageNumberToSet);
+    updatePatternProperty("points", newPoints);
     setSelectedPointsUuid(selectedPoints);
   };
 
@@ -127,6 +139,9 @@ export default function PointsSection({
     let updatedPattern = { ...pattern };
     const newPoint = getPointsPlaceHolder(updatedPattern.uuid, updatedPattern.points.length);
     updatedPattern.points.push(newPoint);
+
+    const pageNumberToSet = Math.floor((updatedPattern.points.length - 1) / itemsPerPage);
+    setCurrentPage(pageNumberToSet);
     setPattern(updatedPattern);
   };
 
@@ -164,9 +179,16 @@ export default function PointsSection({
         <Divider />
       </div>
       <div style={{ height: 400, width: "100%", overflowY: "scroll" }}>
+        <OnTrue onTrue={showColorWarning}>
+          <Fade in={showColorWarning} timeout={1000}>
+            <Alert severity="warning">
+              Warning! The color changes are only applied when clicking next to the color picker!
+            </Alert>
+          </Fade>
+        </OnTrue>
         <List>
           {pointsToRender.map((point, index) => (
-            <ListItem>
+            <ListItem key={`points-section-${point.uuid}`}>
               <ListItemIcon onClick={(e: any) => onToggle(point.uuid, e.target.checked)}>
                 <Checkbox
                   edge="start"
@@ -179,7 +201,7 @@ export default function PointsSection({
               <label>{`Point ${point.orderNr + 1}`}</label>
               <TextField
                 style={{ marginLeft: "35px" }}
-                defaultValue={point.x}
+                defaultValue={point.x ?? undefined}
                 onChange={(e) => updatePointProperty(point, e.target.value, "x")}
                 placeholder="x"
                 type="number"
@@ -188,7 +210,7 @@ export default function PointsSection({
               />
               <TextField
                 style={{ marginLeft: "35px" }}
-                defaultValue={point.y}
+                defaultValue={point.y ?? undefined}
                 onChange={(e) => updatePointProperty(point, e.target.value, "y")}
                 placeholder="y"
                 type="number"
@@ -198,13 +220,25 @@ export default function PointsSection({
               <FormControl style={{ marginLeft: "35px", width: "125px" }}>
                 <small style={{ color: "rgba(255, 255, 255, 0.7)" }}>Connected to</small>
                 <Select
-                  value={point.connectedToPointOrderNr}
+                  value={point.connectedToPointOrderNr ?? ""}
                   label="Connected to"
                   onChange={(e) => updatePointProperty(point, e.target.value, "orderNr")}
                 >
                   {connectablePoints}
                 </Select>
               </FormControl>
+              <TextField
+                onClick={() => setShowColorWarning(true)}
+                style={{ marginLeft: "35px", width: "100px" }}
+                defaultValue={getHexColorStringFromPoint(point) ?? "#ffffff"}
+                onBlur={(e) => {
+                  setShowColorWarning(false);
+                  updatePointProperty(point, e.target.value, "colorRgb");
+                }}
+                placeholder="Color"
+                type="color"
+                label="Color"
+              />
             </ListItem>
           ))}
         </List>

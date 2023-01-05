@@ -1,7 +1,7 @@
 import { Point } from "models/components/shared/point";
 import React, { useEffect } from "react";
 import { prepareCanvas } from "services/logic/svg-to-coordinates-converter";
-import { rgbColorStringFromPoint } from "services/shared/converters";
+import { getRgbColorStringFromPoint } from "services/shared/converters";
 
 type Props = {
   selectedPointsUuid?: string[];
@@ -43,7 +43,7 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
     screenScale: number
   ) => {
     let dotThickness: number = 2;
-    let color: string = rgbColorStringFromPoint(point);
+    let color: string = getRgbColorStringFromPoint(point);
     if (pointIsHighlighted) {
       color = "#4287f5";
       dotThickness = 3;

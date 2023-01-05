@@ -106,7 +106,7 @@ export default function SideNav({ pageName, children }: Props) {
                 <IconButton
                   color="inherit"
                   aria-label="open drawer"
-                  onClick={handleDrawerOpen}
+                  onClick={() => handleDrawerOpen()}
                   edge="start"
                   sx={{ mr: 2, ...(open && { display: "none" }) }}
                 >
@@ -117,7 +117,7 @@ export default function SideNav({ pageName, children }: Props) {
             </Grid>
             <Grid item xs container direction="column">
               <Grid display="flex" justifyContent="center">
-                <Button fullWidth color="error" onClick={() => showError(toastSubject.NotImplemented)}>
+                <Button fullWidth color="error" onClick={() => showError(toastSubject.notImplemented)}>
                   Emergency stop
                 </Button>
               </Grid>
