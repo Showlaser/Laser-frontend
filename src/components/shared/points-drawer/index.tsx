@@ -59,7 +59,7 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
         ctx.fillStyle = "#4287f5";
       }
 
-      ctx.fillText(index.toString(), point.x, point.y);
+      ctx.fillText((index + 1).toString(), point.x, point.y);
     }
 
     if (point.connectedToPointOrderNr !== null && point.connectedToPointOrderNr >= 0) {

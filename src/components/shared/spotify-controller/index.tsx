@@ -1,4 +1,15 @@
-import { Button, Fade, FormControlLabel, IconButton, LinearProgress, Link, Menu, Switch, Tooltip } from "@mui/material";
+import {
+  Button,
+  Fade,
+  FormControlLabel,
+  IconButton,
+  LinearProgress,
+  Link,
+  Menu,
+  Skeleton,
+  Switch,
+  Tooltip,
+} from "@mui/material";
 import React, { useEffect } from "react";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
@@ -64,31 +75,54 @@ export default function SpotifyController() {
     await pausePlayer();
   };
 
+  const isLoading = player?.item === undefined;
+
   const getComponentsByLoginState = () => {
     if (userIsLoggedIntoSpotify) {
+      const imageUrl = player?.item?.album?.images?.at(1)?.url ?? player?.item?.album?.images?.at(0)?.url;
       return (
         <div style={{ padding: "20px" }}>
           <Fade in={open} timeout={1000}>
             <span>
-              <FormControlLabel control={<Switch key="lgc-switch" />} label="Enable lasershow generation" />
+              {imageUrl === undefined ? (
+                <Skeleton animation="wave" variant="rectangular" width={300} height={282.5} />
+              ) : (
+                <Fade style={{ width: 300, height: 300 }} in={imageUrl !== undefined} timeout={1000}>
+                  <img src={imageUrl} />
+                </Fade>
+              )}
               <br />
-              <small>{`Bpm: ${parseInt(songData?.tempo)}`}</small>
+              <FormControlLabel
+                disabled={isLoading}
+                control={<Switch key="lgc-switch" />}
+                label="Enable lasershow generation"
+              />
               <br />
-              <small>{`Song: ${player?.item?.name}`}</small>
+              <small style={{ color: isLoading ? "gray" : "whitesmoke" }}>{`Bpm: ${parseInt(
+                songData?.tempo ?? 0
+              )}`}</small>
               <br />
-              <IconButton onClick={previousSong} size="small">
+              <small style={{ color: isLoading ? "gray" : "whitesmoke" }}>{`Song: ${
+                player?.item?.name ?? "loading"
+              }`}</small>
+              <br />
+              <IconButton disabled={isLoading} onClick={previousSong} size="small">
                 <SkipPreviousIcon />
               </IconButton>
-              <IconButton size="small" onClick={() => (player?.is_playing ? onPause() : onPlay())}>
+              <IconButton disabled={isLoading} size="small" onClick={() => (player?.is_playing ? onPause() : onPlay())}>
                 {player?.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
               </IconButton>
-              <IconButton size="small" onClick={skipSong}>
+              <IconButton disabled={isLoading} size="small" onClick={skipSong}>
                 <SkipNextIcon />
               </IconButton>
-              <LinearProgress
-                variant="determinate"
-                value={mapNumber(player?.progress_ms, 0, player?.item?.duration_ms, 0, 100)}
-              />
+              {isLoading ? (
+                <Skeleton animation="wave" variant="rectangular" width={300} height={4} />
+              ) : (
+                <LinearProgress
+                  variant="determinate"
+                  value={mapNumber(player?.progress_ms, 0, player?.item?.duration_ms, 0, 100)}
+                />
+              )}
             </span>
           </Fade>
         </div>

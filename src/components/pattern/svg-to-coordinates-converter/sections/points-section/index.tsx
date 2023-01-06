@@ -1,6 +1,7 @@
 import { Point } from "models/components/shared/point";
 import {
   Alert,
+  Autocomplete,
   Checkbox,
   Divider,
   Fade,
@@ -56,7 +57,7 @@ export default function PointsSection({
           updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = null;
         } else {
           const substringIndex = value.indexOf("Point") + 5;
-          updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = Number(value.substring(substringIndex));
+          updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = Number(value.substring(substringIndex)) - 1;
         }
 
         break;
@@ -82,9 +83,13 @@ export default function PointsSection({
         });
         break;
       case "order":
-        const pointOrderToSwapIndex = updatedPoints.findIndex((p) => p.orderNr === Number(value));
-        updatedPoints[pointOrderToSwapIndex].orderNr = updatedPoints[pointToUpdateIndex].orderNr;
-        updatedPoints[pointToUpdateIndex].orderNr = Number(value);
+        const substringIndex = value.indexOf("Point") + 5;
+        const actualValue = Number(value.substring(substringIndex)) - 1;
+        const pointToSwapOrderWithIndex = updatedPoints.findIndex((p) => p.orderNr === actualValue);
+        const pointToSwapOrderWithOrderNr = updatedPoints[pointToSwapOrderWithIndex].orderNr;
+
+        updatedPoints[pointToSwapOrderWithIndex].orderNr = updatedPoints[pointToUpdateIndex].orderNr;
+        updatedPoints[pointToUpdateIndex].orderNr = pointToSwapOrderWithOrderNr;
         break;
       default:
         break;
@@ -148,9 +153,16 @@ export default function PointsSection({
   const toggleAllPoints = (checked: boolean) =>
     checked ? setSelectedPointsUuid(pattern.points.map((p) => p.uuid)) : setSelectedPointsUuid([]);
 
-  const connectablePoints = [...pattern?.points]
-    .sort((a, b) => a.orderNr - b.orderNr)
-    .map((p) => <MenuItem value={p.orderNr} key={`sp-${p.orderNr}`}>{`Point ${p.orderNr + 1}`}</MenuItem>);
+  const getConnectablePoints = () => {
+    let points = [...pattern?.points]
+      .sort((a, b) => a.orderNr - b.orderNr)
+      .map((p) => ({ label: `Point ${p.orderNr + 1}` }));
+
+    points.unshift({ label: "None" });
+    return points;
+  };
+
+  const connectablePoints = getConnectablePoints();
 
   const onRowsPerPageChange = (itemsPerRow: number) => {
     setItemsPerPage(itemsPerRow);
@@ -182,7 +194,7 @@ export default function PointsSection({
         <OnTrue onTrue={showColorWarning}>
           <Fade in={showColorWarning} timeout={1000}>
             <Alert severity="warning">
-              Warning! The color changes are only applied when clicking next to the color picker!
+              Warning! Color changes are only applied when clicking next to the color picker!
             </Alert>
           </Fade>
         </OnTrue>
@@ -198,7 +210,21 @@ export default function PointsSection({
                   inputProps={{ "aria-labelledby": `points-label-${index}` }}
                 />
               </ListItemIcon>
-              <label>{`Point ${point.orderNr + 1}`}</label>
+              <FormControl style={{ marginLeft: "35px", width: "125px" }}>
+                <Autocomplete
+                  key={`${point.orderNr}-${point.uuid}`}
+                  defaultValue={{
+                    label: `Point ${point.orderNr + 1}`,
+                  }}
+                  disableClearable
+                  onChange={(e, value) => updatePointProperty(point, value?.label, "order")}
+                  disablePortal
+                  options={connectablePoints.filter(
+                    (cp) => cp.label !== `Point ${point.orderNr + 1}` && cp.label !== "None"
+                  )}
+                  renderInput={(params) => <TextField {...params} label="Point order" />}
+                />
+              </FormControl>
               <TextField
                 style={{ marginLeft: "35px" }}
                 defaultValue={point.x ?? undefined}
@@ -218,14 +244,16 @@ export default function PointsSection({
                 label="Y"
               />
               <FormControl style={{ marginLeft: "35px", width: "125px" }}>
-                <small style={{ color: "rgba(255, 255, 255, 0.7)" }}>Connected to</small>
-                <Select
-                  value={point.connectedToPointOrderNr ?? ""}
-                  label="Connected to"
-                  onChange={(e) => updatePointProperty(point, e.target.value, "orderNr")}
-                >
-                  {connectablePoints}
-                </Select>
+                <Autocomplete
+                  defaultValue={{
+                    label: point.connectedToPointOrderNr === null ? "None" : `Point ${point.connectedToPointOrderNr}`,
+                  }}
+                  disableClearable
+                  onChange={(e, value) => updatePointProperty(point, value?.label, "connectedToPointOrderNr")}
+                  disablePortal
+                  options={connectablePoints.filter((cp) => cp.label !== `Point ${point.orderNr + 1}`)}
+                  renderInput={(params) => <TextField {...params} label="Connected to point" />}
+                />
               </FormControl>
               <TextField
                 onClick={() => setShowColorWarning(true)}
