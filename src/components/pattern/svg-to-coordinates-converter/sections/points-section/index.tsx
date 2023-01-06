@@ -190,7 +190,7 @@ export default function PointsSection({
         </Tooltip>
         <Divider />
       </div>
-      <div style={{ height: 400, width: "100%", overflowY: "scroll" }}>
+      <div style={{ height: 500, width: "100%", overflowY: "scroll" }}>
         <OnTrue onTrue={showColorWarning}>
           <Fade in={showColorWarning} timeout={1000}>
             <Alert severity="warning">
