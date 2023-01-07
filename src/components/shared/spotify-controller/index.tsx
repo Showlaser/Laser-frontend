@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Fade,
   FormControlLabel,
@@ -31,6 +32,7 @@ export default function SpotifyController() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [songData, setSongData] = React.useState<any>({});
   const [player, setPlayer] = React.useState<any>({});
+  const [refreshAttempts, setRefreshAttempts] = React.useState<number>(0);
   const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -54,18 +56,14 @@ export default function SpotifyController() {
       return;
     }
 
-    const playerResult = await getPlayerStatus();
+    const playerResult = await getPlayerState();
     if (playerResult?.item?.id !== songData?.id) {
-      const trackResult = await getTrackData(playerResult);
+      const trackResult = await getTrackAudioFeatures(playerResult?.item?.id ?? "");
       setSongData(trackResult);
     }
 
     setPlayer(playerResult);
   };
-
-  const getPlayerStatus = async () => await getPlayerState();
-
-  const getTrackData = async (playerResult: any) => await getTrackAudioFeatures(playerResult?.item?.id ?? "");
 
   const onPlay = async () => {
     await startPlayer();
@@ -78,62 +76,71 @@ export default function SpotifyController() {
   const isLoading = player?.item === undefined;
 
   const getComponentsByLoginState = () => {
-    if (userIsLoggedIntoSpotify) {
-      const imageUrl = player?.item?.album?.images?.at(1)?.url ?? player?.item?.album?.images?.at(0)?.url;
-      return (
-        <div style={{ padding: "20px" }}>
-          <Fade in={open} timeout={1000}>
-            <span>
-              {imageUrl === undefined ? (
-                <Skeleton animation="wave" variant="rectangular" width={300} height={282.5} />
-              ) : (
-                <Fade style={{ width: 300, height: 300 }} in={imageUrl !== undefined} timeout={1000}>
-                  <img src={imageUrl} />
-                </Fade>
-              )}
-              <br />
-              <FormControlLabel
-                disabled={isLoading}
-                control={<Switch key="lgc-switch" />}
-                label="Enable lasershow generation"
-              />
-              <br />
-              <small style={{ color: isLoading ? "gray" : "whitesmoke" }}>{`Bpm: ${parseInt(
-                songData?.tempo ?? 0
-              )}`}</small>
-              <br />
-              <small style={{ color: isLoading ? "gray" : "whitesmoke" }}>{`Song: ${
-                player?.item?.name ?? "loading"
-              }`}</small>
-              <br />
-              <IconButton disabled={isLoading} onClick={previousSong} size="small">
-                <SkipPreviousIcon />
-              </IconButton>
-              <IconButton disabled={isLoading} size="small" onClick={() => (player?.is_playing ? onPause() : onPlay())}>
-                {player?.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
-              </IconButton>
-              <IconButton disabled={isLoading} size="small" onClick={skipSong}>
-                <SkipNextIcon />
-              </IconButton>
-              {isLoading ? (
-                <Skeleton animation="wave" variant="rectangular" width={300} height={4} />
-              ) : (
-                <LinearProgress
-                  variant="determinate"
-                  value={mapNumber(player?.progress_ms, 0, player?.item?.duration_ms, 0, 100)}
-                />
-              )}
-            </span>
-          </Fade>
-        </div>
-      );
-    } else {
+    if (!userIsLoggedIntoSpotify) {
       return (
         <Button variant="contained" href={paths.Settings}>
           Login to Spotify to use this component
         </Button>
       );
     }
+
+    const activeSpotifySessionOnLoggedInUserAccount = player?.device !== undefined;
+    if (!activeSpotifySessionOnLoggedInUserAccount) {
+      return (
+        <div style={{ margin: "10px" }}>
+          <Alert severity="error">Please open Spotify on a device and play a song</Alert>
+        </div>
+      );
+    }
+
+    const imageUrl = player?.item?.album?.images?.at(1)?.url ?? player?.item?.album?.images?.at(0)?.url;
+    return (
+      <div style={{ padding: "20px" }}>
+        <Fade in={open} timeout={1000}>
+          <span>
+            {imageUrl === undefined ? (
+              <Skeleton animation="wave" variant="rectangular" width={300} height={282.5} />
+            ) : (
+              <Fade style={{ width: 300, height: 300 }} in={imageUrl !== undefined} timeout={1000}>
+                <img src={imageUrl} />
+              </Fade>
+            )}
+            <br />
+            <FormControlLabel
+              disabled={isLoading}
+              control={<Switch key="lgc-switch" />}
+              label="Enable lasershow generation"
+            />
+            <br />
+            <small style={{ color: isLoading ? "gray" : "whitesmoke" }}>{`Bpm: ${parseInt(
+              songData?.tempo ?? 0
+            )}`}</small>
+            <br />
+            <small style={{ color: isLoading ? "gray" : "whitesmoke" }}>{`Song: ${
+              player?.item?.name ?? "loading"
+            }`}</small>
+            <br />
+            <IconButton disabled={isLoading} onClick={previousSong} size="small">
+              <SkipPreviousIcon />
+            </IconButton>
+            <IconButton disabled={isLoading} size="small" onClick={() => (player?.is_playing ? onPause() : onPlay())}>
+              {player?.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
+            </IconButton>
+            <IconButton disabled={isLoading} size="small" onClick={skipSong}>
+              <SkipNextIcon />
+            </IconButton>
+            {isLoading ? (
+              <Skeleton animation="wave" variant="rectangular" width={300} height={4} />
+            ) : (
+              <LinearProgress
+                variant="determinate"
+                value={mapNumber(player?.progress_ms, 0, player?.item?.duration_ms, 0, 100)}
+              />
+            )}
+          </span>
+        </Fade>
+      </div>
+    );
   };
 
   return (
@@ -158,7 +165,7 @@ export default function SpotifyController() {
           horizontal: "center",
         }}
       >
-        {getComponentsByLoginState()}{" "}
+        {getComponentsByLoginState()}
       </Menu>
     </>
   );

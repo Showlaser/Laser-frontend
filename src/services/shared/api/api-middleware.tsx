@@ -2,6 +2,7 @@ import paths from "../router-paths";
 import { showError, toastSubject, showSuccess } from "../toast-messages";
 import { Post } from "./api-actions";
 import apiEndpoints from "./api-endpoints";
+import Cookies from "universal-cookie";
 
 const handleErrorMessage = (statusCode: number, ignoredStatusCodes: number[]) => {
   if (ignoredStatusCodes.includes(statusCode)) {
@@ -22,12 +23,36 @@ const handleErrorMessage = (statusCode: number, ignoredStatusCodes: number[]) =>
   showError(subject !== undefined ? subject : toastSubject.apiUnavailable);
 };
 
+const refreshUserTokensIfExpired = async () => {
+  const cookie = new Cookies();
+  const loginCookie = cookie.get("logged-in");
+  const loginTime = Date.parse(loginCookie?.loginTime);
+  const currentTime = Date.now();
+  const jwtExpirationTimeMs = 300000;
+
+  if (currentTime - loginTime > jwtExpirationTimeMs) {
+    const refreshResponse: any = await Post(apiEndpoints.refreshToken, null);
+    if (refreshResponse.status !== 200 && !window.location.href.includes("login")) {
+      return false;
+    }
+  }
+
+  cookie.set("logged-in", { loginTime: currentTime });
+  return true;
+};
+
 export async function sendRequest(
   requestFunction: () => Promise<Response>,
   ignoredStatusCodes: number[],
   onSuccessToastSubject: any = null,
   redirectToLoginOnError: boolean = true
 ) {
+  const success = refreshUserTokensIfExpired();
+  if (redirectToLoginOnError && !success) {
+    const redirectTo = window.location.href;
+    window.location.href = `${paths.Login}?redirect=${redirectTo}`;
+  }
+
   let response;
   try {
     response = await requestFunction();
@@ -36,14 +61,6 @@ export async function sendRequest(
     }
     if (response.status === 401) {
       // tokens are set by cookies
-      const refreshResponse: any = await Post(apiEndpoints.refreshToken, null);
-      if (refreshResponse.status !== 200 && !window.location.href.includes("login")) {
-        if (redirectToLoginOnError) {
-          const redirectTo = window.location.href;
-          window.location.href = `${paths.Login}?redirect=${redirectTo}`;
-        }
-        return;
-      }
 
       response = await requestFunction();
     }

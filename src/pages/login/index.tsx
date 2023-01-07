@@ -10,34 +10,37 @@ import "./index.css";
 export default function Login() {
   const [submitInProgress, setSubmitInProgress] = useState(false);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitInProgress(true);
     const json = getFormDataObject(e);
-    login(json).then((result) => {
-      setSubmitInProgress(false);
-      if (result?.status === 200) {
-        const cookie = new Cookies();
-        cookie.set("LoggedIn", true, {
+    const result = await login(json);
+    setSubmitInProgress(false);
+    if (result?.status === 200) {
+      const cookie = new Cookies();
+      cookie.set(
+        "logged-in",
+        { loginTime: Date.now() },
+        {
           path: "/",
           sameSite: true,
-        });
-
-        let redirectUrl = getCodeFromResponse();
-        if (stringIsEmpty(redirectUrl)) {
-          redirectUrl = paths.Dashboard;
         }
+      );
 
-        const termsAndConditionsAccepted = localStorage.getItem("terms-accepted");
-        window.location.href = termsAndConditionsAccepted ? redirectUrl : paths.Disclaimer;
-        return;
-      } else if (result?.status === 451) {
-        showError(toastSubject.accountDisabled);
-        return;
+      let redirectUrl = getCodeFromResponse();
+      if (stringIsEmpty(redirectUrl)) {
+        redirectUrl = paths.Dashboard;
       }
 
-      showError(toastSubject.invalidLoginCredentials);
-    });
+      const termsAndConditionsAccepted = localStorage.getItem("terms-accepted");
+      window.location.href = termsAndConditionsAccepted ? redirectUrl : paths.Disclaimer;
+      return;
+    } else if (result?.status === 451) {
+      showError(toastSubject.accountDisabled);
+      return;
+    }
+
+    showError(toastSubject.invalidLoginCredentials);
   };
 
   return (
