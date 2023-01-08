@@ -26,18 +26,20 @@ const handleErrorMessage = (statusCode: number, ignoredStatusCodes: number[]) =>
 const refreshUserTokensIfExpired = async () => {
   const cookie = new Cookies();
   const loginCookie = cookie.get("logged-in");
-  const loginTime = Date.parse(loginCookie?.loginTime);
+  const loginTime = Number(loginCookie?.loginTime);
   const currentTime = Date.now();
   const jwtExpirationTimeMs = 300000;
 
-  if (currentTime - loginTime > jwtExpirationTimeMs) {
+  const jwtExpired = currentTime - loginTime > jwtExpirationTimeMs;
+  if (jwtExpired) {
     const refreshResponse: any = await Post(apiEndpoints.refreshToken, null);
     if (refreshResponse.status !== 200 && !window.location.href.includes("login")) {
       return false;
     }
+
+    cookie.set("logged-in", { loginTime: currentTime });
   }
 
-  cookie.set("logged-in", { loginTime: currentTime });
   return true;
 };
 
@@ -47,7 +49,7 @@ export async function sendRequest(
   onSuccessToastSubject: any = null,
   redirectToLoginOnError: boolean = true
 ) {
-  const success = refreshUserTokensIfExpired();
+  const success = await refreshUserTokensIfExpired();
   if (redirectToLoginOnError && !success) {
     const redirectTo = window.location.href;
     window.location.href = `${paths.Login}?redirect=${redirectTo}`;

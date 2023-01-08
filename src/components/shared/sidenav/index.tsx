@@ -27,6 +27,7 @@ import { Grid, ListItemButton } from "@mui/material";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
 import { showError, toastSubject } from "services/shared/toast-messages";
+import AccountPopover from "../account-popover";
 
 const drawerWidth = 240;
 
@@ -125,6 +126,7 @@ export default function SideNav({ pageName, children }: Props) {
             <Grid item xs container direction="column">
               <Grid display="flex" justifyContent="flex-end">
                 <SpotifyController />
+                <AccountPopover />
               </Grid>
             </Grid>
           </Grid>
@@ -171,21 +173,6 @@ export default function SideNav({ pageName, children }: Props) {
               title: "Lasershow Spotify connector",
               icon: <SettingsInputComponentIcon />,
               path: paths.LasershowSpotifyConnector,
-            },
-            {
-              title: "Settings",
-              icon: <SettingsIcon />,
-              path: paths.Settings,
-            },
-            {
-              title: "Account",
-              icon: <AccountCircleIcon />,
-              path: paths.Account,
-            },
-            {
-              title: "Logout",
-              icon: <LogoutIcon />,
-              path: paths.Logout,
             },
           ].map((item, index) => (
             <ListItemButton key={`side-nav-list-item-${index}`} component={Link} to={item.path}>

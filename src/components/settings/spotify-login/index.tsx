@@ -36,7 +36,7 @@ export default function SpotifyLogin() {
   };
 
   return (
-    <>
+    <div style={{ textAlign: "left" }}>
       <h2>
         <img src="icons/spotify-icon.svg" style={{ maxWidth: "20px", marginRight: "5px" }} />
         Spotify
@@ -51,6 +51,6 @@ export default function SpotifyLogin() {
           Login to Spotify
         </Button>
       )}
-    </>
+    </div>
   );
 }

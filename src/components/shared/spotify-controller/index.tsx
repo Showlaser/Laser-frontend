@@ -5,13 +5,12 @@ import {
   FormControlLabel,
   IconButton,
   LinearProgress,
-  Link,
   Menu,
   Skeleton,
   Switch,
   Tooltip,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
@@ -27,13 +26,17 @@ import {
 } from "services/logic/spotify";
 import paths from "services/shared/router-paths";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import { dataSavingIsEnabled } from "services/shared/user-settings";
+import { OnTrue } from "../on-true";
+import { useTheme } from "@mui/material";
 
 export default function SpotifyController() {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [songData, setSongData] = React.useState<any>({});
-  const [player, setPlayer] = React.useState<any>({});
-  const [refreshAttempts, setRefreshAttempts] = React.useState<number>(0);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [songData, setSongData] = useState<any>({});
+  const [player, setPlayer] = useState<any>({});
+  const [noActiveDevice, setNoActiveDevice] = useState<boolean>(false);
   const open = Boolean(anchorEl);
+  const { palette } = useTheme();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -46,7 +49,7 @@ export default function SpotifyController() {
     localStorage.getItem("SpotifyAccessToken") !== null && localStorage.getItem("SpotifyAccessToken") !== "undefined";
 
   useEffect(() => {
-    const interval = setInterval(() => getData(), 2000);
+    const interval = setInterval(() => getData(), dataSavingIsEnabled() ? 5000 : 2000);
     return () => clearInterval(interval);
   }, [player, songData]);
 
@@ -57,6 +60,13 @@ export default function SpotifyController() {
     }
 
     const playerResult = await getPlayerState();
+    if (playerResult?.device === undefined) {
+      setNoActiveDevice(true);
+      return;
+    }
+
+    setNoActiveDevice(false);
+
     if (playerResult?.item?.id !== songData?.id) {
       const trackResult = await getTrackAudioFeatures(playerResult?.item?.id ?? "");
       setSongData(trackResult);
@@ -84,8 +94,7 @@ export default function SpotifyController() {
       );
     }
 
-    const activeSpotifySessionOnLoggedInUserAccount = player?.device !== undefined;
-    if (!activeSpotifySessionOnLoggedInUserAccount) {
+    if (noActiveDevice) {
       return (
         <div style={{ margin: "10px" }}>
           <Alert severity="error">Please open Spotify on a device and play a song</Alert>
@@ -137,6 +146,9 @@ export default function SpotifyController() {
                 value={mapNumber(player?.progress_ms, 0, player?.item?.duration_ms, 0, 100)}
               />
             )}
+            <OnTrue onTrue={dataSavingIsEnabled()}>
+              <small style={{ color: palette.warning.main }}>Data saving enabled. Updating every 5 seconds</small>
+            </OnTrue>
           </span>
         </Fade>
       </div>

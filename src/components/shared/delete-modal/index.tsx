@@ -4,6 +4,7 @@ import React from "react";
 export type ModalOptions = {
   show: boolean;
   onDelete: () => void;
+  title?: string;
 };
 
 type Props = {
@@ -12,6 +13,12 @@ type Props = {
 };
 
 export default function DeleteModal({ setModalOptions, modalOptions }: Props) {
+  const onModalClose = () => {
+    let updatedModalOptions = { ...modalOptions };
+    updatedModalOptions.show = false;
+    setModalOptions(updatedModalOptions);
+  };
+
   return (
     <Modal open={modalOptions.show}>
       <Grid
@@ -23,11 +30,11 @@ export default function DeleteModal({ setModalOptions, modalOptions }: Props) {
         style={{ minHeight: "100vh" }}
       >
         <Paper sx={{ textAlign: "left", width: "60%", padding: "5px 20px 5px 20px" }}>
-          <h3>Are you sure you want to delete this item?</h3>
+          <h3>{modalOptions?.title ?? "Are you sure you want to delete this item?"}</h3>
           <Divider />
           <br />
           <div style={{ float: "right" }}>
-            <Button variant="text" onClick={() => setModalOptions({ show: false, onDelete: () => null })}>
+            <Button variant="text" onClick={onModalClose}>
               Cancel
             </Button>
             <Button
@@ -35,10 +42,7 @@ export default function DeleteModal({ setModalOptions, modalOptions }: Props) {
               color="primary"
               onClick={() => {
                 modalOptions.onDelete();
-                setModalOptions({
-                  show: false,
-                  onDelete: () => null,
-                });
+                onModalClose();
               }}
               style={{ marginLeft: "5px" }}
             >

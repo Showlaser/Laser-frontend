@@ -2,7 +2,7 @@ import "./index.css";
 import React, { useEffect, useState } from "react";
 import SideNav from "components/shared/sidenav";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-import { Button, Divider, Grid, Modal, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
+import { SpeedDial, SpeedDialAction } from "@mui/material";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
@@ -13,7 +13,7 @@ import { getAnimations, removeAnimation } from "services/logic/animation-logic";
 import { convertPatternToAnimation } from "services/shared/converters";
 import AnimationKeyFrameEditor from "components/animation/animation-keyframe-editor";
 import { Pattern } from "models/components/shared/pattern";
-import DeleteModal from "components/shared/delete-modal";
+import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
 
 export default function AnimationPage() {
   const [selectedAnimation, setSelectedAnimation] = useState<Animation | null>(null);
@@ -21,9 +21,9 @@ export default function AnimationPage() {
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
   const [convertPatternModalOpen, setConvertPatternModalOpen] = useState<boolean>(false);
   const [animationsModalOpen, setAnimationsModalOpen] = useState<boolean>(false);
-  const [modalOptions, setModalOptions] = useState<any>({
+  const [modalOptions, setModalOptions] = useState<ModalOptions>({
     show: false,
-    onDelete: null,
+    onDelete: () => null,
   });
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function AnimationPage() {
       setAvailablePatterns(patterns);
     }
 
-    setModalOptions({ show: false, onDelete: null });
+    setModalOptions({ show: false, onDelete: () => null });
   };
 
   const onAnimationDelete = async (uuid: string) => {
@@ -87,7 +87,7 @@ export default function AnimationPage() {
       setAvailableAnimations(animations);
     }
 
-    setModalOptions({ show: false, onDelete: null });
+    setModalOptions({ show: false, onDelete: () => null });
   };
 
   return (

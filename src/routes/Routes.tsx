@@ -13,7 +13,6 @@ import Registration from "pages/registration";
 import LasershowSpotifyConnector from "pages/lasershow-spotify-connector";
 import Logout from "pages/logout";
 import Disclaimer from "pages/disclaimer";
-import Settings from "pages/settings";
 import Dashboard from "pages/dashboard";
 
 function routes() {
@@ -21,7 +20,6 @@ function routes() {
     <Routes>
       <Route path={routerPaths.Login} element={<Login />} />
       <Route path={routerPaths.Dashboard} element={<Dashboard />} />
-      <Route path={routerPaths.Settings} element={<Settings />} />
       <Route path={routerPaths.PatternEditor} element={<PatternEditor />} />
       <Route path={routerPaths.Installation} element={<Installation />} />
       <Route path={routerPaths.SpotifyVote} element={<SpotifyVote />} />

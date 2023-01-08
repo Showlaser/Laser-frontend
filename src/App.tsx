@@ -5,7 +5,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { Fade } from "@mui/material";
 
 function App() {
   const theme = React.useMemo(
