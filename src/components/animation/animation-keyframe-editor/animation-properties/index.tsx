@@ -14,11 +14,11 @@ import {
 } from "@mui/material";
 
 import React from "react";
-import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Animation, AnimationPattern } from "models/components/shared/animation";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
+import { canvasPxSize } from "services/shared/config";
 
 type Props = {
   selectedAnimation: Animation | null;
@@ -193,27 +193,30 @@ export default function AnimationProperties({
     </span>
   );
 
+  const propertyStyle = { marginBottom: canvasPxSize / 4 - 95 };
+
   return (
     <>
       <Paper
-        style={{ padding: "15px", paddingTop: "2px" }}
+        style={{ padding: "15px", paddingTop: "2px", minHeight: `${canvasPxSize + 70}px` }}
         key={`${selectedAnimationPattern?.pattern.scale}-${selectedAnimationPattern?.pattern.xOffset}-${selectedAnimationPattern?.pattern.yOffset}-${selectedAnimationPattern?.pattern.rotation}`}
       >
         <p>Animation properties</p>
-        <Divider style={{ marginBottom: "10px" }} />
-        <FormLabel htmlFor="animation-scale">Scale</FormLabel>
-        <br />
-        <Input
-          id="animation-scale"
-          type="number"
-          inputProps={{ min: 0.1, max: 10, step: 0.1 }}
-          defaultValue={getPropertyValue("scale")}
-          onChange={(e) => updateProperty(Number(e.target.value))}
-          disabled={selectedKeyFrame?.propertyEdited !== "scale"}
-        />
-        {nextKeyFrameButton("scale")}
-        <br />
-        <div style={{ marginTop: "60px" }}>
+        <Divider style={propertyStyle} />
+        <div style={propertyStyle}>
+          <FormLabel htmlFor="animation-scale">Scale</FormLabel>
+          <br />
+          <Input
+            id="animation-scale"
+            type="number"
+            inputProps={{ min: 0.1, max: 10, step: 0.1 }}
+            defaultValue={getPropertyValue("scale")}
+            onChange={(e) => updateProperty(Number(e.target.value))}
+            disabled={selectedKeyFrame?.propertyEdited !== "scale"}
+          />
+          {nextKeyFrameButton("scale")}
+        </div>
+        <div style={propertyStyle}>
           <FormLabel htmlFor="animation-xoffset">X offset</FormLabel>
           <br />
           <Input
@@ -226,8 +229,7 @@ export default function AnimationProperties({
           />
           {nextKeyFrameButton("xOffset")}
         </div>
-        <br />
-        <div style={{ marginTop: "60px" }}>
+        <div style={propertyStyle}>
           <FormLabel htmlFor="animation-yoffset">Y offset</FormLabel>
           <br />
           <Input
@@ -240,7 +242,7 @@ export default function AnimationProperties({
           />
           {nextKeyFrameButton("yOffset")}
         </div>
-        <div style={{ marginTop: "70px" }}>
+        <div style={propertyStyle}>
           <FormLabel htmlFor="animation-rotation">Rotation</FormLabel>
           <br />
           <Input
@@ -253,33 +255,15 @@ export default function AnimationProperties({
           />
           {nextKeyFrameButton("rotation")}
         </div>
-        <br />
-        <Divider />
-        <Tooltip title="Remove keyframe" placement="right">
-          <span>
-            <IconButton
-              disabled={selectedKeyFrameUuid === ""}
-              style={{ marginLeft: "10px" }}
-              onClick={() => (window.confirm("Are you sure you want to remove this keyframe?") ? onRemove() : null)}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-      </Paper>
-      <br />
-      <Paper style={{ padding: "15px", paddingTop: "2px" }}>
-        <p>Animation info</p>
-        <Divider />
         <small>
           Animation duration:{" "}
-          {Math.max(...(selectedAnimationPattern?.animationKeyFrames?.map((ak) => ak?.timeMs) ?? []))}
+          {Math.max(...(selectedAnimationPattern?.animationKeyFrames?.map((ak) => ak?.timeMs) ?? [0]))} ms
         </small>
-        <br />
-        <small>Total keyframes: {selectedAnimationPattern?.animationKeyFrames?.length}</small>
         <div style={{ maxHeight: "200px", overflowY: "auto" }}>
           <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>All points</AccordionSummary>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <small>All keyframes ({selectedAnimationPattern?.animationKeyFrames?.length ?? 0})</small>
+            </AccordionSummary>
             <AccordionDetails>
               <List>
                 {selectedAnimationPattern?.animationKeyFrames?.map((keyFrame) => (

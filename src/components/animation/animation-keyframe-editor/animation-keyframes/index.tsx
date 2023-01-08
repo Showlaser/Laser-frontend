@@ -6,12 +6,11 @@ import {
   MenuItem,
   Tooltip,
   IconButton,
-  Slider,
   useTheme,
   LinearProgress,
 } from "@mui/material";
 import { Animation, AnimationKeyFrame, AnimationPattern } from "models/components/shared/animation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { createGuid, mapNumber, normalize as normalize, numberIsBetweenOrEqual } from "services/shared/math";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
@@ -54,10 +53,10 @@ export default function AnimationKeyFrames({
 }: Props) {
   let stepsToDrawMaxRange = 0;
   const keyFramesPropertiesPosition = [
-    { property: "scale", yPosition: 80 },
-    { property: "xOffset", yPosition: 220 },
-    { property: "yOffset", yPosition: 360 },
-    { property: "rotation", yPosition: 500 },
+    { property: "scale", yPosition: canvasPxSize * 0.2 },
+    { property: "xOffset", yPosition: canvasPxSize * 0.4 },
+    { property: "yOffset", yPosition: canvasPxSize * 0.6 },
+    { property: "rotation", yPosition: canvasPxSize * 0.8 },
   ];
 
   const { palette } = useTheme();
@@ -111,11 +110,10 @@ export default function AnimationKeyFrames({
     const minRange = timelinePositionMs;
     stepsToDrawMaxRange = (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
 
-    const stepCorrection = -25;
-    let xPos = 100;
+    let xPos = canvasPxSize / 10 + 35;
     for (let i = minRange; i < stepsToDrawMaxRange + 1; i += selectableSteps[selectableStepsIndex]) {
-      ctx.fillText(i.toString(), xPos + stepCorrection, 645);
-      xPos += 55;
+      ctx.fillText(i.toString(), xPos, canvasPxSize);
+      xPos += canvasPxSize / 13;
     }
 
     const keyFramesInRange = selectedAnimationPattern?.animationKeyFrames.filter((keyframe) =>
@@ -338,7 +336,7 @@ export default function AnimationKeyFrames({
         onMouseDown={onMiddleMouseClick}
       />
       <LinearProgress
-        sx={{ width: "575px", marginLeft: "75px", transition: "none" }}
+        sx={{ width: `${canvasPxSize - 80}px`, marginLeft: "80px", transition: "none" }}
         variant="determinate"
         value={timelinePositionMs <= duration ? normalize(timelinePositionMs, 0, duration) : 100}
       />

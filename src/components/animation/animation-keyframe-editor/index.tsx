@@ -149,40 +149,42 @@ export default function AnimationKeyFrameEditor({
   };
 
   return (
-    <Grid container direction="row" spacing={2} key={selectedKeyFrameUuid}>
-      <Grid item xs={2}>
-        <AnimationProperties
-          selectedAnimation={selectedAnimation}
-          selectedKeyFrameUuid={selectedKeyFrameUuid}
-          setSelectedKeyFrameUuid={setSelectedKeyFrameUuid}
-          setSelectedAnimation={setSelectedAnimation}
-          setTimelinePositionMs={setTimelinePositionMs}
-          xCorrection={xCorrection}
-          selectableStepsIndex={selectableStepsIndex}
-          selectedAnimationPattern={selectedAnimationPattern}
-          setSelectedAnimationPattern={setSelectedAnimationPattern}
-        />
-      </Grid>
-      <Grid item xs>
-        <AnimationKeyFrames
-          selectedAnimation={selectedAnimation}
-          selectedKeyFrameUuid={selectedKeyFrameUuid}
-          setSelectedKeyFrameUuid={setSelectedKeyFrameUuid}
-          setSelectedAnimation={setSelectedAnimation}
-          setTimelinePositionMs={setTimelinePositionMs}
-          xCorrection={xCorrection}
-          selectableStepsIndex={selectableStepsIndex}
-          timelinePositionMs={timelinePositionMs}
-          playAnimation={playAnimation}
-          setSelectableStepsIndex={setSelectableStepsIndex}
-          selectableSteps={selectableSteps}
-          setPlayAnimation={setPlayAnimation}
-          selectedAnimationPattern={selectedAnimationPattern}
-          setSelectedAnimationPattern={setSelectedAnimationPattern}
-        />
-      </Grid>
-      <Grid item xs>
-        <PointsDrawer pointsToDraw={getPointsToDraw()} />
+    <>
+      <Grid container direction="row" spacing={2} key={selectedKeyFrameUuid}>
+        <Grid item xs={3} style={{ maxWidth: "25vh" }}>
+          <AnimationProperties
+            selectedAnimation={selectedAnimation}
+            selectedKeyFrameUuid={selectedKeyFrameUuid}
+            setSelectedKeyFrameUuid={setSelectedKeyFrameUuid}
+            setSelectedAnimation={setSelectedAnimation}
+            setTimelinePositionMs={setTimelinePositionMs}
+            xCorrection={xCorrection}
+            selectableStepsIndex={selectableStepsIndex}
+            selectedAnimationPattern={selectedAnimationPattern}
+            setSelectedAnimationPattern={setSelectedAnimationPattern}
+          />
+        </Grid>
+        <Grid item xs>
+          <AnimationKeyFrames
+            selectedAnimation={selectedAnimation}
+            selectedKeyFrameUuid={selectedKeyFrameUuid}
+            setSelectedKeyFrameUuid={setSelectedKeyFrameUuid}
+            setSelectedAnimation={setSelectedAnimation}
+            setTimelinePositionMs={setTimelinePositionMs}
+            xCorrection={xCorrection}
+            selectableStepsIndex={selectableStepsIndex}
+            timelinePositionMs={timelinePositionMs}
+            playAnimation={playAnimation}
+            setSelectableStepsIndex={setSelectableStepsIndex}
+            selectableSteps={selectableSteps}
+            setPlayAnimation={setPlayAnimation}
+            selectedAnimationPattern={selectedAnimationPattern}
+            setSelectedAnimationPattern={setSelectedAnimationPattern}
+          />
+        </Grid>
+        <Grid item xs>
+          <PointsDrawer pointsToDraw={getPointsToDraw()} />
+        </Grid>
       </Grid>
       <Grid item xs>
         <AnimationPatternTimeline
@@ -190,6 +192,6 @@ export default function AnimationKeyFrameEditor({
           setSelectedAnimationPattern={setSelectedAnimationPattern}
         />
       </Grid>
-    </Grid>
+    </>
   );
 }
