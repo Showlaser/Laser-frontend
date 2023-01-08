@@ -1,7 +1,18 @@
-import { Grid, InputLabel, Input, Select, MenuItem, Tooltip, IconButton } from "@mui/material";
-import { Animation, AnimationKeyFrame } from "models/components/shared/animation";
-import React, { useEffect } from "react";
-import { createGuid, mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
+import {
+  Grid,
+  InputLabel,
+  Input,
+  Select,
+  MenuItem,
+  Tooltip,
+  IconButton,
+  Slider,
+  useTheme,
+  LinearProgress,
+} from "@mui/material";
+import { Animation, AnimationKeyFrame, AnimationPattern } from "models/components/shared/animation";
+import React, { useEffect, useState } from "react";
+import { createGuid, mapNumber, normalize as normalize, numberIsBetweenOrEqual } from "services/shared/math";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -9,22 +20,24 @@ import { propertiesSettings } from "services/logic/animation-logic";
 import { canvasPxSize } from "services/shared/config";
 
 type Props = {
-  animation: Animation | null;
   timelinePositionMs: number;
   playAnimation: boolean;
   setTimelinePositionMs: (value: number) => void;
   setSelectableStepsIndex: (value: number) => void;
   selectableSteps: number[];
   selectableStepsIndex: number;
-  selectedKeyFrameUuid: string;
   xCorrection: number[];
+  selectedAnimation: Animation | null;
   setSelectedAnimation: (animation: Animation) => void;
+  selectedKeyFrameUuid: string;
   setSelectedKeyFrameUuid: (uuid: string) => void;
   setPlayAnimation: (play: boolean) => void;
+  selectedAnimationPattern: AnimationPattern | null;
+  setSelectedAnimationPattern: (animationPattern: AnimationPattern | null) => void;
 };
 
 export default function AnimationKeyFrames({
-  animation,
+  selectedAnimation: animation,
   timelinePositionMs,
   playAnimation,
   setTimelinePositionMs,
@@ -36,6 +49,8 @@ export default function AnimationKeyFrames({
   setSelectedAnimation,
   setSelectedKeyFrameUuid,
   setPlayAnimation,
+  setSelectedAnimationPattern,
+  selectedAnimationPattern,
 }: Props) {
   let stepsToDrawMaxRange = 0;
   const keyFramesPropertiesPosition = [
@@ -44,6 +59,8 @@ export default function AnimationKeyFrames({
     { property: "yOffset", yPosition: 360 },
     { property: "rotation", yPosition: 500 },
   ];
+
+  const { palette } = useTheme();
 
   useEffect(() => {
     drawTimelineOnCanvas();
@@ -101,7 +118,7 @@ export default function AnimationKeyFrames({
       xPos += 55;
     }
 
-    const keyFramesInRange = animation?.animationKeyFrames.filter((keyframe) =>
+    const keyFramesInRange = selectedAnimationPattern?.animationKeyFrames.filter((keyframe) =>
       numberIsBetweenOrEqual(keyframe.timeMs, minRange, stepsToDrawMaxRange)
     );
 
@@ -150,7 +167,7 @@ export default function AnimationKeyFrames({
       const isSelected = keyFrame.uuid === selectedKeyFrameUuid;
       ctx.beginPath();
       ctx.arc(x + stepsCorrection[selectableStepsIndex], y, isSelected ? 8 : 6, 0, 2 * Math.PI);
-      ctx.fillStyle = isSelected ? "#4287f5" : "white";
+      ctx.fillStyle = isSelected ? palette.primary.main : "white";
       ctx.fill();
     });
   };
@@ -274,7 +291,7 @@ export default function AnimationKeyFrames({
   const getKeyFrameFromMousePosition = (x: number, y: number) => {
     const propertyClicked = getPropertyFromYPosition(y);
 
-    const selectedKeyFrame = animation?.animationKeyFrames.find((keyFrame) => {
+    const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames.find((keyFrame) => {
       const min = (x - selectableSteps[selectableStepsIndex] / 5 - 1) | 0;
       const thisKeyFrameIsClicked =
         keyFrame.timeMs >= min && keyFrame.timeMs === x && keyFrame.propertyEdited === propertyClicked;
@@ -308,6 +325,7 @@ export default function AnimationKeyFrames({
     setSelectedKeyFrameUuid(keyFrame.uuid);
   };
 
+  const duration = Math.max(...(selectedAnimationPattern?.animationKeyFrames?.map((ak) => ak?.timeMs) ?? []));
   return (
     <>
       <canvas
@@ -318,6 +336,11 @@ export default function AnimationKeyFrames({
         onMouseLeave={drawTimelineOnCanvas}
         onWheel={onMouseScroll}
         onMouseDown={onMiddleMouseClick}
+      />
+      <LinearProgress
+        sx={{ width: "575px", marginLeft: "75px", transition: "none" }}
+        variant="determinate"
+        value={timelinePositionMs <= duration ? normalize(timelinePositionMs, 0, duration) : 100}
       />
       <Grid container direction="row" spacing={2}>
         <Grid item xs={2.6}>

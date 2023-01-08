@@ -16,35 +16,40 @@ import {
 import React from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Animation } from "models/components/shared/animation";
+import { Animation, AnimationPattern } from "models/components/shared/animation";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import { propertiesSettings } from "services/logic/animation-logic";
 
 type Props = {
-  animation: Animation | null;
+  selectedAnimation: Animation | null;
   selectedKeyFrameUuid: string;
   setSelectedKeyFrameUuid: (uuid: string) => void;
   setSelectedAnimation: (animation: Animation) => void;
   setTimelinePositionMs: any;
   xCorrection: number[];
   selectableStepsIndex: number;
+  selectedAnimationPattern: AnimationPattern | null;
+  setSelectedAnimationPattern: (animationPattern: AnimationPattern | null) => void;
 };
 
 export default function AnimationProperties({
-  animation,
+  selectedAnimation,
   selectedKeyFrameUuid,
   setSelectedKeyFrameUuid,
   setSelectedAnimation,
   setTimelinePositionMs,
   xCorrection,
   selectableStepsIndex,
+  selectedAnimationPattern,
+  setSelectedAnimationPattern,
 }: Props) {
-  const selectedKeyFrame = animation?.animationKeyFrames?.find((kf) => kf.uuid === selectedKeyFrameUuid);
+  const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames?.find((kf) => kf.uuid === selectedKeyFrameUuid);
 
   const updateProperty = (value: string | number) => {
-    const selectedKeyFrameIndex = animation?.animationKeyFrames.findIndex((kf) => kf.uuid === selectedKeyFrameUuid);
-    let updatedAnimation: any = { ...animation };
+    const selectedKeyFrameIndex = selectedAnimationPattern?.animationKeyFrames.findIndex(
+      (kf) => kf.uuid === selectedKeyFrameUuid
+    );
+    let updatedAnimation: any = { ...selectedAnimation };
     if (
       updatedAnimation === undefined ||
       selectedKeyFrameIndex === undefined ||
@@ -59,7 +64,7 @@ export default function AnimationProperties({
   };
 
   const getPropertyValue = (property: string) => {
-    const selectedKeyFrame = animation?.animationKeyFrames.find(
+    const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames.find(
       (kf) => kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property
     );
 
@@ -72,8 +77,10 @@ export default function AnimationProperties({
     }
 
     setSelectedKeyFrameUuid("");
-    let updatedAnimation: any = { ...animation };
-    const selectedKeyFrameIndex = animation?.animationKeyFrames.findIndex((kf) => kf.uuid === selectedKeyFrameUuid);
+    let updatedAnimation: any = { ...selectedAnimation };
+    const selectedKeyFrameIndex = selectedAnimationPattern?.animationKeyFrames.findIndex(
+      (kf) => kf.uuid === selectedKeyFrameUuid
+    );
     if (
       updatedAnimation === undefined ||
       selectedKeyFrameIndex === undefined ||
@@ -87,13 +94,15 @@ export default function AnimationProperties({
   };
 
   const getNextOrPreviousKeyframe = (getPrevious: boolean, property: string) => {
-    const currentSelectedKeyFrame = animation?.animationKeyFrames.find((ak) => ak.uuid === selectedKeyFrameUuid);
+    const currentSelectedKeyFrame = selectedAnimationPattern?.animationKeyFrames.find(
+      (ak) => ak.uuid === selectedKeyFrameUuid
+    );
     if (currentSelectedKeyFrame === undefined) {
       onGetNextOrPreviousKeyframeError(property);
       return;
     }
 
-    const keyFrames = animation?.animationKeyFrames
+    const keyFrames = selectedAnimationPattern?.animationKeyFrames
       .filter((ak) => {
         const propertyIsTheSame = ak.propertyEdited === property;
         const isBelowOrUnderCurrentSelectedKeyFrame = getPrevious
@@ -136,7 +145,7 @@ export default function AnimationProperties({
   };
 
   const getLastKeyframe = (property: string, currentSelectedKeyFrameTimeMs: number) => {
-    const keyFrames = animation?.animationKeyFrames
+    const keyFrames = selectedAnimationPattern?.animationKeyFrames
       .filter((ak) => {
         const propertyIsTheSame = ak.propertyEdited === property;
         const isOverCurrentSelectedKeyFrame = ak.timeMs >= currentSelectedKeyFrameTimeMs ?? 0;
@@ -158,7 +167,7 @@ export default function AnimationProperties({
   };
 
   const onGetNextOrPreviousKeyframeError = (property: string) => {
-    const kf = animation?.animationKeyFrames
+    const kf = selectedAnimationPattern?.animationKeyFrames
       .filter((ak) => ak.propertyEdited === property)
       .sort((a, b) => a.timeMs - b.timeMs)
       .at(0);
@@ -188,7 +197,7 @@ export default function AnimationProperties({
     <>
       <Paper
         style={{ padding: "15px", paddingTop: "2px" }}
-        key={`${animation?.pattern.scale}-${animation?.pattern.xOffset}-${animation?.pattern.yOffset}-${animation?.pattern.rotation}`}
+        key={`${selectedAnimationPattern?.pattern.scale}-${selectedAnimationPattern?.pattern.xOffset}-${selectedAnimationPattern?.pattern.yOffset}-${selectedAnimationPattern?.pattern.rotation}`}
       >
         <p>Animation properties</p>
         <Divider style={{ marginBottom: "10px" }} />
@@ -262,15 +271,18 @@ export default function AnimationProperties({
       <Paper style={{ padding: "15px", paddingTop: "2px" }}>
         <p>Animation info</p>
         <Divider />
-        <small>Animation duration: {Math.max(...(animation?.animationKeyFrames?.map((ak) => ak?.timeMs) ?? []))}</small>
+        <small>
+          Animation duration:{" "}
+          {Math.max(...(selectedAnimationPattern?.animationKeyFrames?.map((ak) => ak?.timeMs) ?? []))}
+        </small>
         <br />
-        <small>Total keyframes: {animation?.animationKeyFrames?.length}</small>
+        <small>Total keyframes: {selectedAnimationPattern?.animationKeyFrames?.length}</small>
         <div style={{ maxHeight: "200px", overflowY: "auto" }}>
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>All points</AccordionSummary>
             <AccordionDetails>
               <List>
-                {animation?.animationKeyFrames?.map((keyFrame) => (
+                {selectedAnimationPattern?.animationKeyFrames?.map((keyFrame) => (
                   <ListItemButton
                     key={`${keyFrame.uuid}-points`}
                     onClick={() => {

@@ -9,6 +9,7 @@ import {
   Skeleton,
   Switch,
   Tooltip,
+  useTheme,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -28,7 +29,6 @@ import paths from "services/shared/router-paths";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import { dataSavingIsEnabled } from "services/shared/user-settings";
 import { OnTrue } from "../on-true";
-import { useTheme } from "@mui/material";
 
 export default function SpotifyController() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -88,7 +88,7 @@ export default function SpotifyController() {
   const getComponentsByLoginState = () => {
     if (!userIsLoggedIntoSpotify) {
       return (
-        <Button variant="contained" href={paths.Settings}>
+        <Button variant="contained" href={paths.Account}>
           Login to Spotify to use this component
         </Button>
       );

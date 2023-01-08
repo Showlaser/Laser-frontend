@@ -3,7 +3,7 @@ import { Animation, animationPlaceholder } from "models/components/shared/animat
 import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
 import { canvasPxSize } from "./config";
-import { getCenterOfPoints, mapNumber, rotatePoints } from "./math";
+import { createGuid, getCenterOfPoints, mapNumber, rotatePoints } from "./math";
 
 export const getRgbColorStringFromPoint = (point: Point): string =>
   `rgb(${point.redLaserPowerPwm},${point.greenLaserPowerPwm},${point.blueLaserPowerPwm})`;
@@ -35,8 +35,14 @@ export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   let animation: Animation = animationPlaceholder();
   animation.name = pattern.name;
   animation.image = pattern.image;
-  animation.pattern = pattern;
-  animation.animationKeyFrames = [];
+  animation.animationPatterns = [
+    {
+      uuid: createGuid(),
+      pattern,
+      animationKeyFrames: [],
+    },
+  ];
+
   return animation;
 };
 

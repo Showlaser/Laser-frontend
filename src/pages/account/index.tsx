@@ -1,25 +1,24 @@
 import {
   Button,
   TextField,
-  Grid,
   Divider,
   Alert,
   LinearProgress,
   Fade,
-  Modal,
   Paper,
   useTheme,
   FormControlLabel,
   FormGroup,
   Switch,
   Tooltip,
+  Skeleton,
 } from "@mui/material";
 import SpotifyLogin from "components/settings/spotify-login";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
+import { OnTrue } from "components/shared/on-true";
 import SideNav from "components/shared/sidenav";
 import { User } from "models/components/shared/user";
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getCurrentUser, removeUser, updateUser } from "services/logic/user-logic";
 import { getFormDataFromEvent } from "services/shared/form-data-helper";
 import { stringIsEmpty } from "services/shared/general";
@@ -76,53 +75,63 @@ export default function Account() {
   return (
     <SideNav pageName="Account">
       <div style={{ width: "100%" }}>
-        <div style={{ width: "40vh", margin: "0 auto" }}>
+        <div style={{ width: "50vh", margin: "0 auto" }}>
           <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
           {getSectionComponent(
             "Account",
-            <form onSubmit={onSubmit} style={{ textAlign: "center" }}>
-              <TextField fullWidth label="Username" defaultValue={userData?.username} name="username" required />
-              <TextField
-                fullWidth
-                label="Email"
-                type="email"
-                name="email"
-                defaultValue={userData?.email}
-                required
-                onChange={(e) => {
-                  userData?.email !== e.target.value ? setEmailChanged(true) : setEmailChanged(false);
-                }}
+            userData === undefined ? (
+              <Skeleton
+                style={{ marginTop: "-50px", marginBottom: "-50px" }}
+                animation="wave"
+                width="37vh"
+                height="50vh"
               />
-              <TextField fullWidth type="password" name="newPassword" label="New password" />
-              <TextField fullWidth type="password" label="Repeat password" name="newPasswordRepeat" />
-              <br />
-              <Divider style={{ width: "100%" }} />
-              <TextField required fullWidth name="password" type="password" label="Current password" />
-              <br />
-              <Fade in={emailChanged} timeout={1000} style={{ display: emailChanged ? "block" : "none" }}>
-                <Alert severity="warning">
-                  Warning if you change your email, you have to revalidate your email, make sure you entered the right
-                  email address otherwise you will lose access to your account!
-                </Alert>
-              </Fade>
-              <br />
-              <Button type="submit" variant="contained" disabled={submitInProgress} fullWidth>
-                Update account
-              </Button>
-              {submitInProgress ? <LinearProgress /> : null}
-              <hr style={{ width: "100%" }} />
-              <Button
-                color="error"
-                variant="text"
-                onClick={() => {
-                  let updatedModalOptions = { ...modalOptions };
-                  updatedModalOptions.show = true;
-                  setModalOptions(updatedModalOptions);
-                }}
-              >
-                Remove account
-              </Button>
-            </form>
+            ) : (
+              <form key={userData?.username} onSubmit={onSubmit} style={{ textAlign: "center" }}>
+                <TextField fullWidth label="Username" defaultValue={userData?.username} name="username" required />
+                <TextField
+                  fullWidth
+                  label="Email"
+                  type="email"
+                  name="email"
+                  defaultValue={userData?.email}
+                  required
+                  onChange={(e) => {
+                    userData?.email !== e.target.value ? setEmailChanged(true) : setEmailChanged(false);
+                  }}
+                />
+                <TextField fullWidth type="password" name="newPassword" label="New password" />
+                <TextField fullWidth type="password" label="Repeat password" name="newPasswordRepeat" />
+                <br />
+                <Divider style={{ width: "100%" }} />
+                <TextField required fullWidth name="password" type="password" label="Current password" />
+                <br />
+                <Fade in={emailChanged} timeout={1000} style={{ display: emailChanged ? "block" : "none" }}>
+                  <Alert severity="warning">
+                    Warning if you change your email, you have to revalidate your email, make sure you entered the right
+                    email address otherwise you will lose access to your account!
+                  </Alert>
+                </Fade>
+                <br />
+                <Button type="submit" variant="contained" disabled={submitInProgress} fullWidth>
+                  Update account
+                </Button>
+                {submitInProgress ? <LinearProgress /> : null}
+                <Divider style={{ width: "100%", margin: "10px 0 10px 0" }} />
+                <Button
+                  fullWidth
+                  color="error"
+                  variant="text"
+                  onClick={() => {
+                    let updatedModalOptions = { ...modalOptions };
+                    updatedModalOptions.show = true;
+                    setModalOptions(updatedModalOptions);
+                  }}
+                >
+                  Remove account
+                </Button>
+              </form>
+            )
           )}
           {getSectionComponent("Settings", <SpotifyLogin />)}
           {getSectionComponent(

@@ -4,7 +4,7 @@
 import { Point } from "models/components/shared/point";
 
 // Function to normalise the values (MIN / MAX could be integrated)
-export const normalise = (value: number, min: number, max: number) => ((value - min) * 100) / (max - min);
+export const normalize = (value: number, min: number, max: number) => ((value - min) * 100) / (max - min);
 
 export const mapNumber = (number: number, inMin: number, inMax: number, outMin: number, outMax: number) => {
   return ((number - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;

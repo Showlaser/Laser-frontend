@@ -1,4 +1,4 @@
-import { Button, Icon } from "@mui/material";
+import { Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { getSpotifyAccessTokens, grandSpotifyAccess } from "services/logic/spotify";
 import { getCodeFromResponse } from "services/shared/general";

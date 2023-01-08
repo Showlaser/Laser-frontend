@@ -1,7 +1,7 @@
 import { Button, Grid, List, ListItemText } from "@mui/material";
 import LinearWithValueLabel from "components/shared/progress-with-label";
 import { useEffect, useState, useRef } from "react";
-import { normalise } from "services/shared/math";
+import { normalize } from "services/shared/math";
 import { getDifferenceBetweenTwoDatesInMinutesAndSecondsString } from "services/shared/general";
 import Cookies from "universal-cookie";
 import React from "react";
@@ -72,7 +72,7 @@ export default function VoteOverView({ voteState, voteCookie, onVoteEnded }: Pro
 
       <List style={{ width: "90%", maxWidth: "70vh" }}>
         {voteState?.votablePlaylistCollection?.map((playlist) => {
-          const value = normalise(playlist?.votes?.length, 0, Number(totalVotes));
+          const value = normalize(playlist?.votes?.length, 0, Number(totalVotes));
           return (
             <span key={playlist?.uuid}>
               <ListItemText primary={playlist?.playlistName} />

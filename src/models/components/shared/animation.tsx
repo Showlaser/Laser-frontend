@@ -13,14 +13,17 @@ export type AnimationKeyFrame = {
   propertyValue: number;
 };
 
-export type AnimationEffect = {};
+export type AnimationPattern = {
+  uuid: string;
+  pattern: Pattern;
+  animationKeyFrames: AnimationKeyFrame[];
+};
 
 export type Animation = {
   uuid: string;
   name: string;
   image: string | null;
-  pattern: Pattern;
-  animationKeyFrames: AnimationKeyFrame[];
+  animationPatterns: AnimationPattern[];
   animationEffects: AnimationEffect[];
 };
 
@@ -28,7 +31,6 @@ export const animationPlaceholder = (): Animation => ({
   uuid: createGuid(),
   name: "Placeholder animation",
   image: null,
-  pattern: getPatternPlaceHolder(),
-  animationKeyFrames: [],
+  animationPatterns: [],
   animationEffects: [],
 });

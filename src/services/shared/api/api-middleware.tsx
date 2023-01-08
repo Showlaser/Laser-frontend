@@ -47,11 +47,12 @@ export async function sendRequest(
   requestFunction: () => Promise<Response>,
   ignoredStatusCodes: number[],
   onSuccessToastSubject: any = null,
-  redirectToLoginOnError: boolean = true
+  redirectToLoginOnError: boolean = false
 ) {
   const success = await refreshUserTokensIfExpired();
   if (redirectToLoginOnError && !success) {
     const redirectTo = window.location.href;
+    alert("Redirect");
     window.location.href = `${paths.Login}?redirect=${redirectTo}`;
   }
 

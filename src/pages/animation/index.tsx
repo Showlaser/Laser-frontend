@@ -7,13 +7,14 @@ import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import CardOverview from "components/shared/card-overview";
-import { Animation } from "models/components/shared/animation";
+import { Animation, AnimationPattern } from "models/components/shared/animation";
 import { getPatterns, removePattern } from "services/logic/pattern-logic";
 import { getAnimations, removeAnimation } from "services/logic/animation-logic";
 import { convertPatternToAnimation } from "services/shared/converters";
 import AnimationKeyFrameEditor from "components/animation/animation-keyframe-editor";
 import { Pattern } from "models/components/shared/pattern";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
+import { OnTrue } from "components/shared/on-true";
 
 export default function AnimationPage() {
   const [selectedAnimation, setSelectedAnimation] = useState<Animation | null>(null);
@@ -21,6 +22,7 @@ export default function AnimationPage() {
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
   const [convertPatternModalOpen, setConvertPatternModalOpen] = useState<boolean>(false);
   const [animationsModalOpen, setAnimationsModalOpen] = useState<boolean>(false);
+  const [selectedAnimationPattern, setSelectedAnimationPattern] = useState<AnimationPattern | null>(null);
   const [modalOptions, setModalOptions] = useState<ModalOptions>({
     show: false,
     onDelete: () => null,
@@ -46,12 +48,12 @@ export default function AnimationPage() {
       <SpeedDialAction
         onClick={() => setConvertPatternModalOpen(true)}
         key="sd-pattern-to-animation"
+        tooltipTitle="Convert saved pattern to animation"
         icon={
           <label htmlFor="raised-button-file" style={{ cursor: "pointer", padding: "25px" }}>
             <AllInclusiveIcon style={{ marginTop: "8px" }} />
           </label>
         }
-        tooltipTitle="Convert saved pattern to animation"
       />
       <SpeedDialAction
         onClick={() => setAnimationsModalOpen(true)}
@@ -71,6 +73,10 @@ export default function AnimationPage() {
     if (result?.status === 200 && availablePatterns !== null) {
       let patterns = [...availablePatterns];
       const patternIndex = patterns.findIndex((p) => p.uuid === uuid);
+      if (patternIndex === -1) {
+        return;
+      }
+
       patterns.splice(patternIndex, 1);
       setAvailablePatterns(patterns);
     }
@@ -83,6 +89,10 @@ export default function AnimationPage() {
     if (result?.status === 200 && availableAnimations !== null) {
       let animations = [...availableAnimations];
       const animationIndex = animations.findIndex((a) => a.uuid === uuid);
+      if (animationIndex === -1) {
+        return;
+      }
+
       animations.splice(animationIndex, 1);
       setAvailableAnimations(animations);
     }
@@ -96,9 +106,15 @@ export default function AnimationPage() {
       {selectedAnimation === null ? (
         getSpeedDial()
       ) : (
-        <AnimationKeyFrameEditor animation={selectedAnimation} setSelectedAnimation={setSelectedAnimation} />
+        <AnimationKeyFrameEditor
+          availablePatterns={availablePatterns}
+          setSelectedAnimationPattern={setSelectedAnimationPattern}
+          selectedAnimationPattern={selectedAnimationPattern}
+          selectedAnimation={selectedAnimation}
+          setSelectedAnimation={setSelectedAnimation}
+        />
       )}
-      {convertPatternModalOpen && (
+      <OnTrue onTrue={convertPatternModalOpen}>
         <CardOverview
           closeOverview={() => setConvertPatternModalOpen(false)}
           show={convertPatternModalOpen}
@@ -122,8 +138,8 @@ export default function AnimationPage() {
             })) ?? []
           }
         />
-      )}
-      {animationsModalOpen && (
+      </OnTrue>
+      <OnTrue onTrue={animationsModalOpen}>
         <CardOverview
           closeOverview={() => setAnimationsModalOpen(false)}
           show={animationsModalOpen}
@@ -142,7 +158,7 @@ export default function AnimationPage() {
             })) ?? []
           }
         />
-      )}
+      </OnTrue>
     </SideNav>
   );
 }

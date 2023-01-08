@@ -23,7 +23,7 @@ import "./index.css";
 import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SpotifyController from "../spotify-controller";
-import { Grid, ListItemButton } from "@mui/material";
+import { Fade, Grid, ListItemButton } from "@mui/material";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
 import { showError, toastSubject } from "services/shared/toast-messages";
@@ -183,7 +183,9 @@ export default function SideNav({ pageName, children }: Props) {
         </List>
       </Drawer>
       <Main id="menu-children" open={open} style={{ marginTop: "50px" }}>
-        {children}
+        <Fade in={true} timeout={1000}>
+          <span>{children}</span>
+        </Fade>
       </Main>
     </Box>
   );
