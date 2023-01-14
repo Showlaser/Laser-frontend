@@ -65,3 +65,5 @@ export const getCenterOfPoints = (points: Point[], xOffset: number, yOffset: num
 
   return { x: centerX, y: centerY };
 };
+
+export const getRandomNumber = (max: number) => Math.floor(Math.random() * max + 1);

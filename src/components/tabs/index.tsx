@@ -7,11 +7,11 @@ export type TabSelectorData = {
   tabChildren: React.ReactNode;
 };
 
-type TabSelectorProps = {
+type Props = {
   data: TabSelectorData[];
 };
 
-export default function TabSelector({ data }: TabSelectorProps) {
+export default function TabSelector({ data }: Props) {
   const [selectedTabIndex, setSelectedTabIndex] = React.useState<number>(0);
 
   function a11yProps(index: number) {
