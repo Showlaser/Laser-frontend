@@ -13,7 +13,7 @@ export default function LaserZoneTable({ zones }: Props) {
       <Typography sx={{ textAlign: "center" }} variant="h5" color="text.primary" gutterBottom>
         Zones
       </Typography>
-      <div style={{ height: "80%", overflowY: "scroll" }}>
+      <div style={{ height: "90%", overflowY: "auto" }}>
         <Table>
           <TableHead>
             <TableRow>

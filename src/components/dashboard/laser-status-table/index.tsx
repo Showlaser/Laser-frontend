@@ -1,4 +1,4 @@
-import { TableRow, TableCell, Tooltip, Card, Typography, Divider, Table, TableHead, TableBody } from "@mui/material";
+import { TableRow, TableCell, Tooltip, Card, Typography, Table, TableHead, TableBody } from "@mui/material";
 import React from "react";
 import CircleIcon from "@mui/icons-material/Circle";
 import { LaserInfo } from "models/components/shared/lasers";
@@ -13,7 +13,7 @@ export default function LaserStatusTable({ lasers }: Props) {
       <Typography sx={{ textAlign: "center" }} variant="h5" color="text.primary" gutterBottom>
         Lasers status
       </Typography>
-      <div style={{ height: "80%", overflowY: "scroll" }}>
+      <div style={{ height: "90%", overflowY: "auto" }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -21,6 +21,7 @@ export default function LaserStatusTable({ lasers }: Props) {
               <TableCell>Specs</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Online</TableCell>
+              <TableCell>Health</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -39,6 +40,14 @@ export default function LaserStatusTable({ lasers }: Props) {
                   <Tooltip title={`Laser is ${laser.online ? "online" : "offline"}`}>
                     <CircleIcon fontSize="small" style={{ color: laser.online ? "#4262ca" : "red" }} />
                   </Tooltip>
+                </TableCell>
+                <TableCell>
+                  <span>
+                    {
+                      laser.logs.find((log) => log.dateTime.toLocaleTimeString() === new Date().toLocaleTimeString())
+                        ?.health
+                    }
+                  </span>
                 </TableCell>
               </TableRow>
             ))}

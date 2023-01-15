@@ -4,19 +4,24 @@ import LaserZoneTable from "components/dashboard/laser-zone-table";
 import SideNav from "components/shared/sidenav";
 import TabSelector, { TabSelectorData } from "components/tabs";
 import { LaserHealth, LaserInfo, LaserLog, LaserStatus } from "models/components/shared/lasers";
-import React, { useLayoutEffect, useState } from "react";
+import React from "react";
 import "chart.js/auto";
-import { Line } from "react-chartjs-2";
+import { Doughnut, Line } from "react-chartjs-2";
 import { getRandomNumber } from "services/shared/math";
 import { subtractMinutesFromCurrentDate } from "services/shared/dateHelper";
 
 export default function Dashboard() {
+  const randomProperty = (obj: any) => {
+    const keys = Object.keys(obj);
+    return obj[keys[(keys.length * Math.random()) << 0]];
+  };
+
   const generateFakeLogForLaser = (laserUuid: string): LaserLog[] =>
     [30, 20, 10, 0].map((time) => ({
       laserUuid,
       dateTime: subtractMinutesFromCurrentDate(time),
       temperature: getRandomNumber(65),
-      health: LaserHealth[getRandomNumber(3)] as unknown as LaserHealth,
+      health: randomProperty(LaserHealth),
     }));
 
   const testLasers: LaserInfo[] = [
@@ -70,6 +75,8 @@ export default function Dashboard() {
     },
   };
 
+  const getRandomColor = () => `${getRandomNumber(255)}, ${getRandomNumber(255)}, ${getRandomNumber(255)}`;
+
   const colors = ["72, 92, 219", "15, 184, 60", "209, 33, 21", "252, 186, 3", "0, 255, 255"];
 
   const getFilteredAndSortedLogsFromLaser = (laser: LaserInfo, labels: string[]) => {
@@ -81,19 +88,74 @@ export default function Dashboard() {
   const labels = [30, 20, 10, 0].map((time) => subtractMinutesFromCurrentDate(time).toLocaleTimeString());
   const temperatureChartData = {
     labels,
-    datasets: testLasers.map((laser, index) => ({
-      label: laser?.name,
-      data: getFilteredAndSortedLogsFromLaser(laser, labels).map((log) => log.temperature),
-      backgroundColor: `rgba(${colors[index]}, 0.1)`,
-      borderColor: `rgba(${colors[index]}, 1)`,
-      fill: true,
-    })),
+    datasets: testLasers.map((laser, index) => {
+      const rgbValues = colors[index] ?? getRandomColor();
+      return {
+        label: laser?.name,
+        data: getFilteredAndSortedLogsFromLaser(laser, labels).map((log) => log.temperature),
+        backgroundColor: `rgba(${rgbValues}, 0.1)`,
+        borderColor: `rgba(${rgbValues}, 1)`,
+        fill: true,
+      };
+    }),
+  };
+
+  const onlineChartData = {
+    labels: ["Online", "Offline"],
+    datasets: [
+      {
+        data: [testLasers.filter((laser) => laser.online).length, testLasers.filter((laser) => !laser.online).length],
+        backgroundColor: [`rgba(${colors[0]}, 0.2)`, `rgba(${colors[2]}, 0.2)`],
+        borderColor: [`rgba(${colors[0]}, 1)`, `rgba(${colors[2]}, 1)`],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const healthChartData = () => {
+    const mergedLogs = testLasers.map((laser) => laser.logs).flat();
+    const currentTimeLogs = mergedLogs.filter(
+      (log) => log.dateTime.toLocaleTimeString() === new Date().toLocaleTimeString()
+    );
+    const currentHealthOfLasers = currentTimeLogs.map((log) => log.health);
+
+    const labels = [LaserHealth.Ok, LaserHealth.DefectGalvo, LaserHealth.Overheating, LaserHealth.Unknown];
+    const data = labels.map((label) => currentHealthOfLasers?.filter((health) => health === label).length);
+    return {
+      labels,
+      datasets: [
+        {
+          data,
+          backgroundColor: [
+            `rgba(${colors[0]}, 0.2)`,
+            `rgba(${colors[1]}, 0.2)`,
+            `rgba(${colors[2]}, 0.2)`,
+            `rgba(${colors[3]}, 0.2)`,
+          ],
+          borderColor: [
+            `rgba(${colors[0]}, 1)`,
+            `rgba(${colors[1]}, 1)`,
+            `rgba(${colors[2]}, 1)`,
+            `rgba(${colors[3]}, 1)`,
+          ],
+          borderWidth: 1,
+        },
+      ],
+    };
   };
 
   const tabData: TabSelectorData[] = [
     {
-      tabName: "Temperature",
+      tabName: "Temperatures",
       tabChildren: <Line options={chartOptions} data={temperatureChartData} />,
+    },
+    {
+      tabName: "Online",
+      tabChildren: <Doughnut data={onlineChartData} />,
+    },
+    {
+      tabName: "Health",
+      tabChildren: <Doughnut data={healthChartData()} />,
     },
   ];
 
@@ -101,13 +163,13 @@ export default function Dashboard() {
     <SideNav pageName="Dashboard">
       <Grid container justifyContent="center">
         <LaserStatusTable lasers={testLasers} />
-        <LaserZoneTable zones={zones} />
-        <Card sx={{ m: 2, p: 3 }}>
+        <Card sx={{ m: 2, p: 3, width: "60vh" }}>
           <Typography sx={{ textAlign: "center" }} variant="h5" color="text.primary" gutterBottom>
             Lasers info
           </Typography>
           <TabSelector data={tabData} />
         </Card>
+        <LaserZoneTable zones={zones} />
       </Grid>
     </SideNav>
   );

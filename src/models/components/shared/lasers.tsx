@@ -5,18 +5,20 @@ export enum LaserStatus {
   EmergencyButtonPressed,
 }
 
-export enum LaserHealth {
-  Overheating,
-  Ok,
-  Unknown,
-  DefectGalvo,
-}
+export const LaserHealth = {
+  Overheating: "Overheating",
+  Ok: "Ok",
+  Unknown: "Unknown",
+  DefectGalvo: "DefectGalvo",
+};
+
+type valueof<T> = T[keyof T];
 
 export type LaserLog = {
   laserUuid: string;
   dateTime: Date;
   temperature: number;
-  health: LaserHealth;
+  health: valueof<typeof LaserHealth>;
 };
 
 export type LaserInfo = {
