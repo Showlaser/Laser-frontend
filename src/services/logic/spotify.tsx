@@ -15,13 +15,8 @@ const onError = async (errorCode: any) => {
       return;
     }
 
-    const tokens: SpotifyTokens = await (await refreshSpotifyAccessToken(refreshToken))?.json();
-    const tokensInvalid =
-      !tokens.access_token ||
-      tokens.access_token.length < 20 ||
-      !tokens.refresh_token ||
-      tokens.refresh_token.length < 20;
-    if (tokensInvalid) {
+    const tokens: SpotifyTokens | null = await refreshSpotifyAccessToken(refreshToken);
+    if (tokens === null) {
       return;
     }
 
@@ -31,6 +26,8 @@ const onError = async (errorCode: any) => {
   }
 };
 
+export const updateSpotifyToken = (accessToken: string) => Spotify.setAccessToken(accessToken);
+
 export const grandSpotifyAccess = () => {
   return sendRequest(() => Get(apiEndpoints.grandSpotifyAccess), []);
 };
@@ -38,7 +35,7 @@ export const grandSpotifyAccess = () => {
 export const getSpotifyAccessTokens = (code: string) =>
   sendRequest(() => Get(`${apiEndpoints.getSpotifyAccessToken}?code=${code}`), []).then((value) => value?.json());
 
-export const refreshSpotifyAccessToken = async (refreshToken: string) => {
+export const refreshSpotifyAccessToken = async (refreshToken: string): Promise<SpotifyTokens | null> => {
   const response = await sendRequest(
     () => Get(`${apiEndpoints.refreshSpotifyAccessToken}?refreshToken=${refreshToken}`),
     [],
@@ -50,7 +47,7 @@ export const refreshSpotifyAccessToken = async (refreshToken: string) => {
     return null;
   }
 
-  return response.json();
+  return await response.json();
 };
 
 const executeRequest = async (request: () => any) => {

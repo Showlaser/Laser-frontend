@@ -110,6 +110,10 @@ export const toastSubject: ToastSubject = {
     message: "The pattern is unsafe to project and will not be projected.",
     id: 25,
   },
+  unauthorized: {
+    message: "Your not authorized",
+    id: 26,
+  },
 };
 
 const calculateAutoCloseTime = (text: string) => {

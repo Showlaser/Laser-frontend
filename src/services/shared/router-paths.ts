@@ -1,6 +1,5 @@
 const paths = {
   Dashboard: "/",
-  Settings: "/settings",
   Zones: "/zones",
   PatternEditor: "/pattern-editor",
   LasershowEditor: "/lasershow-editor",

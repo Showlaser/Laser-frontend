@@ -11,6 +11,7 @@ const handleErrorMessage = (statusCode: number, ignoredStatusCodes: number[]) =>
 
   const statusCodes: any = {
     400: toastSubject.apiBadRequest,
+    401: toastSubject.unauthorized,
     404: toastSubject.apiNotFound,
     406: toastSubject.unsafePattern,
     409: toastSubject.apiDuplication,
@@ -49,10 +50,9 @@ export async function sendRequest(
   onSuccessToastSubject: any = null,
   redirectToLoginOnError: boolean = false
 ) {
-  const success = await refreshUserTokensIfExpired();
-  if (redirectToLoginOnError && !success) {
+  const userTokensNotExpired = await refreshUserTokensIfExpired();
+  if (redirectToLoginOnError && !userTokensNotExpired) {
     const redirectTo = window.location.href;
-    alert("Redirect");
     window.location.href = `${paths.Login}?redirect=${redirectTo}`;
   }
 
@@ -62,10 +62,9 @@ export async function sendRequest(
     if (onSuccessToastSubject !== undefined && onSuccessToastSubject !== null) {
       showSuccess(onSuccessToastSubject);
     }
-    if (response.status === 401) {
-      // tokens are set by cookies
-
-      response = await requestFunction();
+    if (response.status === 401 && redirectToLoginOnError) {
+      const redirectTo = window.location.href;
+      window.location.href = `${paths.Login}?redirect=${redirectTo}`;
     }
 
     if (response.status !== 200) {

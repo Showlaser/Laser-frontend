@@ -1,8 +1,15 @@
 import { Button } from "@mui/material";
+import { SpotifyTokens } from "models/components/shared/Spotify";
 import React, { useEffect, useState } from "react";
-import { getSpotifyAccessTokens, grandSpotifyAccess } from "services/logic/spotify";
-import { getCodeFromResponse } from "services/shared/general";
+import {
+  getSpotifyAccessTokens,
+  grandSpotifyAccess,
+  refreshSpotifyAccessToken,
+  updateSpotifyToken,
+} from "services/logic/spotify";
+import { getCodeFromResponse, stringIsEmpty } from "services/shared/general";
 import paths from "services/shared/router-paths";
+import { showSuccess, toastSubject } from "services/shared/toast-messages";
 
 export default function SpotifyLogin() {
   const accessTokenAvailable: boolean = localStorage.getItem("SpotifyAccessToken") !== null;
@@ -20,7 +27,7 @@ export default function SpotifyLogin() {
       setLoggedIn(true);
     });
 
-    window.history.replaceState(null, "Laser controller", paths.Settings);
+    window.history.replaceState(null, "Laser controller", paths.Account);
   }, []);
 
   const login = () => {
@@ -35,6 +42,25 @@ export default function SpotifyLogin() {
     setLoggedIn(false);
   };
 
+  const testForceRefreshREMOVEINPRODUCTION = async () => {
+    const refreshToken = localStorage.getItem("SpotifyRefreshToken");
+    if (refreshToken === undefined || stringIsEmpty(refreshToken) || refreshToken === null) {
+      return;
+    }
+
+    const tokens: SpotifyTokens | null = await refreshSpotifyAccessToken(refreshToken);
+    if (tokens === null) {
+      alert("Tokens null");
+      return;
+    }
+
+    console.log(tokens);
+    localStorage.setItem("SpotifyAccessToken", tokens.access_token);
+    localStorage.setItem("SpotifyRefreshToken", tokens.refresh_token);
+    updateSpotifyToken(tokens.access_token);
+    showSuccess(toastSubject.changesSaved);
+  };
+
   return (
     <div style={{ textAlign: "left" }}>
       <h2>
@@ -45,6 +71,9 @@ export default function SpotifyLogin() {
         <span>
           <p>You are logged in to Spotify</p>
           <Button onClick={removeSpotifyTokens}>Logout of Spotify</Button>
+          <Button onClick={() => testForceRefreshREMOVEINPRODUCTION()}>
+            Force token refresh NOTE: DEVELOPMENT ONLY REMOVE IN PRODUCTION
+          </Button>
         </span>
       ) : (
         <Button variant="contained" style={{ backgroundColor: "#1DB954" }} onClick={login}>

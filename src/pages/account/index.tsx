@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import SpotifyLogin from "components/settings/spotify-login";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
-import { OnTrue } from "components/shared/on-true";
 import SideNav from "components/shared/sidenav";
 import { User } from "models/components/shared/user";
 import React, { useEffect, useState } from "react";
@@ -29,7 +28,6 @@ export default function Account() {
   const [userData, setUserData] = useState<User | undefined>(undefined);
   const [emailChanged, setEmailChanged] = useState<boolean>(false);
   const [submitInProgress, setSubmitInProgress] = useState<boolean>(false);
-  const { palette } = useTheme();
   const [modalOptions, setModalOptions] = useState<ModalOptions>({
     show: false,
     onDelete: removeUser,
@@ -117,10 +115,11 @@ export default function Account() {
                   Update account
                 </Button>
                 {submitInProgress ? <LinearProgress /> : null}
-                <Divider style={{ width: "100%", margin: "10px 0 10px 0" }} />
                 <Button
+                  style={{ marginTop: "15px" }}
                   fullWidth
                   color="error"
+                  size="small"
                   variant="text"
                   onClick={() => {
                     let updatedModalOptions = { ...modalOptions };

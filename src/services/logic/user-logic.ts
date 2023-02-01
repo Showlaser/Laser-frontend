@@ -7,7 +7,7 @@ import { toastSubject } from "services/shared/toast-messages";
 export const addUser = async (data: any) => sendRequest(() => Post(apiEndpoints.user, data), [409]);
 
 export const getCurrentUser = async () =>
-  sendRequest(() => Get(apiEndpoints.user), []).then((value: any) => value.json());
+  sendRequest(() => Get(apiEndpoints.user), [], null, true).then((value: any) => value.json());
 
 export const updateUser = async (user: any) =>
   sendRequest(() => Put(apiEndpoints.user, user), [401], toastSubject.changesSaved);
