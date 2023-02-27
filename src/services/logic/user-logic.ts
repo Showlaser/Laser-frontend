@@ -12,6 +12,8 @@ export const getCurrentUser = async () =>
 export const updateUser = async (user: any) =>
   sendRequest(() => Put(apiEndpoints.user, user), [401], toastSubject.changesSaved);
 
+export const logout = async () => sendRequest(() => Post(apiEndpoints.logout), [401]);
+
 export const removeUser = async () =>
   sendRequest(() => Delete(apiEndpoints.user), [401], toastSubject.changesSaved).then(
     () => (window.location.href = paths.Login)

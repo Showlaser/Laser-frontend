@@ -9,6 +9,7 @@ const apiEndpoints = {
   animation: `${laserApiUrl}animation`,
   user: `${authApiUrl}user`,
   login: `${authApiUrl}user/login`,
+  logout: `${authApiUrl}user/logout`,
   refreshToken: `${authApiUrl}user/refresh-token`,
   getSpotifyAccessToken: `${authApiUrl}spotify/get-access-token`,
   grandSpotifyAccess: `${authApiUrl}spotify/grand-access`,

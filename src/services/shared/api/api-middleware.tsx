@@ -31,10 +31,11 @@ const refreshUserTokensIfExpired = async () => {
   const currentTime = Date.now();
   const jwtExpirationTimeMs = 300000;
 
-  const jwtExpired = currentTime - loginTime > jwtExpirationTimeMs;
+  const loginTimeIsNotValid = isNaN(loginTime);
+  const jwtExpired = currentTime - loginTime > jwtExpirationTimeMs || loginTimeIsNotValid;
   if (jwtExpired) {
     const refreshResponse: any = await Post(apiEndpoints.refreshToken, null);
-    if (refreshResponse.status !== 200 && !window.location.href.includes("login")) {
+    if (refreshResponse.status !== 200) {
       return false;
     }
 
@@ -50,8 +51,8 @@ export async function sendRequest(
   onSuccessToastSubject: any = null,
   redirectToLoginOnError: boolean = false
 ) {
-  const userTokensNotExpired = await refreshUserTokensIfExpired();
-  if (redirectToLoginOnError && !userTokensNotExpired) {
+  const userTokensExpired = !(await refreshUserTokensIfExpired());
+  if (redirectToLoginOnError && userTokensExpired && !window.location.href.includes("login")) {
     const redirectTo = window.location.href;
     window.location.href = `${paths.Login}?redirect=${redirectTo}`;
   }

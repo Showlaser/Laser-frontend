@@ -110,7 +110,7 @@ export default function PatternEditor({
     const canvas: HTMLCanvasElement | null = document.getElementById("svg-canvas") as HTMLCanvasElement;
     let patternToUpdate = { ...pattern };
     if (canvas !== null) {
-      patternToUpdate.image = canvas.toDataURL();
+      patternToUpdate.image = canvas.toDataURL("image/webp", 0.4);
       setPattern(patternToUpdate);
     }
 
