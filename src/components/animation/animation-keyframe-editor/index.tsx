@@ -144,8 +144,7 @@ export default function AnimationKeyFrameEditor({
 
   const getPointsToDraw = () => {
     const previousCurrentAndNextKeyFrames = getPreviousCurrentAndNextKeyFramePerProperty();
-    const points = getPointsByTimelinePosition(previousCurrentAndNextKeyFrames);
-    return points;
+    return getPointsByTimelinePosition(previousCurrentAndNextKeyFrames);
   };
 
   return (

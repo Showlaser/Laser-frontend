@@ -44,6 +44,7 @@ export default function AnimationProperties({
   setSelectedAnimationPattern,
 }: Props) {
   const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames?.find((kf) => kf.uuid === selectedKeyFrameUuid);
+  const uiComponentsAreDisabled = selectedAnimationPattern === null;
 
   const updateProperty = (value: string | number) => {
     const selectedKeyFrameIndex = selectedAnimationPattern?.animationKeyFrames.findIndex(
@@ -181,110 +182,111 @@ export default function AnimationProperties({
   const nextKeyFrameButton = (property: string) => (
     <span style={{ marginLeft: "5px" }}>
       <Tooltip title={`Previous ${property} keyframe`}>
-        <IconButton onClick={() => getNextOrPreviousKeyframe(true, property)}>
-          <NavigateBeforeIcon />
-        </IconButton>
+        <span>
+          <IconButton disabled={uiComponentsAreDisabled} onClick={() => getNextOrPreviousKeyframe(true, property)}>
+            <NavigateBeforeIcon />
+          </IconButton>
+        </span>
       </Tooltip>
       <Tooltip title={`Next ${property} keyframe`}>
-        <IconButton onClick={() => getNextOrPreviousKeyframe(false, property)}>
-          <NavigateNextIcon />
-        </IconButton>
+        <span>
+          <IconButton disabled={uiComponentsAreDisabled} onClick={() => getNextOrPreviousKeyframe(false, property)}>
+            <NavigateNextIcon />
+          </IconButton>
+        </span>
       </Tooltip>
     </span>
   );
 
   const propertyStyle = { marginBottom: canvasPxSize / 4 - 95 };
-
   return (
-    <>
-      <Paper
-        style={{ padding: "15px", paddingTop: "2px", minHeight: `${canvasPxSize + 70}px` }}
-        key={`${selectedAnimationPattern?.pattern.scale}-${selectedAnimationPattern?.pattern.xOffset}-${selectedAnimationPattern?.pattern.yOffset}-${selectedAnimationPattern?.pattern.rotation}`}
-      >
-        <p>Animation properties</p>
-        <Divider style={propertyStyle} />
-        <div style={propertyStyle}>
-          <FormLabel htmlFor="animation-scale">Scale</FormLabel>
-          <br />
-          <Input
-            id="animation-scale"
-            type="number"
-            inputProps={{ min: 0.1, max: 10, step: 0.1 }}
-            defaultValue={getPropertyValue("scale")}
-            onChange={(e) => updateProperty(Number(e.target.value))}
-            disabled={selectedKeyFrame?.propertyEdited !== "scale"}
-          />
-          {nextKeyFrameButton("scale")}
-        </div>
-        <div style={propertyStyle}>
-          <FormLabel htmlFor="animation-xoffset">X offset</FormLabel>
-          <br />
-          <Input
-            id="animation-xoffset"
-            type="number"
-            inputProps={{ min: -4000, max: 4000 }}
-            defaultValue={getPropertyValue("xOffset")}
-            onChange={(e) => updateProperty(Number(e.target.value))}
-            disabled={selectedKeyFrame?.propertyEdited !== "xOffset"}
-          />
-          {nextKeyFrameButton("xOffset")}
-        </div>
-        <div style={propertyStyle}>
-          <FormLabel htmlFor="animation-yoffset">Y offset</FormLabel>
-          <br />
-          <Input
-            id="animation-yoffset"
-            type="number"
-            inputProps={{ min: -4000, max: 4000 }}
-            defaultValue={getPropertyValue("yOffset")}
-            onChange={(e) => updateProperty(Number(e.target.value))}
-            disabled={selectedKeyFrame?.propertyEdited !== "yOffset"}
-          />
-          {nextKeyFrameButton("yOffset")}
-        </div>
-        <div style={propertyStyle}>
-          <FormLabel htmlFor="animation-rotation">Rotation</FormLabel>
-          <br />
-          <Input
-            id="animation-rotation"
-            type="number"
-            inputProps={{ min: -360, max: 360 }}
-            defaultValue={getPropertyValue("rotation")}
-            onChange={(e) => updateProperty(Number(e.target.value))}
-            disabled={selectedKeyFrame?.propertyEdited !== "rotation"}
-          />
-          {nextKeyFrameButton("rotation")}
-        </div>
-        <small>
-          Animation duration:{" "}
-          {Math.max(...(selectedAnimationPattern?.animationKeyFrames?.map((ak) => ak?.timeMs) ?? [0]))} ms
-        </small>
-        <div style={{ maxHeight: "200px", overflowY: "auto" }}>
-          <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <small>All keyframes ({selectedAnimationPattern?.animationKeyFrames?.length ?? 0})</small>
-            </AccordionSummary>
-            <AccordionDetails>
-              <List>
-                {selectedAnimationPattern?.animationKeyFrames?.map((keyFrame) => (
-                  <ListItemButton
-                    key={`${keyFrame.uuid}-points`}
-                    onClick={() => {
-                      setTimelinePositionMs(keyFrame.timeMs - xCorrection[selectableStepsIndex]);
-                      setSelectedKeyFrameUuid(keyFrame.uuid);
-                    }}
-                  >
-                    <ListItemText
-                      primary={`Time ms: ${keyFrame.timeMs}`}
-                      secondary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
-                    />
-                  </ListItemButton>
-                ))}
-              </List>
-            </AccordionDetails>
-          </Accordion>
-        </div>
-      </Paper>
-    </>
+    <Paper
+      style={{ padding: "15px", paddingTop: "2px", minHeight: `${canvasPxSize + 70}px` }}
+      key={`${selectedAnimationPattern?.pattern.scale}-${selectedAnimationPattern?.pattern.xOffset}-${selectedAnimationPattern?.pattern.yOffset}-${selectedAnimationPattern?.pattern.rotation}`}
+    >
+      <p>Animation properties</p>
+      <Divider style={propertyStyle} />
+      <div style={propertyStyle}>
+        <FormLabel htmlFor="animation-scale">Scale</FormLabel>
+        <br />
+        <Input
+          id="animation-scale"
+          type="number"
+          inputProps={{ min: 0.1, max: 10, step: 0.1 }}
+          defaultValue={getPropertyValue("scale")}
+          onChange={(e) => updateProperty(Number(e.target.value))}
+          disabled={selectedKeyFrame?.propertyEdited !== "scale" || uiComponentsAreDisabled}
+        />
+        {nextKeyFrameButton("scale")}
+      </div>
+      <div style={propertyStyle}>
+        <FormLabel htmlFor="animation-xoffset">X offset</FormLabel>
+        <br />
+        <Input
+          id="animation-xoffset"
+          type="number"
+          inputProps={{ min: -4000, max: 4000 }}
+          defaultValue={getPropertyValue("xOffset")}
+          onChange={(e) => updateProperty(Number(e.target.value))}
+          disabled={selectedKeyFrame?.propertyEdited !== "xOffset" || uiComponentsAreDisabled}
+        />
+        {nextKeyFrameButton("xOffset")}
+      </div>
+      <div style={propertyStyle}>
+        <FormLabel htmlFor="animation-yoffset">Y offset</FormLabel>
+        <br />
+        <Input
+          id="animation-yoffset"
+          type="number"
+          inputProps={{ min: -4000, max: 4000 }}
+          defaultValue={getPropertyValue("yOffset")}
+          onChange={(e) => updateProperty(Number(e.target.value))}
+          disabled={selectedKeyFrame?.propertyEdited !== "yOffset" || uiComponentsAreDisabled}
+        />
+        {nextKeyFrameButton("yOffset")}
+      </div>
+      <div style={propertyStyle}>
+        <FormLabel htmlFor="animation-rotation">Rotation</FormLabel>
+        <br />
+        <Input
+          id="animation-rotation"
+          type="number"
+          inputProps={{ min: -360, max: 360 }}
+          defaultValue={getPropertyValue("rotation")}
+          onChange={(e) => updateProperty(Number(e.target.value))}
+          disabled={selectedKeyFrame?.propertyEdited !== "rotation" || uiComponentsAreDisabled}
+        />
+        {nextKeyFrameButton("rotation")}
+      </div>
+      <small>
+        Animation duration:{" "}
+        {Math.max(...(selectedAnimationPattern?.animationKeyFrames?.map((ak) => ak?.timeMs) ?? [0]))} ms
+      </small>
+      <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+        <Accordion disabled={uiComponentsAreDisabled}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <small>All keyframes ({selectedAnimationPattern?.animationKeyFrames?.length ?? 0})</small>
+          </AccordionSummary>
+          <AccordionDetails>
+            <List>
+              {selectedAnimationPattern?.animationKeyFrames?.map((keyFrame) => (
+                <ListItemButton
+                  key={`${keyFrame.uuid}-points`}
+                  onClick={() => {
+                    setTimelinePositionMs(keyFrame.timeMs - xCorrection[selectableStepsIndex]);
+                    setSelectedKeyFrameUuid(keyFrame.uuid);
+                  }}
+                >
+                  <ListItemText
+                    primary={`Time ms: ${keyFrame.timeMs}`}
+                    secondary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
+                  />
+                </ListItemButton>
+              ))}
+            </List>
+          </AccordionDetails>
+        </Accordion>
+      </div>
+    </Paper>
   );
 }

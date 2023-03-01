@@ -54,7 +54,6 @@ export default function SpotifyLogin() {
       return;
     }
 
-    console.log(tokens);
     localStorage.setItem("SpotifyAccessToken", tokens.access_token);
     localStorage.setItem("SpotifyRefreshToken", tokens.refresh_token);
     updateSpotifyToken(tokens.access_token);

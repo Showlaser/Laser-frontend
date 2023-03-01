@@ -105,15 +105,15 @@ export const prepareCanvas = (canvas: HTMLCanvasElement): CanvasRenderingContext
   }
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.moveTo(0, 325);
-  ctx.lineTo(canvasPxSize, 325);
+  ctx.moveTo(0, canvasPxSize / 2);
+  ctx.lineTo(canvasPxSize, canvasPxSize / 2);
 
   ctx.strokeStyle = "#706f6f";
   ctx.lineWidth = 0.1;
   ctx.stroke();
 
-  ctx.moveTo(325, 0);
-  ctx.lineTo(325, canvasPxSize);
+  ctx.moveTo(canvasPxSize / 2, 0);
+  ctx.lineTo(canvasPxSize / 2, canvasPxSize);
 
   ctx.stroke();
   return ctx;

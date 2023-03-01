@@ -51,6 +51,7 @@ export default function AnimationKeyFrames({
   setSelectedAnimationPattern,
   selectedAnimationPattern,
 }: Props) {
+  const uiComponentsAreDisabled = selectedAnimationPattern === null;
   let stepsToDrawMaxRange = 0;
   const keyFramesPropertiesPosition = [
     { property: "scale", yPosition: canvasPxSize * 0.2 },
@@ -344,6 +345,7 @@ export default function AnimationKeyFrames({
         <Grid item xs={2.6}>
           <InputLabel id="timeline-position-ms">Timeline position ms</InputLabel>
           <Input
+            disabled={uiComponentsAreDisabled}
             id="timeline-position-ms"
             value={timelinePositionMs}
             onKeyDown={(e) => e.preventDefault()}
@@ -354,14 +356,17 @@ export default function AnimationKeyFrames({
         </Grid>
         <span style={{ marginLeft: "10px", marginTop: "40px" }}>
           <Tooltip title="Reset timeline position to 0">
-            <IconButton onClick={() => setTimelinePositionMs(0)}>
-              <RestartAltIcon />
-            </IconButton>
+            <span>
+              <IconButton disabled={uiComponentsAreDisabled} onClick={() => setTimelinePositionMs(0)}>
+                <RestartAltIcon />
+              </IconButton>
+            </span>
           </Tooltip>
         </span>
         <Grid item xs={3}>
           <InputLabel id="steps-select">Steps</InputLabel>
           <Select
+            disabled={uiComponentsAreDisabled}
             labelId="steps-select"
             value={selectableStepsIndex}
             onChange={(e) => setSelectableStepsIndex(Number(e.target.value))}
@@ -375,15 +380,19 @@ export default function AnimationKeyFrames({
           <span style={{ marginLeft: "10px" }}>
             {playAnimation ? (
               <Tooltip title="Pause animation">
-                <IconButton onClick={() => setPlayAnimation(false)}>
-                  <PauseIcon />
-                </IconButton>
+                <span>
+                  <IconButton onClick={() => setPlayAnimation(false)} disabled={uiComponentsAreDisabled}>
+                    <PauseIcon />
+                  </IconButton>
+                </span>
               </Tooltip>
             ) : (
               <Tooltip title="Start animation">
-                <IconButton onClick={() => setPlayAnimation(true)}>
-                  <PlayArrowIcon />
-                </IconButton>
+                <span>
+                  <IconButton onClick={() => setPlayAnimation(true)} disabled={uiComponentsAreDisabled}>
+                    <PlayArrowIcon />
+                  </IconButton>
+                </span>
               </Tooltip>
             )}
           </span>
