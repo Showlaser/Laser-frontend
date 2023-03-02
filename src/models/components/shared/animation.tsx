@@ -1,5 +1,5 @@
 import { createGuid } from "services/shared/math";
-import { Pattern, getPatternPlaceHolder } from "./pattern";
+import { Pattern } from "./pattern";
 
 export enum AnimationEffects {
   Enlarge,

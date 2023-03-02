@@ -17,6 +17,7 @@ import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { propertiesSettings } from "services/logic/animation-logic";
 import { canvasPxSize } from "services/shared/config";
+import { drawLine, writeText } from "components/shared/canvas-helper";
 
 type Props = {
   timelinePositionMs: number;
@@ -86,20 +87,6 @@ export default function AnimationKeyFrames({
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     return canvas;
-  };
-
-  const drawLine = (fromX: number, fromY: number, toX: number, toY: number, ctx: CanvasRenderingContext2D) => {
-    ctx.moveTo(fromX, fromY);
-    ctx.lineTo(toX, toY);
-    ctx.strokeStyle = "rgb(90, 90, 90, 0.7)";
-    ctx.stroke();
-  };
-
-  const writeText = (x: number, y: number, text: string, ctx: CanvasRenderingContext2D) => {
-    ctx.beginPath();
-    ctx.font = "12px sans-serif";
-    ctx.fillStyle = "whitesmoke";
-    ctx.fillText(text, x, y);
   };
 
   const drawTimeStepsAndKeyframes = (canvas: HTMLCanvasElement) => {

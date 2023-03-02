@@ -187,6 +187,7 @@ export default function AnimationKeyFrameEditor({
       </Grid>
       <Grid item xs>
         <AnimationPatternTimeline
+          selectedAnimation={selectedAnimation}
           selectedAnimationPattern={selectedAnimationPattern}
           setSelectedAnimationPattern={setSelectedAnimationPattern}
         />
