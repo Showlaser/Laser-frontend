@@ -9,7 +9,7 @@ import {
   useTheme,
   LinearProgress,
 } from "@mui/material";
-import { Animation, AnimationKeyFrame, AnimationPattern } from "models/components/shared/animation";
+import { AnimationKeyFrame } from "models/components/shared/animation";
 import React, { useEffect } from "react";
 import { createGuid, mapNumber, normalize as normalize, numberIsBetweenOrEqual } from "services/shared/math";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -18,40 +18,50 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { propertiesSettings } from "services/logic/animation-logic";
 import { canvasPxSize } from "services/shared/config";
 import { drawLine, writeText } from "components/shared/canvas-helper";
+import animation, {
+  SelectedAnimationContext,
+  SelectedAnimationContextType,
+  SelectedAnimationPatternContext,
+  SelectedAnimationPatternContextType,
+} from "pages/animation";
+import {
+  XCorrectionContext,
+  TimeLinePositionContext,
+  SelectableStepsIndexContext,
+  PlayAnimationContext,
+  SelectableStepsContext,
+  TimeLineContextType,
+  SelectableStepsIndexContextType,
+  SelectedKeyFrameContextType,
+  PlayAnimationContextType,
+  SelectedKeyFrameContext,
+} from "..";
 
-type Props = {
-  timelinePositionMs: number;
-  playAnimation: boolean;
-  setTimelinePositionMs: (value: number) => void;
-  setSelectableStepsIndex: (value: number) => void;
-  selectableSteps: number[];
-  selectableStepsIndex: number;
-  xCorrection: number[];
-  selectedAnimation: Animation | null;
-  setSelectedAnimation: (animation: Animation) => void;
-  selectedKeyFrameUuid: string;
-  setSelectedKeyFrameUuid: (uuid: string) => void;
-  setPlayAnimation: (play: boolean) => void;
-  selectedAnimationPattern: AnimationPattern | null;
-  setSelectedAnimationPattern: (animationPattern: AnimationPattern | null) => void;
-};
+export default function AnimationKeyFrames() {
+  const { selectedAnimation, setSelectedAnimation } = React.useContext(
+    SelectedAnimationContext
+  ) as SelectedAnimationContextType;
 
-export default function AnimationKeyFrames({
-  selectedAnimation: animation,
-  timelinePositionMs,
-  playAnimation,
-  setTimelinePositionMs,
-  setSelectableStepsIndex,
-  selectableSteps,
-  selectableStepsIndex,
-  selectedKeyFrameUuid,
-  xCorrection,
-  setSelectedAnimation,
-  setSelectedKeyFrameUuid,
-  setPlayAnimation,
-  setSelectedAnimationPattern,
-  selectedAnimationPattern,
-}: Props) {
+  const { selectedAnimationPattern, setSelectedAnimationPattern } = React.useContext(
+    SelectedAnimationPatternContext
+  ) as SelectedAnimationPatternContextType;
+
+  const xCorrection = React.useContext(XCorrectionContext);
+  const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
+    TimeLinePositionContext
+  ) as TimeLineContextType;
+
+  const selectableSteps = React.useContext(SelectableStepsContext);
+  const { selectableStepsIndex, setSelectableStepsIndex } = React.useContext(
+    SelectableStepsIndexContext
+  ) as SelectableStepsIndexContextType;
+
+  const { selectedKeyFrameUuid, setSelectedKeyFrameUuid } = React.useContext(
+    SelectedKeyFrameContext
+  ) as SelectedKeyFrameContextType;
+
+  const { playAnimation, setPlayAnimation } = React.useContext(PlayAnimationContext) as PlayAnimationContextType;
+
   const uiComponentsAreDisabled = selectedAnimationPattern === null;
   let stepsToDrawMaxRange = 0;
   const keyFramesPropertiesPosition = [

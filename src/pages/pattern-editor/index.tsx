@@ -118,7 +118,7 @@ export default function PatternPage() {
           })) ?? []
         }
         onNoItemsMessageTitle="No saved patterns"
-        onNoItemsDescription="Create a new pattern"
+        onNoItemsDescription="Create a new pattern first"
       />
       <Box>
         <input

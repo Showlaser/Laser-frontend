@@ -10,7 +10,12 @@ import { mapNumber } from "services/shared/math";
 import { applyParametersToPointsForCanvas } from "services/shared/converters";
 import { propertiesSettings } from "services/logic/animation-logic";
 import AnimationPatternTimeline from "./animation-pattern-timeline";
-import { Pattern } from "models/components/shared/pattern";
+import {
+  SelectedAnimationContext,
+  SelectedAnimationContextType,
+  SelectedAnimationPatternContext,
+  SelectedAnimationPatternContextType,
+} from "pages/animation";
 
 type PreviousCurrentAndNextKeyFramePerProperty = {
   previous: AnimationKeyFrame[];
@@ -18,26 +23,46 @@ type PreviousCurrentAndNextKeyFramePerProperty = {
   next: AnimationKeyFrame[];
 };
 
-type Props = {
-  selectedAnimation: Animation | null;
-  setSelectedAnimation: (animation: Animation | null) => void;
-  availablePatterns: Pattern[] | null;
-  selectedAnimationPattern: AnimationPattern | null;
-  setSelectedAnimationPattern: (pattern: AnimationPattern | null) => void;
+export type TimeLineContextType = {
+  timelinePositionMs: number;
+  setTimelinePositionMs: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export default function AnimationKeyFrameEditor({
-  selectedAnimation,
-  setSelectedAnimation,
-  selectedAnimationPattern,
-  setSelectedAnimationPattern,
-}: Props) {
+export type SelectableStepsIndexContextType = {
+  selectableStepsIndex: number;
+  setSelectableStepsIndex: React.Dispatch<React.SetStateAction<number>>;
+};
+
+export type SelectedKeyFrameContextType = {
+  selectedKeyFrameUuid: string;
+  setSelectedKeyFrameUuid: React.Dispatch<React.SetStateAction<string>>;
+};
+
+export type PlayAnimationContextType = {
+  playAnimation: boolean;
+  setPlayAnimation: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export const TimeLinePositionContext = React.createContext<TimeLineContextType | null>(null);
+export const SelectableStepsIndexContext = React.createContext<SelectableStepsIndexContextType | null>(null);
+export const SelectedKeyFrameContext = React.createContext<SelectedKeyFrameContextType | null>(null);
+export const PlayAnimationContext = React.createContext<PlayAnimationContextType | null>(null);
+export const XCorrectionContext = React.createContext<number[]>([]);
+export const SelectableStepsContext = React.createContext<number[]>([10, 100, 1000, 10000]);
+
+export default function AnimationKeyFrameEditor() {
+  const { selectedAnimation, setSelectedAnimation } = React.useContext(
+    SelectedAnimationContext
+  ) as SelectedAnimationContextType;
+  const { selectedAnimationPattern, setSelectedAnimationPattern } = React.useContext(
+    SelectedAnimationPatternContext
+  ) as SelectedAnimationPatternContextType;
+
   const [timelinePositionMs, setTimelinePositionMs] = useState<number>(0);
   const [selectableStepsIndex, setSelectableStepsIndex] = useState<number>(0);
   const [selectedKeyFrameUuid, setSelectedKeyFrameUuid] = useState<string>("");
   const [playAnimation, setPlayAnimation] = useState<boolean>(false);
   const selectableSteps = [10, 100, 1000, 10000];
-  const xCorrection = [20, 350, 3000, 8000];
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -48,18 +73,38 @@ export default function AnimationKeyFrameEditor({
     return () => clearInterval(interval);
   }, [playAnimation, selectableStepsIndex, timelinePositionMs, selectedKeyFrameUuid, selectedAnimation]);
 
+  const getWrapperContext = (reactObject: React.ReactNode) => (
+    <TimeLinePositionContext.Provider value={{ timelinePositionMs, setTimelinePositionMs }}>
+      <SelectableStepsIndexContext.Provider value={{ selectableStepsIndex, setSelectableStepsIndex }}>
+        <SelectedKeyFrameContext.Provider value={{ selectedKeyFrameUuid, setSelectedKeyFrameUuid }}>
+          <PlayAnimationContext.Provider value={{ playAnimation, setPlayAnimation }}>
+            <XCorrectionContext.Provider value={[20, 350, 3000, 8000]}>
+              <SelectableStepsContext.Provider value={selectableSteps}>{reactObject}</SelectableStepsContext.Provider>
+            </XCorrectionContext.Provider>
+          </PlayAnimationContext.Provider>
+        </SelectedKeyFrameContext.Provider>
+      </SelectableStepsIndexContext.Provider>
+    </TimeLinePositionContext.Provider>
+  );
+
   const getNextKeyFramesByPropertySorted = (property: string) =>
     selectedAnimationPattern?.animationKeyFrames
-      .filter((ak) => ak.timeMs > timelinePositionMs && ak.propertyEdited === property)
-      .sort((a, b) => a.timeMs - b.timeMs);
+      .filter(
+        (ak: { timeMs: number; propertyEdited: string }) =>
+          ak.timeMs > timelinePositionMs && ak.propertyEdited === property
+      )
+      .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
 
   const getPreviousKeyFramesByPropertySortedDescending = (property: string) =>
     selectedAnimationPattern?.animationKeyFrames
-      .filter((ak) => ak.timeMs < timelinePositionMs && ak.propertyEdited === property)
-      .sort((a, b) => b.timeMs - a.timeMs);
+      .filter(
+        (ak: { timeMs: number; propertyEdited: string }) =>
+          ak.timeMs < timelinePositionMs && ak.propertyEdited === property
+      )
+      .sort((a: { timeMs: number }, b: { timeMs: number }) => b.timeMs - a.timeMs);
 
   const getCurrentKeyFrame = () =>
-    selectedAnimationPattern?.animationKeyFrames.filter((ak) => ak.timeMs === timelinePositionMs);
+    selectedAnimationPattern?.animationKeyFrames.filter((ak: { timeMs: number }) => ak.timeMs === timelinePositionMs);
 
   const getPreviousCurrentAndNextKeyFramePerProperty = (): PreviousCurrentAndNextKeyFramePerProperty => {
     let previousNextAndCurrentKeyFramePerProperty: PreviousCurrentAndNextKeyFramePerProperty = {
@@ -151,35 +196,10 @@ export default function AnimationKeyFrameEditor({
     <>
       <Grid container direction="row" spacing={2} key={selectedKeyFrameUuid}>
         <Grid item xs={3} style={{ maxWidth: "25vh" }}>
-          <AnimationProperties
-            selectedAnimation={selectedAnimation}
-            selectedKeyFrameUuid={selectedKeyFrameUuid}
-            setSelectedKeyFrameUuid={setSelectedKeyFrameUuid}
-            setSelectedAnimation={setSelectedAnimation}
-            setTimelinePositionMs={setTimelinePositionMs}
-            xCorrection={xCorrection}
-            selectableStepsIndex={selectableStepsIndex}
-            selectedAnimationPattern={selectedAnimationPattern}
-            setSelectedAnimationPattern={setSelectedAnimationPattern}
-          />
+          {getWrapperContext(<AnimationProperties />)}
         </Grid>
         <Grid item xs>
-          <AnimationKeyFrames
-            selectedAnimation={selectedAnimation}
-            selectedKeyFrameUuid={selectedKeyFrameUuid}
-            setSelectedKeyFrameUuid={setSelectedKeyFrameUuid}
-            setSelectedAnimation={setSelectedAnimation}
-            setTimelinePositionMs={setTimelinePositionMs}
-            xCorrection={xCorrection}
-            selectableStepsIndex={selectableStepsIndex}
-            timelinePositionMs={timelinePositionMs}
-            playAnimation={playAnimation}
-            setSelectableStepsIndex={setSelectableStepsIndex}
-            selectableSteps={selectableSteps}
-            setPlayAnimation={setPlayAnimation}
-            selectedAnimationPattern={selectedAnimationPattern}
-            setSelectedAnimationPattern={setSelectedAnimationPattern}
-          />
+          {getWrapperContext(<AnimationKeyFrames />)}
         </Grid>
         <Grid item xs>
           <PointsDrawer pointsToDraw={getPointsToDraw()} />

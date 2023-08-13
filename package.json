@@ -59,6 +59,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/d3-array": "^3.0.2",
     "@types/react-router-dom": "^5.3.3",
     "electron": "^22.0.0",

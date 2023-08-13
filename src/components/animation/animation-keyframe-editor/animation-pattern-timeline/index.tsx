@@ -65,7 +65,8 @@ export default function AnimationPatternTimeline({
   };
 
   const onVisibilityCheckmarkClick = (x: number, y: number) => {
-    if (!numberIsBetweenOrEqual(x, 5, 20)) {
+    const mouseClickIsNotInsideCheckboxMargin = !numberIsBetweenOrEqual(x, 5, 20);
+    if (mouseClickIsNotInsideCheckboxMargin) {
       return;
     }
 

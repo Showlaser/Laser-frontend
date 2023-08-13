@@ -15,40 +15,54 @@ import {
 
 import React from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Animation, AnimationPattern } from "models/components/shared/animation";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import { canvasPxSize } from "services/shared/config";
+import {
+  PlayAnimationContext,
+  PlayAnimationContextType,
+  SelectableStepsIndexContext,
+  SelectableStepsIndexContextType,
+  SelectedKeyFrameContext,
+  SelectedKeyFrameContextType,
+  TimeLineContextType,
+  TimeLinePositionContext,
+  XCorrectionContext,
+} from "..";
+import {
+  SelectedAnimationContext,
+  SelectedAnimationContextType,
+  SelectedAnimationPatternContext,
+  SelectedAnimationPatternContextType,
+} from "pages/animation";
 
-type Props = {
-  selectedAnimation: Animation | null;
-  selectedKeyFrameUuid: string;
-  setSelectedKeyFrameUuid: (uuid: string) => void;
-  setSelectedAnimation: (animation: Animation) => void;
-  setTimelinePositionMs: any;
-  xCorrection: number[];
-  selectableStepsIndex: number;
-  selectedAnimationPattern: AnimationPattern | null;
-  setSelectedAnimationPattern: (animationPattern: AnimationPattern | null) => void;
-};
+export default function AnimationProperties() {
+  const { selectedAnimation, setSelectedAnimation } = React.useContext(
+    SelectedAnimationContext
+  ) as SelectedAnimationContextType;
+  const { selectedAnimationPattern, setSelectedAnimationPattern } = React.useContext(
+    SelectedAnimationPatternContext
+  ) as SelectedAnimationPatternContextType;
+  const xCorrection = React.useContext(XCorrectionContext);
+  const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
+    TimeLinePositionContext
+  ) as TimeLineContextType;
+  const { selectableStepsIndex, setSelectableStepsIndex } = React.useContext(
+    SelectableStepsIndexContext
+  ) as SelectableStepsIndexContextType;
+  const { selectedKeyFrameUuid, setSelectedKeyFrameUuid } = React.useContext(
+    SelectedKeyFrameContext
+  ) as SelectedKeyFrameContextType;
+  const { playAnimation, setPlayAnimation } = React.useContext(PlayAnimationContext) as PlayAnimationContextType;
 
-export default function AnimationProperties({
-  selectedAnimation,
-  selectedKeyFrameUuid,
-  setSelectedKeyFrameUuid,
-  setSelectedAnimation,
-  setTimelinePositionMs,
-  xCorrection,
-  selectableStepsIndex,
-  selectedAnimationPattern,
-  setSelectedAnimationPattern,
-}: Props) {
-  const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames?.find((kf) => kf.uuid === selectedKeyFrameUuid);
+  const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames?.find(
+    (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
+  );
   const uiComponentsAreDisabled = selectedAnimationPattern === null;
 
   const updateProperty = (value: string | number) => {
     const selectedKeyFrameIndex = selectedAnimationPattern?.animationKeyFrames.findIndex(
-      (kf) => kf.uuid === selectedKeyFrameUuid
+      (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
     );
     let updatedAnimation: any = { ...selectedAnimation };
     if (
@@ -66,7 +80,7 @@ export default function AnimationProperties({
 
   const getPropertyValue = (property: string) => {
     const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames.find(
-      (kf) => kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property
+      (kf: { uuid: any; propertyEdited: string }) => kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property
     );
 
     return selectedKeyFrame?.propertyValue;
@@ -80,7 +94,7 @@ export default function AnimationProperties({
     setSelectedKeyFrameUuid("");
     let updatedAnimation: any = { ...selectedAnimation };
     const selectedKeyFrameIndex = selectedAnimationPattern?.animationKeyFrames.findIndex(
-      (kf) => kf.uuid === selectedKeyFrameUuid
+      (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
     );
     if (
       updatedAnimation === undefined ||
@@ -96,7 +110,7 @@ export default function AnimationProperties({
 
   const getNextOrPreviousKeyframe = (getPrevious: boolean, property: string) => {
     const currentSelectedKeyFrame = selectedAnimationPattern?.animationKeyFrames.find(
-      (ak) => ak.uuid === selectedKeyFrameUuid
+      (ak: { uuid: any }) => ak.uuid === selectedKeyFrameUuid
     );
     if (currentSelectedKeyFrame === undefined) {
       onGetNextOrPreviousKeyframeError(property);
@@ -104,7 +118,7 @@ export default function AnimationProperties({
     }
 
     const keyFrames = selectedAnimationPattern?.animationKeyFrames
-      .filter((ak) => {
+      .filter((ak: { propertyEdited: string; timeMs: number }) => {
         const propertyIsTheSame = ak.propertyEdited === property;
         const isBelowOrUnderCurrentSelectedKeyFrame = getPrevious
           ? ak.timeMs <= currentSelectedKeyFrame?.timeMs ?? 0
@@ -112,13 +126,15 @@ export default function AnimationProperties({
 
         return propertyIsTheSame && isBelowOrUnderCurrentSelectedKeyFrame;
       })
-      .sort((a, b) => a.timeMs - b.timeMs);
+      .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
 
     if (keyFrames === undefined) {
       return;
     }
 
-    const currentPositionInArray = keyFrames?.findIndex((ak) => ak.uuid === currentSelectedKeyFrame.uuid);
+    const currentPositionInArray = keyFrames?.findIndex(
+      (ak: { uuid: any }) => ak.uuid === currentSelectedKeyFrame.uuid
+    );
     if (currentPositionInArray === -1) {
       onGetNextOrPreviousKeyframeError(property);
       return;
@@ -147,12 +163,12 @@ export default function AnimationProperties({
 
   const getLastKeyframe = (property: string, currentSelectedKeyFrameTimeMs: number) => {
     const keyFrames = selectedAnimationPattern?.animationKeyFrames
-      .filter((ak) => {
+      .filter((ak: { propertyEdited: string; timeMs: number }) => {
         const propertyIsTheSame = ak.propertyEdited === property;
         const isOverCurrentSelectedKeyFrame = ak.timeMs >= currentSelectedKeyFrameTimeMs ?? 0;
         return propertyIsTheSame && isOverCurrentSelectedKeyFrame;
       })
-      .sort((a, b) => a.timeMs - b.timeMs);
+      .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
 
     if (keyFrames === undefined) {
       return;
@@ -169,8 +185,8 @@ export default function AnimationProperties({
 
   const onGetNextOrPreviousKeyframeError = (property: string) => {
     const kf = selectedAnimationPattern?.animationKeyFrames
-      .filter((ak) => ak.propertyEdited === property)
-      .sort((a, b) => a.timeMs - b.timeMs)
+      .filter((ak: { propertyEdited: string }) => ak.propertyEdited === property)
+      .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs)
       .at(0);
     if (kf === undefined) {
       return;
@@ -260,7 +276,8 @@ export default function AnimationProperties({
       </div>
       <small>
         Animation duration:{" "}
-        {Math.max(...(selectedAnimationPattern?.animationKeyFrames?.map((ak) => ak?.timeMs) ?? [0]))} ms
+        {Math.max(...(selectedAnimationPattern?.animationKeyFrames?.map((ak: { timeMs: any }) => ak?.timeMs) ?? [0]))}{" "}
+        ms
       </small>
       <div style={{ maxHeight: "200px", overflowY: "auto" }}>
         <Accordion disabled={uiComponentsAreDisabled}>
@@ -269,20 +286,22 @@ export default function AnimationProperties({
           </AccordionSummary>
           <AccordionDetails>
             <List>
-              {selectedAnimationPattern?.animationKeyFrames?.map((keyFrame) => (
-                <ListItemButton
-                  key={`${keyFrame.uuid}-points`}
-                  onClick={() => {
-                    setTimelinePositionMs(keyFrame.timeMs - xCorrection[selectableStepsIndex]);
-                    setSelectedKeyFrameUuid(keyFrame.uuid);
-                  }}
-                >
-                  <ListItemText
-                    primary={`Time ms: ${keyFrame.timeMs}`}
-                    secondary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
-                  />
-                </ListItemButton>
-              ))}
+              {selectedAnimationPattern?.animationKeyFrames?.map(
+                (keyFrame: { uuid: any; timeMs: number; propertyEdited: any; propertyValue: any }) => (
+                  <ListItemButton
+                    key={`${keyFrame.uuid}-points`}
+                    onClick={() => {
+                      setTimelinePositionMs(keyFrame.timeMs - xCorrection[selectableStepsIndex]);
+                      setSelectedKeyFrameUuid(keyFrame.uuid);
+                    }}
+                  >
+                    <ListItemText
+                      primary={`Time ms: ${keyFrame.timeMs}`}
+                      secondary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
+                    />
+                  </ListItemButton>
+                )
+              )}
             </List>
           </AccordionDetails>
         </Accordion>
