@@ -18,8 +18,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { OnTrue } from "../on-true";
 
 type CardOverviewItems = {
-  uuid: string;
-  name: string;
+  uuid: string | null;
+  name: string | null;
   image: string | null;
   onCardClick: (item: any) => void;
 };
@@ -30,7 +30,7 @@ type CardOverviewProps = {
   items: CardOverviewItems[];
   onNoItemsMessageTitle: string;
   onNoItemsDescription: string;
-  onDeleteClick: (uuid: string) => void;
+  onDeleteClick: (uuid: string | null) => void;
 };
 
 export default function CardOverview({
@@ -56,7 +56,13 @@ export default function CardOverview({
         <IconButton style={{ marginLeft: "95%" }} onClick={closeOverview}>
           <CloseIcon />
         </IconButton>
-        <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center">
+        <Grid
+          container
+          spacing={0}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+        >
           <OnTrue onTrue={items?.length > 0}>
             <Paper
               sx={{
@@ -71,9 +77,16 @@ export default function CardOverview({
                 value={searchValue}
                 sx={{ ml: 1, flex: 1 }}
                 placeholder="Search items"
-                onChange={(e) => setSearchValue(e.target.value.toLocaleLowerCase())}
+                onChange={(e) =>
+                  setSearchValue(e.target.value.toLocaleLowerCase())
+                }
               />
-              <IconButton type="button" sx={{ p: "10px" }} aria-label="search" onClick={() => setSearchValue("")}>
+              <IconButton
+                type="button"
+                sx={{ p: "10px" }}
+                aria-label="search"
+                onClick={() => setSearchValue("")}
+              >
                 <CloseIcon />
               </IconButton>
             </Paper>
@@ -96,19 +109,35 @@ export default function CardOverview({
             }}
           >
             {items
-              .filter((item) => (searchValue.length > 0 ? item.name.toLowerCase().includes(searchValue) : true))
+              .filter((item) =>
+                searchValue.length > 0
+                  ? item?.name?.toLowerCase().includes(searchValue)
+                  : true
+              )
               .map((item, index) => (
-                <Grow in={items.length > 0} timeout={1400 * index > 2500 ? 2500 : 1400 * index} key={`card ${index}`}>
-                  <Card sx={{ width: "20%", minWidth: "30vh", margin: 1 }} key={item.name + "card-overview"}>
+                <Grow
+                  in={items.length > 0}
+                  timeout={1400 * index > 2500 ? 2500 : 1400 * index}
+                  key={`card ${index}`}
+                >
+                  <Card
+                    sx={{ width: "20%", minWidth: "30vh", margin: 1 }}
+                    key={item.name + "card-overview"}
+                  >
                     <CardActionArea onClick={() => item.onCardClick(item)}>
-                      <CardMedia component="img" height="300" alt="pattern image" src={item.image ?? ""} />
+                      <CardMedia
+                        component="img"
+                        height="300"
+                        alt="pattern image"
+                        src={item.image ?? ""}
+                      />
                       <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
                           {item.name}
                         </Typography>
                       </CardContent>
                     </CardActionArea>
-                    <Button fullWidth onClick={() => onDeleteClick(item.uuid)}>
+                    <Button fullWidth onClick={() => onDeleteClick(item?.uuid)}>
                       Delete
                     </Button>
                   </Card>

@@ -1,12 +1,7 @@
 import { createGuid } from "services/shared/math";
 import { Pattern } from "./pattern";
 
-export enum AnimationEffects {
-  Enlarge,
-  Reduce,
-}
-
-export type AnimationKeyFrame = {
+export type AnimationPatternKeyFrame = {
   uuid: string;
   timeMs: number;
   propertyEdited: string;
@@ -16,7 +11,9 @@ export type AnimationKeyFrame = {
 export type AnimationPattern = {
   uuid: string;
   pattern: Pattern;
-  animationKeyFrames: AnimationKeyFrame[];
+  animationKeyFrames: AnimationPatternKeyFrame[];
+  startTimeMs: number;
+  timelineId: number;
 };
 
 export type Animation = {
@@ -24,7 +21,6 @@ export type Animation = {
   name: string;
   image: string | null;
   animationPatterns: AnimationPattern[];
-  animationEffects: AnimationEffect[];
 };
 
 export const animationPlaceholder = (): Animation => ({
@@ -32,5 +28,4 @@ export const animationPlaceholder = (): Animation => ({
   name: "Placeholder animation",
   image: null,
   animationPatterns: [],
-  animationEffects: [],
 });

@@ -1,1 +1,1 @@
-export const canvasPxSize = 500;
+export const canvasPxSize = window.innerHeight / 1.6;

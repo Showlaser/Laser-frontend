@@ -7,7 +7,10 @@ import AttachFileIcon from "@mui/icons-material/AttachFile";
 import PatternEditor from "components/pattern/svg-to-coordinates-converter";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
-import { getPatternPlaceHolder, Pattern } from "models/components/shared/pattern";
+import {
+  getPatternPlaceHolder,
+  Pattern,
+} from "models/components/shared/pattern";
 import { getPatterns, removePattern } from "services/logic/pattern-logic";
 import CardOverview from "components/shared/card-overview";
 import AddIcon from "@mui/icons-material/Add";
@@ -16,7 +19,9 @@ import DeleteModal from "components/shared/delete-modal";
 
 export default function PatternPage() {
   const [uploadedFile, setUploadedFile] = useState<any>();
-  const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
+  const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(
+    null
+  );
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
   const [modalOptions, setModalOptions] = useState<any>({
@@ -44,7 +49,13 @@ export default function PatternPage() {
     <SpeedDial
       ariaLabel="SpeedDial basic example"
       sx={{ position: "absolute", bottom: 30, right: 30 }}
-      icon={uploadedFile === undefined && selectedPattern === null ? <SpeedDialIcon /> : <SettingsIcon />}
+      icon={
+        uploadedFile === undefined && selectedPattern === null ? (
+          <SpeedDialIcon />
+        ) : (
+          <SettingsIcon />
+        )
+      }
     >
       <SpeedDialAction
         key="sd-new-file"
@@ -60,7 +71,10 @@ export default function PatternPage() {
         key="sd-upload"
         tooltipTitle="Upload local file"
         icon={
-          <label htmlFor="raised-button-file" style={{ cursor: "pointer", padding: "25px" }}>
+          <label
+            htmlFor="raised-button-file"
+            style={{ cursor: "pointer", padding: "25px" }}
+          >
             <AttachFileIcon style={{ marginTop: "8px" }} />
           </label>
         }
@@ -90,11 +104,16 @@ export default function PatternPage() {
 
   return (
     <SideNav pageName="Pattern editor">
-      <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
+      <DeleteModal
+        modalOptions={modalOptions}
+        setModalOptions={setModalOptions}
+      />
       <OnTrue onTrue={uploadedFile !== undefined || selectedPattern !== null}>
         <PatternEditor
           patternNamesInUse={
-            availablePatterns?.map((pattern) => (pattern.uuid !== selectedPattern?.uuid ? pattern.name : "")) ?? []
+            availablePatterns?.map((pattern) =>
+              pattern.uuid !== selectedPattern?.uuid ? pattern.name : ""
+            ) ?? []
           }
           uploadedFile={uploadedFile}
           setUploadedFile={setUploadedFile}
@@ -105,7 +124,9 @@ export default function PatternPage() {
       <CardOverview
         closeOverview={() => setModalOpen(false)}
         show={modalOpen}
-        onDeleteClick={(uuid) => setModalOptions({ show: true, onDelete: () => onDelete(uuid) })}
+        onDeleteClick={(uuid) =>
+          setModalOptions({ show: true, onDelete: () => onDelete(uuid ?? "") })
+        }
         items={
           availablePatterns?.map((pattern) => ({
             uuid: pattern.uuid,
@@ -135,7 +156,9 @@ export default function PatternPage() {
             setUploadedFile(e.target.files[0]);
           }}
         />
-        {uploadedFile === undefined && selectedPattern === null ? getSpeedDial() : null}
+        {uploadedFile === undefined && selectedPattern === null
+          ? getSpeedDial()
+          : null}
       </Box>
     </SideNav>
   );

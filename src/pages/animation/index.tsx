@@ -7,7 +7,10 @@ import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import CardOverview from "components/shared/card-overview";
-import { Animation, AnimationPattern } from "models/components/shared/animation";
+import {
+  Animation,
+  AnimationPattern,
+} from "models/components/shared/animation";
 import { getPatterns, removePattern } from "services/logic/pattern-logic";
 import { getAnimations, removeAnimation } from "services/logic/animation-logic";
 import { convertPatternToAnimation } from "services/shared/converters";
@@ -23,7 +26,9 @@ export type SelectedAnimationContextType = {
 
 export type AvailableAnimationsContextType = {
   availableAnimations: Animation[] | null;
-  setAvailableAnimations: React.Dispatch<React.SetStateAction<Animation[] | null>>;
+  setAvailableAnimations: React.Dispatch<
+    React.SetStateAction<Animation[] | null>
+  >;
 };
 
 export type AvailablePatternsContextType = {
@@ -33,42 +38,83 @@ export type AvailablePatternsContextType = {
 
 export type SelectedAnimationPatternContextType = {
   selectedAnimationPattern: AnimationPattern | null;
-  setSelectedAnimationPattern: React.Dispatch<React.SetStateAction<AnimationPattern | null>>;
+  setSelectedAnimationPattern: React.Dispatch<
+    React.SetStateAction<AnimationPattern | null>
+  >;
 };
 
-export const SelectedAnimationContext = React.createContext<SelectedAnimationContextType | null>(null);
-export const AvailableAnimationsContext = React.createContext<AvailableAnimationsContextType | null>(null);
-export const AvailablePatternsContext = React.createContext<AvailablePatternsContextType | null>(null);
-export const SelectedAnimationPatternContext = React.createContext<SelectedAnimationPatternContextType | null>(null);
+export const SelectedAnimationContext =
+  React.createContext<SelectedAnimationContextType | null>(null);
+export const AvailableAnimationsContext =
+  React.createContext<AvailableAnimationsContextType | null>(null);
+export const AvailablePatternsContext =
+  React.createContext<AvailablePatternsContextType | null>(null);
+export const SelectedAnimationPatternContext =
+  React.createContext<SelectedAnimationPatternContextType | null>(null);
 
 export default function AnimationPage() {
-  const [selectedAnimation, setSelectedAnimation] = useState<Animation | null>(null);
-  const [availableAnimations, setAvailableAnimations] = useState<Animation[] | null>(null);
-  const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
-  const [convertPatternModalOpen, setConvertPatternModalOpen] = useState<boolean>(false);
-  const [animationsModalOpen, setAnimationsModalOpen] = useState<boolean>(false);
-  const [selectedAnimationPattern, setSelectedAnimationPattern] = useState<AnimationPattern | null>(null);
+  const [selectedAnimation, setSelectedAnimation] = useState<Animation | null>(
+    null
+  );
+  const [availableAnimations, setAvailableAnimations] = useState<
+    Animation[] | null
+  >(null);
+  const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(
+    null
+  );
+  const [convertPatternModalOpen, setConvertPatternModalOpen] =
+    useState<boolean>(false);
+  const [animationsModalOpen, setAnimationsModalOpen] =
+    useState<boolean>(false);
+  const [selectedAnimationPattern, setSelectedAnimationPattern] =
+    useState<AnimationPattern | null>(null);
   const [modalOptions, setModalOptions] = useState<ModalOptions>({
     show: false,
     onDelete: () => null,
   });
+
+  const selectedAnimationMemo = React.useMemo(
+    () => ({ selectedAnimation, setSelectedAnimation }),
+    [selectedAnimation]
+  );
+
+  const availableAnimationsMemo = React.useMemo(
+    () => ({ availableAnimations, setAvailableAnimations }),
+    [availableAnimations]
+  );
+
+  const availablePatternsMemo = React.useMemo(
+    () => ({ availablePatterns, setAvailablePatterns }),
+    [selectedAnimation]
+  );
+
+  const selectedAnimationPatternMemo = React.useMemo(
+    () => ({ selectedAnimationPattern, setSelectedAnimationPattern }),
+    [selectedAnimation]
+  );
 
   useEffect(() => {
     if (availableAnimations === null && availablePatterns === null) {
       getPatterns().then((patterns) => setAvailablePatterns(patterns ?? []));
       getAnimations().then((response) => {
         if (response?.status === 200) {
-          response.json().then((animations: Animation[]) => setAvailableAnimations(animations));
+          response
+            .json()
+            .then((animations: Animation[]) =>
+              setAvailableAnimations(animations)
+            );
         }
       });
     }
   }, []);
 
   const getWrapperContext = (reactObject: React.ReactNode) => (
-    <SelectedAnimationContext.Provider value={{ selectedAnimation, setSelectedAnimation }}>
-      <AvailableAnimationsContext.Provider value={{ availableAnimations, setAvailableAnimations }}>
-        <AvailablePatternsContext.Provider value={{ availablePatterns, setAvailablePatterns }}>
-          <SelectedAnimationPatternContext.Provider value={{ selectedAnimationPattern, setSelectedAnimationPattern }}>
+    <SelectedAnimationContext.Provider value={selectedAnimationMemo}>
+      <AvailableAnimationsContext.Provider value={availableAnimationsMemo}>
+        <AvailablePatternsContext.Provider value={availablePatternsMemo}>
+          <SelectedAnimationPatternContext.Provider
+            value={selectedAnimationPatternMemo}
+          >
             {reactObject}
           </SelectedAnimationPatternContext.Provider>
         </AvailablePatternsContext.Provider>
@@ -87,7 +133,10 @@ export default function AnimationPage() {
         key="sd-pattern-to-animation"
         tooltipTitle="Convert saved pattern to animation"
         icon={
-          <label htmlFor="raised-button-file" style={{ cursor: "pointer", padding: "25px" }}>
+          <label
+            htmlFor="raised-button-file"
+            style={{ cursor: "pointer", padding: "25px" }}
+          >
             <AllInclusiveIcon style={{ marginTop: "8px" }} />
           </label>
         }
@@ -96,7 +145,10 @@ export default function AnimationPage() {
         onClick={() => setAnimationsModalOpen(true)}
         key="sd-animation-from-pc"
         icon={
-          <label htmlFor="raised-button-file" style={{ cursor: "pointer", padding: "25px" }}>
+          <label
+            htmlFor="raised-button-file"
+            style={{ cursor: "pointer", padding: "25px" }}
+          >
             <CloudDownloadIcon style={{ marginTop: "8px" }} />
           </label>
         }
@@ -139,15 +191,25 @@ export default function AnimationPage() {
 
   return (
     <SideNav pageName="Animation">
-      <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
-      {selectedAnimation === null ? getSpeedDial() : getWrapperContext(<AnimationKeyFrameEditor />)}
+      <DeleteModal
+        modalOptions={modalOptions}
+        setModalOptions={setModalOptions}
+      />
+      {selectedAnimation === null
+        ? getSpeedDial()
+        : getWrapperContext(<AnimationKeyFrameEditor />)}
       <OnTrue onTrue={convertPatternModalOpen}>
         <CardOverview
           closeOverview={() => setConvertPatternModalOpen(false)}
           show={convertPatternModalOpen}
           onNoItemsMessageTitle="No patterns saved"
           onNoItemsDescription="Create a new pattern in the pattern editor"
-          onDeleteClick={(uuid) => setModalOptions({ show: true, onDelete: () => onPatternDelete(uuid) })}
+          onDeleteClick={(uuid) =>
+            setModalOptions({
+              show: true,
+              onDelete: () => onPatternDelete(uuid ?? ""),
+            })
+          }
           items={
             availablePatterns?.map((pattern) => ({
               uuid: pattern.uuid,
@@ -157,7 +219,9 @@ export default function AnimationPage() {
                 setConvertPatternModalOpen(false);
                 let availableAnimationsToUpdate = availableAnimations ?? [];
                 const convertedAnimation = convertPatternToAnimation(pattern);
-
+                setSelectedAnimationPattern(
+                  convertedAnimation.animationPatterns[0]
+                );
                 availableAnimations?.push(convertedAnimation);
                 setAvailableAnimations(availableAnimationsToUpdate);
                 setSelectedAnimation(convertedAnimation);
@@ -172,7 +236,12 @@ export default function AnimationPage() {
           show={animationsModalOpen}
           onNoItemsMessageTitle="No animations saved"
           onNoItemsDescription="Create a new animation first"
-          onDeleteClick={(uuid) => setModalOptions({ show: true, onDelete: () => onAnimationDelete(uuid) })}
+          onDeleteClick={(uuid) =>
+            setModalOptions({
+              show: true,
+              onDelete: () => onAnimationDelete(uuid ?? ""),
+            })
+          }
           items={
             availableAnimations?.map((animation) => ({
               uuid: animation.uuid,
