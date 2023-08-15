@@ -7,16 +7,17 @@ import {
   refreshSpotifyAccessToken,
   updateSpotifyToken,
 } from "services/logic/spotify";
-import { getCodeFromResponse, stringIsEmpty } from "services/shared/general";
+import { getUrlCode, stringIsEmpty } from "services/shared/general";
 import paths from "services/shared/router-paths";
 import { showSuccess, toastSubject } from "services/shared/toast-messages";
 
 export default function SpotifyLogin() {
-  const accessTokenAvailable: boolean = localStorage.getItem("SpotifyAccessToken") !== null;
+  const accessTokenAvailable: boolean =
+    localStorage.getItem("SpotifyAccessToken") !== null;
   const [loggedIn, setLoggedIn] = useState<boolean>(accessTokenAvailable);
 
   useEffect(() => {
-    const code = getCodeFromResponse();
+    const code = getUrlCode();
     if (code?.length < 10) {
       return;
     }
@@ -32,7 +33,9 @@ export default function SpotifyLogin() {
 
   const login = () => {
     grandSpotifyAccess().then((response) =>
-      response?.text().then((responseText) => (window.location.href = responseText))
+      response
+        ?.text()
+        .then((responseText) => (window.location.href = responseText))
     );
   };
 
@@ -44,11 +47,17 @@ export default function SpotifyLogin() {
 
   const testForceRefreshREMOVEINPRODUCTION = async () => {
     const refreshToken = localStorage.getItem("SpotifyRefreshToken");
-    if (refreshToken === undefined || stringIsEmpty(refreshToken) || refreshToken === null) {
+    if (
+      refreshToken === undefined ||
+      stringIsEmpty(refreshToken) ||
+      refreshToken === null
+    ) {
       return;
     }
 
-    const tokens: SpotifyTokens | null = await refreshSpotifyAccessToken(refreshToken);
+    const tokens: SpotifyTokens | null = await refreshSpotifyAccessToken(
+      refreshToken
+    );
     if (tokens === null) {
       alert("Tokens null");
       return;
@@ -63,7 +72,10 @@ export default function SpotifyLogin() {
   return (
     <div style={{ textAlign: "left" }}>
       <h2>
-        <img src="icons/spotify-icon.svg" style={{ maxWidth: "20px", marginRight: "5px" }} />
+        <img
+          src="icons/spotify-icon.svg"
+          style={{ maxWidth: "20px", marginRight: "5px" }}
+        />
         Spotify
       </h2>
       {loggedIn ? (
@@ -75,7 +87,11 @@ export default function SpotifyLogin() {
           </Button>
         </span>
       ) : (
-        <Button variant="contained" style={{ backgroundColor: "#1DB954" }} onClick={login}>
+        <Button
+          variant="contained"
+          style={{ backgroundColor: "#1DB954" }}
+          onClick={login}
+        >
           Login to Spotify
         </Button>
       )}

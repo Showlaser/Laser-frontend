@@ -42,5 +42,5 @@ export const drawRectangleWithText = (
   ctx.fill();
 
   const textLength = text.length;
-  writeText(x - textLength + 22.5, y + height / 1.75, text, textColor, ctx);
+  writeText(5 + x + textLength / 3, y + height / 1.75, text, textColor, ctx);
 };

@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import { login } from "services/logic/login-logic";
 import {
-  getCodeFromResponse,
+  getUrlCode,
   getFormDataObject,
   stringIsEmpty,
 } from "services/shared/general";
@@ -37,7 +37,7 @@ export default function Login() {
         }
       );
 
-      let redirectUrl = getCodeFromResponse();
+      let redirectUrl = getUrlCode();
       if (stringIsEmpty(redirectUrl)) {
         redirectUrl = paths.Dashboard;
       }

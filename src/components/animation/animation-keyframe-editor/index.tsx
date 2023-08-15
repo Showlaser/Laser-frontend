@@ -282,9 +282,7 @@ export default function AnimationKeyFrameEditor() {
   const getPointsToDraw = () => {
     const animationPatternsToPlay = selectedAnimation?.animationPatterns.filter(
       (ap) => {
-        const animationStartTimeMs =
-          Math.min(...ap.animationKeyFrames.map((akf) => akf.timeMs)) +
-          ap.startTimeMs;
+        const animationStartTimeMs = ap.startTimeMs;
 
         const animationLengthMs =
           Math.max(...ap.animationKeyFrames.map((akf) => akf.timeMs)) +

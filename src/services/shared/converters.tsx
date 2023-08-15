@@ -48,7 +48,32 @@ export const convertPatternToAnimation = (pattern: Pattern): Animation => {
       uuid: createGuid(),
       name: getRandomObjectName(),
       pattern,
-      animationKeyFrames: [],
+      animationKeyFrames: [
+        {
+          uuid: createGuid(),
+          timeMs: 0,
+          propertyEdited: "scale",
+          propertyValue: pattern.scale,
+        },
+        {
+          uuid: createGuid(),
+          timeMs: 0,
+          propertyEdited: "xOffset",
+          propertyValue: pattern.xOffset,
+        },
+        {
+          uuid: createGuid(),
+          timeMs: 0,
+          propertyEdited: "yOffset",
+          propertyValue: pattern.yOffset,
+        },
+        {
+          uuid: createGuid(),
+          timeMs: 0,
+          propertyEdited: "rotation",
+          propertyValue: pattern.rotation,
+        },
+      ],
       startTimeMs: 0,
       timelineId: 0,
     },

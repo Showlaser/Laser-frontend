@@ -22,7 +22,10 @@ export function getFormDataObject(event: any) {
   return object;
 }
 
-export const getDifferenceBetweenTwoDatesInMinutesAndSecondsString = (expirationDate: Date, dateNow: Date) => {
+export const getDifferenceBetweenTwoDatesInMinutesAndSecondsString = (
+  expirationDate: Date,
+  dateNow: Date
+) => {
   const difference = expirationDate.getTime() - dateNow.getTime();
   if (difference <= 0) {
     return "Voting ended!";
@@ -33,7 +36,9 @@ export const getDifferenceBetweenTwoDatesInMinutesAndSecondsString = (expiration
     minutes %= 60;
     seconds %= 60;
 
-    return `${minutes < 10 ? "0" : ""}${minutes} : ${seconds < 10 ? "0" : ""}${seconds}`;
+    return `${minutes < 10 ? "0" : ""}${minutes} : ${
+      seconds < 10 ? "0" : ""
+    }${seconds}`;
   }
 };
 
@@ -49,18 +54,8 @@ export function toCamelCase(key: any, value: any) {
   return value;
 }
 
-export const objectsAreSame = (obj1: any, obj2: any) => JSON.stringify(obj1) === JSON.stringify(obj2);
-
-export const deepClone = (obj: any) => JSON.parse(JSON.stringify(obj));
-
 // function to obtain a single code in the url
 export const getUrlCode = () => {
-  const urlData = window.location.search;
-  const indexOfData = urlData.indexOf("=");
-  return urlData.substring(indexOfData + 1, urlData.length);
-};
-
-export const getCodeFromResponse = () => {
   const urlData = window.location.search;
   const indexOfData = urlData.indexOf("=");
   return urlData.substring(indexOfData + 1, urlData.length);

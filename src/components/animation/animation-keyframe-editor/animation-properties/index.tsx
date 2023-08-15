@@ -68,7 +68,7 @@ export default function AnimationPatternProperties() {
   );
   const uiComponentsAreDisabled = selectedAnimationPattern === null;
 
-  const updateProperty = (value: string | number) => {
+  const updateKeyframeProperty = (value: string | number) => {
     const selectedKeyFrameIndex =
       selectedAnimationPattern?.animationKeyFrames.findIndex(
         (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
@@ -229,14 +229,15 @@ export default function AnimationPatternProperties() {
     </span>
   );
 
-  const updatePatternName = (e: any) => {
+  const updatePatternProperty = (propertyName: string, value: any) => {
     let updatedAnimation: any = { ...selectedAnimation };
     if (updatedAnimation?.animationPatterns === undefined) {
       return;
     }
 
-    updatedAnimation.animationPatterns[selectedAnimationPatternIndex].name =
-      e.target.value;
+    updatedAnimation.animationPatterns[selectedAnimationPatternIndex][
+      propertyName
+    ] = value;
     setSelectedAnimation(updatedAnimation);
   };
 
@@ -257,9 +258,22 @@ export default function AnimationPatternProperties() {
         <br />
         <Input
           id="animation-name"
-          inputProps={{ min: 2, max: 15 }}
+          inputProps={{ maxLength: 25 }}
           defaultValue={selectedAnimationPattern?.name}
-          onChange={updatePatternName}
+          onChange={(e) => updatePatternProperty("name", e.target.value)}
+        />
+      </div>
+      <div style={{ marginBottom: "5px" }}>
+        <FormLabel htmlFor="animation-starttime">Starttime in Ms</FormLabel>
+        <br />
+        <Input
+          id="animation-starttime"
+          type="number"
+          inputProps={{ min: 0, max: 100000000 }}
+          defaultValue={selectedAnimationPattern?.startTimeMs}
+          onChange={(e) =>
+            updatePatternProperty("startTimeMs", Number(e.target.value))
+          }
         />
       </div>
       <div style={propertyStyle}>
@@ -270,7 +284,7 @@ export default function AnimationPatternProperties() {
           type="number"
           inputProps={{ min: 0.1, max: 10, step: 0.1 }}
           defaultValue={getPropertyValue("scale")}
-          onChange={(e) => updateProperty(Number(e.target.value))}
+          onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
           disabled={
             selectedKeyFrame?.propertyEdited !== "scale" ||
             uiComponentsAreDisabled
@@ -286,7 +300,7 @@ export default function AnimationPatternProperties() {
           type="number"
           inputProps={{ min: -4000, max: 4000 }}
           defaultValue={getPropertyValue("xOffset")}
-          onChange={(e) => updateProperty(Number(e.target.value))}
+          onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
           disabled={
             selectedKeyFrame?.propertyEdited !== "xOffset" ||
             uiComponentsAreDisabled
@@ -302,7 +316,7 @@ export default function AnimationPatternProperties() {
           type="number"
           inputProps={{ min: -4000, max: 4000 }}
           defaultValue={getPropertyValue("yOffset")}
-          onChange={(e) => updateProperty(Number(e.target.value))}
+          onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
           disabled={
             selectedKeyFrame?.propertyEdited !== "yOffset" ||
             uiComponentsAreDisabled
@@ -318,7 +332,7 @@ export default function AnimationPatternProperties() {
           type="number"
           inputProps={{ min: -360, max: 360 }}
           defaultValue={getPropertyValue("rotation")}
-          onChange={(e) => updateProperty(Number(e.target.value))}
+          onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
           disabled={
             selectedKeyFrame?.propertyEdited !== "rotation" ||
             uiComponentsAreDisabled
