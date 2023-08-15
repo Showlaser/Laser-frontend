@@ -51,6 +51,8 @@ export const AvailablePatternsContext =
   React.createContext<AvailablePatternsContextType | null>(null);
 export const SelectedAnimationPatternContext =
   React.createContext<SelectedAnimationPatternContextType | null>(null);
+export const SelectedAnimationPatternIndexContext =
+  React.createContext<number>(0);
 
 export default function AnimationPage() {
   const [selectedAnimation, setSelectedAnimation] = useState<Animation | null>(
@@ -115,7 +117,15 @@ export default function AnimationPage() {
           <SelectedAnimationPatternContext.Provider
             value={selectedAnimationPatternMemo}
           >
-            {reactObject}
+            <SelectedAnimationPatternIndexContext.Provider
+              value={
+                selectedAnimation?.animationPatterns.findIndex(
+                  (ap) => ap.uuid === selectedAnimationPattern?.uuid
+                ) ?? 0
+              }
+            >
+              {reactObject}
+            </SelectedAnimationPatternIndexContext.Provider>
           </SelectedAnimationPatternContext.Provider>
         </AvailablePatternsContext.Provider>
       </AvailableAnimationsContext.Provider>

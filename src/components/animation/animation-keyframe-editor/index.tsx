@@ -1,8 +1,10 @@
 import { Grid } from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
-import { AnimationPatternKeyFrame } from "models/components/shared/animation";
+import {
+  AnimationPattern,
+  AnimationPatternKeyFrame,
+} from "models/components/shared/animation";
 import React, { useEffect, useState } from "react";
-
 import AnimationPatternProperties from "./animation-properties";
 import AnimationPatternKeyFrames from "./animation-keyframes";
 import { Point } from "models/components/shared/point";
@@ -15,7 +17,9 @@ import {
   SelectedAnimationContextType,
   SelectedAnimationPatternContext,
   SelectedAnimationPatternContextType,
+  SelectedAnimationPatternIndexContext,
 } from "pages/animation";
+import { Pattern } from "models/components/shared/pattern";
 
 type PreviousCurrentAndNextKeyFramePerProperty = {
   previous: AnimationPatternKeyFrame[];
@@ -52,11 +56,10 @@ export const SelectedKeyFrameContext =
 export const PlayAnimationContext =
   React.createContext<PlayAnimationContextType | null>(null);
 export const XCorrectionContext = React.createContext<number[]>([]);
+export const StepsToDrawMaxRangeContext = React.createContext<number>(0);
 export const SelectableStepsContext = React.createContext<number[]>([
   10, 100, 1000, 10000,
 ]);
-
-export const StepsToDrawMaxRangeContext = React.createContext<number>(0);
 
 export default function AnimationKeyFrameEditor() {
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
@@ -66,6 +69,10 @@ export default function AnimationKeyFrameEditor() {
     React.useContext(
       SelectedAnimationPatternContext
     ) as SelectedAnimationPatternContextType;
+
+  const selectedAnimationPatternIndex = React.useContext(
+    SelectedAnimationPatternIndexContext
+  ) as number;
 
   const [timelinePositionMs, setTimelinePositionMs] = useState<number>(0);
   const [selectableStepsIndex, setSelectableStepsIndex] = useState<number>(0);
@@ -130,8 +137,11 @@ export default function AnimationKeyFrameEditor() {
     </TimeLinePositionContext.Provider>
   );
 
-  const getNextKeyFramesByPropertySorted = (property: string) =>
-    selectedAnimationPattern?.animationKeyFrames
+  const getNextKeyFramesByPropertySorted = (
+    property: string,
+    animationPattern: AnimationPattern
+  ) =>
+    animationPattern?.animationKeyFrames
       .filter(
         (ak: { timeMs: number; propertyEdited: string }) =>
           ak.timeMs > timelinePositionMs && ak.propertyEdited === property
@@ -140,8 +150,11 @@ export default function AnimationKeyFrameEditor() {
         (a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs
       );
 
-  const getPreviousKeyFramesByPropertySortedDescending = (property: string) =>
-    selectedAnimationPattern?.animationKeyFrames
+  const getPreviousKeyFramesByPropertySortedDescendingFromAnimationPattern = (
+    property: string,
+    animationPattern: AnimationPattern
+  ) =>
+    animationPattern?.animationKeyFrames
       .filter(
         (ak: { timeMs: number; propertyEdited: string }) =>
           ak.timeMs < timelinePositionMs && ak.propertyEdited === property
@@ -155,38 +168,42 @@ export default function AnimationKeyFrameEditor() {
       (ak: { timeMs: number }) => ak.timeMs === timelinePositionMs
     );
 
-  const getPreviousCurrentAndNextKeyFramePerProperty =
-    (): PreviousCurrentAndNextKeyFramePerProperty => {
-      let previousNextAndCurrentKeyFramePerProperty: PreviousCurrentAndNextKeyFramePerProperty =
-        {
-          previous: [],
-          current: getCurrentKeyFrame() ?? [],
-          next: [],
-        };
+  const getPreviousCurrentAndNextKeyFramePerPropertyFromAnimationPattern = (
+    animationPattern: AnimationPattern
+  ): PreviousCurrentAndNextKeyFramePerProperty => {
+    let previousNextAndCurrentKeyFramePerProperty: PreviousCurrentAndNextKeyFramePerProperty =
+      {
+        previous: [],
+        current: getCurrentKeyFrame() ?? [],
+        next: [],
+      };
 
-      propertiesSettings.forEach((propertySetting) => {
-        const previous = getPreviousKeyFramesByPropertySortedDescending(
-          propertySetting.property
+    propertiesSettings.forEach((propertySetting) => {
+      const previous =
+        getPreviousKeyFramesByPropertySortedDescendingFromAnimationPattern(
+          propertySetting.property,
+          animationPattern
         )?.at(0);
-        if (previous !== undefined) {
-          previousNextAndCurrentKeyFramePerProperty.previous.push(previous);
-        }
+      if (previous !== undefined) {
+        previousNextAndCurrentKeyFramePerProperty.previous.push(previous);
+      }
 
-        const next = getNextKeyFramesByPropertySorted(
-          propertySetting.property
-        )?.at(0);
-        if (next !== undefined) {
-          previousNextAndCurrentKeyFramePerProperty.next.push(next);
-        }
-      });
+      const next = getNextKeyFramesByPropertySorted(
+        propertySetting.property,
+        animationPattern
+      )?.at(0);
+      if (next !== undefined) {
+        previousNextAndCurrentKeyFramePerProperty.next.push(next);
+      }
+    });
 
-      return previousNextAndCurrentKeyFramePerProperty;
-    };
+    return previousNextAndCurrentKeyFramePerProperty;
+  };
 
-  const getPointsByTimelinePosition = (
+  const getPatternPointsByTimelinePosition = (
+    pattern: Pattern,
     previousNextAndCurrentKeyFrames: PreviousCurrentAndNextKeyFramePerProperty
   ): Point[] => {
-    const pattern = selectedAnimationPattern?.pattern;
     if (pattern?.points === undefined) {
       return [];
     }
@@ -263,21 +280,48 @@ export default function AnimationKeyFrameEditor() {
   };
 
   const getPointsToDraw = () => {
-    const patternsToPlay = selectedAnimation?.animationPatterns.filter((ap) =>
-      numberIsBetweenOrEqual(
-        ap.startTimeMs,
-        timelinePositionMs,
-        stepsToDrawMaxRange
-      )
+    const animationPatternsToPlay = selectedAnimation?.animationPatterns.filter(
+      (ap) => {
+        const animationStartTimeMs =
+          Math.min(...ap.animationKeyFrames.map((akf) => akf.timeMs)) +
+          ap.startTimeMs;
+
+        const animationLengthMs =
+          Math.max(...ap.animationKeyFrames.map((akf) => akf.timeMs)) +
+          ap.startTimeMs;
+
+        return numberIsBetweenOrEqual(
+          timelinePositionMs,
+          animationStartTimeMs,
+          animationLengthMs
+        );
+      }
     );
 
-    if (patternsToPlay?.length === 0) {
+    const animationPatternsToPlayLength = animationPatternsToPlay?.length ?? 0;
+    if (
+      animationPatternsToPlayLength === 0 ||
+      animationPatternsToPlay === undefined
+    ) {
       return [];
     }
 
-    const previousCurrentAndNextKeyFrames =
-      getPreviousCurrentAndNextKeyFramePerProperty();
-    return getPointsByTimelinePosition(previousCurrentAndNextKeyFrames);
+    let points: Point[] = [];
+    for (let i = 0; i < animationPatternsToPlayLength; i++) {
+      const animationPattern = animationPatternsToPlay[i];
+      const previousCurrentAndNextKeyFrames =
+        getPreviousCurrentAndNextKeyFramePerPropertyFromAnimationPattern(
+          animationPattern
+        );
+      const patternPoints = getPatternPointsByTimelinePosition(
+        animationPattern.pattern,
+        previousCurrentAndNextKeyFrames
+      );
+
+      points = points.concat(patternPoints);
+    }
+
+    return points;
   };
 
   return (

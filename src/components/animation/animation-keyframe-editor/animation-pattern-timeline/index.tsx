@@ -169,9 +169,9 @@ export default function AnimationPatternTimeline() {
       drawRectangleWithText(
         i + 80,
         timelineYAxis - 20,
-        80 + (animationPattern?.pattern?.name?.length ?? 1 * 2),
+        80 + (animationPattern?.name?.length ?? 1 * 2),
         40,
-        `${animationPattern?.pattern.name}`,
+        `${animationPattern?.name}`,
         "white",
         "#485cdb",
         ctx

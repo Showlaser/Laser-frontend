@@ -7,6 +7,7 @@ import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
 import { canvasPxSize } from "./config";
 import { createGuid, getCenterOfPoints, mapNumber, rotatePoints } from "./math";
+import { getRandomObjectName } from "./random-object-name-generator";
 
 export const getRgbColorStringFromPoint = (point: Point): string =>
   `rgb(${point.redLaserPowerPwm},${point.greenLaserPowerPwm},${point.blueLaserPowerPwm})`;
@@ -45,6 +46,7 @@ export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   animation.animationPatterns = [
     {
       uuid: createGuid(),
+      name: getRandomObjectName(),
       pattern,
       animationKeyFrames: [],
       startTimeMs: 0,

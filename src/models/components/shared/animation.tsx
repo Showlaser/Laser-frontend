@@ -10,6 +10,7 @@ export type AnimationPatternKeyFrame = {
 
 export type AnimationPattern = {
   uuid: string;
+  name: string;
   pattern: Pattern;
   animationKeyFrames: AnimationPatternKeyFrame[];
   startTimeMs: number;

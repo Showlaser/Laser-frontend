@@ -13,7 +13,7 @@ import {
   Tooltip,
 } from "@mui/material";
 
-import React from "react";
+import React, { ChangeEvent } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
@@ -34,6 +34,7 @@ import {
   SelectedAnimationContextType,
   SelectedAnimationPatternContext,
   SelectedAnimationPatternContextType,
+  SelectedAnimationPatternIndexContext,
 } from "pages/animation";
 
 export default function AnimationPatternProperties() {
@@ -58,6 +59,10 @@ export default function AnimationPatternProperties() {
     PlayAnimationContext
   ) as PlayAnimationContextType;
 
+  const selectedAnimationPatternIndex = React.useContext(
+    SelectedAnimationPatternIndexContext
+  );
+
   const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames?.find(
     (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
   );
@@ -72,14 +77,16 @@ export default function AnimationPatternProperties() {
     if (
       updatedAnimation === undefined ||
       selectedKeyFrameIndex === undefined ||
-      updatedAnimation?.animationKeyFrames === undefined ||
-      updatedAnimation.animationKeyFrames[selectedKeyFrameIndex] === undefined
+      updatedAnimation?.animationPatterns === undefined ||
+      selectedAnimationPattern?.animationKeyFrames[selectedKeyFrameIndex] ===
+        undefined
     ) {
       return;
     }
 
-    updatedAnimation.animationKeyFrames[selectedKeyFrameIndex].propertyValue =
-      value;
+    updatedAnimation.animationPatterns[
+      selectedAnimationPatternIndex
+    ].animationKeyFrames[selectedKeyFrameIndex].propertyValue = value;
     setSelectedAnimation(updatedAnimation);
   };
 
@@ -90,29 +97,6 @@ export default function AnimationPatternProperties() {
     );
 
     return selectedKeyFrame?.propertyValue;
-  };
-
-  const onRemove = () => {
-    if (selectedKeyFrameUuid === "") {
-      return;
-    }
-
-    setSelectedKeyFrameUuid("");
-    let updatedAnimation: any = { ...selectedAnimation };
-    const selectedKeyFrameIndex =
-      selectedAnimationPattern?.animationKeyFrames.findIndex(
-        (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
-      );
-    if (
-      updatedAnimation === undefined ||
-      selectedKeyFrameIndex === undefined ||
-      updatedAnimation?.animationKeyFrames === undefined
-    ) {
-      return;
-    }
-
-    updatedAnimation.animationKeyFrames.splice(selectedKeyFrameIndex, 1);
-    setSelectedAnimation(updatedAnimation);
   };
 
   const getNextOrPreviousKeyframe = (
@@ -172,7 +156,7 @@ export default function AnimationPatternProperties() {
       return;
     }
 
-    setTimelinePositionMs(keyFrame?.timeMs - xCorrection[selectableStepsIndex]);
+    setTimelinePositionMs(keyFrame?.timeMs);
     setSelectedKeyFrameUuid(keyFrame.uuid);
   };
 
@@ -245,7 +229,18 @@ export default function AnimationPatternProperties() {
     </span>
   );
 
-  const propertyStyle = { marginBottom: canvasPxSize / 4 - 100 };
+  const updatePatternName = (e: any) => {
+    let updatedAnimation: any = { ...selectedAnimation };
+    if (updatedAnimation?.animationPatterns === undefined) {
+      return;
+    }
+
+    updatedAnimation.animationPatterns[selectedAnimationPatternIndex].name =
+      e.target.value;
+    setSelectedAnimation(updatedAnimation);
+  };
+
+  const propertyStyle = { marginBottom: canvasPxSize / 4 - 120 };
   return (
     <Paper
       style={{
@@ -256,7 +251,17 @@ export default function AnimationPatternProperties() {
       key={`${selectedAnimationPattern?.pattern.scale}-${selectedAnimationPattern?.pattern.xOffset}-${selectedAnimationPattern?.pattern.yOffset}-${selectedAnimationPattern?.pattern.rotation}`}
     >
       <p>Animation pattern properties</p>
-      <Divider style={propertyStyle} />
+      <Divider />
+      <div style={{ marginBottom: "5px" }}>
+        <FormLabel htmlFor="animation-name">Name</FormLabel>
+        <br />
+        <Input
+          id="animation-name"
+          inputProps={{ min: 2, max: 15 }}
+          defaultValue={selectedAnimationPattern?.name}
+          onChange={updatePatternName}
+        />
+      </div>
       <div style={propertyStyle}>
         <FormLabel htmlFor="animation-scale">Scale</FormLabel>
         <br />

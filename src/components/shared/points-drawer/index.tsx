@@ -1,7 +1,10 @@
 import { Point } from "models/components/shared/point";
 import React, { useEffect } from "react";
 import { prepareCanvas } from "services/logic/svg-to-coordinates-converter";
-import { getRgbColorStringFromPoint } from "services/shared/converters";
+import {
+  getHexColorStringFromPoint,
+  getRgbColorStringFromPoint,
+} from "services/shared/converters";
 
 type Props = {
   selectedPointsUuid?: string[];
@@ -50,7 +53,6 @@ export default function PointsDrawer({
     let dotThickness: number = 3;
     let color: string = getRgbColorStringFromPoint(point);
     if (pointIsHighlighted) {
-      color = "#4287f5";
       dotThickness = 6;
     }
 
@@ -61,10 +63,9 @@ export default function PointsDrawer({
     if (showPointNumber) {
       if (pointIsHighlighted) {
         ctx.font = "20px sans-serif";
-        ctx.fillStyle = "#4287f5";
       }
 
-      ctx.fillText((index + 1).toString(), point.x, point.y);
+      ctx.fillText((index + 1).toString(), point.x + 5, point.y + 3);
     }
 
     if (
@@ -73,7 +74,6 @@ export default function PointsDrawer({
     ) {
       const nextPoint = updatedPoints[point.connectedToPointOrderNr];
       drawLine(point, nextPoint, ctx);
-      drawDot(ctx, point, screenScale, dotThickness);
     } else if (point.connectedToPointOrderNr === null) {
       drawDot(ctx, point, screenScale, dotThickness);
     }
@@ -104,7 +104,7 @@ export default function PointsDrawer({
   ) => {
     ctx.moveTo(fromPoint.x, fromPoint.y);
     ctx.lineTo(toPoint.x, toPoint.y);
-    ctx.strokeStyle = "#ffffff";
+    ctx.strokeStyle = getHexColorStringFromPoint(toPoint);
     ctx.lineWidth = 2;
     ctx.stroke();
   };

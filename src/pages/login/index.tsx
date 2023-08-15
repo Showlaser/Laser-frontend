@@ -1,6 +1,16 @@
-import { Button, FormControl, Grid, LinearProgress, TextField } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  Grid,
+  LinearProgress,
+  TextField,
+} from "@mui/material";
 import { login } from "services/logic/login-logic";
-import { getCodeFromResponse, getFormDataObject, stringIsEmpty } from "services/shared/general";
+import {
+  getCodeFromResponse,
+  getFormDataObject,
+  stringIsEmpty,
+} from "services/shared/general";
 import paths from "services/shared/router-paths";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import Cookies from "universal-cookie";
@@ -33,7 +43,9 @@ export default function Login() {
       }
 
       const termsAndConditionsAccepted = localStorage.getItem("terms-accepted");
-      window.location.href = termsAndConditionsAccepted ? redirectUrl : paths.Disclaimer;
+      window.location.href = termsAndConditionsAccepted
+        ? redirectUrl
+        : paths.Disclaimer;
       return;
     } else if (result?.status === 451) {
       showError(toastSubject.accountDisabled);
@@ -44,15 +56,38 @@ export default function Login() {
   };
 
   return (
-    <Grid id="login-wrapper" container spacing={0} direction="column" alignItems="center">
+    <Grid
+      id="login-wrapper"
+      container
+      spacing={0}
+      direction="column"
+      alignItems="center"
+    >
       <form id="login" onSubmit={onSubmit}>
         <FormControl>
           <h1>Login</h1>
-          <TextField required autoComplete="off" defaultValue="vincent" label="Username" name="username" />
+          <TextField
+            required
+            autoComplete="off"
+            defaultValue="vincent"
+            label="Username"
+            name="username"
+          />
           <br />
-          <TextField required label="Password" defaultValue="Thermoneter" type="password" name="password" />
+          <TextField
+            required
+            label="Password"
+            defaultValue="123"
+            type="password"
+            name="password"
+          />
           <br />
-          <Button disabled={submitInProgress} variant="contained" type="submit" fullWidth>
+          <Button
+            disabled={submitInProgress}
+            variant="contained"
+            type="submit"
+            fullWidth
+          >
             Login
           </Button>
           {submitInProgress ? <LinearProgress /> : null}
