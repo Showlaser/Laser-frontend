@@ -215,7 +215,7 @@ export default function AnimationPatternProperties() {
     let elements = [];
     for (let i = 0; i < 3; i++) {
       elements.push(
-        <MenuItem selected={(selectedAnimationPattern?.timelineId ?? 0) == i} value={i}>
+        <MenuItem key={`${i}-menu-items`} selected={(selectedAnimationPattern?.timelineId ?? 0) == i} value={i}>
           {i + 1}
         </MenuItem>
       );

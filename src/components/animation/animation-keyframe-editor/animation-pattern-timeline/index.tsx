@@ -6,7 +6,7 @@ import {
   SelectedAnimationPatternContextType,
 } from "pages/animation";
 import React, { useEffect, useState } from "react";
-import { numberIsBetweenOrEqual } from "services/shared/math";
+import { mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
 import {
   SelectableStepsContext,
   SelectableStepsIndexContext,
@@ -38,6 +38,7 @@ export default function AnimationPatternTimeline() {
 
   const canvasHeight = 160;
   const canvasWidth = window.innerWidth - 60;
+  const animationPatternHeightOnCanvas = 40;
 
   const getTimelineData = () => {
     const numberOfTimeLines = 3;
@@ -68,7 +69,7 @@ export default function AnimationPatternTimeline() {
   }, [screenWidthPx, timelinePositionMs, selectedAnimation, selectableStepsIndex]);
 
   const draw = (ctx: CanvasRenderingContext2D) => {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.clearRect(0, 0, canvasWidth, ctx.canvas.height);
     drawTimeLines(ctx);
     drawAnimationPatternsOnTimelines();
   };
@@ -91,7 +92,7 @@ export default function AnimationPatternTimeline() {
     }
 
     const selectedStep = selectableSteps[selectableStepsIndex];
-    const distanceBetweenSteps = ctx.canvas.width / 10 - 2;
+    const distanceBetweenSteps = canvasWidth / 10 - 2;
 
     for (let i = 0; i < selectedStep + 1; i++) {
       const x = i * distanceBetweenSteps;
@@ -100,13 +101,27 @@ export default function AnimationPatternTimeline() {
   };
 
   const onAnimationPatternClick = (x: number, y: number) => {
-    const minRange = timelinePositionMs;
+    const clickedAnimationPattern = getAnimationPatternFromMouseClick(x, y);
+    if (clickedAnimationPattern !== undefined) {
+      setSelectedAnimationPattern(clickedAnimationPattern);
+    }
+  };
 
-    const animationPatternsInRange = selectedAnimation?.animationPatterns.filter((ap) =>
-      numberIsBetweenOrEqual(ap.startTimeMs, minRange, stepsToDrawMaxRange)
-    );
-    const animationPatternsInRangeCount = animationPatternsInRange?.length ?? 0;
+  const getAnimationPatternFromMouseClick = (x: number, y: number) => {
     const numberOfTimeLines = timelines.length;
+    const timelineIdPressed = getTimelineIdPressed(numberOfTimeLines, canvasHeight, y, animationPatternHeightOnCanvas);
+    if (timelineIdPressed === undefined) {
+      return undefined;
+    }
+
+    const xMappedToTimelinePosition = mapNumber(x, 0, canvasWidth, timelinePositionMs, stepsToDrawMaxRange);
+    return selectedAnimation?.animationPatterns.find((ap) => {
+      const patternDuration = Math.max(...ap.animationKeyFrames.map((ak) => ak.timeMs));
+      return (
+        numberIsBetweenOrEqual(xMappedToTimelinePosition, ap.startTimeMs, patternDuration) &&
+        ap.timelineId === timelineIdPressed
+      );
+    });
   };
 
   const onCanvasClick = (e: any) => {
@@ -114,6 +129,7 @@ export default function AnimationPatternTimeline() {
     const rect = canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
+    onAnimationPatternClick(x, y);
   };
 
   const drawAnimationPatternsOnTimelines = () => {
@@ -140,14 +156,14 @@ export default function AnimationPatternTimeline() {
         ...(animationPattern?.animationKeyFrames?.map((ak) => ak?.timeMs) ?? [])
       );
 
-      const xPosition = (animationPattern?.startTimeMs ?? 0) - timelinePositionMs * (canvas.width / 100);
-      const widthToDisplay = animationPatternDuration * (canvas.width / 100);
+      const xPosition = (animationPattern?.startTimeMs ?? 0) - timelinePositionMs * (canvasWidth / 100);
+      const widthToDisplay = animationPatternDuration * (canvasWidth / 100);
 
       drawRoundedRectangleWithText(
         xPosition,
         y + 5,
         widthToDisplay,
-        40,
+        animationPatternHeightOnCanvas,
         `${animationPattern?.name}`,
         "white",
         "#485cdb",
@@ -161,4 +177,23 @@ export default function AnimationPatternTimeline() {
       <canvas className="canvas" onClick={onCanvasClick} id="animation-pattern-timeline-canvas" />
     </div>
   );
+}
+function getTimelineIdPressed(
+  numberOfTimeLines: number,
+  canvasHeight: number,
+  y: number,
+  animationPatternHeightOnCanvas: number
+) {
+  for (let i = 0; i < numberOfTimeLines; i++) {
+    const timelineCanvasYPosition =
+      (canvasHeight - 10) / numberOfTimeLines + (i * (canvasHeight - 10)) / numberOfTimeLines;
+    const yPositionIsInTimeline = numberIsBetweenOrEqual(
+      y,
+      timelineCanvasYPosition - animationPatternHeightOnCanvas - 5,
+      timelineCanvasYPosition
+    );
+    if (yPositionIsInTimeline) {
+      return i;
+    }
+  }
 }
