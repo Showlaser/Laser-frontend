@@ -5,16 +5,20 @@ import { showError, showSuccess, toastSubject } from "services/shared/toast-mess
 import paths from "services/shared/router-paths";
 import { addUser } from "services/logic/user-logic";
 import React from "react";
+import LinearProgress from "@mui/material/LinearProgress";
+import { OnTrue } from "components/shared/on-true";
 
 export default function Registration() {
   const [buttonDisabled, setButtonDisabled] = useState(false);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setButtonDisabled(true);
     const formData = getFormDataFromEvent(e);
     const passwordsDoNotMatch = formData.password !== formData.passwordRepeat;
     if (passwordsDoNotMatch) {
       showError(toastSubject.passwordsDoNotMatch);
+      setButtonDisabled(false);
       return;
     }
 
@@ -26,8 +30,11 @@ export default function Registration() {
       }
       if (result?.status === 409) {
         showError(toastSubject.duplicatedName);
+        setButtonDisabled(false);
         return;
       }
+
+      setButtonDisabled(false);
     });
   };
 
@@ -50,6 +57,9 @@ export default function Registration() {
           <Button type="submit" variant="contained" disabled={buttonDisabled} fullWidth>
             Register
           </Button>
+          <OnTrue onTrue={buttonDisabled}>
+            <LinearProgress />
+          </OnTrue>
         </FormControl>
       </form>
     </Grid>

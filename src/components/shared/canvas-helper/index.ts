@@ -3,11 +3,13 @@ export const drawLine = (
   fromY: number,
   toX: number,
   toY: number,
-  ctx: CanvasRenderingContext2D
+  ctx: CanvasRenderingContext2D,
+  color: string = "rgb(90, 90, 90, 0.7)"
 ) => {
+  ctx.lineWidth = 1;
   ctx.moveTo(fromX, fromY);
   ctx.lineTo(toX, toY);
-  ctx.strokeStyle = "rgb(90, 90, 90, 0.7)";
+  ctx.strokeStyle = color;
   ctx.stroke();
 };
 
@@ -25,7 +27,7 @@ export const writeText = (
   ctx.fillText(text, x, y);
 };
 
-export const drawRectangleWithText = (
+export const drawRoundedRectangleWithText = (
   x: number,
   y: number,
   width: number,
@@ -38,7 +40,7 @@ export const drawRectangleWithText = (
   ctx.beginPath();
   ctx.lineWidth = 6;
   ctx.fillStyle = rectangleColor;
-  ctx.rect(x, y, width, height);
+  ctx.roundRect(x, y, width, height, 2);
   ctx.fill();
 
   const textLength = text.length;
