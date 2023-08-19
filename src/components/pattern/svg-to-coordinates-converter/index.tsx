@@ -41,6 +41,7 @@ export default function PatternEditor({
   const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>([]);
   const [patternNameIsInUse, setPatternNameIsInUse] = React.useState<boolean>(false);
   const [pointsToDraw, setPointToDraw] = React.useState<Point[]>([]);
+  const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
 
   const alertUser = (e: BeforeUnloadEvent) => {
     e.preventDefault();
@@ -160,7 +161,7 @@ export default function PatternEditor({
   return (
     <Grid style={{ outline: "none" }} container tabIndex={0} onKeyDown={onKeyDown} direction="row" spacing={2}>
       <Grid item xs={6.5}>
-        <TabSelector data={tabSelectorData} />
+        <TabSelector data={tabSelectorData} selectedTabId={selectedTabId} setSelectedTabId={setSelectedTabId} />
       </Grid>
       <Grid item sx={{ marginLeft: "40px" }}>
         <PointsDrawer

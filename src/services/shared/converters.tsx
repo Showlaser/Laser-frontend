@@ -1,6 +1,8 @@
 import { rgbToHex } from "@mui/material";
 import {
   Animation,
+  AnimationPattern,
+  AnimationPatternKeyFrame,
   animationPlaceholder,
 } from "models/components/shared/animation";
 import { Pattern } from "models/components/shared/pattern";
@@ -25,13 +27,9 @@ const hexToRgb = (hex: string) => {
   };
 };
 
-export const getHexColorStringFromPoint = (point: Point): string =>
-  rgbToHex(getRgbColorStringFromPoint(point));
+export const getHexColorStringFromPoint = (point: Point): string => rgbToHex(getRgbColorStringFromPoint(point));
 
-export const setLaserPowerFromHexString = (
-  hex: string,
-  point: Point
-): Point => {
+export const setLaserPowerFromHexString = (hex: string, point: Point): Point => {
   const rgb = hexToRgb(hex);
   point.redLaserPowerPwm = rgb?.r;
   point.greenLaserPowerPwm = rgb?.g;
@@ -41,57 +39,62 @@ export const setLaserPowerFromHexString = (
 
 export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   let animation: Animation = animationPlaceholder();
+  const animationPattern = new AnimationPattern();
+  animationPattern.uuid = createGuid();
+  animationPattern.name = `${pattern.name}-new`;
+  animationPattern.pattern = pattern;
+  animationPattern.animationKeyFrames = generateAnimationKeyframesFromPattern(pattern);
+  animationPattern.startTimeMs = 0;
+  animationPattern.timelineId = 0;
   animation.name = pattern.name;
   animation.image = pattern.image;
-  animation.animationPatterns = [
-    {
-      uuid: createGuid(),
-      name: getRandomObjectName(),
-      pattern,
-      animationKeyFrames: [
-        {
-          uuid: createGuid(),
-          timeMs: 0,
-          propertyEdited: "scale",
-          propertyValue: pattern.scale,
-        },
-        {
-          uuid: createGuid(),
-          timeMs: 0,
-          propertyEdited: "xOffset",
-          propertyValue: pattern.xOffset,
-        },
-        {
-          uuid: createGuid(),
-          timeMs: 0,
-          propertyEdited: "yOffset",
-          propertyValue: pattern.yOffset,
-        },
-        {
-          uuid: createGuid(),
-          timeMs: 0,
-          propertyEdited: "rotation",
-          propertyValue: pattern.rotation,
-        },
-      ],
-      startTimeMs: 0,
-      timelineId: 0,
-    },
-  ];
+  animation.animationPatterns = [animationPattern];
 
   return animation;
 };
 
-export const applyParametersToPointsForCanvasByPattern = (
-  pattern: Pattern
-): Point[] =>
-  applyParametersToPointsForCanvas(
-    pattern.scale,
-    pattern.xOffset,
-    pattern.yOffset,
-    pattern.rotation,
-    pattern.points
-  );
+export const convertPatternToAnimationPattern = (pattern: Pattern): AnimationPattern => {
+  const animationPattern = new AnimationPattern();
+  animationPattern.uuid = createGuid();
+  animationPattern.name = `${pattern.name}-new`;
+  animationPattern.pattern = pattern;
+  animationPattern.animationKeyFrames = generateAnimationKeyframesFromPattern(pattern);
+  animationPattern.startTimeMs = 0;
+  animationPattern.timelineId = 0;
+  return animationPattern;
+};
+
+const generateAnimationKeyframesFromPattern = (pattern: Pattern): AnimationPatternKeyFrame[] => {
+  return [
+    {
+      uuid: createGuid(),
+      timeMs: 0,
+      propertyEdited: "scale",
+      propertyValue: pattern.scale,
+    },
+    {
+      uuid: createGuid(),
+      timeMs: 0,
+      propertyEdited: "xOffset",
+      propertyValue: pattern.xOffset,
+    },
+    {
+      uuid: createGuid(),
+      timeMs: 0,
+      propertyEdited: "yOffset",
+      propertyValue: pattern.yOffset,
+    },
+    {
+      uuid: createGuid(),
+      timeMs: 0,
+      propertyEdited: "rotation",
+      propertyValue: pattern.rotation,
+    },
+  ];
+};
+
+export const applyParametersToPointsForCanvasByPattern = (pattern: Pattern): Point[] =>
+  applyParametersToPointsForCanvas(pattern.scale, pattern.xOffset, pattern.yOffset, pattern.rotation, pattern.points);
 
 export const applyParametersToPointsForCanvas = (
   scale: number,
@@ -111,20 +114,11 @@ export const applyParametersToPointsForCanvas = (
     pointsWithOffsetApplied.push(point);
   }
 
-  const centerOfPattern = getCenterOfPoints(
-    pointsWithOffsetApplied,
-    xOffset,
-    yOffset
-  );
+  const centerOfPattern = getCenterOfPoints(pointsWithOffsetApplied, xOffset, yOffset);
   const centerX = centerOfPattern.x;
   const centerY = centerOfPattern.y;
 
-  const rotatedPoints = rotatePoints(
-    pointsWithOffsetApplied,
-    rotation,
-    centerX,
-    centerY
-  );
+  const rotatedPoints = rotatePoints(pointsWithOffsetApplied, rotation, centerX, centerY);
   return convertPointsToCanvasSize(rotatedPoints);
 };
 

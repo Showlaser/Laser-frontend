@@ -8,14 +8,18 @@ export type AnimationPatternKeyFrame = {
   propertyValue: number;
 };
 
-export type AnimationPattern = {
-  uuid: string;
-  name: string;
-  pattern: Pattern;
-  animationKeyFrames: AnimationPatternKeyFrame[];
-  startTimeMs: number;
-  timelineId: number;
-};
+export class AnimationPattern {
+  public uuid: string | undefined;
+  public name: string | undefined;
+  public pattern: Pattern | undefined;
+  public animationKeyFrames: AnimationPatternKeyFrame[] = [];
+  public startTimeMs: number = 0;
+  public timelineId: number = 0;
+
+  public get getDuration() {
+    return Math.max(...this.animationKeyFrames.map((akf) => akf.timeMs));
+  }
+}
 
 export type Animation = {
   uuid: string;

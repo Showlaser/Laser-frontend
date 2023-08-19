@@ -183,18 +183,18 @@ export default function AnimationPatternProperties() {
   };
 
   const nextKeyFrameButton = (property: string) => (
-    <span style={{ marginLeft: "5px" }}>
+    <span style={{ marginLeft: "2px" }}>
       <Tooltip title={`Previous ${property} keyframe`}>
         <span>
           <IconButton disabled={uiComponentsAreDisabled} onClick={() => getNextOrPreviousKeyframe(true, property)}>
-            <NavigateBeforeIcon />
+            <NavigateBeforeIcon fontSize="small" />
           </IconButton>
         </span>
       </Tooltip>
       <Tooltip title={`Next ${property} keyframe`}>
         <span>
           <IconButton disabled={uiComponentsAreDisabled} onClick={() => getNextOrPreviousKeyframe(false, property)}>
-            <NavigateNextIcon />
+            <NavigateNextIcon fontSize="small" />
           </IconButton>
         </span>
       </Tooltip>
@@ -224,25 +224,16 @@ export default function AnimationPatternProperties() {
     return elements;
   };
 
-  const propertyStyle = { marginBottom: canvasPxSize / 4 - 140 };
+  const propertyStyle = { marginBottom: canvasPxSize / 4 - 150 };
   return (
-    <Paper
-      style={{
-        padding: "15px",
-        paddingTop: "2px",
-        maxHeight: `${canvasPxSize + 70}px`,
-      }}
-      key={`${selectedAnimationPattern?.pattern.scale}-${selectedAnimationPattern?.pattern.xOffset}-${selectedAnimationPattern?.pattern.yOffset}-${selectedAnimationPattern?.pattern.rotation}`}
-    >
-      <span>Animation pattern properties</span>
-      <Divider />
+    <Paper>
       <div style={{ marginBottom: "5px" }}>
         <FormLabel htmlFor="animation-name">Name</FormLabel>
         <br />
         <Input
           id="animation-name"
           inputProps={{ maxLength: 25 }}
-          defaultValue={selectedAnimationPattern?.name}
+          value={selectedAnimationPattern?.name}
           onChange={(e) => updatePatternProperty("name", e.target.value)}
         />
       </div>
@@ -253,7 +244,7 @@ export default function AnimationPatternProperties() {
           id="animation-scale"
           type="number"
           inputProps={{ min: 0.1, max: 10, step: 0.1 }}
-          defaultValue={getPropertyValue("scale")}
+          value={getPropertyValue("scale")}
           onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
           disabled={selectedKeyFrame?.propertyEdited !== "scale" || uiComponentsAreDisabled}
         />
@@ -266,7 +257,7 @@ export default function AnimationPatternProperties() {
           id="animation-xoffset"
           type="number"
           inputProps={{ min: -4000, max: 4000 }}
-          defaultValue={getPropertyValue("xOffset")}
+          value={getPropertyValue("xOffset")}
           onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
           disabled={selectedKeyFrame?.propertyEdited !== "xOffset" || uiComponentsAreDisabled}
         />
@@ -279,7 +270,7 @@ export default function AnimationPatternProperties() {
           id="animation-yoffset"
           type="number"
           inputProps={{ min: -4000, max: 4000 }}
-          defaultValue={getPropertyValue("yOffset")}
+          value={getPropertyValue("yOffset")}
           onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
           disabled={selectedKeyFrame?.propertyEdited !== "yOffset" || uiComponentsAreDisabled}
         />
@@ -292,7 +283,7 @@ export default function AnimationPatternProperties() {
           id="animation-rotation"
           type="number"
           inputProps={{ min: -360, max: 360 }}
-          defaultValue={getPropertyValue("rotation")}
+          value={getPropertyValue("rotation")}
           onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
           disabled={selectedKeyFrame?.propertyEdited !== "rotation" || uiComponentsAreDisabled}
         />
@@ -305,7 +296,7 @@ export default function AnimationPatternProperties() {
           id="animation-starttime"
           type="number"
           inputProps={{ min: 0, max: 100000000 }}
-          defaultValue={selectedAnimationPattern?.startTimeMs}
+          value={selectedAnimationPattern?.startTimeMs}
           onChange={(e) => updatePatternProperty("startTimeMs", Number(e.target.value))}
         />
       </div>
@@ -314,7 +305,7 @@ export default function AnimationPatternProperties() {
           <FormLabel id="properties-timeline-id">Timeline id</FormLabel>
           <Select
             labelId="properties-timeline-id"
-            defaultValue={selectedAnimationPattern?.timelineId}
+            value={selectedAnimationPattern?.timelineId}
             label="Timeline id"
             onChange={(e) => updatePatternProperty("timelineId", Number(e.target.value))}
           >

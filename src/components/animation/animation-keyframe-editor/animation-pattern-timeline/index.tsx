@@ -115,13 +115,11 @@ export default function AnimationPatternTimeline() {
     }
 
     const xMappedToTimelinePosition = mapNumber(x, 0, canvasWidth, timelinePositionMs, stepsToDrawMaxRange);
-    return selectedAnimation?.animationPatterns.find((ap) => {
-      const patternDuration = Math.max(...ap.animationKeyFrames.map((ak) => ak.timeMs));
-      return (
-        numberIsBetweenOrEqual(xMappedToTimelinePosition, ap.startTimeMs, patternDuration) &&
+    return selectedAnimation?.animationPatterns.find(
+      (ap) =>
+        numberIsBetweenOrEqual(xMappedToTimelinePosition, ap.startTimeMs, ap.getDuration === 0 ? 4 : ap.getDuration) &&
         ap.timelineId === timelineIdPressed
-      );
-    });
+    );
   };
 
   const onCanvasClick = (e: any) => {
@@ -141,10 +139,9 @@ export default function AnimationPatternTimeline() {
       (ap) => (keyframeTimes = keyframeTimes.concat(ap.animationKeyFrames.map((ak) => ak.timeMs)))
     );
     const animationDuration = Math.max(...keyframeTimes);
-    const animationPatternsInRange = selectedAnimation?.animationPatterns.filter((ap) => {
-      const patternDuration = Math.max(...ap.animationKeyFrames.map((ak) => ak.timeMs));
-      return numberIsBetweenOrEqual(patternDuration, timelinePositionMs, animationDuration);
-    });
+    const animationPatternsInRange = selectedAnimation?.animationPatterns.filter((ap) =>
+      numberIsBetweenOrEqual(ap.getDuration, timelinePositionMs, animationDuration)
+    );
 
     const animationPatternsInRangeCount = animationPatternsInRange?.length ?? 0;
     const numberOfTimeLines = timelines.length;
@@ -152,9 +149,11 @@ export default function AnimationPatternTimeline() {
     for (let i = 0; i < animationPatternsInRangeCount; i++) {
       const animationPattern = selectedAnimation?.animationPatterns[i];
       const y = ((canvasHeight - 10) / numberOfTimeLines) * (animationPattern?.timelineId ?? 0);
-      const animationPatternDuration = Math.max(
-        ...(animationPattern?.animationKeyFrames?.map((ak) => ak?.timeMs) ?? [])
-      );
+      let animationPatternDuration = animationPattern?.getDuration ?? 0;
+
+      if (animationPatternDuration === 0) {
+        animationPatternDuration = 4; // to prevent the pattern from being to small to click on
+      }
 
       const xPosition = (animationPattern?.startTimeMs ?? 0) - timelinePositionMs * (canvasWidth / 100);
       const widthToDisplay = animationPatternDuration * (canvasWidth / 100);
@@ -172,28 +171,29 @@ export default function AnimationPatternTimeline() {
     }
   };
 
+  const getTimelineIdPressed = (
+    numberOfTimeLines: number,
+    canvasHeight: number,
+    y: number,
+    animationPatternHeightOnCanvas: number
+  ) => {
+    for (let i = 0; i < numberOfTimeLines; i++) {
+      const timelineCanvasYPosition =
+        (canvasHeight - 10) / numberOfTimeLines + (i * (canvasHeight - 10)) / numberOfTimeLines;
+      const yPositionIsInTimeline = numberIsBetweenOrEqual(
+        y,
+        timelineCanvasYPosition - animationPatternHeightOnCanvas - 5,
+        timelineCanvasYPosition
+      );
+      if (yPositionIsInTimeline) {
+        return i;
+      }
+    }
+  };
+
   return (
     <div style={{ marginTop: "5px" }}>
       <canvas className="canvas" onClick={onCanvasClick} id="animation-pattern-timeline-canvas" />
     </div>
   );
-}
-function getTimelineIdPressed(
-  numberOfTimeLines: number,
-  canvasHeight: number,
-  y: number,
-  animationPatternHeightOnCanvas: number
-) {
-  for (let i = 0; i < numberOfTimeLines; i++) {
-    const timelineCanvasYPosition =
-      (canvasHeight - 10) / numberOfTimeLines + (i * (canvasHeight - 10)) / numberOfTimeLines;
-    const yPositionIsInTimeline = numberIsBetweenOrEqual(
-      y,
-      timelineCanvasYPosition - animationPatternHeightOnCanvas - 5,
-      timelineCanvasYPosition
-    );
-    if (yPositionIsInTimeline) {
-      return i;
-    }
-  }
 }

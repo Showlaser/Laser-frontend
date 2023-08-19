@@ -11,6 +11,8 @@ import { getRandomNumber } from "services/shared/math";
 import { subtractMinutesFromCurrentDate } from "services/shared/dateHelper";
 
 export default function Dashboard() {
+  const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
+
   const randomProperty = (obj: any) => {
     const keys = Object.keys(obj);
     return obj[keys[(keys.length * Math.random()) << 0]];
@@ -167,7 +169,7 @@ export default function Dashboard() {
           <Typography sx={{ textAlign: "center" }} variant="h5" color="text.primary" gutterBottom>
             Lasers info
           </Typography>
-          <TabSelector data={tabData} />
+          <TabSelector data={tabData} selectedTabId={selectedTabId} setSelectedTabId={setSelectedTabId} />
         </Card>
         <LaserZoneTable zones={zones} />
       </Grid>
