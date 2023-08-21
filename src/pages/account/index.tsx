@@ -6,7 +6,6 @@ import {
   LinearProgress,
   Fade,
   Paper,
-  useTheme,
   FormControlLabel,
   FormGroup,
   Switch,

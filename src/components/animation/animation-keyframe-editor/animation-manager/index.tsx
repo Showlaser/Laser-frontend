@@ -5,10 +5,22 @@ import {
   SelectedAnimationContextType,
 } from "pages/animation";
 import React, { useEffect } from "react";
-import { FormControl, FormLabel, MenuItem, Select } from "@mui/material";
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormLabel,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 import { convertPatternToAnimationPattern } from "services/shared/converters";
 import { Animation, AnimationPattern } from "models/components/shared/animation";
-import { emptyGuid } from "services/shared/math";
+import { animationPatternTimeWidthWhenDurationIsZero } from "services/shared/config";
+import { OnTrue } from "components/shared/on-true";
+import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
 
 export default function AnimationManager() {
   const { availablePatterns, setAvailablePatterns } = React.useContext(
@@ -19,7 +31,42 @@ export default function AnimationManager() {
     SelectedAnimationContext
   ) as SelectedAnimationContextType;
 
-  useEffect(() => {}, [availablePatterns]);
+  const [checkedUuidsToRemove, setCheckedUuidsToRemove] = React.useState<string[]>([]);
+  const [checkedUuidsToAdd, setCheckedUuidsToAdd] = React.useState<string[]>([]);
+
+  const deleteSelectedAnimationPatterns = () => {
+    if (selectedAnimation === undefined) {
+      return;
+    }
+
+    let updatedAnimation: any = { ...selectedAnimation };
+    const animationPatternsToKeep = updatedAnimation.animationPatterns?.filter(
+      (ap: { uuid: string }) => !checkedUuidsToRemove.some((uuid) => uuid === ap.uuid)
+    );
+    updatedAnimation.animationPatterns = animationPatternsToKeep;
+    setSelectedAnimation(updatedAnimation);
+    setCheckedUuidsToRemove([]);
+  };
+
+  const [modalOptions, setModalOptions] = React.useState<ModalOptions>({
+    show: false,
+    onDelete: () => {},
+    title: "Are you sure you want to remove the selected animation pattern(s)?",
+  });
+
+  useEffect(() => {}, [availablePatterns, checkedUuidsToRemove]);
+
+  const handleToggle = (uuid: string | undefined, arrayToUpdate: string[], updateArray: (array: string[]) => void) => {
+    if (uuid === undefined) {
+      return;
+    }
+
+    const uuidIndex = arrayToUpdate.findIndex((u) => u === uuid);
+    const newChecked = [...arrayToUpdate];
+
+    uuidIndex === -1 ? newChecked.push(uuid) : newChecked.splice(uuidIndex, 1);
+    updateArray(newChecked);
+  };
 
   const getAvailableTimelinePositionSpot = () => {
     for (let i = 0; i < 3; i++) {
@@ -42,9 +89,19 @@ export default function AnimationManager() {
     }
 
     lastAnimationPatternsOnTimelines.sort((a, b) => a.getDuration + a.startTimeMs - b.getDuration + b.startTimeMs);
+    const firstAnimationPattern = lastAnimationPatternsOnTimelines.at(-1);
+    if (firstAnimationPattern === undefined) {
+      return { timelineId: null, timeMs: null };
+    }
+
+    const startTimeMs =
+      (firstAnimationPattern.getDuration === 0
+        ? animationPatternTimeWidthWhenDurationIsZero * 4
+        : firstAnimationPattern.getDuration) + firstAnimationPattern.startTimeMs;
+
     return {
-      timelineId: lastAnimationPatternsOnTimelines[0].timelineId,
-      timeMs: lastAnimationPatternsOnTimelines[0].startTimeMs,
+      timelineId: firstAnimationPattern.timelineId,
+      timeMs: startTimeMs,
     };
   };
 
@@ -61,6 +118,10 @@ export default function AnimationManager() {
 
     let convertedPattern = convertPatternToAnimationPattern(patternToAdd);
     const { timelineId, timeMs } = getAvailableTimelinePositionSpot();
+    if (timelineId === null || timeMs === null || convertedPattern === undefined) {
+      return;
+    }
+
     convertedPattern.timelineId = timelineId;
     convertedPattern.startTimeMs = timeMs;
     updatedAnimation.animationPatterns?.push(convertedPattern);
@@ -69,20 +130,83 @@ export default function AnimationManager() {
 
   return (
     <div>
-      <FormControl fullWidth>
-        <FormLabel id="animation-patterns">Add animation pattern</FormLabel>
-        <Select
-          id="ap-selector"
-          labelId="animation-patterns"
-          label="Add animation pattern"
-          onChange={(e) => addAnimationPatternToAnimation(e.target.value as string)}
-        >
+      <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
+      <FormControl fullWidth style={{ marginTop: "20px" }}>
+        <FormLabel>Add animation patterns</FormLabel>
+        <List style={{ maxHeight: "200px", overflowY: "auto" }}>
           {availablePatterns?.map((ap) => (
-            <MenuItem key={`a-manager-ap-${ap.uuid}`} value={ap.uuid}>
-              {ap.name}
-            </MenuItem>
+            <ListItem key={`ap-am-${ap.uuid}`} disablePadding>
+              <ListItemButton
+                role={undefined}
+                onClick={() => handleToggle(ap.uuid, checkedUuidsToAdd, setCheckedUuidsToAdd)}
+                dense
+              >
+                <ListItemIcon>
+                  <Checkbox
+                    edge="start"
+                    checked={checkedUuidsToAdd.some((u) => u === ap.uuid)}
+                    tabIndex={-1}
+                    disableRipple
+                    inputProps={{ "aria-labelledby": `ap-am-ip-${ap.uuid}` }}
+                  />
+                </ListItemIcon>
+                <ListItemText id={`ap-am-ip-${ap.uuid}`} primary={ap.name} />
+              </ListItemButton>
+            </ListItem>
           ))}
-        </Select>
+        </List>
+        <OnTrue onTrue={checkedUuidsToAdd.length > 0}>
+          <Button
+            variant="contained"
+            style={{ marginTop: "10px" }}
+            onClick={() => {
+              let updatedAnimation: Animation = { ...selectedAnimation };
+              
+            }}
+          >
+            Add
+          </Button>
+        </OnTrue>
+      </FormControl>
+      <FormControl fullWidth style={{ marginTop: "20px" }}>
+        <FormLabel>Remove animation patterns</FormLabel>
+        <List style={{ maxHeight: "200px", overflowY: "auto" }}>
+          {selectedAnimation?.animationPatterns.map((ap) => (
+            <ListItem key={`ap-am-${ap.uuid}`} disablePadding>
+              <ListItemButton
+                role={undefined}
+                onClick={() => handleToggle(ap.uuid, checkedUuidsToRemove, setCheckedUuidsToRemove)}
+                dense
+              >
+                <ListItemIcon>
+                  <Checkbox
+                    edge="start"
+                    checked={checkedUuidsToRemove.some((u) => u === ap.uuid)}
+                    tabIndex={-1}
+                    disableRipple
+                    inputProps={{ "aria-labelledby": `ap-am-ip-${ap.uuid}` }}
+                  />
+                </ListItemIcon>
+                <ListItemText id={`ap-am-ip-${ap.uuid}`} primary={ap.name} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <OnTrue onTrue={checkedUuidsToRemove.length > 0}>
+          <Button
+            variant="contained"
+            color="error"
+            style={{ marginTop: "10px" }}
+            onClick={() => {
+              let updateModalOptions = { ...modalOptions };
+              updateModalOptions.show = true;
+              updateModalOptions.onDelete = deleteSelectedAnimationPatterns;
+              setModalOptions(updateModalOptions);
+            }}
+          >
+            Delete
+          </Button>
+        </OnTrue>
       </FormControl>
     </div>
   );

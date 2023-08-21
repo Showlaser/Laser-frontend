@@ -15,6 +15,7 @@ import {
   TimeLineContextType,
   TimeLinePositionContext,
 } from "..";
+import { animationPatternTimeWidthWhenDurationIsZero } from "services/shared/config";
 
 export default function AnimationPatternTimeline() {
   const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
@@ -75,9 +76,6 @@ export default function AnimationPatternTimeline() {
   };
 
   const handleResize = () => {
-    const canvas = document.getElementById("animation-pattern-timeline-canvas") as HTMLCanvasElement;
-    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-
     const windowWidth = window.innerWidth;
     setScreenWidthPx(windowWidth);
   };
@@ -117,8 +115,11 @@ export default function AnimationPatternTimeline() {
     const xMappedToTimelinePosition = mapNumber(x, 0, canvasWidth, timelinePositionMs, stepsToDrawMaxRange);
     return selectedAnimation?.animationPatterns.find(
       (ap) =>
-        numberIsBetweenOrEqual(xMappedToTimelinePosition, ap.startTimeMs, ap.getDuration === 0 ? 4 : ap.getDuration) &&
-        ap.timelineId === timelineIdPressed
+        numberIsBetweenOrEqual(
+          xMappedToTimelinePosition,
+          ap.startTimeMs,
+          ap.getDuration === 0 ? animationPatternTimeWidthWhenDurationIsZero : ap.getDuration
+        ) && ap.timelineId === timelineIdPressed
     );
   };
 
@@ -138,25 +139,29 @@ export default function AnimationPatternTimeline() {
     selectedAnimation?.animationPatterns.forEach(
       (ap) => (keyframeTimes = keyframeTimes.concat(ap.animationKeyFrames.map((ak) => ak.timeMs)))
     );
-    const animationDuration = Math.max(...keyframeTimes);
     const animationPatternsInRange = selectedAnimation?.animationPatterns.filter((ap) =>
-      numberIsBetweenOrEqual(ap.getDuration, timelinePositionMs, animationDuration)
+      numberIsBetweenOrEqual(ap.startTimeMs, timelinePositionMs, stepsToDrawMaxRange)
     );
+    if (animationPatternsInRange === undefined) {
+      return;
+    }
 
     const animationPatternsInRangeCount = animationPatternsInRange?.length ?? 0;
     const numberOfTimeLines = timelines.length;
-
     for (let i = 0; i < animationPatternsInRangeCount; i++) {
-      const animationPattern = selectedAnimation?.animationPatterns[i];
+      const animationPattern = animationPatternsInRange[i];
       const y = ((canvasHeight - 10) / numberOfTimeLines) * (animationPattern?.timelineId ?? 0);
       let animationPatternDuration = animationPattern?.getDuration ?? 0;
 
       if (animationPatternDuration === 0) {
-        animationPatternDuration = 4; // to prevent the pattern from being to small to click on
+        animationPatternDuration = animationPatternTimeWidthWhenDurationIsZero / selectableSteps[selectableStepsIndex]; // to prevent the pattern from being to small to click on
       }
 
-      const xPosition = (animationPattern?.startTimeMs ?? 0) - timelinePositionMs * (canvasWidth / 100);
-      const widthToDisplay = animationPatternDuration * (canvasWidth / 100);
+      const xPosition =
+        (((animationPattern?.startTimeMs ?? 0) - timelinePositionMs) *
+          (canvasWidth / selectableSteps[selectableStepsIndex])) /
+        10;
+      const widthToDisplay = animationPatternDuration * (canvasWidth / 10);
 
       drawRoundedRectangleWithText(
         xPosition,

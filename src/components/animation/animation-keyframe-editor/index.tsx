@@ -229,13 +229,9 @@ export default function AnimationKeyFrameEditor() {
   };
 
   const getPointsToDraw = (): Point[] => {
-    const animationPatternsToPlay = selectedAnimation?.animationPatterns.filter((ap) => {
-      const animationStartTimeMs = ap.startTimeMs;
-      const animationLengthMs = Math.max(...ap.animationKeyFrames.map((akf) => akf.timeMs)) + ap.startTimeMs;
-
-      return numberIsBetweenOrEqual(timelinePositionMs, animationStartTimeMs, animationLengthMs);
-    });
-
+    const animationPatternsToPlay = selectedAnimation?.animationPatterns.filter((ap) =>
+      numberIsBetweenOrEqual(timelinePositionMs, ap.startTimeMs, ap.getDuration + ap.startTimeMs)
+    );
     const animationPatternsToPlayLength = animationPatternsToPlay?.length ?? 0;
     if (animationPatternsToPlayLength === 0 || animationPatternsToPlay === undefined) {
       return [];
