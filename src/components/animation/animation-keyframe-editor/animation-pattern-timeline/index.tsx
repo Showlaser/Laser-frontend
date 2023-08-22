@@ -314,10 +314,11 @@ export default function AnimationPatternTimeline() {
             inputProps={{
               min: 0,
               step: selectableSteps[selectableStepsIndex],
+              max: 1000000,
             }}
           />
         </Grid>
-        <Grid item xs={1}>
+        <Grid item xs={1.2}>
           <InputLabel id="steps-select">Steps</InputLabel>
           <Select
             disabled={selectedAnimation === null}
@@ -374,7 +375,6 @@ export default function AnimationPatternTimeline() {
           </span>
         </Grid>
       </Grid>
-      <Divider style={{ marginBottom: "10px", marginTop: "-10px" }} />
       <canvas onClick={onCanvasClick} id="animation-pattern-timeline-canvas" />
       <LinearProgress
         sx={{

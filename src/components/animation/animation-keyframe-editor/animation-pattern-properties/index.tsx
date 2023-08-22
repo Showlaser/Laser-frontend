@@ -251,14 +251,20 @@ export default function AnimationPatternProperties() {
     let availableTimelines: number[] = [];
     for (let i = 0; i < 3; i++) {
       const timelineSpotIsAvailable = !selectedAnimation.animationPatterns.some(
-        (ap) =>
-          ap.timelineId === i &&
-          numberIsBetweenOrEqual(
-            ap.startTimeMs,
-            selectedAnimationPattern?.startTimeMs ?? 0,
+        (ap) => {
+          if (ap.timelineId === i) {
+            return false;
+          }
+
+          const isNotOverlappingAtStart =
+            ap.startTimeMs + ap.getDuration <
+            (selectedAnimationPattern?.startTimeMs ?? 0);
+          const isNotOverlappingAtEnd =
+            ap.startTimeMs >
             (selectedAnimationPattern?.startTimeMs ?? 0) +
-              (selectedAnimationPattern?.getDuration ?? 0)
-          )
+              (selectedAnimationPattern?.getDuration ?? 0);
+          return isNotOverlappingAtStart && isNotOverlappingAtEnd;
+        }
       );
 
       if (timelineSpotIsAvailable) {
