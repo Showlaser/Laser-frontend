@@ -1,6 +1,4 @@
 import {
-  Divider,
-  Paper,
   Input,
   FormLabel,
   Accordion,
@@ -12,12 +10,11 @@ import {
   IconButton,
   Tooltip,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
 } from "@mui/material";
 
-import React, { ChangeEvent } from "react";
+import React from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
@@ -40,14 +37,16 @@ import {
   SelectedAnimationPatternContextType,
   SelectedAnimationPatternIndexContext,
 } from "pages/animation";
+import { numberIsBetweenOrEqual } from "services/shared/math";
 
 export default function AnimationPatternProperties() {
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
     SelectedAnimationContext
   ) as SelectedAnimationContextType;
-  const { selectedAnimationPattern, setSelectedAnimationPattern } = React.useContext(
-    SelectedAnimationPatternContext
-  ) as SelectedAnimationPatternContextType;
+  const { selectedAnimationPattern, setSelectedAnimationPattern } =
+    React.useContext(
+      SelectedAnimationPatternContext
+    ) as SelectedAnimationPatternContextType;
   const xCorrection = React.useContext(XCorrectionContext);
   const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
     TimeLinePositionContext
@@ -58,9 +57,13 @@ export default function AnimationPatternProperties() {
   const { selectedKeyFrameUuid, setSelectedKeyFrameUuid } = React.useContext(
     SelectedKeyFrameContext
   ) as SelectedKeyFrameContextType;
-  const { playAnimation, setPlayAnimation } = React.useContext(PlayAnimationContext) as PlayAnimationContextType;
+  const { playAnimation, setPlayAnimation } = React.useContext(
+    PlayAnimationContext
+  ) as PlayAnimationContextType;
 
-  const selectedAnimationPatternIndex = React.useContext(SelectedAnimationPatternIndexContext);
+  const selectedAnimationPatternIndex = React.useContext(
+    SelectedAnimationPatternIndexContext
+  );
 
   const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames?.find(
     (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
@@ -68,37 +71,44 @@ export default function AnimationPatternProperties() {
   const uiComponentsAreDisabled = selectedAnimationPattern === null;
 
   const updateKeyframeProperty = (value: string | number) => {
-    const selectedKeyFrameIndex = selectedAnimationPattern?.animationKeyFrames.findIndex(
-      (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
-    );
+    const selectedKeyFrameIndex =
+      selectedAnimationPattern?.animationKeyFrames.findIndex(
+        (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
+      );
     let updatedAnimation: any = { ...selectedAnimation };
     if (
       updatedAnimation === undefined ||
       selectedKeyFrameIndex === undefined ||
       updatedAnimation?.animationPatterns === undefined ||
-      selectedAnimationPattern?.animationKeyFrames[selectedKeyFrameIndex] === undefined
+      selectedAnimationPattern?.animationKeyFrames[selectedKeyFrameIndex] ===
+        undefined
     ) {
       return;
     }
 
-    updatedAnimation.animationPatterns[selectedAnimationPatternIndex].animationKeyFrames[
-      selectedKeyFrameIndex
-    ].propertyValue = value;
+    updatedAnimation.animationPatterns[
+      selectedAnimationPatternIndex
+    ].animationKeyFrames[selectedKeyFrameIndex].propertyValue = value;
     setSelectedAnimation(updatedAnimation);
   };
 
   const getPropertyValue = (property: string) => {
     const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames.find(
-      (kf: { uuid: any; propertyEdited: string }) => kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property
+      (kf: { uuid: any; propertyEdited: string }) =>
+        kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property
     );
 
     return selectedKeyFrame?.propertyValue;
   };
 
-  const getNextOrPreviousKeyframe = (getPrevious: boolean, property: string) => {
-    const currentSelectedKeyFrame = selectedAnimationPattern?.animationKeyFrames.find(
-      (ak: { uuid: any }) => ak.uuid === selectedKeyFrameUuid
-    );
+  const getNextOrPreviousKeyframe = (
+    getPrevious: boolean,
+    property: string
+  ) => {
+    const currentSelectedKeyFrame =
+      selectedAnimationPattern?.animationKeyFrames.find(
+        (ak: { uuid: any }) => ak.uuid === selectedKeyFrameUuid
+      );
     if (currentSelectedKeyFrame === undefined) {
       onGetNextOrPreviousKeyframeError(property);
       return;
@@ -113,7 +123,9 @@ export default function AnimationPatternProperties() {
 
         return propertyIsTheSame && isBelowOrUnderCurrentSelectedKeyFrame;
       })
-      .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
+      .sort(
+        (a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs
+      );
 
     if (keyFrames === undefined) {
       return;
@@ -138,7 +150,9 @@ export default function AnimationPatternProperties() {
       return;
     }
 
-    keyFrame = getPrevious ? keyFrames[currentPositionInArray - 1] : keyFrames[currentPositionInArray + 1];
+    keyFrame = getPrevious
+      ? keyFrames[currentPositionInArray - 1]
+      : keyFrames[currentPositionInArray + 1];
     if (keyFrame === undefined) {
       onGetNextOrPreviousKeyframeError(property);
       return;
@@ -148,14 +162,20 @@ export default function AnimationPatternProperties() {
     setSelectedKeyFrameUuid(keyFrame.uuid);
   };
 
-  const getLastKeyframe = (property: string, currentSelectedKeyFrameTimeMs: number) => {
+  const getLastKeyframe = (
+    property: string,
+    currentSelectedKeyFrameTimeMs: number
+  ) => {
     const keyFrames = selectedAnimationPattern?.animationKeyFrames
       .filter((ak: { propertyEdited: string; timeMs: number }) => {
         const propertyIsTheSame = ak.propertyEdited === property;
-        const isOverCurrentSelectedKeyFrame = ak.timeMs >= currentSelectedKeyFrameTimeMs ?? 0;
+        const isOverCurrentSelectedKeyFrame =
+          ak.timeMs >= currentSelectedKeyFrameTimeMs ?? 0;
         return propertyIsTheSame && isOverCurrentSelectedKeyFrame;
       })
-      .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
+      .sort(
+        (a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs
+      );
 
     if (keyFrames === undefined) {
       return;
@@ -172,8 +192,12 @@ export default function AnimationPatternProperties() {
 
   const onGetNextOrPreviousKeyframeError = (property: string) => {
     const kf = selectedAnimationPattern?.animationKeyFrames
-      .filter((ak: { propertyEdited: string }) => ak.propertyEdited === property)
-      .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs)
+      .filter(
+        (ak: { propertyEdited: string }) => ak.propertyEdited === property
+      )
+      .sort(
+        (a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs
+      )
       .at(0);
     if (kf === undefined) {
       return;
@@ -186,14 +210,20 @@ export default function AnimationPatternProperties() {
     <span style={{ marginLeft: "2px" }}>
       <Tooltip title={`Previous ${property} keyframe`}>
         <span>
-          <IconButton disabled={uiComponentsAreDisabled} onClick={() => getNextOrPreviousKeyframe(true, property)}>
+          <IconButton
+            disabled={uiComponentsAreDisabled}
+            onClick={() => getNextOrPreviousKeyframe(true, property)}
+          >
             <NavigateBeforeIcon fontSize="small" />
           </IconButton>
         </span>
       </Tooltip>
       <Tooltip title={`Next ${property} keyframe`}>
         <span>
-          <IconButton disabled={uiComponentsAreDisabled} onClick={() => getNextOrPreviousKeyframe(false, property)}>
+          <IconButton
+            disabled={uiComponentsAreDisabled}
+            onClick={() => getNextOrPreviousKeyframe(false, property)}
+          >
             <NavigateNextIcon fontSize="small" />
           </IconButton>
         </span>
@@ -207,15 +237,43 @@ export default function AnimationPatternProperties() {
       return;
     }
 
-    updatedAnimation.animationPatterns[selectedAnimationPatternIndex][propertyName] = value;
+    updatedAnimation.animationPatterns[selectedAnimationPatternIndex][
+      propertyName
+    ] = value;
     setSelectedAnimation(updatedAnimation);
   };
 
   const getTimelineMenuItems = () => {
-    let elements = [];
+    if (selectedAnimation === null) {
+      return;
+    }
+
+    let availableTimelines: number[] = [];
     for (let i = 0; i < 3; i++) {
+      const timelineSpotIsAvailable = !selectedAnimation.animationPatterns.some(
+        (ap) =>
+          ap.timelineId === i &&
+          numberIsBetweenOrEqual(
+            ap.startTimeMs,
+            selectedAnimationPattern?.startTimeMs ?? 0,
+            (selectedAnimationPattern?.startTimeMs ?? 0) +
+              (selectedAnimationPattern?.getDuration ?? 0)
+          )
+      );
+
+      if (timelineSpotIsAvailable) {
+        availableTimelines.push(i);
+      }
+    }
+
+    let elements = [];
+    for (let i = 0; i < availableTimelines.length; i++) {
       elements.push(
-        <MenuItem key={`${i}-menu-items`} selected={(selectedAnimationPattern?.timelineId ?? 0) == i} value={i}>
+        <MenuItem
+          key={`${i}-menu-items`}
+          selected={(selectedAnimationPattern?.timelineId ?? 0) == i}
+          value={i}
+        >
           {i + 1}
         </MenuItem>
       );
@@ -226,7 +284,7 @@ export default function AnimationPatternProperties() {
 
   const propertyStyle = { marginBottom: canvasPxSize / 4 - 150 };
   return (
-    <Paper>
+    <div>
       <div style={{ marginBottom: "5px" }}>
         <FormLabel htmlFor="animation-name">Name</FormLabel>
         <br />
@@ -246,7 +304,10 @@ export default function AnimationPatternProperties() {
           inputProps={{ min: 0.1, max: 10, step: 0.1 }}
           value={getPropertyValue("scale")}
           onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
-          disabled={selectedKeyFrame?.propertyEdited !== "scale" || uiComponentsAreDisabled}
+          disabled={
+            selectedKeyFrame?.propertyEdited !== "scale" ||
+            uiComponentsAreDisabled
+          }
         />
         {nextKeyFrameButton("scale")}
       </div>
@@ -259,7 +320,10 @@ export default function AnimationPatternProperties() {
           inputProps={{ min: -4000, max: 4000 }}
           value={getPropertyValue("xOffset")}
           onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
-          disabled={selectedKeyFrame?.propertyEdited !== "xOffset" || uiComponentsAreDisabled}
+          disabled={
+            selectedKeyFrame?.propertyEdited !== "xOffset" ||
+            uiComponentsAreDisabled
+          }
         />
         {nextKeyFrameButton("xOffset")}
       </div>
@@ -272,7 +336,10 @@ export default function AnimationPatternProperties() {
           inputProps={{ min: -4000, max: 4000 }}
           value={getPropertyValue("yOffset")}
           onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
-          disabled={selectedKeyFrame?.propertyEdited !== "yOffset" || uiComponentsAreDisabled}
+          disabled={
+            selectedKeyFrame?.propertyEdited !== "yOffset" ||
+            uiComponentsAreDisabled
+          }
         />
         {nextKeyFrameButton("yOffset")}
       </div>
@@ -285,7 +352,10 @@ export default function AnimationPatternProperties() {
           inputProps={{ min: -360, max: 360 }}
           value={getPropertyValue("rotation")}
           onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
-          disabled={selectedKeyFrame?.propertyEdited !== "rotation" || uiComponentsAreDisabled}
+          disabled={
+            selectedKeyFrame?.propertyEdited !== "rotation" ||
+            uiComponentsAreDisabled
+          }
         />
         {nextKeyFrameButton("rotation")}
       </div>
@@ -297,7 +367,9 @@ export default function AnimationPatternProperties() {
           type="number"
           inputProps={{ min: 0, max: 100000000 }}
           value={selectedAnimationPattern?.startTimeMs}
-          onChange={(e) => updatePatternProperty("startTimeMs", Number(e.target.value))}
+          onChange={(e) =>
+            updatePatternProperty("startTimeMs", Number(e.target.value))
+          }
         />
       </div>
       <div style={{ marginBottom: "5px" }}>
@@ -307,44 +379,56 @@ export default function AnimationPatternProperties() {
             labelId="properties-timeline-id"
             value={selectedAnimationPattern?.timelineId}
             label="Timeline id"
-            onChange={(e) => updatePatternProperty("timelineId", Number(e.target.value))}
+            onChange={(e) =>
+              updatePatternProperty("timelineId", Number(e.target.value))
+            }
           >
             {getTimelineMenuItems()}
           </Select>
         </FormControl>
       </div>
-      <small>
-        Animation pattern duration:{" "}
-        {Math.max(...(selectedAnimationPattern?.animationKeyFrames?.map((ak: { timeMs: any }) => ak?.timeMs) ?? [0]))}{" "}
-        ms
+      <small style={{ marginTop: "5px", marginBottom: "5px" }}>
+        Animation pattern duration: {selectedAnimationPattern?.getDuration} ms
       </small>
       <div style={{ maxHeight: "150px", overflowY: "auto" }}>
         <Accordion disabled={uiComponentsAreDisabled}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <small>All keyframes ({selectedAnimationPattern?.animationKeyFrames?.length ?? 0})</small>
+            <small>
+              All keyframes (
+              {selectedAnimationPattern?.animationKeyFrames?.length ?? 0})
+            </small>
           </AccordionSummary>
           <AccordionDetails>
             <List dense={true}>
               {selectedAnimationPattern?.animationKeyFrames
                 .sort((a, b) => a.timeMs - b.timeMs)
-                ?.map((keyFrame: { uuid: any; timeMs: number; propertyEdited: any; propertyValue: any }) => (
-                  <ListItemButton
-                    key={`${keyFrame.uuid}-points`}
-                    onClick={() => {
-                      setTimelinePositionMs(keyFrame.timeMs - xCorrection[selectableStepsIndex]);
-                      setSelectedKeyFrameUuid(keyFrame.uuid);
-                    }}
-                  >
-                    <ListItemText
-                      primary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
-                      secondary={`${keyFrame.timeMs} ms`}
-                    />
-                  </ListItemButton>
-                ))}
+                ?.map(
+                  (keyFrame: {
+                    uuid: any;
+                    timeMs: number;
+                    propertyEdited: any;
+                    propertyValue: any;
+                  }) => (
+                    <ListItemButton
+                      key={`${keyFrame.uuid}-points`}
+                      onClick={() => {
+                        setTimelinePositionMs(
+                          keyFrame.timeMs - xCorrection[selectableStepsIndex]
+                        );
+                        setSelectedKeyFrameUuid(keyFrame.uuid);
+                      }}
+                    >
+                      <ListItemText
+                        primary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
+                        secondary={`${keyFrame.timeMs} ms`}
+                      />
+                    </ListItemButton>
+                  )
+                )}
             </List>
           </AccordionDetails>
         </Accordion>
       </div>
-    </Paper>
+    </div>
   );
 }

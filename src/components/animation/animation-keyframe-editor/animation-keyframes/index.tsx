@@ -1,20 +1,11 @@
-import {
-  Grid,
-  InputLabel,
-  Input,
-  Select,
-  MenuItem,
-  Tooltip,
-  IconButton,
-  useTheme,
-  LinearProgress,
-} from "@mui/material";
+import { useTheme } from "@mui/material";
 import { AnimationPatternKeyFrame } from "models/components/shared/animation";
 import React, { useEffect } from "react";
-import { createGuid, mapNumber, normalize as normalize, numberIsBetweenOrEqual } from "services/shared/math";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import PauseIcon from "@mui/icons-material/Pause";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import {
+  createGuid,
+  mapNumber,
+  numberIsBetweenOrEqual,
+} from "services/shared/math";
 import { propertiesSettings } from "services/logic/animation-logic";
 import { canvasPxSize } from "services/shared/config";
 import { drawLine, writeText } from "components/shared/canvas-helper";
@@ -43,9 +34,10 @@ export default function AnimationPatternKeyFrames() {
     SelectedAnimationContext
   ) as SelectedAnimationContextType;
 
-  const { selectedAnimationPattern, setSelectedAnimationPattern } = React.useContext(
-    SelectedAnimationPatternContext
-  ) as SelectedAnimationPatternContextType;
+  const { selectedAnimationPattern, setSelectedAnimationPattern } =
+    React.useContext(
+      SelectedAnimationPatternContext
+    ) as SelectedAnimationPatternContextType;
 
   const xCorrection = React.useContext(XCorrectionContext);
   const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
@@ -61,9 +53,10 @@ export default function AnimationPatternKeyFrames() {
     SelectedKeyFrameContext
   ) as SelectedKeyFrameContextType;
 
-  const { playAnimation, setPlayAnimation } = React.useContext(PlayAnimationContext) as PlayAnimationContextType;
+  const { playAnimation, setPlayAnimation } = React.useContext(
+    PlayAnimationContext
+  ) as PlayAnimationContextType;
 
-  const uiComponentsAreDisabled = selectedAnimationPattern === null;
   const stepsToDrawMaxRange = React.useContext(StepsToDrawMaxRangeContext);
 
   const keyFramesPropertiesPosition = [
@@ -75,7 +68,8 @@ export default function AnimationPatternKeyFrames() {
 
   const selectedAnimationPatternIndex =
     selectedAnimation?.animationPatterns?.findIndex(
-      (ap: { uuid: string | undefined }) => ap.uuid === selectedAnimationPattern?.uuid
+      (ap: { uuid: string | undefined }) =>
+        ap.uuid === selectedAnimationPattern?.uuid
     ) ?? 0;
 
   const { palette } = useTheme();
@@ -93,7 +87,9 @@ export default function AnimationPatternKeyFrames() {
   ]);
 
   const getPropertyFromYPosition = (y: number) =>
-    keyFramesPropertiesPosition.find((prop) => numberIsBetweenOrEqual(prop.yPosition, y - 20, y + 20))?.property;
+    keyFramesPropertiesPosition.find((prop) =>
+      numberIsBetweenOrEqual(prop.yPosition, y - 20, y + 20)
+    )?.property;
 
   const prepareCanvas = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
     canvas.width = canvasPxSize;
@@ -113,14 +109,23 @@ export default function AnimationPatternKeyFrames() {
     ctx.fillStyle = "whitesmoke";
 
     let xPos = canvasPxSize / 10 + 35;
-    for (let i = timelinePositionMs; i < stepsToDrawMaxRange + 1; i += selectableSteps[selectableStepsIndex]) {
+    for (
+      let i = timelinePositionMs;
+      i < stepsToDrawMaxRange + 1;
+      i += selectableSteps[selectableStepsIndex]
+    ) {
       ctx.fillText(i.toString(), xPos, canvasPxSize - 3);
       xPos += canvasPxSize / 13;
     }
 
-    const keyFramesInRange = selectedAnimationPattern?.animationKeyFrames.filter((keyframe) =>
-      numberIsBetweenOrEqual(keyframe.timeMs, timelinePositionMs, stepsToDrawMaxRange)
-    );
+    const keyFramesInRange =
+      selectedAnimationPattern?.animationKeyFrames.filter((keyframe) =>
+        numberIsBetweenOrEqual(
+          keyframe.timeMs,
+          timelinePositionMs,
+          stepsToDrawMaxRange
+        )
+      );
 
     if (keyFramesInRange === undefined) {
       return;
@@ -142,13 +147,18 @@ export default function AnimationPatternKeyFrames() {
   };
 
   const drawTimelineOnCanvas = () => {
-    let canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
+    let canvas = document.getElementById(
+      "svg-keyframe-canvas"
+    ) as HTMLCanvasElement;
     canvas = prepareCanvas(canvas);
     drawProperties(canvas);
     drawTimeStepsAndKeyframes(canvas);
   };
 
-  const drawKeyFrames = (keyFrames: AnimationPatternKeyFrame[], canvas: HTMLCanvasElement) => {
+  const drawKeyFrames = (
+    keyFrames: AnimationPatternKeyFrame[],
+    canvas: HTMLCanvasElement
+  ) => {
     if (keyFrames.length === 0) {
       return;
     }
@@ -156,17 +166,31 @@ export default function AnimationPatternKeyFrames() {
     const stepsCorrection = [-2, 1, 1, 1, 1];
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     keyFrames.forEach((keyFrame) => {
-      const keyFrameProperty = keyFramesPropertiesPosition.find((p) => p.property === keyFrame.propertyEdited);
+      const keyFrameProperty = keyFramesPropertiesPosition.find(
+        (p) => p.property === keyFrame.propertyEdited
+      );
       if (keyFrameProperty === undefined) {
         return;
       }
 
       const y = keyFrameProperty.yPosition;
-      const x = mapNumber(keyFrame.timeMs, timelinePositionMs, stepsToDrawMaxRange, 80, canvasPxSize);
+      const x = mapNumber(
+        keyFrame.timeMs,
+        timelinePositionMs,
+        stepsToDrawMaxRange,
+        80,
+        canvasPxSize
+      );
 
       const isSelected = keyFrame.uuid === selectedKeyFrameUuid;
       ctx.beginPath();
-      ctx.arc(x + stepsCorrection[selectableStepsIndex], y, isSelected ? 8 : 6, 0, 2 * Math.PI);
+      ctx.arc(
+        x + stepsCorrection[selectableStepsIndex],
+        y,
+        isSelected ? 8 : 6,
+        0,
+        2 * Math.PI
+      );
       ctx.fillStyle = isSelected ? palette.primary.main : "white";
       ctx.fill();
     });
@@ -179,14 +203,26 @@ export default function AnimationPatternKeyFrames() {
 
     e.preventDefault();
 
-    const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById(
+      "svg-keyframe-canvas"
+    ) as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     const mouseXPosition = e.clientX - rect.left;
     const mouseYPosition = e.clientY - rect.top;
-    const mappedX: number = mapNumber(mouseXPosition, 80, canvasPxSize, timelinePositionMs, stepsToDrawMaxRange) | 0;
+    const mappedX: number =
+      mapNumber(
+        mouseXPosition,
+        80,
+        canvasPxSize,
+        timelinePositionMs,
+        stepsToDrawMaxRange
+      ) | 0;
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
 
-    const keyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
+    const keyFrame = getKeyFrameFromMousePosition(
+      mappedXToStep,
+      mouseYPosition
+    );
     let updatedAnimation: any = { ...selectedAnimation };
 
     if (animation === undefined || keyFrame === undefined) {
@@ -199,14 +235,20 @@ export default function AnimationPatternKeyFrames() {
 
     const indexToRemove = updatedAnimation.animationPatterns[
       selectedAnimationPatternIndex
-    ].animationKeyFrames.findIndex((kf: AnimationPatternKeyFrame) => kf.uuid === keyFrame.uuid);
-    updatedAnimation.animationPatterns[selectedAnimationPatternIndex].animationKeyFrames.splice(indexToRemove, 1);
+    ].animationKeyFrames.findIndex(
+      (kf: AnimationPatternKeyFrame) => kf.uuid === keyFrame.uuid
+    );
+    updatedAnimation.animationPatterns[
+      selectedAnimationPatternIndex
+    ].animationKeyFrames.splice(indexToRemove, 1);
     setSelectedAnimation(updatedAnimation);
   };
 
   const showMouseXAxis = (event: any) => {
     drawTimelineOnCanvas();
-    const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById(
+      "svg-keyframe-canvas"
+    ) as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     const mouseXPosition = event.clientX - rect.left;
     const mouseYPosition = event.clientY - rect.top;
@@ -214,14 +256,30 @@ export default function AnimationPatternKeyFrames() {
       return;
     }
 
-    const mappedX: number = mapNumber(mouseXPosition, 80, canvasPxSize, timelinePositionMs, stepsToDrawMaxRange) | 0;
+    const mappedX: number =
+      mapNumber(
+        mouseXPosition,
+        80,
+        canvasPxSize,
+        timelinePositionMs,
+        stepsToDrawMaxRange
+      ) | 0;
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
-    const hoveredKeyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
+    const hoveredKeyFrame = getKeyFrameFromMousePosition(
+      mappedXToStep,
+      mouseYPosition
+    );
 
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     drawLine(mouseXPosition, 0, mouseXPosition, canvasPxSize, ctx);
     if (hoveredKeyFrame === undefined) {
-      writeText(mouseXPosition, mouseYPosition, mappedXToStep.toString() + " x", "whitesmoke", ctx);
+      writeText(
+        mouseXPosition,
+        mouseYPosition,
+        mappedXToStep.toString() + " x",
+        "whitesmoke",
+        ctx
+      );
     } else {
       writeText(
         mouseXPosition,
@@ -234,14 +292,18 @@ export default function AnimationPatternKeyFrames() {
   };
 
   const onCanvasClick = (event: any) => {
-    const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById(
+      "svg-keyframe-canvas"
+    ) as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     let x = event.clientX - rect.left;
     if (x < 85) {
       x = 85;
     }
 
-    const mappedX: number = mapNumber(x, 80, canvasPxSize, timelinePositionMs, stepsToDrawMaxRange) | 0;
+    const mappedX: number =
+      mapNumber(x, 80, canvasPxSize, timelinePositionMs, stepsToDrawMaxRange) |
+      0;
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
 
     const y = event.clientY - rect.top;
@@ -265,12 +327,16 @@ export default function AnimationPatternKeyFrames() {
   const getKeyFrameFromMousePosition = (x: number, y: number) => {
     const propertyClicked = getPropertyFromYPosition(y);
 
-    const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames.find((keyFrame) => {
-      const min = (x - selectableSteps[selectableStepsIndex] / 5 - 1) | 0;
-      const thisKeyFrameIsClicked =
-        keyFrame.timeMs >= min && keyFrame.timeMs === x && keyFrame.propertyEdited === propertyClicked;
-      return thisKeyFrameIsClicked;
-    });
+    const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames.find(
+      (keyFrame) => {
+        const min = (x - selectableSteps[selectableStepsIndex] / 5 - 1) | 0;
+        const thisKeyFrameIsClicked =
+          keyFrame.timeMs >= min &&
+          keyFrame.timeMs === x &&
+          keyFrame.propertyEdited === propertyClicked;
+        return thisKeyFrameIsClicked;
+      }
+    );
 
     return selectedKeyFrame;
   };
@@ -286,7 +352,9 @@ export default function AnimationPatternKeyFrames() {
       uuid: createGuid(),
       timeMs,
       propertyEdited,
-      propertyValue: propertiesSettings.find((ps) => ps.property === propertyEdited)?.default ?? 0,
+      propertyValue:
+        propertiesSettings.find((ps) => ps.property === propertyEdited)
+          ?.default ?? 0,
     };
 
     let updatedAnimation: any = { ...selectedAnimation };
@@ -294,91 +362,21 @@ export default function AnimationPatternKeyFrames() {
       return;
     }
 
-    updatedAnimation.animationPatterns[selectedAnimationPatternIndex ?? 0].animationKeyFrames.push(keyFrame);
+    updatedAnimation.animationPatterns[
+      selectedAnimationPatternIndex ?? 0
+    ].animationKeyFrames.push(keyFrame);
     setSelectedAnimation(updatedAnimation);
     setSelectedKeyFrameUuid(keyFrame.uuid);
   };
 
-  const duration = Math.max(...(selectedAnimationPattern?.animationKeyFrames?.map((ak) => ak?.timeMs) ?? []));
   return (
-    <>
-      <canvas
-        className="canvas"
-        id="svg-keyframe-canvas"
-        onClick={onCanvasClick}
-        onMouseMove={showMouseXAxis}
-        onMouseLeave={drawTimelineOnCanvas}
-        onMouseDown={onMiddleMouseClick}
-      />
-      <LinearProgress
-        sx={{
-          width: `${canvasPxSize - 80}px`,
-          marginLeft: "80px",
-          transition: "none",
-        }}
-        variant="determinate"
-        value={timelinePositionMs <= duration ? normalize(timelinePositionMs, 0, duration) : 100}
-      />
-      <Grid container direction="row" spacing={2}>
-        <Grid item xs={2.6}>
-          <InputLabel id="timeline-position-ms">Timeline position ms</InputLabel>
-          <Input
-            disabled={uiComponentsAreDisabled}
-            id="timeline-position-ms"
-            value={timelinePositionMs}
-            onKeyDown={(e) => e.preventDefault()}
-            onChange={(e) => setTimelinePositionMs(Number(e.target.value))}
-            type="number"
-            inputProps={{
-              min: 0,
-              step: selectableSteps[selectableStepsIndex],
-            }}
-          />
-        </Grid>
-        <Grid item xs={3}>
-          <InputLabel id="steps-select">Steps</InputLabel>
-          <Select
-            disabled={uiComponentsAreDisabled}
-            labelId="steps-select"
-            value={selectableStepsIndex}
-            onChange={(e) => setSelectableStepsIndex(Number(e.target.value))}
-          >
-            {selectableSteps.map((step, index) => (
-              <MenuItem key={step} value={index} selected={index === selectableStepsIndex}>
-                {step}
-              </MenuItem>
-            ))}
-          </Select>
-          <span style={{ marginLeft: "5px" }}>
-            <Tooltip title="Reset timeline position to 0">
-              <span>
-                <IconButton disabled={uiComponentsAreDisabled} onClick={() => setTimelinePositionMs(0)}>
-                  <RestartAltIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
-          </span>
-          <span>
-            {playAnimation ? (
-              <Tooltip title="Pause animation">
-                <span>
-                  <IconButton onClick={() => setPlayAnimation(false)} disabled={uiComponentsAreDisabled}>
-                    <PauseIcon />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Start animation">
-                <span>
-                  <IconButton onClick={() => setPlayAnimation(true)} disabled={uiComponentsAreDisabled}>
-                    <PlayArrowIcon />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            )}
-          </span>
-        </Grid>
-      </Grid>
-    </>
+    <canvas
+      className="canvas"
+      id="svg-keyframe-canvas"
+      onClick={onCanvasClick}
+      onMouseMove={showMouseXAxis}
+      onMouseLeave={drawTimelineOnCanvas}
+      onMouseDown={onMiddleMouseClick}
+    />
   );
 }

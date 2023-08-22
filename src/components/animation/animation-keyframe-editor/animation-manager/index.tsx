@@ -17,7 +17,10 @@ import {
   ListItemText,
 } from "@mui/material";
 import { convertPatternToAnimationPattern } from "services/shared/converters";
-import { Animation, AnimationPattern } from "models/components/shared/animation";
+import {
+  Animation,
+  AnimationPattern,
+} from "models/components/shared/animation";
 import { animationPatternTimeWidthWhenDurationIsZero } from "services/shared/config";
 import { OnTrue } from "components/shared/on-true";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
@@ -31,8 +34,12 @@ export default function AnimationManager() {
     SelectedAnimationContext
   ) as SelectedAnimationContextType;
 
-  const [checkedUuidsToRemove, setCheckedUuidsToRemove] = React.useState<string[]>([]);
-  const [checkedUuidsToAdd, setCheckedUuidsToAdd] = React.useState<string[]>([]);
+  const [checkedUuidsToRemove, setCheckedUuidsToRemove] = React.useState<
+    string[]
+  >([]);
+  const [checkedUuidsToAdd, setCheckedUuidsToAdd] = React.useState<string[]>(
+    []
+  );
 
   const deleteSelectedAnimationPatterns = () => {
     if (selectedAnimation === undefined) {
@@ -41,7 +48,8 @@ export default function AnimationManager() {
 
     let updatedAnimation: any = { ...selectedAnimation };
     const animationPatternsToKeep = updatedAnimation.animationPatterns?.filter(
-      (ap: { uuid: string }) => !checkedUuidsToRemove.some((uuid) => uuid === ap.uuid)
+      (ap: { uuid: string }) =>
+        !checkedUuidsToRemove.some((uuid) => uuid === ap.uuid)
     );
     updatedAnimation.animationPatterns = animationPatternsToKeep;
     setSelectedAnimation(updatedAnimation);
@@ -56,7 +64,11 @@ export default function AnimationManager() {
 
   useEffect(() => {}, [availablePatterns, checkedUuidsToRemove]);
 
-  const handleToggle = (uuid: string | undefined, arrayToUpdate: string[], updateArray: (array: string[]) => void) => {
+  const handleToggle = (
+    uuid: string | undefined,
+    arrayToUpdate: string[],
+    updateArray: (array: string[]) => void
+  ) => {
     if (uuid === undefined) {
       return;
     }
@@ -68,19 +80,18 @@ export default function AnimationManager() {
     updateArray(newChecked);
   };
 
-  const getAvailableTimelinePositionSpot = () => {
+  const getAvailableTimelinePositionSpot = (animation: Animation) => {
     for (let i = 0; i < 3; i++) {
-      const animationPatternWithSameTimelineId = selectedAnimation?.animationPatterns.filter(
-        (ap) => ap.timelineId === i
-      );
-      if (animationPatternWithSameTimelineId?.length === 0) {
+      const animationPatternWithSameTimelineId =
+        animation.animationPatterns.filter((ap) => ap.timelineId === i);
+      if (animationPatternWithSameTimelineId.length === 0) {
         return { timelineId: i, timeMs: 0 };
       }
     }
 
     let lastAnimationPatternsOnTimelines: AnimationPattern[] = [];
     for (let i = 0; i < 3; i++) {
-      const lastAnimationPatternOnTimeline = selectedAnimation?.animationPatterns
+      const lastAnimationPatternOnTimeline = animation.animationPatterns
         .filter((ap) => ap.timelineId === i)
         ?.at(-1);
       if (lastAnimationPatternOnTimeline !== undefined) {
@@ -88,7 +99,9 @@ export default function AnimationManager() {
       }
     }
 
-    lastAnimationPatternsOnTimelines.sort((a, b) => a.getDuration + a.startTimeMs - b.getDuration + b.startTimeMs);
+    lastAnimationPatternsOnTimelines.sort(
+      (a, b) => a.getDuration + a.startTimeMs - b.getDuration + b.startTimeMs
+    );
     const firstAnimationPattern = lastAnimationPatternsOnTimelines.at(-1);
     if (firstAnimationPattern === undefined) {
       return { timelineId: null, timeMs: null };
@@ -97,7 +110,8 @@ export default function AnimationManager() {
     const startTimeMs =
       (firstAnimationPattern.getDuration === 0
         ? animationPatternTimeWidthWhenDurationIsZero * 4
-        : firstAnimationPattern.getDuration) + firstAnimationPattern.startTimeMs;
+        : firstAnimationPattern.getDuration) +
+      firstAnimationPattern.startTimeMs;
 
     return {
       timelineId: firstAnimationPattern.timelineId,
@@ -105,32 +119,46 @@ export default function AnimationManager() {
     };
   };
 
-  const addAnimationPatternToAnimation = (selectedUuid: string) => {
+  const addAnimationPatternsToAnimation = () => {
     if (selectedAnimation === null) {
       return;
     }
 
     let updatedAnimation: Animation = { ...selectedAnimation };
-    const patternToAdd = availablePatterns?.find((ap) => ap.uuid === selectedUuid);
-    if (patternToAdd === undefined) {
+    const patternsToAdd = availablePatterns?.filter((ap) =>
+      checkedUuidsToAdd.some((cu) => cu === ap.uuid)
+    );
+    if (patternsToAdd === undefined) {
       return;
     }
 
-    let convertedPattern = convertPatternToAnimationPattern(patternToAdd);
-    const { timelineId, timeMs } = getAvailableTimelinePositionSpot();
-    if (timelineId === null || timeMs === null || convertedPattern === undefined) {
-      return;
-    }
+    patternsToAdd.forEach((pta) => {
+      let convertedPattern = convertPatternToAnimationPattern(pta);
+      const { timelineId, timeMs } =
+        getAvailableTimelinePositionSpot(updatedAnimation);
+      if (
+        timelineId === null ||
+        timeMs === null ||
+        convertedPattern === undefined
+      ) {
+        return;
+      }
 
-    convertedPattern.timelineId = timelineId;
-    convertedPattern.startTimeMs = timeMs;
-    updatedAnimation.animationPatterns?.push(convertedPattern);
+      convertedPattern.timelineId = timelineId;
+      convertedPattern.startTimeMs = timeMs;
+      updatedAnimation.animationPatterns?.push(convertedPattern);
+    });
+
     setSelectedAnimation(updatedAnimation);
+    setCheckedUuidsToAdd([]);
   };
 
   return (
     <div>
-      <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
+      <DeleteModal
+        modalOptions={modalOptions}
+        setModalOptions={setModalOptions}
+      />
       <FormControl fullWidth style={{ marginTop: "20px" }}>
         <FormLabel>Add animation patterns</FormLabel>
         <List style={{ maxHeight: "200px", overflowY: "auto" }}>
@@ -138,7 +166,9 @@ export default function AnimationManager() {
             <ListItem key={`ap-am-${ap.uuid}`} disablePadding>
               <ListItemButton
                 role={undefined}
-                onClick={() => handleToggle(ap.uuid, checkedUuidsToAdd, setCheckedUuidsToAdd)}
+                onClick={() =>
+                  handleToggle(ap.uuid, checkedUuidsToAdd, setCheckedUuidsToAdd)
+                }
                 dense
               >
                 <ListItemIcon>
@@ -159,10 +189,7 @@ export default function AnimationManager() {
           <Button
             variant="contained"
             style={{ marginTop: "10px" }}
-            onClick={() => {
-              let updatedAnimation: Animation = { ...selectedAnimation };
-              
-            }}
+            onClick={addAnimationPatternsToAnimation}
           >
             Add
           </Button>
@@ -175,7 +202,13 @@ export default function AnimationManager() {
             <ListItem key={`ap-am-${ap.uuid}`} disablePadding>
               <ListItemButton
                 role={undefined}
-                onClick={() => handleToggle(ap.uuid, checkedUuidsToRemove, setCheckedUuidsToRemove)}
+                onClick={() =>
+                  handleToggle(
+                    ap.uuid,
+                    checkedUuidsToRemove,
+                    setCheckedUuidsToRemove
+                  )
+                }
                 dense
               >
                 <ListItemIcon>

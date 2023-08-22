@@ -1,6 +1,9 @@
-import { Grid, Paper } from "@mui/material";
+import { Grid, Paper, Stack } from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
-import { AnimationPattern, AnimationPatternKeyFrame } from "models/components/shared/animation";
+import {
+  AnimationPattern,
+  AnimationPatternKeyFrame,
+} from "models/components/shared/animation";
 import React, { useEffect, useState } from "react";
 import AnimationPatternProperties from "./animation-pattern-properties";
 import AnimationPatternKeyFrames from "./animation-keyframes";
@@ -47,21 +50,28 @@ export type PlayAnimationContextType = {
   setPlayAnimation: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const TimeLinePositionContext = React.createContext<TimeLineContextType | null>(null);
-export const SelectableStepsIndexContext = React.createContext<SelectableStepsIndexContextType | null>(null);
-export const SelectedKeyFrameContext = React.createContext<SelectedKeyFrameContextType | null>(null);
-export const PlayAnimationContext = React.createContext<PlayAnimationContextType | null>(null);
+export const TimeLinePositionContext =
+  React.createContext<TimeLineContextType | null>(null);
+export const SelectableStepsIndexContext =
+  React.createContext<SelectableStepsIndexContextType | null>(null);
+export const SelectedKeyFrameContext =
+  React.createContext<SelectedKeyFrameContextType | null>(null);
+export const PlayAnimationContext =
+  React.createContext<PlayAnimationContextType | null>(null);
 export const XCorrectionContext = React.createContext<number[]>([]);
 export const StepsToDrawMaxRangeContext = React.createContext<number>(0);
-export const SelectableStepsContext = React.createContext<number[]>([10, 100, 1000, 10000]);
+export const SelectableStepsContext = React.createContext<number[]>([
+  10, 100, 1000, 10000,
+]);
 
 export default function AnimationKeyFrameEditor() {
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
     SelectedAnimationContext
   ) as SelectedAnimationContextType;
-  const { selectedAnimationPattern, setSelectedAnimationPattern } = React.useContext(
-    SelectedAnimationPatternContext
-  ) as SelectedAnimationPatternContextType;
+  const { selectedAnimationPattern, setSelectedAnimationPattern } =
+    React.useContext(
+      SelectedAnimationPatternContext
+    ) as SelectedAnimationPatternContextType;
 
   const [timelinePositionMs, setTimelinePositionMs] = useState<number>(0);
   const [selectableStepsIndex, setSelectableStepsIndex] = useState<number>(0);
@@ -70,7 +80,8 @@ export default function AnimationKeyFrameEditor() {
   const selectableSteps = [10, 100, 1000, 10000];
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
 
-  const stepsToDrawMaxRange = (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
+  const stepsToDrawMaxRange =
+    (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
 
   const timelinePositionMemo = React.useMemo(
     () => ({ timelinePositionMs, setTimelinePositionMs }),
@@ -84,16 +95,28 @@ export default function AnimationKeyFrameEditor() {
     () => ({ selectedKeyFrameUuid, setSelectedKeyFrameUuid }),
     [selectableSteps]
   );
-  const playAnimationMemo = React.useMemo(() => ({ playAnimation, setPlayAnimation }), [playAnimation]);
+  const playAnimationMemo = React.useMemo(
+    () => ({ playAnimation, setPlayAnimation }),
+    [playAnimation]
+  );
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (playAnimation) {
-      interval = setInterval(() => setTimelinePositionMs(timelinePositionMs + 10), 10);
+      interval = setInterval(
+        () => setTimelinePositionMs(timelinePositionMs + 10),
+        10
+      );
     }
 
     return () => clearInterval(interval);
-  }, [playAnimation, selectableStepsIndex, timelinePositionMs, selectedKeyFrameUuid, selectedAnimation]);
+  }, [
+    playAnimation,
+    selectableStepsIndex,
+    timelinePositionMs,
+    selectedKeyFrameUuid,
+    selectedAnimation,
+  ]);
 
   useEffect(() => {
     setSelectedTabId(1);
@@ -106,7 +129,9 @@ export default function AnimationKeyFrameEditor() {
           <PlayAnimationContext.Provider value={playAnimationMemo}>
             <XCorrectionContext.Provider value={[20, 350, 3000, 8000]}>
               <SelectableStepsContext.Provider value={selectableSteps}>
-                <StepsToDrawMaxRangeContext.Provider value={stepsToDrawMaxRange}>
+                <StepsToDrawMaxRangeContext.Provider
+                  value={stepsToDrawMaxRange}
+                >
                   {reactObject}
                 </StepsToDrawMaxRangeContext.Provider>
               </SelectableStepsContext.Provider>
@@ -117,13 +142,18 @@ export default function AnimationKeyFrameEditor() {
     </TimeLinePositionContext.Provider>
   );
 
-  const getNextKeyFramesByPropertySorted = (property: string, animationPattern: AnimationPattern) =>
+  const getNextKeyFramesByPropertySorted = (
+    property: string,
+    animationPattern: AnimationPattern
+  ) =>
     animationPattern?.animationKeyFrames
       .filter(
         (ak: { timeMs: number; propertyEdited: string }) =>
           ak.timeMs > timelinePositionMs && ak.propertyEdited === property
       )
-      .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
+      .sort(
+        (a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs
+      );
 
   const getPreviousKeyFramesByPropertySortedDescendingFromAnimationPattern = (
     property: string,
@@ -134,30 +164,39 @@ export default function AnimationKeyFrameEditor() {
         (ak: { timeMs: number; propertyEdited: string }) =>
           ak.timeMs < timelinePositionMs && ak.propertyEdited === property
       )
-      .sort((a: { timeMs: number }, b: { timeMs: number }) => b.timeMs - a.timeMs);
+      .sort(
+        (a: { timeMs: number }, b: { timeMs: number }) => b.timeMs - a.timeMs
+      );
 
   const getCurrentKeyFrame = () =>
-    selectedAnimationPattern?.animationKeyFrames.filter((ak: { timeMs: number }) => ak.timeMs === timelinePositionMs);
+    selectedAnimationPattern?.animationKeyFrames.filter(
+      (ak: { timeMs: number }) => ak.timeMs === timelinePositionMs
+    );
 
   const getPreviousCurrentAndNextKeyFramePerPropertyFromAnimationPattern = (
     animationPattern: AnimationPattern
   ): PreviousCurrentAndNextKeyFramePerProperty => {
-    let previousNextAndCurrentKeyFramePerProperty: PreviousCurrentAndNextKeyFramePerProperty = {
-      previous: [],
-      current: getCurrentKeyFrame() ?? [],
-      next: [],
-    };
+    let previousNextAndCurrentKeyFramePerProperty: PreviousCurrentAndNextKeyFramePerProperty =
+      {
+        previous: [],
+        current: getCurrentKeyFrame() ?? [],
+        next: [],
+      };
 
     propertiesSettings.forEach((propertySetting) => {
-      const previous = getPreviousKeyFramesByPropertySortedDescendingFromAnimationPattern(
-        propertySetting.property,
-        animationPattern
-      )?.at(0);
+      const previous =
+        getPreviousKeyFramesByPropertySortedDescendingFromAnimationPattern(
+          propertySetting.property,
+          animationPattern
+        )?.at(0);
       if (previous !== undefined) {
         previousNextAndCurrentKeyFramePerProperty.previous.push(previous);
       }
 
-      const next = getNextKeyFramesByPropertySorted(propertySetting.property, animationPattern)?.at(0);
+      const next = getNextKeyFramesByPropertySorted(
+        propertySetting.property,
+        animationPattern
+      )?.at(0);
       if (next !== undefined) {
         previousNextAndCurrentKeyFramePerProperty.next.push(next);
       }
@@ -189,7 +228,9 @@ export default function AnimationKeyFrameEditor() {
       const currentKeyFrameIsAvailable = currentKeyFrame !== undefined;
       const previousKeyFrame = currentKeyFrameIsAvailable
         ? currentKeyFrame
-        : previousNextAndCurrentKeyFrames.previous.find((kf) => kf.propertyEdited === currentPropertySetting.property);
+        : previousNextAndCurrentKeyFrames.previous.find(
+            (kf) => kf.propertyEdited === currentPropertySetting.property
+          );
 
       const nextKeyFrame = previousNextAndCurrentKeyFrames.next.find(
         (kf) => kf.propertyEdited === currentPropertySetting.property
@@ -198,19 +239,34 @@ export default function AnimationKeyFrameEditor() {
       const valuesPerPropertyIndex = valuesPerProperty.findIndex(
         (vpp) => vpp.property === currentPropertySetting.property
       );
-      if (valuesPerPropertyIndex !== -1 && previousKeyFrame !== undefined && nextKeyFrame !== undefined) {
-        valuesPerProperty[valuesPerPropertyIndex].value = calculateNewValueByKeyFrames(previousKeyFrame, nextKeyFrame);
-      } else if (valuesPerPropertyIndex !== -1 && previousKeyFrame !== undefined) {
-        valuesPerProperty[valuesPerPropertyIndex].value = previousKeyFrame.propertyValue;
+      if (
+        valuesPerPropertyIndex !== -1 &&
+        previousKeyFrame !== undefined &&
+        nextKeyFrame !== undefined
+      ) {
+        valuesPerProperty[valuesPerPropertyIndex].value =
+          calculateNewValueByKeyFrames(previousKeyFrame, nextKeyFrame);
+      } else if (
+        valuesPerPropertyIndex !== -1 &&
+        previousKeyFrame !== undefined
+      ) {
+        valuesPerProperty[valuesPerPropertyIndex].value =
+          previousKeyFrame.propertyValue;
       }
     }
 
-    const scale = valuesPerProperty.find((vpp) => vpp.property === "scale")?.value ?? 1;
-    const xOffset = valuesPerProperty.find((vpp) => vpp.property === "xOffset")?.value ?? 0;
-    const yOffset = valuesPerProperty.find((vpp) => vpp.property === "yOffset")?.value ?? 0;
-    const rotation = valuesPerProperty.find((vpp) => vpp.property === "rotation")?.value ?? 0;
+    const scale =
+      valuesPerProperty.find((vpp) => vpp.property === "scale")?.value ?? 1;
+    const xOffset =
+      valuesPerProperty.find((vpp) => vpp.property === "xOffset")?.value ?? 0;
+    const yOffset =
+      valuesPerProperty.find((vpp) => vpp.property === "yOffset")?.value ?? 0;
+    const rotation =
+      valuesPerProperty.find((vpp) => vpp.property === "rotation")?.value ?? 0;
 
-    return applyParametersToPointsForCanvas(scale, xOffset, yOffset, rotation, [...points]);
+    return applyParametersToPointsForCanvas(scale, xOffset, yOffset, rotation, [
+      ...points,
+    ]);
   };
 
   const calculateNewValueByKeyFrames = (
@@ -229,11 +285,19 @@ export default function AnimationKeyFrameEditor() {
   };
 
   const getPointsToDraw = (): Point[] => {
-    const animationPatternsToPlay = selectedAnimation?.animationPatterns.filter((ap) =>
-      numberIsBetweenOrEqual(timelinePositionMs, ap.startTimeMs, ap.getDuration + ap.startTimeMs)
+    const animationPatternsToPlay = selectedAnimation?.animationPatterns.filter(
+      (ap) =>
+        numberIsBetweenOrEqual(
+          timelinePositionMs,
+          ap.startTimeMs,
+          ap.getDuration + ap.startTimeMs
+        )
     );
     const animationPatternsToPlayLength = animationPatternsToPlay?.length ?? 0;
-    if (animationPatternsToPlayLength === 0 || animationPatternsToPlay === undefined) {
+    if (
+      animationPatternsToPlayLength === 0 ||
+      animationPatternsToPlay === undefined
+    ) {
       return [];
     }
 
@@ -245,7 +309,9 @@ export default function AnimationKeyFrameEditor() {
       }
 
       const previousCurrentAndNextKeyFrames =
-        getPreviousCurrentAndNextKeyFramePerPropertyFromAnimationPattern(animationPattern);
+        getPreviousCurrentAndNextKeyFramePerPropertyFromAnimationPattern(
+          animationPattern
+        );
       const patternPoints = getPatternPointsByTimelinePosition(
         animationPattern.pattern,
         previousCurrentAndNextKeyFrames
@@ -259,7 +325,7 @@ export default function AnimationKeyFrameEditor() {
 
   return (
     <>
-      <Grid container direction="row" spacing={2} key={selectedKeyFrameUuid}>
+      <Grid container direction="row" spacing={1} key={selectedKeyFrameUuid}>
         {getWrapperContext(
           <Grid item xs={3.2}>
             <Paper
@@ -271,7 +337,10 @@ export default function AnimationKeyFrameEditor() {
             >
               <TabSelector
                 data={[
-                  { tabName: "Animation manager", tabChildren: <AnimationManager /> },
+                  {
+                    tabName: "Animation manager",
+                    tabChildren: <AnimationManager />,
+                  },
                   {
                     tabName: "Animation pattern properties",
                     tabChildren: <AnimationPatternProperties />,
@@ -291,9 +360,11 @@ export default function AnimationKeyFrameEditor() {
           <PointsDrawer pointsToDraw={getPointsToDraw()} />
         </Grid>
       </Grid>
-      <Grid item xs>
-        {getWrapperContext(<AnimationPatternTimeline />)}
-      </Grid>
+      <Stack>
+        <Grid item xs={12}>
+          {getWrapperContext(<AnimationPatternTimeline />)}
+        </Grid>
+      </Stack>
     </>
   );
 }
