@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import { OnTrue } from "components/shared/on-true";
 import * as React from "react";
 
 interface TabPanelProps {
@@ -15,7 +16,9 @@ export default function TabPanel({ children, index, value }: TabPanelProps) {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      <OnTrue onTrue={value === index}>
+        <Box sx={{ p: 3 }}>{children}</Box>
+      </OnTrue>
     </div>
   );
 }
