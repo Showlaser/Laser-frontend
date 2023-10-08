@@ -3,6 +3,8 @@ import { sendRequest } from "services/shared/api/api-middleware";
 import apiEndpoints from "services/shared/api/api-endpoints";
 import { toastSubject } from "services/shared/toast-messages";
 import { Pattern } from "models/components/shared/pattern";
+import { numberIsBetweenOrEqual } from "services/shared/math";
+import { Animation } from "models/components/shared/animation";
 
 export const getPatterns = async (): Promise<Pattern[]> => {
   const value = await sendRequest(() => Get(apiEndpoints.pattern), [200]);
@@ -20,3 +22,12 @@ export const removePattern = (uuid: string) => {
 export const playPattern = (pattern: Pattern) => {
   return sendRequest(() => Post(apiEndpoints.pattern + "/play", pattern), []);
 };
+
+export const getAnimationPatternsInTimelineRange = (
+  animation: Animation | null,
+  timelinePositionMs: number,
+  stepsToDrawMaxRange: number
+) =>
+  animation?.animationPatterns.filter((ap) =>
+    numberIsBetweenOrEqual(ap.startTimeMs, timelinePositionMs, stepsToDrawMaxRange)
+  );

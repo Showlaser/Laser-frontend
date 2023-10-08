@@ -33,6 +33,7 @@ import {
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { getAnimationPatternsInTimelineRange } from "services/logic/pattern-logic";
 
 export default function AnimationPatternTimeline() {
   const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
@@ -87,7 +88,14 @@ export default function AnimationPatternTimeline() {
     canvas.style.height = `${canvasHeight}px`;
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     draw(ctx);
-  }, [screenWidthPx, screenHeightPx, timelinePositionMs, selectedAnimation, selectableStepsIndex]);
+  }, [
+    screenWidthPx,
+    screenHeightPx,
+    timelinePositionMs,
+    selectedAnimation,
+    selectableStepsIndex,
+    selectedAnimationPattern,
+  ]);
 
   const draw = (ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, canvasWidth, ctx.canvas.height);
@@ -140,7 +148,7 @@ export default function AnimationPatternTimeline() {
         numberIsBetweenOrEqual(
           xMappedToTimelinePosition,
           ap.startTimeMs,
-          ap.getDuration === 0 ? animationPatternTimeWidthWhenDurationIsZero : ap.getDuration
+          ap.getDuration === 0 ? ap.startTimeMs + animationPatternTimeWidthWhenDurationIsZero : ap.getDuration
         ) && ap.timelineId === timelineIdPressed
     );
   };
@@ -162,8 +170,10 @@ export default function AnimationPatternTimeline() {
       (ap) => (keyframeTimes = keyframeTimes.concat(ap.animationKeyFrames.map((ak) => ak.timeMs)))
     );
 
-    const animationPatternsInRange = selectedAnimation?.animationPatterns.filter((ap) =>
-      numberIsBetweenOrEqual(ap.startTimeMs, timelinePositionMs, stepsToDrawMaxRange)
+    const animationPatternsInRange = getAnimationPatternsInTimelineRange(
+      selectedAnimation,
+      timelinePositionMs,
+      stepsToDrawMaxRange
     );
     if (animationPatternsInRange === undefined) {
       return;
@@ -186,6 +196,7 @@ export default function AnimationPatternTimeline() {
         10;
       const widthToDisplay = animationPatternDuration * (canvasWidth / 10);
 
+      let rectangleColor = selectedAnimationPattern?.uuid === animationPattern.uuid ? "#6370c2" : "#485cdb";
       drawRoundedRectangleWithText(
         xPosition,
         y + 5,
@@ -193,7 +204,7 @@ export default function AnimationPatternTimeline() {
         animationPatternHeightOnCanvas,
         `${animationPattern?.name}`,
         "white",
-        "#485cdb",
+        rectangleColor,
         ctx
       );
     }
@@ -209,6 +220,7 @@ export default function AnimationPatternTimeline() {
       const timelineCanvasYPosition =
         (canvasHeight - timelineNumbersHeight) / numberOfTimeLines +
         (i * (canvasHeight - timelineNumbersHeight)) / numberOfTimeLines;
+
       const yPositionIsInTimeline = numberIsBetweenOrEqual(
         y,
         timelineCanvasYPosition - animationPatternHeightOnCanvas - 5,

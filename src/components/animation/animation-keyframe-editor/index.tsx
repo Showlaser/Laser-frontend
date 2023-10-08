@@ -229,6 +229,7 @@ export default function AnimationKeyFrameEditor() {
   };
 
   const getPointsToDraw = (): Point[] => {
+    console.log("");
     const animationPatternsToPlay = selectedAnimation?.animationPatterns.filter((ap) =>
       numberIsBetweenOrEqual(timelinePositionMs, ap.startTimeMs, ap.getDuration + ap.startTimeMs)
     );
