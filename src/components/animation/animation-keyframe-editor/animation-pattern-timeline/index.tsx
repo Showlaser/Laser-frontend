@@ -17,23 +17,14 @@ import {
   TimeLineContextType,
   TimeLinePositionContext,
 } from "..";
-import { animationPatternTimeWidthWhenDurationIsZero, canvasPxSize } from "services/shared/config";
-import {
-  LinearProgress,
-  Grid,
-  InputLabel,
-  Input,
-  Select,
-  MenuItem,
-  Tooltip,
-  IconButton,
-  Paper,
-  Divider,
-} from "@mui/material";
+import { animationPatternTimeWidthWhenDurationIsZero } from "services/shared/config";
+import { LinearProgress, Grid, InputLabel, Input, Select, MenuItem, Tooltip, IconButton, Paper } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { getAnimationPatternsInTimelineRange } from "services/logic/pattern-logic";
+
+export const numberOfTimeLines = 3;
 
 export default function AnimationPatternTimeline() {
   const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
@@ -54,8 +45,6 @@ export default function AnimationPatternTimeline() {
   ) as SelectedAnimationPatternContextType;
 
   const { playAnimation, setPlayAnimation } = React.useContext(PlayAnimationContext) as PlayAnimationContextType;
-
-  const numberOfTimeLines = 3;
   const stepsToDrawMaxRange = React.useContext(StepsToDrawMaxRangeContext);
 
   const canvasHeight = window.innerHeight / 6;

@@ -38,7 +38,7 @@ import {
   SelectedAnimationPatternContextType,
   SelectedAnimationPatternIndexContext,
 } from "pages/animation";
-import { numberIsBetweenOrEqual } from "services/shared/math";
+import { numberOfTimeLines } from "../animation-pattern-timeline";
 
 export default function AnimationPatternProperties() {
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
@@ -107,8 +107,8 @@ export default function AnimationPatternProperties() {
       .filter((ak: { propertyEdited: string; timeMs: number }) => {
         const propertyIsTheSame = ak.propertyEdited === property;
         const isBelowOrUnderCurrentSelectedKeyFrame = getPrevious
-          ? ak.timeMs <= currentSelectedKeyFrame?.timeMs ?? 0
-          : ak.timeMs >= currentSelectedKeyFrame?.timeMs ?? 0;
+          ? ak.timeMs <= currentSelectedKeyFrame?.timeMs
+          : ak.timeMs >= currentSelectedKeyFrame?.timeMs;
 
         return propertyIsTheSame && isBelowOrUnderCurrentSelectedKeyFrame;
       })
@@ -151,7 +151,7 @@ export default function AnimationPatternProperties() {
     const keyFrames = selectedAnimationPattern?.animationKeyFrames
       .filter((ak: { propertyEdited: string; timeMs: number }) => {
         const propertyIsTheSame = ak.propertyEdited === property;
-        const isOverCurrentSelectedKeyFrame = ak.timeMs >= currentSelectedKeyFrameTimeMs ?? 0;
+        const isOverCurrentSelectedKeyFrame = ak.timeMs >= currentSelectedKeyFrameTimeMs;
         return propertyIsTheSame && isOverCurrentSelectedKeyFrame;
       })
       .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
@@ -211,44 +211,16 @@ export default function AnimationPatternProperties() {
   };
 
   const getTimelineMenuItems = () => {
-    if (selectedAnimation === null) {
-      return [];
-    }
-
-    let availableTimelines: number[] = [];
-    for (let i = 0; i < 3; i++) {
-      const timelineSpotIsAvailable = !selectedAnimation.animationPatterns.some((ap) => {
-        if (ap.timelineId === i) {
-          return false;
-        }
-
-        const duration = ap.getDuration === 0 ? animationPatternTimeWidthWhenDurationIsZero : ap.getDuration;
-        const selectedAnimationPatternDuration =
-          selectedAnimationPattern?.getDuration === 0
-            ? animationPatternTimeWidthWhenDurationIsZero
-            : selectedAnimationPattern?.getDuration;
-
-        const isNotOverlappingAtStart = ap.startTimeMs + duration < (selectedAnimationPattern?.startTimeMs ?? 0);
-        const isNotOverlappingAtEnd =
-          ap.startTimeMs > (selectedAnimationPattern?.startTimeMs ?? 0) + (selectedAnimationPatternDuration ?? 0);
-        return isNotOverlappingAtStart && isNotOverlappingAtEnd;
-      });
-
-      if (timelineSpotIsAvailable) {
-        availableTimelines.push(i);
-      }
-    }
-
-    let elements = [];
-    for (let i = 0; i < availableTimelines.length; i++) {
-      elements.push(
-        <MenuItem key={`${i}-menu-items`} selected={(selectedAnimationPattern?.timelineId ?? 0) == i} value={i}>
+    let items = [];
+    for (let i = 0; i < numberOfTimeLines; i++) {
+      items.push(
+        <MenuItem key={`${i}-menu-items`} selected={(selectedAnimationPattern?.timelineId ?? 0) === i} value={i}>
           {i + 1}
         </MenuItem>
       );
     }
 
-    return elements;
+    return items;
   };
 
   const labelStyle = { marginBottom: "-11px", marginTop: "2.5px" };
