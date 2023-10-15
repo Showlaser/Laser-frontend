@@ -34,26 +34,20 @@ export const playPattern = (pattern: Pattern) => {
 
 export const getAnimationPatternsInTimelineRange = (
   animation: Animation | null,
-  timelinePositionMs: number,
-  stepsToDrawMaxRange: number
-) =>
-  animation?.animationPatterns.filter((ap) =>
-    numberIsBetweenOrEqual(ap.startTimeMs, timelinePositionMs, stepsToDrawMaxRange)
-  );
+  startRange: number,
+  endRange: number
+) => animation?.animationPatterns.filter((ap) => numberIsBetweenOrEqual(ap.startTimeMs, startRange, endRange));
 
-export const getNextKeyFramesByPropertySorted = (
+export const getKeyframesPastStartTimeSortedByTime = (
   property: string,
   animationPattern: AnimationPattern,
-  timelinePositionMs: number
+  starttime: number
 ) =>
   animationPattern?.animationKeyFrames
-    .filter(
-      (ak: { timeMs: number; propertyEdited: string }) =>
-        ak.timeMs > timelinePositionMs && ak.propertyEdited === property
-    )
+    .filter((ak: { timeMs: number; propertyEdited: string }) => ak.timeMs > starttime && ak.propertyEdited === property)
     .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
 
-export const getPreviousKeyFramesByPropertySortedDescendingFromAnimationPattern = (
+export const getKeyframesBeforeStartTimeSortedByTimeDescending = (
   property: string,
   animationPattern: AnimationPattern,
   timelinePositionMs: number
@@ -79,7 +73,7 @@ export const getPreviousCurrentAndNextKeyFrames = (
   };
 
   propertiesSettings.forEach((propertySetting) => {
-    const previous = getPreviousKeyFramesByPropertySortedDescendingFromAnimationPattern(
+    const previous = getKeyframesBeforeStartTimeSortedByTimeDescending(
       propertySetting.property,
       animationPattern,
       timelinePositionMs
@@ -88,9 +82,11 @@ export const getPreviousCurrentAndNextKeyFrames = (
       previousNextAndCurrentKeyFramePerProperty.previous.push(previous);
     }
 
-    const next = getNextKeyFramesByPropertySorted(propertySetting.property, animationPattern, timelinePositionMs)?.at(
-      0
-    );
+    const next = getKeyframesPastStartTimeSortedByTime(
+      propertySetting.property,
+      animationPattern,
+      timelinePositionMs
+    )?.at(0);
     if (next !== undefined) {
       previousNextAndCurrentKeyFramePerProperty.next.push(next);
     }
