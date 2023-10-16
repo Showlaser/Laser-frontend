@@ -8,7 +8,7 @@ export const getPointsTestSet = (): Point[] => [
   {
     uuid: "72398da6-61a3-42f9-8225-473508a012c5",
     patternUuid: "a4db904a-220a-4d99-86b4-194e8eb72f4d",
-    x: 1000,
+    x: -1000,
     y: 0,
     redLaserPowerPwm: 0,
     greenLaserPowerPwm: 0,

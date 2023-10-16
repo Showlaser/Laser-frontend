@@ -38,7 +38,7 @@ export const getAnimationPatternsInTimelineRange = (
   endRange: number
 ) => animation?.animationPatterns.filter((ap) => numberIsBetweenOrEqual(ap.startTimeMs, startRange, endRange));
 
-export const getKeyframesPastStartTimeSortedByTime = (
+export const getKeyFramesPastStartTimeSortedByTime = (
   property: string,
   animationPattern: AnimationPattern,
   starttime: number
@@ -47,7 +47,7 @@ export const getKeyframesPastStartTimeSortedByTime = (
     .filter((ak: { timeMs: number; propertyEdited: string }) => ak.timeMs > starttime && ak.propertyEdited === property)
     .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
 
-export const getKeyframesBeforeStartTimeSortedByTimeDescending = (
+export const getKeyFramesBeforeStartTimeSortedByTimeDescending = (
   property: string,
   animationPattern: AnimationPattern,
   timelinePositionMs: number
@@ -62,7 +62,7 @@ export const getKeyframesBeforeStartTimeSortedByTimeDescending = (
 export const getCurrentKeyFrame = (selectedAnimationPattern: AnimationPattern, timelinePositionMs: number) =>
   selectedAnimationPattern?.animationKeyFrames.filter((ak: { timeMs: number }) => ak.timeMs === timelinePositionMs);
 
-export const getPreviousCurrentAndNextKeyFrames = (
+export const getPreviousCurrentAndNextKeyFramePerProperty = (
   animationPattern: AnimationPattern,
   timelinePositionMs: number
 ): PreviousCurrentAndNextKeyFramePerProperty => {
@@ -73,7 +73,7 @@ export const getPreviousCurrentAndNextKeyFrames = (
   };
 
   propertiesSettings.forEach((propertySetting) => {
-    const previous = getKeyframesBeforeStartTimeSortedByTimeDescending(
+    const previous = getKeyFramesBeforeStartTimeSortedByTimeDescending(
       propertySetting.property,
       animationPattern,
       timelinePositionMs
@@ -82,7 +82,7 @@ export const getPreviousCurrentAndNextKeyFrames = (
       previousNextAndCurrentKeyFramePerProperty.previous.push(previous);
     }
 
-    const next = getKeyframesPastStartTimeSortedByTime(
+    const next = getKeyFramesPastStartTimeSortedByTime(
       propertySetting.property,
       animationPattern,
       timelinePositionMs

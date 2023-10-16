@@ -15,7 +15,10 @@ import {
 import TabSelector from "components/tabs";
 import AnimationManager from "./animation-manager";
 import { canvasPxSize } from "services/shared/config";
-import { getPatternPointsByTimelinePosition, getPreviousCurrentAndNextKeyFrames } from "services/logic/pattern-logic";
+import {
+  getPatternPointsByTimelinePosition,
+  getPreviousCurrentAndNextKeyFramePerProperty,
+} from "services/logic/pattern-logic";
 
 export type TimeLineContextType = {
   timelinePositionMs: number;
@@ -123,7 +126,10 @@ export default function AnimationKeyFrameEditor() {
         return [];
       }
 
-      const previousCurrentAndNextKeyFrames = getPreviousCurrentAndNextKeyFrames(animationPattern, timelinePositionMs);
+      const previousCurrentAndNextKeyFrames = getPreviousCurrentAndNextKeyFramePerProperty(
+        animationPattern,
+        timelinePositionMs
+      );
       const patternPoints = getPatternPointsByTimelinePosition(
         animationPattern.pattern,
         previousCurrentAndNextKeyFrames,
