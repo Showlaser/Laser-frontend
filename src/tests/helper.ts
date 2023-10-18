@@ -40,8 +40,7 @@ export const getPointsTestSet = (): Point[] => [
   },
 ];
 
-type pointsTestSetParameters = { x: number; y: number };
-export const generatePointsTestSet = (coordinates: pointsTestSetParameters[]): Point[] =>
+export const generatePointsTestSet = (coordinates: { x: number; y: number }[]): Point[] =>
   coordinates.map((coordinate, index) => ({
     uuid: "test",
     patternUuid: "a4db904a-220a-4d99-86b4-194e8eb72f4d",

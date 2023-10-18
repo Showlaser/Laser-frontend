@@ -8,7 +8,7 @@ test(
     "Then I expect the returned point to be in the center",
   () => {
     const testPoints = getPointsTestSet();
-    const result = getCenterOfPoints(testPoints, 0, 0);
+    const result = getCenterOfPoints(testPoints);
 
     expect(result.x).toBe(0);
     expect(result.y).toBe(0);
@@ -36,7 +36,7 @@ test(
       },
     ]);
 
-    const result = getCenterOfPoints(testPoints, 0, 0);
+    const result = getCenterOfPoints(testPoints);
     expect(result.x).toBe(0);
     expect(result.y).toBe(-1333.3333333333333);
   }
@@ -59,7 +59,7 @@ test(
       },
     ]);
 
-    const result = getCenterOfPoints(testPoints, 0, 0);
+    const result = getCenterOfPoints(testPoints);
     const expectedResult = { x: 0, y: 0 };
     expect(result).toStrictEqual(expectedResult);
   }
@@ -67,7 +67,7 @@ test(
 
 test(
   "Tested: rotatePoints:" +
-    "Given the provided points are -1000 and 0" +
+    "Given the provided points are -1000 and 0 " +
     "When I execute the function," +
     "Then I expect the returned point to be rotated 90 degrees clockwise",
   () => {

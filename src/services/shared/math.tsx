@@ -34,27 +34,30 @@ export const numberIsBetweenOrEqual = (number: number, min: number, max: number)
 export const getLargestNumber = (numberOne: number, numberTwo: number): number =>
   numberOne > numberTwo ? numberOne : numberTwo;
 
-export const rotatePoints = (points: Point[], rotation: number, centerX: number, centerY: number) => {
-  const correctRotation = rotation < 0 ? Math.abs(rotation) : -Math.abs(rotation);
-  const radians = (Math.PI / 180) * correctRotation,
-    cos = Math.cos(radians),
-    sin = Math.sin(radians);
-
-  let rotatedPoints: Point[] = [];
-  const pointsLength = points.length;
-  for (let i = 0; i < pointsLength; i++) {
-    let point = { ...points[i] };
-    const x = cos * (point.x - centerX) + sin * (point.y - centerY) + centerX;
-    const y = cos * (point.y - centerY) - sin * (point.x - centerX) + centerY;
-    point.x = x;
-    point.y = y;
-    rotatedPoints.push(point);
-  }
-
-  return rotatedPoints;
+export const roundToZero = (value: number, tolerance = 1e-10) => {
+  return Math.abs(value) < tolerance ? 0 : value;
 };
 
-export const getCenterOfPoints = (points: Point[], xOffset: number, yOffset: number): { x: number; y: number } => {
+export const rotatePoints = (points: Point[], angleInDegrees: number, centerX: number, centerY: number) => {
+  const angleInRadians = ((360 - angleInDegrees) * Math.PI) / 180;
+  let updatedPoints = [];
+
+  const pointsLength = points.length;
+  for (let i = 0; i < pointsLength; i++) {
+    const point = points[i];
+    const x = centerX + (point.x - centerX) * Math.cos(angleInRadians) - (point.y - centerY) * Math.sin(angleInRadians);
+    const y = centerY + (point.x - centerX) * Math.sin(angleInRadians) + (point.y - centerY) * Math.cos(angleInRadians);
+
+    point.x = roundToZero(x);
+    point.y = roundToZero(y);
+
+    updatedPoints.push(point);
+  }
+
+  return updatedPoints;
+};
+
+export const getCenterOfPoints = (points: Point[]): { x: number; y: number } => {
   const pointsLength = points.length;
   if (pointsLength === 0) {
     return { x: 0, y: 0 };
