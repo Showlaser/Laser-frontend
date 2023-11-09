@@ -235,7 +235,7 @@ export default function AnimationPatternTimeline() {
   return (
     <Paper style={{ marginTop: "25px" }}>
       <Grid container direction="row" sx={{ padding: "10px" }}>
-        <Grid item xs={1.2}>
+        <Grid item>
           <InputLabel id="timeline-position-ms">Timeline position ms</InputLabel>
           <Input
             disabled={selectedAnimation === null}
@@ -251,7 +251,7 @@ export default function AnimationPatternTimeline() {
             }}
           />
         </Grid>
-        <Grid item xs={1.2}>
+        <Grid item ml={1.5}>
           <InputLabel id="steps-select">Steps</InputLabel>
           <Select
             disabled={selectedAnimation === null}
