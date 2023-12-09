@@ -72,29 +72,36 @@ export const testPattern: Pattern = {
   rotation: 0,
 };
 
-export const testAnimationPattern = (keyframesStartTime: number, animationDuration: number): AnimationPattern => {
+export const testAnimationPattern = (
+  patternStartTime: number,
+  keyframesStartTime: number,
+  animationDuration: number
+): AnimationPattern => {
   const animationPattern: AnimationPattern = new AnimationPattern();
   animationPattern.uuid = "4145ab82-6a79-48d1-8425-747a464a4940";
   animationPattern.name = "Test animation pattern";
   animationPattern.pattern = testPattern;
+  animationPattern.startTimeMs = patternStartTime;
   animationPattern.animationKeyFrames = getTestAnimationPatternKeyFrames(keyframesStartTime);
+  animationPattern.timelineId = 0;
 
   if (animationDuration > 0) {
     const endKeyframes = getTestAnimationPatternKeyFrames(animationDuration);
     animationPattern.animationKeyFrames = animationPattern.animationKeyFrames.concat(endKeyframes);
   }
 
-  animationPattern.startTimeMs = 0;
-  animationPattern.timelineId = 0;
-
   return animationPattern;
 };
 
-export const testAnimation = (keyframesStartTime: number, animationDuration: number): Animation => {
+export const testAnimation = (
+  patternStartTime: number,
+  keyframesStartTime: number,
+  animationDuration: number
+): Animation => {
   return {
     uuid: "cdef5b05-e8aa-44e3-8261-7619e90b0ef0",
     name: "Test animation",
     image: null,
-    animationPatterns: [testAnimationPattern(keyframesStartTime, animationDuration)],
+    animationPatterns: [testAnimationPattern(patternStartTime, keyframesStartTime, animationDuration)],
   };
 };

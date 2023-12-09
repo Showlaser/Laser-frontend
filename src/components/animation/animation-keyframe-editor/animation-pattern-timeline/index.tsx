@@ -53,6 +53,17 @@ export default function AnimationPatternTimeline() {
   const timelineNumbersHeight = 10;
   const animationPatternHeightOnCanvas = (canvasHeight - 40) / numberOfTimeLines;
 
+  const getAnimationDuration = () => {
+    const times = selectedAnimation?.animationPatterns.map((ap) => ap.startTimeMs + ap.getDuration);
+    if (times === undefined) {
+      return 0;
+    }
+
+    return Math.max(...times);
+  };
+
+  const animationDuration = getAnimationDuration();
+
   const getTimelineData = () => {
     let generatedTimeline = [];
     for (let i = 0; i < numberOfTimeLines; i++) {
@@ -177,10 +188,11 @@ export default function AnimationPatternTimeline() {
       let animationPatternDuration = animationPattern?.getDuration ?? 0;
 
       if (animationPatternDuration === 0) {
-        animationPatternDuration = animationPatternTimeWidthWhenDurationIsZero / selectableSteps[selectableStepsIndex]; // to prevent the pattern from being to small to click on
+        //to prevent the pattern from being to small to click on
+        animationPatternDuration = animationPatternTimeWidthWhenDurationIsZero;
       }
 
-      const widthToDisplay = (canvasWidth / 10) * (animationDuration / selectableSteps[selectableStepsIndex]);
+      const widthToDisplay = (canvasWidth / 10) * (animationPatternDuration / selectableSteps[selectableStepsIndex]);
       const xPosition =
         (canvasWidth / 10) *
         ((animationPattern.startTimeMs - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
@@ -220,17 +232,6 @@ export default function AnimationPatternTimeline() {
       }
     }
   };
-
-  const getAnimationDuration = () => {
-    const times = selectedAnimation?.animationPatterns.map((ap) => ap.startTimeMs + ap.getDuration);
-    if (times === undefined) {
-      return 0;
-    }
-
-    return Math.max(...times);
-  };
-
-  const animationDuration = getAnimationDuration();
 
   return (
     <Paper style={{ marginTop: "25px" }}>
