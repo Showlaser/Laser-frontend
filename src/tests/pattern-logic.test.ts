@@ -87,7 +87,7 @@ const getAnimationWithTwoKeyframes = (): AnimationPattern => {
   const mergedKeyFrames = [firstKeyFrame, secondKeyframe];
 
   let animationPattern = testAnimationPattern(0, 0, 0);
-  animationPattern.animationKeyFrames = mergedKeyFrames;
+  animationPattern.animationPatternKeyFrames = mergedKeyFrames;
   return animationPattern;
 };
 
@@ -159,7 +159,7 @@ test(
   () => {
     const animationPattern = testAnimationPattern(0, 100, 0);
     const keyFrames = getCurrentKeyFrame(animationPattern, 100);
-    expect(keyFrames.length).toBe(animationPattern.animationKeyFrames.length);
+    expect(keyFrames.length).toBe(animationPattern.animationPatternKeyFrames.length);
   }
 );
 
@@ -174,7 +174,7 @@ test(
     const nextKeyFrame = getTestAnimationPatternKeyFrames(200)[0];
 
     let animationPattern = testAnimationPattern(0, 0, 0);
-    animationPattern.animationKeyFrames = animationPattern.animationKeyFrames.concat(
+    animationPattern.animationPatternKeyFrames = animationPattern.animationPatternKeyFrames.concat(
       previousKeyFrame,
       currentKeyFrame,
       nextKeyFrame

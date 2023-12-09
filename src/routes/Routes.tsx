@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import React from "react";
 import routerPaths from "services/shared/router-paths";
 import PatternEditor from "pages/pattern-editor";
-import AnimationEditor from "pages/animation";
+import AnimationEditor from "pages/animation-editor";
 import Installation from "pages/installation";
 import Login from "pages/login";
 import SpotifyVote from "pages/spotify-vote";
@@ -14,6 +14,7 @@ import LasershowSpotifyConnector from "pages/lasershow-spotify-connector";
 import Logout from "pages/logout";
 import Disclaimer from "pages/disclaimer";
 import Dashboard from "pages/dashboard";
+import LasershowEditor from "pages/lasershow-editor";
 
 function routes() {
   return (
@@ -31,6 +32,7 @@ function routes() {
       <Route path={routerPaths.LasershowSpotifyConnector} element={<LasershowSpotifyConnector />} />
       <Route path={routerPaths.ActivateAccount} element={<AccountActivation />} />
       <Route path={routerPaths.AnimationEditor} element={<AnimationEditor />} />
+      <Route path={routerPaths.LasershowEditor} element={<LasershowEditor />} />
     </Routes>
   );
 }

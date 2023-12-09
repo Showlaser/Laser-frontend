@@ -10,7 +10,7 @@ import animation, {
   SelectedAnimationContextType,
   SelectedAnimationPatternContext,
   SelectedAnimationPatternContextType,
-} from "pages/animation";
+} from "pages/animation-editor";
 import {
   XCorrectionContext,
   TimeLinePositionContext,
@@ -30,7 +30,7 @@ export default function AnimationPatternKeyFrames() {
     SelectedAnimationContext
   ) as SelectedAnimationContextType;
 
-  const { selectedAnimationPattern, setSelectedAnimationPattern } = React.useContext(
+  const { selectedAnimationPattern } = React.useContext(
     SelectedAnimationPatternContext
   ) as SelectedAnimationPatternContextType;
 
@@ -40,16 +40,13 @@ export default function AnimationPatternKeyFrames() {
   ) as TimeLineContextType;
 
   const selectableSteps = React.useContext(SelectableStepsContext);
-  const { selectableStepsIndex, setSelectableStepsIndex } = React.useContext(
-    SelectableStepsIndexContext
-  ) as SelectableStepsIndexContextType;
+  const { selectableStepsIndex } = React.useContext(SelectableStepsIndexContext) as SelectableStepsIndexContextType;
 
   const { selectedKeyFrameUuid, setSelectedKeyFrameUuid } = React.useContext(
     SelectedKeyFrameContext
   ) as SelectedKeyFrameContextType;
 
-  const { playAnimation, setPlayAnimation } = React.useContext(PlayAnimationContext) as PlayAnimationContextType;
-
+  const { playAnimation } = React.useContext(PlayAnimationContext) as PlayAnimationContextType;
   const stepsToDrawMaxRange = React.useContext(StepsToDrawMaxRangeContext);
 
   const keyFramesPropertiesPosition = [
@@ -104,7 +101,7 @@ export default function AnimationPatternKeyFrames() {
       xPos += canvasPxSize / 13;
     }
 
-    const keyFramesInRange = selectedAnimationPattern?.animationKeyFrames.filter((keyframe) =>
+    const keyFramesInRange = selectedAnimationPattern?.animationPatternKeyFrames.filter((keyframe) =>
       numberIsBetweenOrEqual(keyframe.timeMs, timelinePositionMs, stepsToDrawMaxRange)
     );
 
@@ -251,7 +248,7 @@ export default function AnimationPatternKeyFrames() {
   const getKeyFrameFromMousePosition = (x: number, y: number) => {
     const propertyClicked = getPropertyFromYPosition(y);
 
-    const selectedKeyFrame = selectedAnimationPattern?.animationKeyFrames.find((keyFrame) => {
+    const selectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames.find((keyFrame) => {
       const min = (x - selectableSteps[selectableStepsIndex] / 5 - 1) | 0;
       const thisKeyFrameIsClicked =
         keyFrame.timeMs >= min && keyFrame.timeMs === x && keyFrame.propertyEdited === propertyClicked;

@@ -1,4 +1,4 @@
-import { Grid, Paper, Stack } from "@mui/material";
+import { Grid, Paper, SpeedDial, SpeedDialAction, Stack } from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
 import React, { useEffect, useState } from "react";
 import AnimationPatternProperties from "./animation-pattern-properties";
@@ -11,7 +11,7 @@ import {
   SelectedAnimationContextType,
   SelectedAnimationPatternContext,
   SelectedAnimationPatternContextType,
-} from "pages/animation";
+} from "pages/animation-editor";
 import TabSelector from "components/tabs";
 import AnimationManager from "./animation-manager";
 import { canvasPxSize } from "services/shared/config";
@@ -19,6 +19,9 @@ import {
   getPatternPointsByTimelinePosition,
   getPreviousCurrentAndNextKeyFramePerProperty,
 } from "services/logic/pattern-logic";
+import SettingsIcon from "@mui/icons-material/Settings";
+import SaveIcon from "@mui/icons-material/Save";
+import ClearIcon from "@mui/icons-material/Clear";
 
 export type TimeLineContextType = {
   timelinePositionMs: number;
@@ -177,11 +180,28 @@ export default function AnimationKeyFrameEditor() {
           <PointsDrawer pointsToDraw={getPointsToDraw()} />
         </Grid>
       </Grid>
-      <Stack>
-        <Grid item xs={12}>
-          {getWrapperContext(<AnimationPatternTimeline />)}
-        </Grid>
-      </Stack>
+      <Grid item xs={12}>
+        {getWrapperContext(<AnimationPatternTimeline />)}
+      </Grid>
+      <Grid>
+        <SpeedDial
+          ariaLabel="SpeedDial basic example"
+          sx={{ position: "fixed", bottom: 30, right: 30 }}
+          icon={<SettingsIcon />}
+        >
+          <SpeedDialAction
+            key="sd-upload-clear"
+            icon={<ClearIcon />}
+            onClick={() =>
+              window.confirm("Are you sure you want to clear the field? Unsaved changes will be lost")
+                ? setSelectedAnimation(null)
+                : null
+            }
+            tooltipTitle="Clear editor field"
+          />
+          <SpeedDialAction icon={<SaveIcon />} onClick={() => {}} tooltipTitle="Save pattern (ctrl + s)" />
+        </SpeedDial>
+      </Grid>
     </>
   );
 }

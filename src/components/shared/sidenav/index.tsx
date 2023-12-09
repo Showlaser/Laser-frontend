@@ -25,6 +25,7 @@ import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import AccountPopover from "../account-popover";
+import MovieIcon from "@mui/icons-material/Movie";
 
 const drawerWidth = 240;
 
@@ -151,6 +152,11 @@ export default function SideNav({ pageName, children }: Props) {
         <List>
           {[
             { title: "Dashboard", icon: <DashboardIcon />, path: paths.Dashboard },
+            {
+              title: "Lasershow editor",
+              icon: <MovieIcon />,
+              path: paths.LasershowEditor,
+            },
             {
               title: "Animation editor",
               icon: <TheatersIcon />,

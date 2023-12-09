@@ -3,7 +3,7 @@ import {
   AvailablePatternsContextType,
   SelectedAnimationContext,
   SelectedAnimationContextType,
-} from "pages/animation";
+} from "pages/animation-editor";
 import React, { useEffect } from "react";
 import {
   Button,

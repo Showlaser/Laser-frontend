@@ -40,9 +40,10 @@ export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   let animation: Animation = animationPlaceholder();
   const animationPattern = new AnimationPattern();
   animationPattern.uuid = createGuid();
+  animationPattern.animationUuid = animation.uuid;
   animationPattern.name = `${pattern.name}-new`;
   animationPattern.pattern = pattern;
-  animationPattern.animationKeyFrames = generateAnimationKeyframesFromPattern(pattern);
+  animationPattern.animationPatternKeyFrames = generateAnimationKeyframesFromPattern(pattern);
   animationPattern.startTimeMs = 0;
   animationPattern.timelineId = 0;
   animation.name = pattern.name;
@@ -57,7 +58,7 @@ export const convertPatternToAnimationPattern = (pattern: Pattern): AnimationPat
   animationPattern.uuid = createGuid();
   animationPattern.name = `${pattern.name}-new`;
   animationPattern.pattern = pattern;
-  animationPattern.animationKeyFrames = generateAnimationKeyframesFromPattern(pattern);
+  animationPattern.animationPatternKeyFrames = generateAnimationKeyframesFromPattern(pattern);
   animationPattern.startTimeMs = 0;
   animationPattern.timelineId = 0;
   return animationPattern;
@@ -67,24 +68,28 @@ const generateAnimationKeyframesFromPattern = (pattern: Pattern): AnimationPatte
   return [
     {
       uuid: createGuid(),
+      animationPatternUuid: pattern.uuid,
       timeMs: 0,
       propertyEdited: "scale",
       propertyValue: pattern.scale,
     },
     {
       uuid: createGuid(),
+      animationPatternUuid: pattern.uuid,
       timeMs: 0,
       propertyEdited: "xOffset",
       propertyValue: pattern.xOffset,
     },
     {
       uuid: createGuid(),
+      animationPatternUuid: pattern.uuid,
       timeMs: 0,
       propertyEdited: "yOffset",
       propertyValue: pattern.yOffset,
     },
     {
       uuid: createGuid(),
+      animationPatternUuid: pattern.uuid,
       timeMs: 0,
       propertyEdited: "rotation",
       propertyValue: pattern.rotation,

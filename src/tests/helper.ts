@@ -56,6 +56,7 @@ export const generatePointsTestSet = (coordinates: { x: number; y: number }[]): 
 export const getTestAnimationPatternKeyFrames = (keyframesStartTime: number): AnimationPatternKeyFrame[] =>
   propertiesSettings.map((propertySetting) => ({
     uuid: createGuid(),
+    animationPatternUuid: "10254bbb-fbea-476b-9c85-7ad05185fa71",
     timeMs: keyframesStartTime,
     propertyEdited: propertySetting.property,
     propertyValue: propertySetting.defaultValue,
@@ -82,12 +83,12 @@ export const testAnimationPattern = (
   animationPattern.name = "Test animation pattern";
   animationPattern.pattern = testPattern;
   animationPattern.startTimeMs = patternStartTime;
-  animationPattern.animationKeyFrames = getTestAnimationPatternKeyFrames(keyframesStartTime);
+  animationPattern.animationPatternKeyFrames = getTestAnimationPatternKeyFrames(keyframesStartTime);
   animationPattern.timelineId = 0;
 
   if (animationDuration > 0) {
     const endKeyframes = getTestAnimationPatternKeyFrames(animationDuration);
-    animationPattern.animationKeyFrames = animationPattern.animationKeyFrames.concat(endKeyframes);
+    animationPattern.animationPatternKeyFrames = animationPattern.animationPatternKeyFrames.concat(endKeyframes);
   }
 
   return animationPattern;

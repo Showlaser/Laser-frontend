@@ -72,7 +72,7 @@ export const getKeyFramesPastTimelinePositionSortedByTime = (
   animationPattern: AnimationPattern,
   timelinePositionMs: number
 ) =>
-  animationPattern?.animationKeyFrames
+  animationPattern?.animationPatternKeyFrames
     .filter(
       (ak: { timeMs: number; propertyEdited: string }) =>
         ak.timeMs > timelinePositionMs && ak.propertyEdited === property
@@ -84,7 +84,7 @@ export const getKeyFramesBeforeTimelinePositionSortedByTimeDescending = (
   animationPattern: AnimationPattern,
   timelinePositionMs: number
 ) =>
-  animationPattern?.animationKeyFrames
+  animationPattern?.animationPatternKeyFrames
     .filter(
       (ak: { timeMs: number; propertyEdited: string }) =>
         ak.timeMs < timelinePositionMs && ak.propertyEdited === property
@@ -92,7 +92,9 @@ export const getKeyFramesBeforeTimelinePositionSortedByTimeDescending = (
     .sort((a: { timeMs: number }, b: { timeMs: number }) => b.timeMs - a.timeMs);
 
 export const getCurrentKeyFrame = (selectedAnimationPattern: AnimationPattern, timelinePositionMs: number) =>
-  selectedAnimationPattern?.animationKeyFrames.filter((ak: { timeMs: number }) => ak.timeMs === timelinePositionMs);
+  selectedAnimationPattern?.animationPatternKeyFrames.filter(
+    (ak: { timeMs: number }) => ak.timeMs === timelinePositionMs
+  );
 
 export const getPreviousCurrentAndNextKeyFramePerProperty = (
   animationPattern: AnimationPattern,

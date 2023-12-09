@@ -4,7 +4,7 @@ import {
   SelectedAnimationContextType,
   SelectedAnimationPatternContext,
   SelectedAnimationPatternContextType,
-} from "pages/animation";
+} from "pages/animation-editor";
 import React, { useEffect, useState } from "react";
 import { mapNumber, normalize, numberIsBetweenOrEqual } from "services/shared/math";
 import {
@@ -22,7 +22,6 @@ import { LinearProgress, Grid, InputLabel, Input, Select, MenuItem, Tooltip, Ico
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { Animation } from "models/components/shared/animation";
 import { getAnimationPatternsToDrawInTimeline } from "services/logic/pattern-logic";
 
 export const numberOfTimeLines = 3;
@@ -37,9 +36,7 @@ export default function AnimationPatternTimeline() {
     SelectableStepsIndexContext
   ) as SelectableStepsIndexContextType;
 
-  const { selectedAnimation, setSelectedAnimation } = React.useContext(
-    SelectedAnimationContext
-  ) as SelectedAnimationContextType;
+  const { selectedAnimation } = React.useContext(SelectedAnimationContext) as SelectedAnimationContextType;
 
   const { selectedAnimationPattern, setSelectedAnimationPattern } = React.useContext(
     SelectedAnimationPatternContext
@@ -168,7 +165,7 @@ export default function AnimationPatternTimeline() {
 
     let keyframeTimes: number[] = [];
     selectedAnimation?.animationPatterns.forEach(
-      (ap) => (keyframeTimes = keyframeTimes.concat(ap.animationKeyFrames.map((ak) => ak.timeMs)))
+      (ap) => (keyframeTimes = keyframeTimes.concat(ap.animationPatternKeyFrames.map((ak) => ak.timeMs)))
     );
 
     const animationPatternsInRange = getAnimationPatternsToDrawInTimeline(
