@@ -22,7 +22,8 @@ import { LinearProgress, Grid, InputLabel, Input, Select, MenuItem, Tooltip, Ico
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { getAnimationPatternsInTimelineRange } from "services/logic/pattern-logic";
+import { Animation } from "models/components/shared/animation";
+import { getAnimationPatternsToDrawInTimeline } from "services/logic/pattern-logic";
 
 export const numberOfTimeLines = 3;
 
@@ -159,7 +160,7 @@ export default function AnimationPatternTimeline() {
       (ap) => (keyframeTimes = keyframeTimes.concat(ap.animationKeyFrames.map((ak) => ak.timeMs)))
     );
 
-    const animationPatternsInRange = getAnimationPatternsInTimelineRange(
+    const animationPatternsInRange = getAnimationPatternsToDrawInTimeline(
       selectedAnimation,
       timelinePositionMs,
       stepsToDrawMaxRange
@@ -179,11 +180,10 @@ export default function AnimationPatternTimeline() {
         animationPatternDuration = animationPatternTimeWidthWhenDurationIsZero / selectableSteps[selectableStepsIndex]; // to prevent the pattern from being to small to click on
       }
 
+      const widthToDisplay = (canvasWidth / 10) * (animationDuration / selectableSteps[selectableStepsIndex]);
       const xPosition =
-        (((animationPattern?.startTimeMs ?? 0) - timelinePositionMs) *
-          (canvasWidth / selectableSteps[selectableStepsIndex])) /
-        10;
-      const widthToDisplay = animationPatternDuration * (canvasWidth / 10);
+        (canvasWidth / 10) *
+        ((animationPattern.startTimeMs - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
 
       let rectangleColor = selectedAnimationPattern?.uuid === animationPattern.uuid ? "#6370c2" : "#485cdb";
       drawRoundedRectangleWithText(

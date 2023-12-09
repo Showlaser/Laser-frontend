@@ -300,7 +300,7 @@ export default function AnimationPatternProperties() {
         size="small"
         id="animation-starttime"
         type="number"
-        inputProps={{ min: 0, max: 100000000 }}
+        inputProps={{ min: 0, max: 100000000, step: "10" }}
         value={selectedAnimationPattern?.startTimeMs}
         onChange={(e) => updatePatternProperty("startTimeMs", Number(e.target.value))}
       />

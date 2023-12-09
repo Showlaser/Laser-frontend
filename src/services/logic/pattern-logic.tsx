@@ -32,22 +32,54 @@ export const playPattern = (pattern: Pattern) => {
   return sendRequest(() => Post(apiEndpoints.pattern + "/play", pattern), []);
 };
 
-export const getAnimationPatternsInTimelineRange = (
+export const getAnimationPatternsInsideTimelineRange = (
   animation: Animation | null,
   startRange: number,
   endRange: number
 ) => animation?.animationPatterns.filter((ap) => numberIsBetweenOrEqual(ap.startTimeMs, startRange, endRange));
 
-export const getKeyFramesPastStartTimeSortedByTime = (
+export const getAnimationPatternsToDrawInTimeline = (
+  animation: Animation | null,
+  timelinePositionMs: number,
+  stepsToDrawMaxRange: number
+) => {
+  return animation?.animationPatterns?.filter((ap) => {
+    const patternStartsBeforeTimeline = ap.startTimeMs < timelinePositionMs;
+    const patternEndsAfterStepsToDraw = ap.startTimeMs + ap.getDuration > stepsToDrawMaxRange;
+    const patternStartsInTimelineRange = numberIsBetweenOrEqual(
+      ap.startTimeMs,
+      timelinePositionMs,
+      stepsToDrawMaxRange
+    );
+
+    const patternEndsInTimelineRange = numberIsBetweenOrEqual(
+      ap.startTimeMs + ap.getDuration,
+      timelinePositionMs,
+      stepsToDrawMaxRange
+    );
+
+    return (
+      (patternStartsBeforeTimeline && patternEndsAfterStepsToDraw) ||
+      (patternStartsInTimelineRange && patternEndsAfterStepsToDraw) ||
+      (patternStartsInTimelineRange && patternEndsInTimelineRange) ||
+      (patternStartsBeforeTimeline && patternEndsInTimelineRange)
+    );
+  });
+};
+
+export const getKeyFramesPastTimelinePositionSortedByTime = (
   property: string,
   animationPattern: AnimationPattern,
-  starttime: number
+  timelinePositionMs: number
 ) =>
   animationPattern?.animationKeyFrames
-    .filter((ak: { timeMs: number; propertyEdited: string }) => ak.timeMs > starttime && ak.propertyEdited === property)
+    .filter(
+      (ak: { timeMs: number; propertyEdited: string }) =>
+        ak.timeMs > timelinePositionMs && ak.propertyEdited === property
+    )
     .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
 
-export const getKeyFramesBeforeStartTimeSortedByTimeDescending = (
+export const getKeyFramesBeforeTimelinePositionSortedByTimeDescending = (
   property: string,
   animationPattern: AnimationPattern,
   timelinePositionMs: number
@@ -73,7 +105,7 @@ export const getPreviousCurrentAndNextKeyFramePerProperty = (
   };
 
   propertiesSettings.forEach((propertySetting) => {
-    const previous = getKeyFramesBeforeStartTimeSortedByTimeDescending(
+    const previous = getKeyFramesBeforeTimelinePositionSortedByTimeDescending(
       propertySetting.property,
       animationPattern,
       timelinePositionMs
@@ -82,7 +114,7 @@ export const getPreviousCurrentAndNextKeyFramePerProperty = (
       previousNextAndCurrentKeyFramePerProperty.previous.push(previous);
     }
 
-    const next = getKeyFramesPastStartTimeSortedByTime(
+    const next = getKeyFramesPastTimelinePositionSortedByTime(
       propertySetting.property,
       animationPattern,
       timelinePositionMs
