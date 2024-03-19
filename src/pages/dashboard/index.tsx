@@ -9,6 +9,7 @@ import "chart.js/auto";
 import { Doughnut, Line } from "react-chartjs-2";
 import { getRandomNumber } from "services/shared/math";
 import { subtractMinutesFromCurrentDate } from "services/shared/dateHelper";
+import { SafetyZone } from "models/components/shared/safety-zone";
 
 export default function Dashboard() {
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
@@ -61,11 +62,39 @@ export default function Dashboard() {
     },
   ];
 
-  const zones = [
-    { uuid: "9cbb621d-2236-462f-9c5c-ef518864748f", name: "Zone 1", enabled: true },
-    { uuid: "37dd16de-8335-485f-981b-322238349914", name: "Zone 2", enabled: true },
-    { uuid: "b09a23b1-0b5b-4997-955b-50d733a8f3a9", name: "Zone 3", enabled: false },
-    { uuid: "8a8892c0-d571-4628-8621-5661cbf8aae7", name: "Zone 4", enabled: true },
+  const zones: SafetyZone[] = [
+    {
+      uuid: "9cbb621d-2236-462f-9c5c-ef518864748f",
+      name: "Zone 1",
+      description: "Zone 1 descr",
+      enabled: true,
+      maxLaserPowerInZonePwm: 0,
+      points: [],
+    },
+    {
+      uuid: "37dd16de-8335-485f-981b-322238349914",
+      name: "Zone 2",
+      description: "Zone 2 descr",
+      enabled: true,
+      maxLaserPowerInZonePwm: 0,
+      points: [],
+    },
+    {
+      uuid: "b09a23b1-0b5b-4997-955b-50d733a8f3a9",
+      name: "Zone 3",
+      description: "Zone 3 descr",
+      enabled: false,
+      maxLaserPowerInZonePwm: 0,
+      points: [],
+    },
+    {
+      uuid: "8a8892c0-d571-4628-8621-5661cbf8aae7",
+      name: "Zone 4",
+      description: "Zone 4 descr",
+      enabled: true,
+      maxLaserPowerInZonePwm: 0,
+      points: [],
+    },
   ];
 
   const chartOptions = {

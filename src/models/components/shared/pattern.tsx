@@ -13,7 +13,7 @@ export type Pattern = {
   rotation: number;
 };
 
-export interface SectionProps {
+export interface PatternSectionProps {
   patternNamesInUse: string[];
   setPatternNameIsInUse: (state: boolean) => void;
   pattern: Pattern;

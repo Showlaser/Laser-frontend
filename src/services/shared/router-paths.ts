@@ -1,6 +1,6 @@
 const paths = {
   Dashboard: "/",
-  Zones: "/zones",
+  SafetyZones: "/safety-zones",
   PatternEditor: "/pattern-editor",
   LasershowEditor: "/lasershow-editor",
   AnimationEditor: "/animation-editor",

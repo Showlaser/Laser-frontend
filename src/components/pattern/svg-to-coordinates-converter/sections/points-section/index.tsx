@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { SectionProps } from "models/components/shared/pattern";
+import { PatternSectionProps } from "models/components/shared/pattern";
 import {
   getHexColorStringFromPoint,
   getRgbColorStringFromPoint,
@@ -38,7 +38,7 @@ export default function PointsSection({
   updatePatternProperty,
   selectedPointsUuid,
   setSelectedPointsUuid,
-}: SectionProps) {
+}: PatternSectionProps) {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsPerPage, setItemsPerPage] = useState<number>(25);
   const [showColorWarning, setShowColorWarning] = React.useState<boolean>(false);

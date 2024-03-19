@@ -1,8 +1,11 @@
 import {
   Alert,
   Button,
+  Divider,
   Fade,
   FormControlLabel,
+  FormLabel,
+  Grid,
   IconButton,
   LinearProgress,
   Menu,
@@ -115,29 +118,37 @@ export default function SpotifyController() {
               </Fade>
             )}
             <br />
-            <FormControlLabel
-              disabled={isLoading}
-              control={<Switch key="lgc-switch" />}
-              label="Enable lasershow generation"
-            />
+            <label style={{ color: isLoading ? "gray" : "whitesmoke", fontSize: "90%" }}>
+              {`${player?.item?.artists[0]?.name ?? "loading"} / `}
+              {`${player?.item?.name ?? "loading"}`}
+            </label>
             <br />
-            <small style={{ color: isLoading ? "gray" : "whitesmoke" }}>{`Bpm: ${parseInt(
-              songData?.tempo ?? 0
-            )}`}</small>
-            <br />
-            <small style={{ color: isLoading ? "gray" : "whitesmoke" }}>{`Song: ${
-              player?.item?.name ?? "loading"
-            }`}</small>
-            <br />
-            <IconButton disabled={isLoading} onClick={previousSong} size="small">
-              <SkipPreviousIcon />
-            </IconButton>
-            <IconButton disabled={isLoading} size="small" onClick={() => (player?.is_playing ? onPause() : onPlay())}>
-              {player?.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
-            </IconButton>
-            <IconButton disabled={isLoading} size="small" onClick={skipSong}>
-              <SkipNextIcon />
-            </IconButton>
+            <small style={{ color: isLoading ? "gray" : "whitesmoke" }}>
+              {`Bpm: ${parseInt(songData?.tempo ?? 0)}`}
+            </small>
+            <Grid container justifyContent="center">
+              <Grid>
+                <Tooltip title="Previous song" placement="bottom-end">
+                  <IconButton disabled={isLoading} onClick={previousSong} size="small">
+                    <SkipPreviousIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Pause song" placement="bottom">
+                  <IconButton
+                    disabled={isLoading}
+                    size="small"
+                    onClick={() => (player?.is_playing ? onPause() : onPlay())}
+                  >
+                    {player?.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Next song" placement="bottom-start">
+                  <IconButton disabled={isLoading} size="small" onClick={skipSong}>
+                    <SkipNextIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Grid>
             {isLoading ? (
               <Skeleton animation="wave" variant="rectangular" width={300} height={4} />
             ) : (
@@ -146,6 +157,13 @@ export default function SpotifyController() {
                 value={mapNumber(player?.progress_ms, 0, player?.item?.duration_ms, 0, 100)}
               />
             )}
+            <br />
+            <Divider />
+            <FormControlLabel
+              disabled={isLoading}
+              control={<Switch key="lgc-switch" />}
+              label="Enable lasershow generation"
+            />
             <OnTrue onTrue={dataSavingIsEnabled()}>
               <small style={{ color: palette.warning.main }}>Data saving enabled. Updating every 5 seconds</small>
             </OnTrue>

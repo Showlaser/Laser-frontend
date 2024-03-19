@@ -3,7 +3,7 @@ import { Box, Button, ButtonGroup, TextField, Typography } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import SelectList from "components/select-list";
-import { SectionProps } from "models/components/shared/pattern";
+import { PatternSectionProps } from "models/components/shared/pattern";
 
 type Laser = {
   name: string;
@@ -11,7 +11,7 @@ type Laser = {
   online: boolean;
 };
 
-export default function ToLaserProjector({ pattern, updatePatternProperty }: SectionProps) {
+export default function ToLaserProjector({ pattern, updatePatternProperty }: PatternSectionProps) {
   const [isPlaying, setIsPlaying] = React.useState<boolean>(localStorage.getItem("lasers-are-playing") !== null);
   const [selectedLasersUuid, setSelectedLasersUuid] = React.useState<string[]>([]);
   const [searchValue, setSearchValue] = React.useState<string>();

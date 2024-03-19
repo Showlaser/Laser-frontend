@@ -1,10 +1,10 @@
 import { Card, Typography, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
-import { ZoneInfo } from "models/components/shared/zone";
+import { SafetyZone } from "models/components/shared/safety-zone";
 import React from "react";
 import CircleIcon from "@mui/icons-material/Circle";
 
 type Props = {
-  zones: ZoneInfo[];
+  zones: SafetyZone[];
 };
 
 export default function LaserZoneTable({ zones }: Props) {

@@ -26,6 +26,7 @@ import { Link } from "react-router-dom";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import AccountPopover from "../account-popover";
 import MovieIcon from "@mui/icons-material/Movie";
+import GridViewIcon from "@mui/icons-material/GridView";
 
 const drawerWidth = 240;
 
@@ -166,6 +167,11 @@ export default function SideNav({ pageName, children }: Props) {
               title: "Pattern editor",
               icon: <AllInclusiveIcon />,
               path: paths.PatternEditor,
+            },
+            {
+              title: "Safety zones",
+              icon: <GridViewIcon />,
+              path: paths.SafetyZones,
             },
             {
               title: "Vote",

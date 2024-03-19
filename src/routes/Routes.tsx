@@ -15,6 +15,7 @@ import Logout from "pages/logout";
 import Disclaimer from "pages/disclaimer";
 import Dashboard from "pages/dashboard";
 import LasershowEditor from "pages/lasershow-editor";
+import SafetyZones from "pages/safety-zones";
 
 function routes() {
   return (
@@ -33,6 +34,7 @@ function routes() {
       <Route path={routerPaths.ActivateAccount} element={<AccountActivation />} />
       <Route path={routerPaths.AnimationEditor} element={<AnimationEditor />} />
       <Route path={routerPaths.LasershowEditor} element={<LasershowEditor />} />
+      <Route path={routerPaths.SafetyZones} element={<SafetyZones />} />
     </Routes>
   );
 }
