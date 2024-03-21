@@ -1,18 +1,31 @@
 import * as React from "react";
 import { Checkbox, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
 
 type Item = {
   uuid: string;
   name: string;
+  description?: string;
 };
 
 type SelectListProps = {
   items: Item[];
-  disabled: boolean;
+  disabled?: boolean;
   onSelect: (uuidCollection: string[]) => void;
+  style?: any;
+  unCheckedCustomIcon?: any;
+  checkedCustomIcon?: any;
 };
 
-export default function SelectList({ items, disabled, onSelect }: SelectListProps) {
+export default function SelectList({
+  items,
+  disabled,
+  onSelect,
+  style,
+  unCheckedCustomIcon,
+  checkedCustomIcon,
+}: SelectListProps) {
   const [checked, setChecked] = React.useState<string[]>([]);
 
   const handleToggle = (uuid: string) => () => {
@@ -30,12 +43,14 @@ export default function SelectList({ items, disabled, onSelect }: SelectListProp
   };
 
   return items.length > 0 ? (
-    <List>
+    <List style={style}>
       {items.map((item) => (
         <ListItem key={item.uuid} disablePadding>
           <ListItemButton disabled={disabled} role={undefined} onClick={handleToggle(item.uuid)} dense>
             <ListItemIcon>
               <Checkbox
+                icon={unCheckedCustomIcon ?? <CheckBoxOutlineBlankIcon />}
+                checkedIcon={checkedCustomIcon ?? <CheckBoxIcon />}
                 edge="start"
                 checked={checked.some((c) => c === item.uuid)}
                 tabIndex={-1}
@@ -45,7 +60,7 @@ export default function SelectList({ items, disabled, onSelect }: SelectListProp
                 }}
               />
             </ListItemIcon>
-            <ListItemText id={`checkbox-list-label-${item.uuid}`} primary={item.name} />
+            <ListItemText id={`checkbox-list-label-${item.uuid}`} primary={item.name} secondary={item?.description} />
           </ListItemButton>
         </ListItem>
       ))}

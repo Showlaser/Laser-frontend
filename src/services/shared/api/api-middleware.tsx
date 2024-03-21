@@ -1,5 +1,5 @@
 import paths from "../router-paths";
-import { showError, toastSubject, showSuccess } from "../toast-messages";
+import { showError, toastSubject, showSuccess, ToastSubjectObject } from "../toast-messages";
 import { Post } from "./api-actions";
 import apiEndpoints from "./api-endpoints";
 import Cookies from "universal-cookie";
@@ -47,8 +47,8 @@ const refreshUserTokensIfExpired = async () => {
 
 export async function sendRequest(
   requestFunction: () => Promise<Response>,
-  ignoredStatusCodes: number[],
-  onSuccessToastSubject: any = null,
+  ignoredStatusCodes: number[] = [],
+  onSuccessToastSubject: ToastSubjectObject | null = null,
   redirectToLoginOnError: boolean = false
 ) {
   const userTokensExpired = !(await refreshUserTokensIfExpired());
@@ -60,7 +60,7 @@ export async function sendRequest(
   let response;
   try {
     response = await requestFunction();
-    if (onSuccessToastSubject !== undefined && onSuccessToastSubject !== null) {
+    if (onSuccessToastSubject !== null && response.status === 200) {
       showSuccess(onSuccessToastSubject);
     }
     if (response.status === 401 && redirectToLoginOnError) {

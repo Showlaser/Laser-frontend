@@ -6,14 +6,10 @@ import {
   Divider,
   Fade,
   FormControl,
-  hexToRgb,
   IconButton,
   List,
   ListItem,
   ListItemIcon,
-  MenuItem,
-  rgbToHex,
-  Select,
   TablePagination,
   TextField,
   Tooltip,
@@ -21,11 +17,7 @@ import {
 import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { PatternSectionProps } from "models/components/shared/pattern";
-import {
-  getHexColorStringFromPoint,
-  getRgbColorStringFromPoint,
-  setLaserPowerFromHexString,
-} from "services/shared/converters";
+import { getHexColorStringFromPoint, setLaserPowerFromHexString } from "services/shared/converters";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import { numberIsBetweenOrEqual } from "services/shared/math";
 import AddIcon from "@mui/icons-material/Add";
@@ -198,7 +190,7 @@ export default function PointsSection({
             </Alert>
           </Fade>
         </OnTrue>
-        <List>
+        <List dense>
           {pointsToRender.map((point, index) => (
             <ListItem key={`points-section-${point.uuid}`}>
               <ListItemIcon onClick={(e: any) => onToggle(point.uuid, e.target.checked)}>
@@ -210,7 +202,7 @@ export default function PointsSection({
                   inputProps={{ "aria-labelledby": `points-label-${index}` }}
                 />
               </ListItemIcon>
-              <FormControl style={{ marginLeft: "35px", width: "125px" }}>
+              <FormControl style={{ width: "125px" }}>
                 <Autocomplete
                   key={`${point.orderNr}-${point.uuid}`}
                   defaultValue={{

@@ -4,7 +4,7 @@ interface ToastSubject {
   [key: string]: ToastSubjectObject;
 }
 
-type ToastSubjectObject = {
+export type ToastSubjectObject = {
   message: string;
   id: number;
 };
@@ -121,10 +121,10 @@ const calculateAutoCloseTime = (text: string) => {
   return autoCloseTime > 3000 ? autoCloseTime : 3000;
 };
 
-export const showError = (subject: ToastSubjectObject) => {
+export const showError = (subject: ToastSubjectObject, additionalMessage?: string) => {
   const { message, id } = subject;
   const time = calculateAutoCloseTime(message);
-  toast.error(message, { toastId: id, autoClose: time });
+  toast.error(`${message} ${additionalMessage}`, { toastId: id, autoClose: time });
 };
 
 export const showSuccess = (subject: ToastSubjectObject) => {

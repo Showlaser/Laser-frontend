@@ -1,4 +1,4 @@
-import { Grid, Paper, SpeedDial, SpeedDialAction, Stack } from "@mui/material";
+import { Grid, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
 import React, { useEffect, useState } from "react";
 import AnimationPatternProperties from "./animation-pattern-properties";
@@ -43,6 +43,10 @@ export type PlayAnimationContextType = {
   setPlayAnimation: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+export type AnimationDurationContextType = {
+  getAnimationDuration: () => number;
+};
+
 export const TimeLinePositionContext = React.createContext<TimeLineContextType | null>(null);
 export const SelectableStepsIndexContext = React.createContext<SelectableStepsIndexContextType | null>(null);
 export const SelectedKeyFrameContext = React.createContext<SelectedKeyFrameContextType | null>(null);
@@ -50,6 +54,7 @@ export const PlayAnimationContext = React.createContext<PlayAnimationContextType
 export const XCorrectionContext = React.createContext<number[]>([]);
 export const StepsToDrawMaxRangeContext = React.createContext<number>(0);
 export const SelectableStepsContext = React.createContext<number[]>([10, 100, 1000, 10000]);
+export const AnimationDurationContext = React.createContext<AnimationDurationContextType | null>(null);
 
 export default function AnimationKeyFrameEditor() {
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
@@ -82,9 +87,24 @@ export default function AnimationKeyFrameEditor() {
   );
   const playAnimationMemo = React.useMemo(() => ({ playAnimation, setPlayAnimation }), [playAnimation]);
 
+  const getAnimationDuration = () => {
+    const times = selectedAnimation?.animationPatterns.map((ap) => ap.startTimeMs + ap.getDuration);
+    if (times === undefined) {
+      return 0;
+    }
+
+    return Math.max(...times);
+  };
+
+  const getAnimationDurationMemo = React.useMemo(() => ({ getAnimationDuration }), [selectedAnimation]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (playAnimation) {
+      if (timelinePositionMs >= getAnimationDuration()) {
+        setPlayAnimation(false);
+      }
+
       interval = setInterval(() => setTimelinePositionMs(timelinePositionMs + 10), 10);
     }
 
@@ -103,7 +123,9 @@ export default function AnimationKeyFrameEditor() {
             <XCorrectionContext.Provider value={[20, 350, 3000, 8000]}>
               <SelectableStepsContext.Provider value={selectableSteps}>
                 <StepsToDrawMaxRangeContext.Provider value={stepsToDrawMaxRange}>
-                  {reactObject}
+                  <AnimationDurationContext.Provider value={getAnimationDurationMemo}>
+                    {reactObject}
+                  </AnimationDurationContext.Provider>
                 </StepsToDrawMaxRangeContext.Provider>
               </SelectableStepsContext.Provider>
             </XCorrectionContext.Provider>

@@ -8,18 +8,14 @@ export async function getAvailableComDevices() {
 }
 
 export async function setSettings(ip: string, comPort: string) {
-  return sendRequest(
-    () => Post(`${apiEndpoints.serial}?comport=${comPort}&ip=${ip}`),
-    [],
-    showSuccess(toastSubject.changesSaved)
-  );
+  return sendRequest(() => Post(`${apiEndpoints.serial}?comport=${comPort}&ip=${ip}`), [], toastSubject.changesSaved);
 }
 
 export async function setConnectionMethod(connectionMethod: string, comPort: string) {
   return sendRequest(
     () => Post(`${apiEndpoints.connectionMethod}?connectionMethod=${connectionMethod}&comPort=${comPort}`),
     [],
-    showSuccess(toastSubject.changesSaved)
+    toastSubject.changesSaved
   );
 }
 

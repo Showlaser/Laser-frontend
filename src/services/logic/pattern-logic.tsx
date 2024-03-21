@@ -16,8 +16,8 @@ export type PreviousCurrentAndNextKeyFramePerProperty = {
 };
 
 export const getPatterns = async (): Promise<Pattern[]> => {
-  const value = await sendRequest(() => Get(apiEndpoints.pattern), [200]);
-  return value?.json();
+  const result = await sendRequest(() => Get(apiEndpoints.pattern), [200]);
+  return result?.json();
 };
 
 export const savePattern = (pattern: Pattern) => {

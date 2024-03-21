@@ -33,6 +33,12 @@ function App() {
               variant: "standard",
             },
           },
+          MuiTooltip: {
+            defaultProps: {
+              enterDelay: 1500,
+              TransitionProps: { timeout: 250 },
+            },
+          },
         },
       }),
     []

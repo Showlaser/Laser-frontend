@@ -1,5 +1,5 @@
 import { useTheme } from "@mui/material";
-import { AnimationPatternKeyFrame } from "models/components/shared/animation";
+import { Animation, AnimationPatternKeyFrame } from "models/components/shared/animation";
 import React, { useEffect } from "react";
 import { createGuid, mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
 import { propertiesSettings } from "services/logic/animation-logic";
@@ -170,7 +170,12 @@ export default function AnimationPatternKeyFrames() {
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
 
     const keyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
-    let updatedAnimation: any = { ...selectedAnimation };
+
+    if (selectedAnimation === null) {
+      return;
+    }
+
+    let updatedAnimation: Animation = { ...selectedAnimation };
 
     if (animation === undefined || keyFrame === undefined) {
       return;
@@ -182,8 +187,11 @@ export default function AnimationPatternKeyFrames() {
 
     const indexToRemove = updatedAnimation.animationPatterns[
       selectedAnimationPatternIndex
-    ].animationKeyFrames.findIndex((kf: AnimationPatternKeyFrame) => kf.uuid === keyFrame.uuid);
-    updatedAnimation.animationPatterns[selectedAnimationPatternIndex].animationKeyFrames.splice(indexToRemove, 1);
+    ].animationPatternKeyFrames.findIndex((kf: AnimationPatternKeyFrame) => kf.uuid === keyFrame.uuid);
+    updatedAnimation.animationPatterns[selectedAnimationPatternIndex].animationPatternKeyFrames.splice(
+      indexToRemove,
+      1
+    );
     setSelectedAnimation(updatedAnimation);
   };
 
@@ -264,20 +272,29 @@ export default function AnimationPatternKeyFrames() {
   };
 
   const createNewKeyframe = (y: number, timeMs: number) => {
+    if (selectedAnimationPattern?.uuid === undefined) {
+      return;
+    }
+
     const propertyEdited = getPropertyFromYPosition(y) ?? "";
-    const keyFrame = {
+    const keyFrame: AnimationPatternKeyFrame = {
       uuid: createGuid(),
+      animationPatternUuid: selectedAnimationPattern.uuid,
       timeMs,
       propertyEdited,
       propertyValue: propertiesSettings.find((ps) => ps.property === propertyEdited)?.defaultValue ?? 0,
     };
 
-    let updatedAnimation: any = { ...selectedAnimation };
+    if (selectedAnimation === null) {
+      return;
+    }
+
+    let updatedAnimation: Animation = { ...selectedAnimation };
     if (updatedAnimation?.animationPatterns === undefined) {
       return;
     }
 
-    updatedAnimation.animationPatterns[selectedAnimationPatternIndex ?? 0].animationKeyFrames.push(keyFrame);
+    updatedAnimation.animationPatterns[selectedAnimationPatternIndex ?? 0].animationPatternKeyFrames.push(keyFrame);
     setSelectedAnimation(updatedAnimation);
     setSelectedKeyFrameUuid(keyFrame.uuid);
   };

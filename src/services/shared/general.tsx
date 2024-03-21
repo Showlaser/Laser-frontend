@@ -9,6 +9,18 @@ export function getRgbStringFromPoint(point: Point) {
   return `rgb(${redLaserPowerPwm},${greenLaserPowerPwm},${blueLaserPowerPwm})`;
 }
 
+export function addChangesSavedEvent() {
+  const onBeforeUnload = (e: any) => {
+    e.preventDefault();
+    e.returnValue = "Changes not saved! Do you want to leave the page?";
+  };
+
+  window.addEventListener("beforeunload", onBeforeUnload);
+  return () => {
+    window.removeEventListener("beforeunload", onBeforeUnload);
+  };
+}
+
 export function getFormDataObject(event: any) {
   if (event === undefined || event === null) {
     return;
@@ -22,10 +34,7 @@ export function getFormDataObject(event: any) {
   return object;
 }
 
-export const getDifferenceBetweenTwoDatesInMinutesAndSecondsString = (
-  expirationDate: Date,
-  dateNow: Date
-) => {
+export const getDifferenceBetweenTwoDatesInMinutesAndSecondsString = (expirationDate: Date, dateNow: Date) => {
   const difference = expirationDate.getTime() - dateNow.getTime();
   if (difference <= 0) {
     return "Voting ended!";
@@ -36,9 +45,7 @@ export const getDifferenceBetweenTwoDatesInMinutesAndSecondsString = (
     minutes %= 60;
     seconds %= 60;
 
-    return `${minutes < 10 ? "0" : ""}${minutes} : ${
-      seconds < 10 ? "0" : ""
-    }${seconds}`;
+    return `${minutes < 10 ? "0" : ""}${minutes} : ${seconds < 10 ? "0" : ""}${seconds}`;
   }
 };
 

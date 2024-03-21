@@ -39,6 +39,7 @@ import {
   SelectedAnimationPatternIndexContext,
 } from "pages/animation-editor";
 import { numberOfTimeLines } from "../animation-pattern-timeline";
+import { Animation } from "models/components/shared/animation";
 
 export default function AnimationPatternProperties() {
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
@@ -66,11 +67,15 @@ export default function AnimationPatternProperties() {
   );
   const uiComponentsAreDisabled = selectedAnimationPattern === null;
 
-  const updateKeyframeProperty = (value: string | number) => {
+  const updateKeyframeProperty = (value: number) => {
     const selectedKeyFrameIndex = selectedAnimationPattern?.animationPatternKeyFrames.findIndex(
       (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
     );
-    let updatedAnimation: any = { ...selectedAnimation };
+    if (selectedAnimation === null) {
+      return;
+    }
+
+    let updatedAnimation: Animation = { ...selectedAnimation };
     if (
       updatedAnimation === undefined ||
       selectedKeyFrameIndex === undefined ||
@@ -80,7 +85,7 @@ export default function AnimationPatternProperties() {
       return;
     }
 
-    updatedAnimation.animationPatterns[selectedAnimationPatternIndex].animationKeyFrames[
+    updatedAnimation.animationPatterns[selectedAnimationPatternIndex].animationPatternKeyFrames[
       selectedKeyFrameIndex
     ].propertyValue = value;
     setSelectedAnimation(updatedAnimation);

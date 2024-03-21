@@ -8,6 +8,8 @@ import {
 import React, { useEffect, useState } from "react";
 import { mapNumber, normalize, numberIsBetweenOrEqual } from "services/shared/math";
 import {
+  AnimationDurationContext,
+  AnimationDurationContextType,
   PlayAnimationContext,
   PlayAnimationContextType,
   SelectableStepsContext,
@@ -44,20 +46,12 @@ export default function AnimationPatternTimeline() {
 
   const { playAnimation, setPlayAnimation } = React.useContext(PlayAnimationContext) as PlayAnimationContextType;
   const stepsToDrawMaxRange = React.useContext(StepsToDrawMaxRangeContext);
+  const { getAnimationDuration } = React.useContext(AnimationDurationContext) as AnimationDurationContextType;
 
   const canvasHeight = window.innerHeight / 6;
   const canvasWidth = window.innerWidth - 60;
   const timelineNumbersHeight = 10;
   const animationPatternHeightOnCanvas = (canvasHeight - 40) / numberOfTimeLines;
-
-  const getAnimationDuration = () => {
-    const times = selectedAnimation?.animationPatterns.map((ap) => ap.startTimeMs + ap.getDuration);
-    if (times === undefined) {
-      return 0;
-    }
-
-    return Math.max(...times);
-  };
 
   const animationDuration = getAnimationDuration();
 

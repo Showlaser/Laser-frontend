@@ -20,13 +20,14 @@ import TheatersIcon from "@mui/icons-material/Theaters";
 import "./index.css";
 import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
 import SpotifyController from "../spotify-controller";
-import { Fade, Grid, ListItemButton } from "@mui/material";
+import { Alert, Fade, Grid, ListItemButton } from "@mui/material";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import AccountPopover from "../account-popover";
 import MovieIcon from "@mui/icons-material/Movie";
 import GridViewIcon from "@mui/icons-material/GridView";
+import { OnTrue } from "../on-true";
 
 const drawerWidth = 240;
 
@@ -82,9 +83,10 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 type Props = {
   pageName?: string;
   children?: React.ReactNode;
+  unsavedChanges?: boolean;
 };
 
-export default function SideNav({ pageName, children }: Props) {
+export default function SideNav({ pageName, children, unsavedChanges = false }: Props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -94,6 +96,14 @@ export default function SideNav({ pageName, children }: Props) {
 
   const handleDrawerClose = () => {
     setOpen(false);
+  };
+
+  const getListItemBackgroundColor = (title: string) => {
+    if (unsavedChanges) {
+      return title !== pageName ? "rgba(255, 0, 0, 0.6)" : "rgba(0, 255, 0, 0.6)";
+    }
+
+    return undefined;
   };
 
   return (
@@ -149,6 +159,9 @@ export default function SideNav({ pageName, children }: Props) {
             {theme.direction === "ltr" ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
+        <OnTrue onTrue={unsavedChanges}>
+          <Alert severity="warning">Your current page has unsaved changes!</Alert>
+        </OnTrue>
         <Divider />
         <List>
           {[
@@ -184,7 +197,14 @@ export default function SideNav({ pageName, children }: Props) {
               path: paths.LasershowSpotifyConnector,
             },
           ].map((item, index) => (
-            <ListItemButton key={`side-nav-list-item-${index}`} component={Link} to={item.path}>
+            <ListItemButton
+              style={{
+                backgroundColor: getListItemBackgroundColor(item.title),
+              }}
+              key={`side-nav-list-item-${index}`}
+              component={Link}
+              to={item.path}
+            >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.title} />
             </ListItemButton>

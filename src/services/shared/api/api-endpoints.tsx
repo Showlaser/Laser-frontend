@@ -15,7 +15,7 @@ const apiEndpoints = {
   grandSpotifyAccess: `${authApiUrl}spotify/grand-access`,
   refreshSpotifyAccessToken: `${authApiUrl}spotify/refresh`,
   vote: `${voteApiUrl}vote`,
-  zone: `${laserApiUrl}zone`,
+  safetyZone: `${laserApiUrl}zone`,
   dashboard: `${laserApiUrl}dashboard`,
   settings: `${laserApiUrl}settings`,
   serial: `${laserApiUrl}settings/serial`,
