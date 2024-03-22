@@ -9,18 +9,6 @@ export function getRgbStringFromPoint(point: Point) {
   return `rgb(${redLaserPowerPwm},${greenLaserPowerPwm},${blueLaserPowerPwm})`;
 }
 
-export function addChangesSavedEvent() {
-  const onBeforeUnload = (e: any) => {
-    e.preventDefault();
-    e.returnValue = "Changes not saved! Do you want to leave the page?";
-  };
-
-  window.addEventListener("beforeunload", onBeforeUnload);
-  return () => {
-    window.removeEventListener("beforeunload", onBeforeUnload);
-  };
-}
-
 export function getFormDataObject(event: any) {
   if (event === undefined || event === null) {
     return;

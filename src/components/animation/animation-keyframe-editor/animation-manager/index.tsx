@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { convertPatternToAnimationPattern } from "services/shared/converters";
 import { Animation, AnimationPattern } from "models/components/shared/animation";
-import { animationPatternTimeWidthWhenDurationIsZero } from "services/shared/config";
+import { timelineItemWidthWhenDurationIsZero } from "services/shared/config";
 import { OnTrue } from "components/shared/on-true";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
 
@@ -39,10 +39,11 @@ export default function AnimationManager() {
       return;
     }
 
-    let updatedAnimation: any = { ...selectedAnimation };
-    const animationPatternsToKeep = updatedAnimation.animationPatterns?.filter(
-      (ap: { uuid: string }) => !checkedUuidsToRemove.some((uuid) => uuid === ap.uuid)
+    let updatedAnimation = { ...selectedAnimation } as Animation;
+    const animationPatternsToKeep: AnimationPattern[] = updatedAnimation.animationPatterns.filter(
+      (ap) => !checkedUuidsToRemove.some((uuid) => uuid === ap.uuid)
     );
+
     updatedAnimation.animationPatterns = animationPatternsToKeep;
     setSelectedAnimation(updatedAnimation);
     setCheckedUuidsToRemove([]);
@@ -92,7 +93,7 @@ export default function AnimationManager() {
 
     const startTimeMs =
       (firstAnimationPattern.getDuration === 0
-        ? animationPatternTimeWidthWhenDurationIsZero * 4
+        ? timelineItemWidthWhenDurationIsZero * 4
         : firstAnimationPattern.getDuration) + firstAnimationPattern.startTimeMs;
 
     return {
@@ -132,7 +133,7 @@ export default function AnimationManager() {
     <div>
       <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
       <FormControl fullWidth>
-        <FormLabel>Add animation patterns</FormLabel>
+        <FormLabel>Add patterns to animation</FormLabel>
         <List style={{ maxHeight: "200px", overflowY: "auto" }}>
           {availablePatterns?.map((ap) => (
             <ListItem key={`ap-am-${ap.uuid}`} disablePadding>

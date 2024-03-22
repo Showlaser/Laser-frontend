@@ -3,7 +3,7 @@ import { Animation, AnimationPatternKeyFrame } from "models/components/shared/an
 import React, { useEffect } from "react";
 import { createGuid, mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
 import { propertiesSettings } from "services/logic/animation-logic";
-import { canvasPxSize } from "services/shared/config";
+import { canvasPxSize, selectableSteps } from "services/shared/config";
 import { drawLine, writeText } from "components/shared/canvas-helper";
 import animation, {
   SelectedAnimationContext,
@@ -12,17 +12,15 @@ import animation, {
   SelectedAnimationPatternContextType,
 } from "pages/animation-editor";
 import {
-  XCorrectionContext,
-  TimeLinePositionContext,
-  SelectableStepsIndexContext,
-  PlayAnimationContext,
-  SelectableStepsContext,
-  TimeLineContextType,
-  SelectableStepsIndexContextType,
-  SelectedKeyFrameContextType,
-  PlayAnimationContextType,
-  SelectedKeyFrameContext,
-  StepsToDrawMaxRangeContext,
+  AnimationTimeLinePositionContext,
+  AnimationSelectableStepsIndexContext,
+  AnimationPlayAnimationContext,
+  AnimationTimeLineContextType,
+  AnimationSelectableStepsIndexContextType,
+  AnimationSelectedKeyFrameContextType,
+  AnimationPlayAnimationContextType,
+  AnimationSelectedKeyFrameContext,
+  AnimationStepsToDrawMaxRangeContext,
 } from "..";
 
 export default function AnimationPatternKeyFrames() {
@@ -34,20 +32,20 @@ export default function AnimationPatternKeyFrames() {
     SelectedAnimationPatternContext
   ) as SelectedAnimationPatternContextType;
 
-  const xCorrection = React.useContext(XCorrectionContext);
   const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
-    TimeLinePositionContext
-  ) as TimeLineContextType;
+    AnimationTimeLinePositionContext
+  ) as AnimationTimeLineContextType;
 
-  const selectableSteps = React.useContext(SelectableStepsContext);
-  const { selectableStepsIndex } = React.useContext(SelectableStepsIndexContext) as SelectableStepsIndexContextType;
+  const { selectableStepsIndex } = React.useContext(
+    AnimationSelectableStepsIndexContext
+  ) as AnimationSelectableStepsIndexContextType;
 
   const { selectedKeyFrameUuid, setSelectedKeyFrameUuid } = React.useContext(
-    SelectedKeyFrameContext
-  ) as SelectedKeyFrameContextType;
+    AnimationSelectedKeyFrameContext
+  ) as AnimationSelectedKeyFrameContextType;
 
-  const { playAnimation } = React.useContext(PlayAnimationContext) as PlayAnimationContextType;
-  const stepsToDrawMaxRange = React.useContext(StepsToDrawMaxRangeContext);
+  const { playAnimation } = React.useContext(AnimationPlayAnimationContext) as AnimationPlayAnimationContextType;
+  const stepsToDrawMaxRange = React.useContext(AnimationStepsToDrawMaxRangeContext);
 
   const keyFramesPropertiesPosition = [
     { property: "scale", yPosition: canvasPxSize * 0.2 },
@@ -65,15 +63,7 @@ export default function AnimationPatternKeyFrames() {
 
   useEffect(() => {
     drawTimelineOnCanvas();
-  }, [
-    animation,
-    timelinePositionMs,
-    playAnimation,
-    selectableSteps,
-    selectableStepsIndex,
-    selectedKeyFrameUuid,
-    xCorrection,
-  ]);
+  }, [animation, timelinePositionMs, playAnimation, selectableStepsIndex, selectedKeyFrameUuid]);
 
   const getPropertyFromYPosition = (y: number) =>
     keyFramesPropertiesPosition.find((prop) => numberIsBetweenOrEqual(prop.yPosition, y - 20, y + 20))?.property;

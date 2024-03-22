@@ -1,23 +1,18 @@
-import { drawLine, drawRoundedRectangleWithText, writeText } from "components/shared/canvas-helper";
-import {
-  SelectedAnimationContext,
-  SelectedAnimationContextType,
-  SelectedAnimationPatternContext,
-  SelectedAnimationPatternContextType,
-} from "pages/animation-editor";
 import React, { useEffect, useState } from "react";
-import { mapNumber, normalize, numberIsBetweenOrEqual } from "services/shared/math";
 import {
-  AnimationDurationContext,
-  AnimationDurationContextType,
-  AnimationPlayAnimationContext,
-  AnimationPlayAnimationContextType,
-  AnimationSelectableStepsIndexContext,
-  AnimationSelectableStepsIndexContextType,
-  AnimationStepsToDrawMaxRangeContext,
-  AnimationTimeLineContextType,
-  AnimationTimeLinePositionContext,
+  LasershowDurationContext,
+  LasershowDurationContextType,
+  LasershowSelectableStepsIndexContext,
+  LasershowSelectableStepsIndexContextType,
+  LasershowStepsToDrawMaxRangeContext,
+  LasershowTimeLineContextType,
+  LasershowTimeLinePositionContext,
+  PlayLasershowContext,
+  PlayLasershowContextType,
+  SelectedLasershowAnimationContext,
+  SelectedLasershowAnimationContextType,
 } from "..";
+import { SelectedLasershowContext, SelectedLasershowContextType } from "pages/lasershow-editor";
 import {
   timelineItemWidthWhenDurationIsZero,
   canvasHeight,
@@ -27,34 +22,40 @@ import {
   timelineNumbersHeight,
   timelineItemHeightOnCanvas,
 } from "services/shared/config";
-import { LinearProgress, Grid, InputLabel, Input, Select, MenuItem, Tooltip, IconButton, Paper } from "@mui/material";
+import { drawLine, drawRoundedRectangleWithText, writeText } from "components/shared/canvas-helper";
+import { mapNumber, normalize, numberIsBetweenOrEqual } from "services/shared/math";
+import { getAnimationDuration, playAnimation } from "services/logic/animation-logic";
+import { Grid, IconButton, Input, InputLabel, LinearProgress, MenuItem, Paper, Select, Tooltip } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { getAnimationPatternsToDrawInTimeline } from "services/logic/pattern-logic";
-import { getAnimationDuration } from "services/logic/animation-logic";
+import { getLasershowAnimationsToDrawInTimeline } from "services/logic/lasershow-logic";
 
-export default function AnimationPatternTimeline() {
+export default function LasershowAnimationTimeline() {
   const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
-    AnimationTimeLinePositionContext
-  ) as AnimationTimeLineContextType;
+    LasershowTimeLinePositionContext
+  ) as LasershowTimeLineContextType;
 
   const { selectableStepsIndex, setSelectableStepsIndex } = React.useContext(
-    AnimationSelectableStepsIndexContext
-  ) as AnimationSelectableStepsIndexContextType;
+    LasershowSelectableStepsIndexContext
+  ) as LasershowSelectableStepsIndexContextType;
 
-  const { selectedAnimation } = React.useContext(SelectedAnimationContext) as SelectedAnimationContextType;
+  const { selectedLasershow, setSelectedLasershow } = React.useContext(
+    SelectedLasershowContext
+  ) as SelectedLasershowContextType;
 
-  const { selectedAnimationPattern, setSelectedAnimationPattern } = React.useContext(
-    SelectedAnimationPatternContext
-  ) as SelectedAnimationPatternContextType;
+  const { selectedLasershowAnimation, setSelectedLasershowAnimation } = React.useContext(
+    SelectedLasershowAnimationContext
+  ) as SelectedLasershowAnimationContextType;
 
-  const { playAnimation, setPlayAnimation } = React.useContext(
-    AnimationPlayAnimationContext
-  ) as AnimationPlayAnimationContextType;
-  const stepsToDrawMaxRange = React.useContext(AnimationStepsToDrawMaxRangeContext);
+  const { playLasershow, setPlayLasershow } = React.useContext(PlayLasershowContext) as PlayLasershowContextType;
+  const stepsToDrawMaxRange = React.useContext(LasershowStepsToDrawMaxRangeContext);
+  const { getLasershowDuration } = React.useContext(LasershowDurationContext) as LasershowDurationContextType;
 
-  const animationDuration = getAnimationDuration(selectedAnimation);
+  const [screenWidthPx, setScreenWidthPx] = useState<number>(window.innerWidth);
+  const [screenHeightPx, setScreenHeightPx] = useState<number>(window.innerHeight);
+
+  const lasershowDuration = getLasershowDuration();
 
   const getTimelineData = () => {
     let generatedTimeline = [];
@@ -69,12 +70,10 @@ export default function AnimationPatternTimeline() {
     return generatedTimeline;
   };
 
-  const [screenWidthPx, setScreenWidthPx] = useState<number>(window.innerWidth);
-  const [screenHeightPx, setScreenHeightPx] = useState<number>(window.innerHeight);
   const timelines = getTimelineData();
 
   useEffect(() => {
-    const canvas = document.getElementById("animation-pattern-timeline-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById("lasershow-timeline-canvas") as HTMLCanvasElement;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     canvas.style.width = `${canvasWidth}px`;
@@ -85,15 +84,15 @@ export default function AnimationPatternTimeline() {
     screenWidthPx,
     screenHeightPx,
     timelinePositionMs,
-    selectedAnimation,
+    selectedLasershow,
     selectableStepsIndex,
-    selectedAnimationPattern,
+    selectedLasershowAnimation,
   ]);
 
   const draw = (ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, canvasWidth, ctx.canvas.height);
     drawTimeLines(ctx);
-    drawAnimationPatternsOnTimelines();
+    drawLasershowAnimationsOnTimelines();
   };
 
   const handleResize = () => {
@@ -121,14 +120,14 @@ export default function AnimationPatternTimeline() {
     }
   };
 
-  const onAnimationPatternClick = (x: number, y: number) => {
-    const clickedAnimationPattern = getAnimationPatternFromMouseClick(x, y);
+  const onLasershowAnimationClick = (x: number, y: number) => {
+    const clickedAnimationPattern = getLasershowAnimationFromMouseClick(x, y);
     if (clickedAnimationPattern !== undefined) {
-      setSelectedAnimationPattern(clickedAnimationPattern);
+      setSelectedLasershowAnimation(clickedAnimationPattern);
     }
   };
 
-  const getAnimationPatternFromMouseClick = (x: number, y: number) => {
+  const getLasershowAnimationFromMouseClick = (x: number, y: number) => {
     const numberOfTimeLines = timelines.length;
     const timelineIdPressed = getTimelineIdPressed(numberOfTimeLines, canvasHeight, y, timelineItemHeightOnCanvas);
     if (timelineIdPressed === undefined) {
@@ -136,61 +135,63 @@ export default function AnimationPatternTimeline() {
     }
 
     const xMappedToTimelinePosition = mapNumber(x, 0, canvasWidth, timelinePositionMs, stepsToDrawMaxRange);
-    return selectedAnimation?.animationPatterns.find(
-      (ap) =>
+    return selectedLasershow?.lasershowAnimations.find(
+      (la) =>
         numberIsBetweenOrEqual(
           xMappedToTimelinePosition,
-          ap.startTimeMs,
-          ap.getDuration === 0 ? ap.startTimeMs + timelineItemWidthWhenDurationIsZero : ap.getDuration
-        ) && ap.timelineId === timelineIdPressed
+          la.startTimeMs,
+          getAnimationDuration(la.animation) === 0
+            ? la.startTimeMs + timelineItemWidthWhenDurationIsZero
+            : getAnimationDuration(la.animation)
+        ) && la.timeLineId === timelineIdPressed
     );
   };
 
   const onCanvasClick = (e: any) => {
-    const canvas = document.getElementById("animation-pattern-timeline-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById("lasershow-animation-timeline-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
-    onAnimationPatternClick(x, y);
+    onLasershowAnimationClick(x, y);
   };
 
-  const drawAnimationPatternsOnTimelines = () => {
-    const canvas = document.getElementById("animation-pattern-timeline-canvas") as HTMLCanvasElement;
+  const drawLasershowAnimationsOnTimelines = () => {
+    const canvas = document.getElementById("lasershow-animation-timeline-canvas") as HTMLCanvasElement;
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    const animationPatternsInRange = getAnimationPatternsToDrawInTimeline(
-      selectedAnimation,
+    const lasershowAnimationsInRange = getLasershowAnimationsToDrawInTimeline(
+      selectedLasershow,
       timelinePositionMs,
       stepsToDrawMaxRange
     );
-    if (animationPatternsInRange === undefined) {
+    if (lasershowAnimationsInRange === undefined) {
       return;
     }
 
-    const animationPatternsInRangeCount = animationPatternsInRange?.length ?? 0;
+    const lasershowAnimationsInRangeCount = lasershowAnimationsInRange?.length ?? 0;
     const numberOfTimeLines = timelines.length;
-    for (let i = 0; i < animationPatternsInRangeCount; i++) {
-      const animationPattern = animationPatternsInRange[i];
-      const y = ((canvasHeight - timelineNumbersHeight) / numberOfTimeLines) * (animationPattern?.timelineId ?? 0);
-      let animationPatternDuration = animationPattern?.getDuration ?? 0;
+    for (let i = 0; i < lasershowAnimationsInRangeCount; i++) {
+      const lasershowAnimation = lasershowAnimationsInRange[i];
+      const y = ((canvasHeight - timelineNumbersHeight) / numberOfTimeLines) * (lasershowAnimation?.timeLineId ?? 0);
+      let lasershowAnimationDuration = getAnimationDuration(lasershowAnimation.animation) ?? 0;
 
-      if (animationPatternDuration === 0) {
-        //to prevent the pattern from being to small to click on
-        animationPatternDuration = timelineItemWidthWhenDurationIsZero;
+      if (lasershowAnimationDuration === 0) {
+        //to prevent the animation from being to small to click on
+        lasershowAnimationDuration = timelineItemWidthWhenDurationIsZero;
       }
 
-      const widthToDisplay = (canvasWidth / 10) * (animationPatternDuration / selectableSteps[selectableStepsIndex]);
+      const widthToDisplay = (canvasWidth / 10) * (lasershowAnimationDuration / selectableSteps[selectableStepsIndex]);
       const xPosition =
         (canvasWidth / 10) *
-        ((animationPattern.startTimeMs - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
+        ((lasershowAnimation.startTimeMs - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
 
-      let rectangleColor = selectedAnimationPattern?.uuid === animationPattern.uuid ? "#6370c2" : "#485cdb";
+      let rectangleColor = selectedLasershowAnimation?.uuid === lasershowAnimation.uuid ? "#6370c2" : "#485cdb";
       drawRoundedRectangleWithText(
         xPosition,
         y + 5,
         widthToDisplay,
         timelineItemHeightOnCanvas,
-        `${animationPattern?.name}`,
+        `${lasershowAnimation?.name}`,
         "white",
         rectangleColor,
         ctx
@@ -202,7 +203,7 @@ export default function AnimationPatternTimeline() {
     numberOfTimeLines: number,
     canvasHeight: number,
     y: number,
-    animationPatternHeightOnCanvas: number
+    lasershowAnimationHeightOnCanvas: number
   ) => {
     for (let i = 0; i < numberOfTimeLines; i++) {
       const timelineCanvasYPosition =
@@ -211,7 +212,7 @@ export default function AnimationPatternTimeline() {
 
       const yPositionIsInTimeline = numberIsBetweenOrEqual(
         y,
-        timelineCanvasYPosition - animationPatternHeightOnCanvas - 5,
+        timelineCanvasYPosition - lasershowAnimationHeightOnCanvas - 5,
         timelineCanvasYPosition
       );
       if (yPositionIsInTimeline) {
@@ -224,9 +225,9 @@ export default function AnimationPatternTimeline() {
     <Paper style={{ marginTop: "25px" }}>
       <Grid container direction="row" sx={{ padding: "10px" }}>
         <Grid item>
-          <InputLabel id="timeline-position-ms">Timeline position ms</InputLabel>
+          <InputLabel id="lasershow-timeline-position-ms">Timeline position ms</InputLabel>
           <Input
-            disabled={selectedAnimation === null}
+            disabled={selectedLasershow === null}
             id="timeline-position-ms"
             value={timelinePositionMs}
             onKeyDown={(e) => e.preventDefault()}
@@ -242,7 +243,7 @@ export default function AnimationPatternTimeline() {
         <Grid item ml={1.5}>
           <InputLabel id="steps-select">Steps</InputLabel>
           <Select
-            disabled={selectedAnimation === null}
+            disabled={selectedLasershow === null}
             labelId="steps-select"
             value={selectableStepsIndex}
             onChange={(e) => setSelectableStepsIndex(Number(e.target.value))}
@@ -256,25 +257,25 @@ export default function AnimationPatternTimeline() {
           <span style={{ marginLeft: "5px" }}>
             <Tooltip title="Reset timeline position to 0">
               <span>
-                <IconButton disabled={selectedAnimation === null} onClick={() => setTimelinePositionMs(0)}>
+                <IconButton disabled={selectedLasershow === null} onClick={() => setTimelinePositionMs(0)}>
                   <RestartAltIcon />
                 </IconButton>
               </span>
             </Tooltip>
           </span>
           <span>
-            {playAnimation ? (
+            {playLasershow ? (
               <Tooltip title="Pause animation">
                 <span>
-                  <IconButton onClick={() => setPlayAnimation(false)} disabled={selectedAnimation === null}>
+                  <IconButton onClick={() => setPlayLasershow(false)} disabled={selectedLasershow === null}>
                     <PauseIcon />
                   </IconButton>
                 </span>
               </Tooltip>
             ) : (
-              <Tooltip title="Start animation">
+              <Tooltip title="Start lasershow">
                 <span>
-                  <IconButton onClick={() => setPlayAnimation(true)} disabled={selectedAnimation === null}>
+                  <IconButton onClick={() => setPlayLasershow(true)} disabled={selectedLasershow === null}>
                     <PlayArrowIcon />
                   </IconButton>
                 </span>
@@ -283,13 +284,13 @@ export default function AnimationPatternTimeline() {
           </span>
         </Grid>
       </Grid>
-      <canvas onClick={onCanvasClick} id="animation-pattern-timeline-canvas" />
+      <canvas onClick={onCanvasClick} id="lasershow-animation-timeline-canvas" />
       <LinearProgress
         sx={{
           transition: "none",
         }}
         variant="determinate"
-        value={timelinePositionMs > animationDuration ? 100 : normalize(timelinePositionMs, 0, animationDuration)}
+        value={timelinePositionMs > lasershowDuration ? 100 : normalize(timelinePositionMs, 0, lasershowDuration)}
       />
     </Paper>
   );

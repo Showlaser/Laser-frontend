@@ -4,11 +4,9 @@ import PointsDrawer from "components/shared/points-drawer";
 import SideNav from "components/shared/sidenav";
 import { Point } from "models/components/shared/point";
 import { SafetyZone, SafetyZonePoint } from "models/components/shared/safety-zone";
-import { sharedSafetyZones } from "pages/dashboard";
 import React, { useEffect } from "react";
 import { getSafetyZones } from "services/logic/zone-logic";
 import { convertPointsToCanvasSize } from "services/shared/converters";
-import { addChangesSavedEvent } from "services/shared/general";
 
 export default function SafetyZones() {
   const [zones, setZones] = React.useState<SafetyZone[]>([]);
@@ -27,8 +25,6 @@ export default function SafetyZones() {
         setZones(sortedSafetyZones);
       });
     }
-
-    addChangesSavedEvent();
   }, []);
 
   const mapSafetyZonePointsToPatternPoints = () => {

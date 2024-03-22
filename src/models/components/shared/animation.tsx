@@ -12,6 +12,7 @@ export type AnimationPatternKeyFrame = {
 export class AnimationPattern {
   public uuid: string | undefined;
   public animationUuid: string | undefined;
+  public patternUuid: string | undefined;
   public name: string | undefined;
   public pattern: Pattern | undefined;
   public animationPatternKeyFrames: AnimationPatternKeyFrame[] = [];

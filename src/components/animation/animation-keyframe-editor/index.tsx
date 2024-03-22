@@ -14,7 +14,7 @@ import {
 } from "pages/animation-editor";
 import TabSelector from "components/tabs";
 import AnimationManager from "./animation-manager";
-import { canvasPxSize } from "services/shared/config";
+import { canvasPxSize, selectableSteps } from "services/shared/config";
 import {
   getPatternPointsByTimelinePosition,
   getPreviousCurrentAndNextKeyFramePerProperty,
@@ -22,23 +22,24 @@ import {
 import SettingsIcon from "@mui/icons-material/Settings";
 import SaveIcon from "@mui/icons-material/Save";
 import ClearIcon from "@mui/icons-material/Clear";
+import { getAnimationDuration, saveAnimation } from "services/logic/animation-logic";
 
-export type TimeLineContextType = {
+export type AnimationTimeLineContextType = {
   timelinePositionMs: number;
   setTimelinePositionMs: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export type SelectableStepsIndexContextType = {
+export type AnimationSelectableStepsIndexContextType = {
   selectableStepsIndex: number;
   setSelectableStepsIndex: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export type SelectedKeyFrameContextType = {
+export type AnimationSelectedKeyFrameContextType = {
   selectedKeyFrameUuid: string;
   setSelectedKeyFrameUuid: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export type PlayAnimationContextType = {
+export type AnimationPlayAnimationContextType = {
   playAnimation: boolean;
   setPlayAnimation: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -47,13 +48,12 @@ export type AnimationDurationContextType = {
   getAnimationDuration: () => number;
 };
 
-export const TimeLinePositionContext = React.createContext<TimeLineContextType | null>(null);
-export const SelectableStepsIndexContext = React.createContext<SelectableStepsIndexContextType | null>(null);
-export const SelectedKeyFrameContext = React.createContext<SelectedKeyFrameContextType | null>(null);
-export const PlayAnimationContext = React.createContext<PlayAnimationContextType | null>(null);
-export const XCorrectionContext = React.createContext<number[]>([]);
-export const StepsToDrawMaxRangeContext = React.createContext<number>(0);
-export const SelectableStepsContext = React.createContext<number[]>([10, 100, 1000, 10000]);
+export const AnimationTimeLinePositionContext = React.createContext<AnimationTimeLineContextType | null>(null);
+export const AnimationSelectableStepsIndexContext =
+  React.createContext<AnimationSelectableStepsIndexContextType | null>(null);
+export const AnimationSelectedKeyFrameContext = React.createContext<AnimationSelectedKeyFrameContextType | null>(null);
+export const AnimationPlayAnimationContext = React.createContext<AnimationPlayAnimationContextType | null>(null);
+export const AnimationStepsToDrawMaxRangeContext = React.createContext<number>(0);
 export const AnimationDurationContext = React.createContext<AnimationDurationContextType | null>(null);
 
 export default function AnimationKeyFrameEditor() {
@@ -68,7 +68,6 @@ export default function AnimationKeyFrameEditor() {
   const [selectableStepsIndex, setSelectableStepsIndex] = useState<number>(0);
   const [selectedKeyFrameUuid, setSelectedKeyFrameUuid] = useState<string>("");
   const [playAnimation, setPlayAnimation] = useState<boolean>(false);
-  const selectableSteps = [10, 100, 1000, 10000];
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
 
   const stepsToDrawMaxRange = (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
@@ -77,31 +76,24 @@ export default function AnimationKeyFrameEditor() {
     () => ({ timelinePositionMs, setTimelinePositionMs }),
     [timelinePositionMs]
   );
-  const selectableStepsMemo = React.useMemo(
-    () => ({ selectableStepsIndex, setSelectableStepsIndex }),
-    [selectableSteps]
-  );
   const selectedKeyFrameMemo = React.useMemo(
     () => ({ selectedKeyFrameUuid, setSelectedKeyFrameUuid }),
-    [selectableSteps]
+    [selectedKeyFrameUuid]
   );
   const playAnimationMemo = React.useMemo(() => ({ playAnimation, setPlayAnimation }), [playAnimation]);
-
-  const getAnimationDuration = () => {
-    const times = selectedAnimation?.animationPatterns.map((ap) => ap.startTimeMs + ap.getDuration);
-    if (times === undefined) {
-      return 0;
-    }
-
-    return Math.max(...times);
-  };
-
-  const getAnimationDurationMemo = React.useMemo(() => ({ getAnimationDuration }), [selectedAnimation]);
+  const selectableStepsIndexMemo = React.useMemo(
+    () => ({ selectableStepsIndex, setSelectableStepsIndex }),
+    [playAnimation]
+  );
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (playAnimation) {
-      if (timelinePositionMs >= getAnimationDuration()) {
+      if (selectedAnimation === null) {
+        return;
+      }
+
+      if (timelinePositionMs >= getAnimationDuration(selectedAnimation)) {
         setPlayAnimation(false);
       }
 
@@ -116,23 +108,17 @@ export default function AnimationKeyFrameEditor() {
   }, [selectedAnimationPattern]);
 
   const getWrapperContext = (reactObject: React.ReactNode) => (
-    <TimeLinePositionContext.Provider value={timelinePositionMemo}>
-      <SelectableStepsIndexContext.Provider value={selectableStepsMemo}>
-        <SelectedKeyFrameContext.Provider value={selectedKeyFrameMemo}>
-          <PlayAnimationContext.Provider value={playAnimationMemo}>
-            <XCorrectionContext.Provider value={[20, 350, 3000, 8000]}>
-              <SelectableStepsContext.Provider value={selectableSteps}>
-                <StepsToDrawMaxRangeContext.Provider value={stepsToDrawMaxRange}>
-                  <AnimationDurationContext.Provider value={getAnimationDurationMemo}>
-                    {reactObject}
-                  </AnimationDurationContext.Provider>
-                </StepsToDrawMaxRangeContext.Provider>
-              </SelectableStepsContext.Provider>
-            </XCorrectionContext.Provider>
-          </PlayAnimationContext.Provider>
-        </SelectedKeyFrameContext.Provider>
-      </SelectableStepsIndexContext.Provider>
-    </TimeLinePositionContext.Provider>
+    <AnimationTimeLinePositionContext.Provider value={timelinePositionMemo}>
+      <AnimationSelectedKeyFrameContext.Provider value={selectedKeyFrameMemo}>
+        <AnimationPlayAnimationContext.Provider value={playAnimationMemo}>
+          <AnimationSelectableStepsIndexContext.Provider value={selectableStepsIndexMemo}>
+            <AnimationStepsToDrawMaxRangeContext.Provider value={stepsToDrawMaxRange}>
+              {reactObject}
+            </AnimationStepsToDrawMaxRangeContext.Provider>
+          </AnimationSelectableStepsIndexContext.Provider>
+        </AnimationPlayAnimationContext.Provider>
+      </AnimationSelectedKeyFrameContext.Provider>
+    </AnimationTimeLinePositionContext.Provider>
   );
 
   const getPointsToDraw = (): Point[] => {
@@ -165,6 +151,12 @@ export default function AnimationKeyFrameEditor() {
     }
 
     return points;
+  };
+
+  const saveAnimationOnApi = async () => {
+    if (selectedAnimation !== null) {
+      await saveAnimation(selectedAnimation);
+    }
   };
 
   return (
@@ -221,7 +213,7 @@ export default function AnimationKeyFrameEditor() {
             }
             tooltipTitle="Clear editor field"
           />
-          <SpeedDialAction icon={<SaveIcon />} onClick={() => {}} tooltipTitle="Save pattern (ctrl + s)" />
+          <SpeedDialAction icon={<SaveIcon />} onClick={saveAnimationOnApi} tooltipTitle="Save animation (ctrl + s)" />
         </SpeedDial>
       </Grid>
     </>

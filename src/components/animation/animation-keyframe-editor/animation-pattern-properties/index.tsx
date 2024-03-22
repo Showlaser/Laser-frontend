@@ -19,17 +19,14 @@ import React from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import { animationPatternTimeWidthWhenDurationIsZero, canvasPxSize } from "services/shared/config";
+import { numberOfTimeLines, xCorrection } from "services/shared/config";
 import {
-  PlayAnimationContext,
-  PlayAnimationContextType,
-  SelectableStepsIndexContext,
-  SelectableStepsIndexContextType,
-  SelectedKeyFrameContext,
-  SelectedKeyFrameContextType,
-  TimeLineContextType,
-  TimeLinePositionContext,
-  XCorrectionContext,
+  AnimationSelectableStepsIndexContext,
+  AnimationSelectableStepsIndexContextType,
+  AnimationSelectedKeyFrameContext,
+  AnimationSelectedKeyFrameContextType,
+  AnimationTimeLineContextType,
+  AnimationTimeLinePositionContext,
 } from "..";
 import {
   SelectedAnimationContext,
@@ -38,7 +35,6 @@ import {
   SelectedAnimationPatternContextType,
   SelectedAnimationPatternIndexContext,
 } from "pages/animation-editor";
-import { numberOfTimeLines } from "../animation-pattern-timeline";
 import { Animation } from "models/components/shared/animation";
 
 export default function AnimationPatternProperties() {
@@ -48,17 +44,15 @@ export default function AnimationPatternProperties() {
   const { selectedAnimationPattern, setSelectedAnimationPattern } = React.useContext(
     SelectedAnimationPatternContext
   ) as SelectedAnimationPatternContextType;
-  const xCorrection = React.useContext(XCorrectionContext);
   const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
-    TimeLinePositionContext
-  ) as TimeLineContextType;
+    AnimationTimeLinePositionContext
+  ) as AnimationTimeLineContextType;
   const { selectableStepsIndex, setSelectableStepsIndex } = React.useContext(
-    SelectableStepsIndexContext
-  ) as SelectableStepsIndexContextType;
+    AnimationSelectableStepsIndexContext
+  ) as AnimationSelectableStepsIndexContextType;
   const { selectedKeyFrameUuid, setSelectedKeyFrameUuid } = React.useContext(
-    SelectedKeyFrameContext
-  ) as SelectedKeyFrameContextType;
-  const { playAnimation, setPlayAnimation } = React.useContext(PlayAnimationContext) as PlayAnimationContextType;
+    AnimationSelectedKeyFrameContext
+  ) as AnimationSelectedKeyFrameContextType;
 
   const selectedAnimationPatternIndex = React.useContext(SelectedAnimationPatternIndexContext);
 
@@ -206,11 +200,11 @@ export default function AnimationPatternProperties() {
   );
 
   const updatePatternProperty = (propertyName: string, value: any) => {
-    let updatedAnimation: any = { ...selectedAnimation };
-    if (updatedAnimation?.animationPatterns === undefined) {
+    if (selectedAnimation?.animationPatterns === undefined) {
       return;
     }
 
+    let updatedAnimation: any = { ...selectedAnimation };
     updatedAnimation.animationPatterns[selectedAnimationPatternIndex][propertyName] = value;
     setSelectedAnimation(updatedAnimation);
   };
@@ -309,7 +303,6 @@ export default function AnimationPatternProperties() {
         value={selectedAnimationPattern?.startTimeMs}
         onChange={(e) => updatePatternProperty("startTimeMs", Number(e.target.value))}
       />
-
       <InputLabel shrink style={labelStyle} id="properties-timeline-id">
         Timeline id
       </InputLabel>

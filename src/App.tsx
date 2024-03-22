@@ -35,7 +35,7 @@ function App() {
           },
           MuiTooltip: {
             defaultProps: {
-              enterDelay: 1500,
+              enterDelay: 750,
               TransitionProps: { timeout: 250 },
             },
           },

@@ -8,7 +8,7 @@ export const getAnimations = async (): Promise<Response | undefined> =>
   sendRequest(() => Get(apiEndpoints.animation), []);
 
 export const saveAnimation = async (animation: Animation) =>
-  (await sendRequest(() => Post(apiEndpoints.animation, animation), [], toastSubject.changesSaved))?.json();
+  await sendRequest(() => Post(apiEndpoints.animation, animation), [], toastSubject.changesSaved);
 
 export const removeAnimation = async (uuid: string) =>
   sendRequest(() => Delete(`${apiEndpoints.animation}/${uuid}`), [], toastSubject.changesSaved);
@@ -46,3 +46,16 @@ export const propertiesSettings = [
     max: 360,
   },
 ];
+
+export const getAnimationDuration = (animation: Animation | null) => {
+  if (animation === null) {
+    return 0;
+  }
+
+  const times = animation?.animationPatterns.map((ap) => ap.startTimeMs + ap.getDuration);
+  if (times === undefined) {
+    return 0;
+  }
+
+  return Math.max(...times);
+};

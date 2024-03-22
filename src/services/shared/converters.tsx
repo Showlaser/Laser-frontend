@@ -9,6 +9,8 @@ import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
 import { canvasPxSize } from "./config";
 import { createGuid, getCenterOfPoints, mapNumber, rotatePoints } from "./math";
+import { LasershowAnimation } from "models/components/shared/lasershow";
+import { getRandomObjectName } from "./random-object-name-generator";
 
 export const getRgbColorStringFromPoint = (point: Point): string =>
   `rgb(${point.redLaserPowerPwm},${point.greenLaserPowerPwm},${point.blueLaserPowerPwm})`;
@@ -41,6 +43,7 @@ export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   const animationPattern = new AnimationPattern();
   animationPattern.uuid = createGuid();
   animationPattern.animationUuid = animation.uuid;
+  animationPattern.patternUuid = pattern.uuid;
   animationPattern.name = `${pattern.name}-new`;
   animationPattern.pattern = pattern;
   animationPattern.animationPatternKeyFrames = generateAnimationKeyframesFromPattern(pattern);
@@ -53,9 +56,25 @@ export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   return animation;
 };
 
+export const convertAnimationToLasershowAnimation = (
+  animation: Animation,
+  lasershowUuid: string
+): LasershowAnimation => {
+  return {
+    uuid: createGuid(),
+    animationUuid: animation.uuid,
+    lasershowUuid,
+    name: getRandomObjectName(),
+    animation,
+    startTimeMs: 0,
+    timeLineId: 0,
+  };
+};
+
 export const convertPatternToAnimationPattern = (pattern: Pattern): AnimationPattern => {
   const animationPattern = new AnimationPattern();
   animationPattern.uuid = createGuid();
+  animationPattern.patternUuid = pattern.uuid;
   animationPattern.name = `${pattern.name}-new`;
   animationPattern.pattern = pattern;
   animationPattern.animationPatternKeyFrames = generateAnimationKeyframesFromPattern(pattern);
