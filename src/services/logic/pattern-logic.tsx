@@ -4,7 +4,12 @@ import apiEndpoints from "services/shared/api/api-endpoints";
 import { toastSubject } from "services/shared/toast-messages";
 import { Pattern } from "models/components/shared/pattern";
 import { mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
-import { Animation, AnimationPattern, AnimationPatternKeyFrame } from "models/components/shared/animation";
+import {
+  Animation,
+  AnimationPattern,
+  AnimationPatternKeyFrame,
+  getAnimationPatternDuration,
+} from "models/components/shared/animation";
 import { Point } from "models/components/shared/point";
 import { applyParametersToPointsForCanvas } from "services/shared/converters";
 import { propertiesSettings } from "./animation-logic";
@@ -45,7 +50,7 @@ export const getAnimationPatternsToDrawInTimeline = (
 ) => {
   return animation?.animationPatterns?.filter((ap) => {
     const patternStartsBeforeTimeline = ap.startTimeMs < timelinePositionMs;
-    const patternEndsAfterStepsToDraw = ap.startTimeMs + ap.getDuration > stepsToDrawMaxRange;
+    const patternEndsAfterStepsToDraw = ap.startTimeMs + getAnimationPatternDuration(ap) > stepsToDrawMaxRange;
     const patternStartsInTimelineRange = numberIsBetweenOrEqual(
       ap.startTimeMs,
       timelinePositionMs,
@@ -53,7 +58,7 @@ export const getAnimationPatternsToDrawInTimeline = (
     );
 
     const patternEndsInTimelineRange = numberIsBetweenOrEqual(
-      ap.startTimeMs + ap.getDuration,
+      ap.startTimeMs + getAnimationPatternDuration(ap),
       timelinePositionMs,
       stepsToDrawMaxRange
     );
@@ -75,7 +80,7 @@ export const getKeyFramesPastTimelinePositionSortedByTime = (
   animationPattern?.animationPatternKeyFrames
     .filter(
       (ak: { timeMs: number; propertyEdited: string }) =>
-        ak.timeMs > timelinePositionMs && ak.propertyEdited === property
+        ak.timeMs > timelinePositionMs && ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
     )
     .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
 
@@ -87,7 +92,7 @@ export const getKeyFramesBeforeTimelinePositionSortedByTimeDescending = (
   animationPattern?.animationPatternKeyFrames
     .filter(
       (ak: { timeMs: number; propertyEdited: string }) =>
-        ak.timeMs < timelinePositionMs && ak.propertyEdited === property
+        ak.timeMs < timelinePositionMs && ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
     )
     .sort((a: { timeMs: number }, b: { timeMs: number }) => b.timeMs - a.timeMs);
 
@@ -148,16 +153,18 @@ export const getPatternPointsByTimelinePosition = (
   for (let i = 0; i < propertiesSettingsLength; i++) {
     const currentPropertySetting = propertiesSettings[i];
     const currentKeyFrame = previousNextAndCurrentKeyFrames.current.find(
-      (kf) => kf.propertyEdited === currentPropertySetting.property
+      (kf) => kf.propertyEdited.toLocaleLowerCase() === currentPropertySetting.property.toLocaleLowerCase()
     );
 
     const currentKeyFrameIsAvailable = currentKeyFrame !== undefined;
     const previousKeyFrame = currentKeyFrameIsAvailable
       ? currentKeyFrame
-      : previousNextAndCurrentKeyFrames.previous.find((kf) => kf.propertyEdited === currentPropertySetting.property);
+      : previousNextAndCurrentKeyFrames.previous.find(
+          (kf) => kf.propertyEdited.toLocaleLowerCase() === currentPropertySetting.property.toLocaleLowerCase()
+        );
 
     const nextKeyFrame = previousNextAndCurrentKeyFrames.next.find(
-      (kf) => kf.propertyEdited === currentPropertySetting.property
+      (kf) => kf.propertyEdited.toLocaleLowerCase() === currentPropertySetting.property.toLocaleLowerCase()
     );
 
     const valuesPerPropertyIndex = valuesPerProperty.findIndex(

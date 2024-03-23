@@ -9,20 +9,20 @@ export type AnimationPatternKeyFrame = {
   propertyValue: number;
 };
 
-export class AnimationPattern {
-  public uuid: string | undefined;
-  public animationUuid: string | undefined;
-  public patternUuid: string | undefined;
-  public name: string | undefined;
-  public pattern: Pattern | undefined;
-  public animationPatternKeyFrames: AnimationPatternKeyFrame[] = [];
-  public startTimeMs: number = 0;
-  public timelineId: number = 0;
+export const getAnimationPatternDuration = (animationPattern: AnimationPattern) => {
+  return Math.max(...animationPattern.animationPatternKeyFrames.map((akf) => akf.timeMs));
+};
 
-  public get getDuration() {
-    return Math.max(...this.animationPatternKeyFrames.map((akf) => akf.timeMs));
-  }
-}
+export type AnimationPattern = {
+  uuid: string | undefined;
+  animationUuid: string | undefined;
+  patternUuid: string | undefined;
+  name: string | undefined;
+  pattern: Pattern | undefined;
+  animationPatternKeyFrames: AnimationPatternKeyFrame[];
+  startTimeMs: number;
+  timelineId: number;
+};
 
 export type Animation = {
   uuid: string;

@@ -72,9 +72,7 @@ export default function AnimationPage() {
     if (availableAnimations === null && availablePatterns === null) {
       getPatterns().then((patterns) => setAvailablePatterns(patterns ?? []));
       getAnimations().then((response) => {
-        if (response?.status === 200) {
-          response.json().then((animations: Animation[]) => setAvailableAnimations(animations));
-        }
+        setAvailableAnimations(response);
       });
     }
   }, []);

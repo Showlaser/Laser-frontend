@@ -46,3 +46,12 @@ export const getLasershowAnimationsToDrawInTimeline = (
     );
   });
 };
+
+export const getLasershowDuration = (lasershow: Lasershow | null) => {
+  const times = lasershow?.lasershowAnimations.map((la) => getAnimationDuration(la.animation));
+  if (times === undefined) {
+    return 0;
+  }
+
+  return Math.max(...times);
+};

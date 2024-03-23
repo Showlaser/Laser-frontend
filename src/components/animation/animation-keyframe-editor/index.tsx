@@ -22,7 +22,7 @@ import {
 import SettingsIcon from "@mui/icons-material/Settings";
 import SaveIcon from "@mui/icons-material/Save";
 import ClearIcon from "@mui/icons-material/Clear";
-import { getAnimationDuration, saveAnimation } from "services/logic/animation-logic";
+import { getAnimationDuration, getPointsToDrawFromAnimation, saveAnimation } from "services/logic/animation-logic";
 
 export type AnimationTimeLineContextType = {
   timelinePositionMs: number;
@@ -83,7 +83,7 @@ export default function AnimationKeyFrameEditor() {
   const playAnimationMemo = React.useMemo(() => ({ playAnimation, setPlayAnimation }), [playAnimation]);
   const selectableStepsIndexMemo = React.useMemo(
     () => ({ selectableStepsIndex, setSelectableStepsIndex }),
-    [playAnimation]
+    [selectableStepsIndex]
   );
 
   useEffect(() => {
@@ -120,38 +120,6 @@ export default function AnimationKeyFrameEditor() {
       </AnimationSelectedKeyFrameContext.Provider>
     </AnimationTimeLinePositionContext.Provider>
   );
-
-  const getPointsToDraw = (): Point[] => {
-    const animationPatternsToPlay = selectedAnimation?.animationPatterns.filter((ap) =>
-      numberIsBetweenOrEqual(timelinePositionMs, ap.startTimeMs, ap.getDuration + ap.startTimeMs)
-    );
-    const animationPatternsToPlayLength = animationPatternsToPlay?.length ?? 0;
-    if (animationPatternsToPlayLength === 0 || animationPatternsToPlay === undefined) {
-      return [];
-    }
-
-    let points: Point[] = [];
-    for (let i = 0; i < animationPatternsToPlayLength; i++) {
-      const animationPattern = animationPatternsToPlay[i];
-      if (animationPattern.pattern === undefined) {
-        return [];
-      }
-
-      const previousCurrentAndNextKeyFrames = getPreviousCurrentAndNextKeyFramePerProperty(
-        animationPattern,
-        timelinePositionMs
-      );
-      const patternPoints = getPatternPointsByTimelinePosition(
-        animationPattern.pattern,
-        previousCurrentAndNextKeyFrames,
-        timelinePositionMs
-      );
-
-      points = points.concat(patternPoints);
-    }
-
-    return points;
-  };
 
   const saveAnimationOnApi = async () => {
     if (selectedAnimation !== null) {
@@ -191,7 +159,7 @@ export default function AnimationKeyFrameEditor() {
           {getWrapperContext(<AnimationPatternKeyFrames />)}
         </Grid>
         <Grid item xs>
-          <PointsDrawer pointsToDraw={getPointsToDraw()} />
+          <PointsDrawer pointsToDraw={getPointsToDrawFromAnimation(timelinePositionMs, selectedAnimation)} />
         </Grid>
       </Grid>
       <Grid item xs={12}>

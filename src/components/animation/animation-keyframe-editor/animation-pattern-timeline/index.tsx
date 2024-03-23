@@ -20,12 +20,9 @@ import {
 } from "..";
 import {
   timelineItemWidthWhenDurationIsZero,
-  canvasHeight,
-  canvasWidth,
   numberOfTimeLines,
   selectableSteps,
   timelineNumbersHeight,
-  timelineItemHeightOnCanvas,
 } from "services/shared/config";
 import { LinearProgress, Grid, InputLabel, Input, Select, MenuItem, Tooltip, IconButton, Paper } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -33,6 +30,7 @@ import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { getAnimationPatternsToDrawInTimeline } from "services/logic/pattern-logic";
 import { getAnimationDuration } from "services/logic/animation-logic";
+import { getAnimationPatternDuration } from "models/components/shared/animation";
 
 export default function AnimationPatternTimeline() {
   const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
@@ -55,6 +53,9 @@ export default function AnimationPatternTimeline() {
   const stepsToDrawMaxRange = React.useContext(AnimationStepsToDrawMaxRangeContext);
 
   const animationDuration = getAnimationDuration(selectedAnimation);
+  const canvasHeight = window.innerHeight / 6;
+  const canvasWidth = window.innerWidth - 60;
+  const timelineItemHeightOnCanvas = (canvasHeight - 40) / numberOfTimeLines;
 
   const getTimelineData = () => {
     let generatedTimeline = [];
@@ -136,14 +137,17 @@ export default function AnimationPatternTimeline() {
     }
 
     const xMappedToTimelinePosition = mapNumber(x, 0, canvasWidth, timelinePositionMs, stepsToDrawMaxRange);
-    return selectedAnimation?.animationPatterns.find(
-      (ap) =>
+    return selectedAnimation?.animationPatterns.find((ap) => {
+      return (
         numberIsBetweenOrEqual(
           xMappedToTimelinePosition,
           ap.startTimeMs,
-          ap.getDuration === 0 ? ap.startTimeMs + timelineItemWidthWhenDurationIsZero : ap.getDuration
+          getAnimationPatternDuration(ap) === 0
+            ? ap.startTimeMs + timelineItemWidthWhenDurationIsZero
+            : getAnimationPatternDuration(ap)
         ) && ap.timelineId === timelineIdPressed
-    );
+      );
+    });
   };
 
   const onCanvasClick = (e: any) => {
@@ -172,7 +176,7 @@ export default function AnimationPatternTimeline() {
     for (let i = 0; i < animationPatternsInRangeCount; i++) {
       const animationPattern = animationPatternsInRange[i];
       const y = ((canvasHeight - timelineNumbersHeight) / numberOfTimeLines) * (animationPattern?.timelineId ?? 0);
-      let animationPatternDuration = animationPattern?.getDuration ?? 0;
+      let animationPatternDuration = getAnimationPatternDuration(animationPattern) ?? 0;
 
       if (animationPatternDuration === 0) {
         //to prevent the pattern from being to small to click on

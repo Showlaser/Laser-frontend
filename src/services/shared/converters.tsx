@@ -40,15 +40,17 @@ export const setLaserPowerFromHexString = (hex: string, point: Point): Point => 
 
 export const convertPatternToAnimation = (pattern: Pattern): Animation => {
   let animation: Animation = animationPlaceholder();
-  const animationPattern = new AnimationPattern();
-  animationPattern.uuid = createGuid();
-  animationPattern.animationUuid = animation.uuid;
-  animationPattern.patternUuid = pattern.uuid;
-  animationPattern.name = `${pattern.name}-new`;
-  animationPattern.pattern = pattern;
-  animationPattern.animationPatternKeyFrames = generateAnimationKeyframesFromPattern(pattern);
-  animationPattern.startTimeMs = 0;
-  animationPattern.timelineId = 0;
+  const animationPattern: AnimationPattern = {
+    uuid: createGuid(),
+    animationUuid: animation.uuid,
+    patternUuid: pattern.uuid,
+    name: `${pattern.name}-new`,
+    pattern: pattern,
+    animationPatternKeyFrames: generateAnimationKeyframesFromPattern(pattern),
+    startTimeMs: 0,
+    timelineId: 0,
+  };
+
   animation.name = pattern.name;
   animation.image = pattern.image;
   animation.animationPatterns = [animationPattern];
@@ -67,20 +69,21 @@ export const convertAnimationToLasershowAnimation = (
     name: getRandomObjectName(),
     animation,
     startTimeMs: 0,
-    timeLineId: 0,
+    timelineId: 0,
   };
 };
 
-export const convertPatternToAnimationPattern = (pattern: Pattern): AnimationPattern => {
-  const animationPattern = new AnimationPattern();
-  animationPattern.uuid = createGuid();
-  animationPattern.patternUuid = pattern.uuid;
-  animationPattern.name = `${pattern.name}-new`;
-  animationPattern.pattern = pattern;
-  animationPattern.animationPatternKeyFrames = generateAnimationKeyframesFromPattern(pattern);
-  animationPattern.startTimeMs = 0;
-  animationPattern.timelineId = 0;
-  return animationPattern;
+export const convertPatternToAnimationPattern = (pattern: Pattern, animation: Animation): AnimationPattern => {
+  return {
+    uuid: createGuid(),
+    animationUuid: animation.uuid,
+    patternUuid: pattern.uuid,
+    name: `${pattern.name}-new`,
+    pattern: pattern,
+    animationPatternKeyFrames: generateAnimationKeyframesFromPattern(pattern),
+    startTimeMs: 0,
+    timelineId: 0,
+  };
 };
 
 const generateAnimationKeyframesFromPattern = (pattern: Pattern): AnimationPatternKeyFrame[] => {

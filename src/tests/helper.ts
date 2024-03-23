@@ -78,13 +78,16 @@ export const testAnimationPattern = (
   keyframesStartTime: number,
   animationDuration: number
 ): AnimationPattern => {
-  const animationPattern: AnimationPattern = new AnimationPattern();
-  animationPattern.uuid = "4145ab82-6a79-48d1-8425-747a464a4940";
-  animationPattern.name = "Test animation pattern";
-  animationPattern.pattern = testPattern;
-  animationPattern.startTimeMs = patternStartTime;
-  animationPattern.animationPatternKeyFrames = getTestAnimationPatternKeyFrames(keyframesStartTime);
-  animationPattern.timelineId = 0;
+  let animationPattern: AnimationPattern = {
+    uuid: "4145ab82-6a79-48d1-8425-747a464a4940",
+    patternUuid: testPattern.uuid,
+    animationUuid: "cdef5b05-e8aa-44e3-8261-7619e90b0ef0",
+    name: "Test animation pattern",
+    pattern: testPattern,
+    startTimeMs: patternStartTime,
+    animationPatternKeyFrames: getTestAnimationPatternKeyFrames(keyframesStartTime),
+    timelineId: 0,
+  };
 
   if (animationDuration > 0) {
     const endKeyframes = getTestAnimationPatternKeyFrames(animationDuration);

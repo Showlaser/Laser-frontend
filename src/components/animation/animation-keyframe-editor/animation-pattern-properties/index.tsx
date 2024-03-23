@@ -87,7 +87,8 @@ export default function AnimationPatternProperties() {
 
   const getPropertyValue = (property: string) => {
     const selectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames.find(
-      (kf: { uuid: any; propertyEdited: string }) => kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property
+      (kf: { uuid: any; propertyEdited: string }) =>
+        kf.uuid === selectedKeyFrameUuid && kf.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
     );
 
     return selectedKeyFrame?.propertyValue;
@@ -104,7 +105,7 @@ export default function AnimationPatternProperties() {
 
     const keyFrames = selectedAnimationPattern?.animationPatternKeyFrames
       .filter((ak: { propertyEdited: string; timeMs: number }) => {
-        const propertyIsTheSame = ak.propertyEdited === property;
+        const propertyIsTheSame = ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase();
         const isBelowOrUnderCurrentSelectedKeyFrame = getPrevious
           ? ak.timeMs <= currentSelectedKeyFrame?.timeMs
           : ak.timeMs >= currentSelectedKeyFrame?.timeMs;
@@ -149,7 +150,7 @@ export default function AnimationPatternProperties() {
   const getLastKeyframe = (property: string, currentSelectedKeyFrameTimeMs: number) => {
     const keyFrames = selectedAnimationPattern?.animationPatternKeyFrames
       .filter((ak: { propertyEdited: string; timeMs: number }) => {
-        const propertyIsTheSame = ak.propertyEdited === property;
+        const propertyIsTheSame = ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase();
         const isOverCurrentSelectedKeyFrame = ak.timeMs >= currentSelectedKeyFrameTimeMs;
         return propertyIsTheSame && isOverCurrentSelectedKeyFrame;
       })
@@ -170,7 +171,9 @@ export default function AnimationPatternProperties() {
 
   const onGetNextOrPreviousKeyframeError = (property: string) => {
     const kf = selectedAnimationPattern?.animationPatternKeyFrames
-      .filter((ak: { propertyEdited: string }) => ak.propertyEdited === property)
+      .filter(
+        (ak: { propertyEdited: string }) => ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
+      )
       .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs)
       .at(0);
     if (kf === undefined) {
@@ -246,7 +249,7 @@ export default function AnimationPatternProperties() {
         inputProps={{ min: 0.1, max: 10, step: 0.1 }}
         value={getPropertyValue("scale")}
         onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
-        disabled={selectedKeyFrame?.propertyEdited !== "scale" || uiComponentsAreDisabled}
+        disabled={selectedKeyFrame?.propertyEdited.toLocaleLowerCase() !== "scale" || uiComponentsAreDisabled}
       />
       {nextKeyFrameButton("scale")}
 
@@ -260,7 +263,7 @@ export default function AnimationPatternProperties() {
         inputProps={{ min: -4000, max: 4000 }}
         value={getPropertyValue("xOffset")}
         onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
-        disabled={selectedKeyFrame?.propertyEdited !== "xOffset" || uiComponentsAreDisabled}
+        disabled={selectedKeyFrame?.propertyEdited.toLocaleLowerCase() !== "xOffset" || uiComponentsAreDisabled}
       />
       {nextKeyFrameButton("xOffset")}
 
@@ -274,7 +277,7 @@ export default function AnimationPatternProperties() {
         inputProps={{ min: -4000, max: 4000 }}
         value={getPropertyValue("yOffset")}
         onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
-        disabled={selectedKeyFrame?.propertyEdited !== "yOffset" || uiComponentsAreDisabled}
+        disabled={selectedKeyFrame?.propertyEdited.toLocaleLowerCase() !== "yOffset" || uiComponentsAreDisabled}
       />
       {nextKeyFrameButton("yOffset")}
 
@@ -288,7 +291,7 @@ export default function AnimationPatternProperties() {
         inputProps={{ min: -360, max: 360 }}
         value={getPropertyValue("rotation")}
         onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
-        disabled={selectedKeyFrame?.propertyEdited !== "rotation" || uiComponentsAreDisabled}
+        disabled={selectedKeyFrame?.propertyEdited.toLocaleLowerCase() !== "rotation" || uiComponentsAreDisabled}
       />
       {nextKeyFrameButton("rotation")}
 
@@ -333,7 +336,7 @@ export default function AnimationPatternProperties() {
                     }}
                   >
                     <ListItemText
-                      primary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
+                      primary={`${keyFrame.propertyEdited.toLocaleLowerCase()}: ${keyFrame.propertyValue}`}
                       secondary={`${keyFrame.timeMs} ms`}
                     />
                   </ListItemButton>

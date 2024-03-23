@@ -129,7 +129,9 @@ export default function AnimationPatternKeyFrames() {
     const stepsCorrection = [-2, 1, 1, 1, 1];
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     keyFrames.forEach((keyFrame) => {
-      const keyFrameProperty = keyFramesPropertiesPosition.find((p) => p.property === keyFrame.propertyEdited);
+      const keyFrameProperty = keyFramesPropertiesPosition.find(
+        (p) => p.property.toLocaleLowerCase() === keyFrame.propertyEdited.toLocaleLowerCase()
+      );
       if (keyFrameProperty === undefined) {
         return;
       }
@@ -249,7 +251,9 @@ export default function AnimationPatternKeyFrames() {
     const selectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames.find((keyFrame) => {
       const min = (x - selectableSteps[selectableStepsIndex] / 5 - 1) | 0;
       const thisKeyFrameIsClicked =
-        keyFrame.timeMs >= min && keyFrame.timeMs === x && keyFrame.propertyEdited === propertyClicked;
+        keyFrame.timeMs >= min &&
+        keyFrame.timeMs === x &&
+        keyFrame.propertyEdited.toLocaleLowerCase() === propertyClicked?.toLocaleLowerCase();
       return thisKeyFrameIsClicked;
     });
 

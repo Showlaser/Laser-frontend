@@ -9,7 +9,7 @@ export type LasershowAnimation = {
   name: string;
   animation: Animation;
   startTimeMs: number;
-  timeLineId: number;
+  timelineId: number;
 };
 
 export type Lasershow = {

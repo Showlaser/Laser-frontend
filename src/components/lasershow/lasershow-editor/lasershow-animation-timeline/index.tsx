@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  LasershowDurationContext,
-  LasershowDurationContextType,
   LasershowSelectableStepsIndexContext,
   LasershowSelectableStepsIndexContextType,
   LasershowStepsToDrawMaxRangeContext,
@@ -9,27 +7,24 @@ import {
   LasershowTimeLinePositionContext,
   PlayLasershowContext,
   PlayLasershowContextType,
-  SelectedLasershowAnimationContext,
-  SelectedLasershowAnimationContextType,
+  SelectedLasershowAnimationUuidContext,
+  SelectedLasershowAnimationUuidContextType,
 } from "..";
 import { SelectedLasershowContext, SelectedLasershowContextType } from "pages/lasershow-editor";
 import {
   timelineItemWidthWhenDurationIsZero,
-  canvasHeight,
-  canvasWidth,
   numberOfTimeLines,
   selectableSteps,
   timelineNumbersHeight,
-  timelineItemHeightOnCanvas,
 } from "services/shared/config";
 import { drawLine, drawRoundedRectangleWithText, writeText } from "components/shared/canvas-helper";
 import { mapNumber, normalize, numberIsBetweenOrEqual } from "services/shared/math";
-import { getAnimationDuration, playAnimation } from "services/logic/animation-logic";
+import { getAnimationDuration } from "services/logic/animation-logic";
 import { Grid, IconButton, Input, InputLabel, LinearProgress, MenuItem, Paper, Select, Tooltip } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { getLasershowAnimationsToDrawInTimeline } from "services/logic/lasershow-logic";
+import { getLasershowAnimationsToDrawInTimeline, getLasershowDuration } from "services/logic/lasershow-logic";
 
 export default function LasershowAnimationTimeline() {
   const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
@@ -44,18 +39,20 @@ export default function LasershowAnimationTimeline() {
     SelectedLasershowContext
   ) as SelectedLasershowContextType;
 
-  const { selectedLasershowAnimation, setSelectedLasershowAnimation } = React.useContext(
-    SelectedLasershowAnimationContext
-  ) as SelectedLasershowAnimationContextType;
+  const { selectedLasershowAnimationUuid, setSelectedLasershowAnimationUuid } = React.useContext(
+    SelectedLasershowAnimationUuidContext
+  ) as SelectedLasershowAnimationUuidContextType;
 
   const { playLasershow, setPlayLasershow } = React.useContext(PlayLasershowContext) as PlayLasershowContextType;
   const stepsToDrawMaxRange = React.useContext(LasershowStepsToDrawMaxRangeContext);
-  const { getLasershowDuration } = React.useContext(LasershowDurationContext) as LasershowDurationContextType;
 
   const [screenWidthPx, setScreenWidthPx] = useState<number>(window.innerWidth);
   const [screenHeightPx, setScreenHeightPx] = useState<number>(window.innerHeight);
 
-  const lasershowDuration = getLasershowDuration();
+  const lasershowDuration = getLasershowDuration(selectedLasershow);
+  const canvasHeight = window.innerHeight / 6;
+  const canvasWidth = window.innerWidth - 60;
+  const timelineItemHeightOnCanvas = (canvasHeight - 40) / numberOfTimeLines;
 
   const getTimelineData = () => {
     let generatedTimeline = [];
@@ -73,7 +70,7 @@ export default function LasershowAnimationTimeline() {
   const timelines = getTimelineData();
 
   useEffect(() => {
-    const canvas = document.getElementById("lasershow-timeline-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById("lasershow-animation-timeline-canvas") as HTMLCanvasElement;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     canvas.style.width = `${canvasWidth}px`;
@@ -86,7 +83,7 @@ export default function LasershowAnimationTimeline() {
     timelinePositionMs,
     selectedLasershow,
     selectableStepsIndex,
-    selectedLasershowAnimation,
+    selectedLasershowAnimationUuid,
   ]);
 
   const draw = (ctx: CanvasRenderingContext2D) => {
@@ -121,9 +118,9 @@ export default function LasershowAnimationTimeline() {
   };
 
   const onLasershowAnimationClick = (x: number, y: number) => {
-    const clickedAnimationPattern = getLasershowAnimationFromMouseClick(x, y);
-    if (clickedAnimationPattern !== undefined) {
-      setSelectedLasershowAnimation(clickedAnimationPattern);
+    const clickedLasershowAnimation = getLasershowAnimationFromMouseClick(x, y);
+    if (clickedLasershowAnimation !== undefined) {
+      setSelectedLasershowAnimationUuid(clickedLasershowAnimation.uuid);
     }
   };
 
@@ -143,7 +140,7 @@ export default function LasershowAnimationTimeline() {
           getAnimationDuration(la.animation) === 0
             ? la.startTimeMs + timelineItemWidthWhenDurationIsZero
             : getAnimationDuration(la.animation)
-        ) && la.timeLineId === timelineIdPressed
+        ) && la.timelineId === timelineIdPressed
     );
   };
 
@@ -172,7 +169,7 @@ export default function LasershowAnimationTimeline() {
     const numberOfTimeLines = timelines.length;
     for (let i = 0; i < lasershowAnimationsInRangeCount; i++) {
       const lasershowAnimation = lasershowAnimationsInRange[i];
-      const y = ((canvasHeight - timelineNumbersHeight) / numberOfTimeLines) * (lasershowAnimation?.timeLineId ?? 0);
+      const y = ((canvasHeight - timelineNumbersHeight) / numberOfTimeLines) * (lasershowAnimation?.timelineId ?? 0);
       let lasershowAnimationDuration = getAnimationDuration(lasershowAnimation.animation) ?? 0;
 
       if (lasershowAnimationDuration === 0) {
@@ -185,7 +182,7 @@ export default function LasershowAnimationTimeline() {
         (canvasWidth / 10) *
         ((lasershowAnimation.startTimeMs - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
 
-      let rectangleColor = selectedLasershowAnimation?.uuid === lasershowAnimation.uuid ? "#6370c2" : "#485cdb";
+      let rectangleColor = selectedLasershowAnimationUuid === lasershowAnimation.uuid ? "#6370c2" : "#485cdb";
       drawRoundedRectangleWithText(
         xPosition,
         y + 5,

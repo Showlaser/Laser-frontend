@@ -79,6 +79,8 @@ export default function LasershowManager() {
       const convertedAnimation = convertAnimationToLasershowAnimation(ata, selectedLasershow.uuid);
       updatedLasershow.lasershowAnimations.push(convertedAnimation);
     });
+
+    setSelectedLasershow(updatedLasershow);
   };
 
   return (

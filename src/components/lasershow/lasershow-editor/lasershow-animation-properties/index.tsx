@@ -1,28 +1,44 @@
-import { Input, InputLabel, MenuItem, Select } from "@mui/material";
+import { Alert, Input, InputLabel, MenuItem, Select } from "@mui/material";
 import React from "react";
 import { numberOfTimeLines } from "services/shared/config";
-import { SelectedLasershowAnimationContext, SelectedLasershowAnimationContextType } from "..";
+import { SelectedLasershowAnimationUuidContext, SelectedLasershowAnimationUuidContextType } from "..";
+import { SelectedLasershowContext, SelectedLasershowContextType } from "pages/lasershow-editor";
 
 export default function LasershowAnimationProperties() {
-  const { selectedLasershowAnimation, setSelectedLasershowAnimation } = React.useContext(
-    SelectedLasershowAnimationContext
-  ) as SelectedLasershowAnimationContextType;
+  const { selectedLasershowAnimationUuid, setSelectedLasershowAnimationUuid } = React.useContext(
+    SelectedLasershowAnimationUuidContext
+  ) as SelectedLasershowAnimationUuidContextType;
+
+  const { selectedLasershow, setSelectedLasershow } = React.useContext(
+    SelectedLasershowContext
+  ) as SelectedLasershowContextType;
+
+  const selectedLasershowAnimation = selectedLasershow?.lasershowAnimations.find(
+    (la) => la.uuid === selectedLasershowAnimationUuid
+  );
 
   const updateLasershowAnimationProperty = (propertyName: string, value: any) => {
-    if (selectedLasershowAnimation === undefined) {
+    if (selectedLasershowAnimationUuid === undefined) {
       return;
     }
 
-    let updatedLasershowAnimation: any = { ...selectedLasershowAnimation };
-    updatedLasershowAnimation[propertyName] = value;
-    setSelectedLasershowAnimation(updatedLasershowAnimation);
+    const selectedLasershowAnimationIndex = selectedLasershow?.lasershowAnimations.findIndex(
+      (la) => la.uuid === selectedLasershowAnimationUuid
+    );
+    if (selectedLasershowAnimationIndex === undefined) {
+      return;
+    }
+
+    let updatedLasershow = { ...selectedLasershow } as any;
+    updatedLasershow.lasershowAnimations[selectedLasershowAnimationIndex][propertyName] = value;
+    setSelectedLasershow(updatedLasershow);
   };
 
   const getTimelineMenuItems = () => {
     let items = [];
     for (let i = 0; i < numberOfTimeLines; i++) {
       items.push(
-        <MenuItem key={`${i}-menu-items`} selected={(selectedLasershowAnimation?.timeLineId ?? 0) === i} value={i}>
+        <MenuItem key={`${i}-menu-items`} selected={(selectedLasershowAnimation?.timelineId ?? 0) === i} value={i}>
           {i + 1}
         </MenuItem>
       );
@@ -32,7 +48,7 @@ export default function LasershowAnimationProperties() {
   };
 
   const labelStyle = { marginBottom: "-11px", marginTop: "2.5px" };
-  return (
+  return selectedLasershowAnimation !== undefined ? (
     <>
       <InputLabel
         shrink
@@ -66,12 +82,14 @@ export default function LasershowAnimationProperties() {
       <Select
         size="small"
         labelId="properties-timeline-id"
-        value={selectedLasershowAnimation?.timeLineId}
+        value={selectedLasershowAnimation?.timelineId}
         label="Timeline id"
-        onChange={(e) => updateLasershowAnimationProperty("timeLineId", Number(e.target.value))}
+        onChange={(e) => updateLasershowAnimationProperty("timelineId", Number(e.target.value))}
       >
         {getTimelineMenuItems()}
       </Select>
     </>
+  ) : (
+    <Alert severity="info">Select a lasershow animation first!</Alert>
   );
 }

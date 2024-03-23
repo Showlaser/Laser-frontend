@@ -17,7 +17,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import { convertPatternToAnimationPattern } from "services/shared/converters";
-import { Animation, AnimationPattern } from "models/components/shared/animation";
+import { Animation, AnimationPattern, getAnimationPatternDuration } from "models/components/shared/animation";
 import { timelineItemWidthWhenDurationIsZero } from "services/shared/config";
 import { OnTrue } from "components/shared/on-true";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
@@ -85,16 +85,18 @@ export default function AnimationManager() {
       }
     }
 
-    lastAnimationPatternsOnTimelines.sort((a, b) => a.getDuration + a.startTimeMs - b.getDuration + b.startTimeMs);
+    lastAnimationPatternsOnTimelines.sort(
+      (a, b) => getAnimationPatternDuration(a) + a.startTimeMs - getAnimationPatternDuration(b) + b.startTimeMs
+    );
     const firstAnimationPattern = lastAnimationPatternsOnTimelines.at(-1);
     if (firstAnimationPattern === undefined) {
       return { timelineId: null, timeMs: null };
     }
 
     const startTimeMs =
-      (firstAnimationPattern.getDuration === 0
+      (getAnimationPatternDuration(firstAnimationPattern) === 0
         ? timelineItemWidthWhenDurationIsZero * 4
-        : firstAnimationPattern.getDuration) + firstAnimationPattern.startTimeMs;
+        : getAnimationPatternDuration(firstAnimationPattern)) + firstAnimationPattern.startTimeMs;
 
     return {
       timelineId: firstAnimationPattern.timelineId,
@@ -114,7 +116,7 @@ export default function AnimationManager() {
     }
 
     patternsToAdd.forEach((pta) => {
-      let convertedPattern = convertPatternToAnimationPattern(pta);
+      let convertedPattern = convertPatternToAnimationPattern(pta, selectedAnimation);
       const { timelineId, timeMs } = getAvailableTimelinePositionSpot(updatedAnimation);
       if (timelineId === null || timeMs === null || convertedPattern === undefined) {
         return;
