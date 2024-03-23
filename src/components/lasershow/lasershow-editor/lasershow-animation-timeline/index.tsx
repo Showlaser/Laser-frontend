@@ -25,6 +25,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { getLasershowAnimationsToDrawInTimeline, getLasershowDuration } from "services/logic/lasershow-logic";
+import { LasershowAnimation } from "models/components/shared/lasershow";
 
 export default function LasershowAnimationTimeline() {
   const { timelinePositionMs, setTimelinePositionMs } = React.useContext(

@@ -263,7 +263,7 @@ export default function AnimationPatternProperties() {
         inputProps={{ min: -4000, max: 4000 }}
         value={getPropertyValue("xOffset")}
         onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
-        disabled={selectedKeyFrame?.propertyEdited.toLocaleLowerCase() !== "xOffset" || uiComponentsAreDisabled}
+        disabled={selectedKeyFrame?.propertyEdited.toLocaleLowerCase() !== "xoffset" || uiComponentsAreDisabled}
       />
       {nextKeyFrameButton("xOffset")}
 
@@ -277,7 +277,7 @@ export default function AnimationPatternProperties() {
         inputProps={{ min: -4000, max: 4000 }}
         value={getPropertyValue("yOffset")}
         onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
-        disabled={selectedKeyFrame?.propertyEdited.toLocaleLowerCase() !== "yOffset" || uiComponentsAreDisabled}
+        disabled={selectedKeyFrame?.propertyEdited.toLocaleLowerCase() !== "yoffset" || uiComponentsAreDisabled}
       />
       {nextKeyFrameButton("yOffset")}
 

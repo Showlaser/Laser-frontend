@@ -11,10 +11,12 @@ import {
 } from "@mui/material";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
 import { OnTrue } from "components/shared/on-true";
-import { Lasershow } from "models/components/shared/lasershow";
+import { Lasershow, LasershowAnimation } from "models/components/shared/lasershow";
 import { AvailableAnimationsContext, AvailableAnimationsContextType } from "pages/lasershow-editor";
 import { SelectedLasershowContext, SelectedLasershowContextType } from "pages/lasershow-editor";
 import React, { useEffect } from "react";
+import { getAnimationDuration } from "services/logic/animation-logic";
+import { timelineItemWidthWhenDurationIsZero } from "services/shared/config";
 import { convertAnimationToLasershowAnimation } from "services/shared/converters";
 
 export default function LasershowManager() {
@@ -77,10 +79,60 @@ export default function LasershowManager() {
 
     animationsToAdd.forEach((ata) => {
       const convertedAnimation = convertAnimationToLasershowAnimation(ata, selectedLasershow.uuid);
+      const { timelineId, timeMs } = getAvailableTimelinePositionSpot(convertedAnimation);
+      if (timelineId === null || timeMs === null || convertedAnimation === undefined) {
+        return;
+      }
+
+      convertedAnimation.timelineId = timelineId;
+      convertedAnimation.startTimeMs = timeMs;
       updatedLasershow.lasershowAnimations.push(convertedAnimation);
     });
 
     setSelectedLasershow(updatedLasershow);
+  };
+
+  const getAvailableTimelinePositionSpot = (lasershowAnimation: LasershowAnimation) => {
+    if (selectedLasershow === null) {
+      return { timelineId: 0, timeMs: 0 };
+    }
+
+    for (let i = 0; i < 3; i++) {
+      const lasershowAnimationsWithSameTimelineId = selectedLasershow.lasershowAnimations?.filter(
+        (la) => la?.timelineId === i
+      );
+      if (lasershowAnimationsWithSameTimelineId.length === 0) {
+        return { timelineId: i, timeMs: 0 };
+      }
+    }
+
+    let lastLasershowAnimationOnTimelines: LasershowAnimation[] = [];
+    for (let i = 0; i < 3; i++) {
+      const lastLasershowAnimationOnTimeline = selectedLasershow.lasershowAnimations
+        .filter((la) => la.timelineId === i)
+        ?.at(-1);
+      if (lastLasershowAnimationOnTimeline !== undefined) {
+        lastLasershowAnimationOnTimelines.push(lastLasershowAnimationOnTimeline);
+      }
+    }
+
+    lastLasershowAnimationOnTimelines.sort(
+      (a, b) => getAnimationDuration(a.animation) + a.startTimeMs - getAnimationDuration(b.animation) + b.startTimeMs
+    );
+    const firstLasershowAnimation = lastLasershowAnimationOnTimelines.at(-1);
+    if (firstLasershowAnimation === undefined) {
+      return { timelineId: null, timeMs: null };
+    }
+
+    const startTimeMs =
+      (getAnimationDuration(firstLasershowAnimation.animation) === 0
+        ? timelineItemWidthWhenDurationIsZero * 4
+        : getAnimationDuration(firstLasershowAnimation.animation)) + firstLasershowAnimation.startTimeMs;
+
+    return {
+      timelineId: firstLasershowAnimation.timelineId,
+      timeMs: startTimeMs,
+    };
   };
 
   return (
