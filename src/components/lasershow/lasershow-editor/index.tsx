@@ -8,14 +8,11 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import SaveIcon from "@mui/icons-material/Save";
 import ClearIcon from "@mui/icons-material/Clear";
 import { getLasershowDuration, saveLasershow } from "services/logic/lasershow-logic";
-import { LasershowAnimation } from "models/components/shared/lasershow";
 import { getAnimationDuration, getPointsToDrawFromAnimation } from "services/logic/animation-logic";
 import LasershowAnimationProperties from "./lasershow-animation-properties";
 import PointsDrawer from "components/shared/points-drawer";
 import { Point } from "models/components/shared/point";
 import { numberIsBetweenOrEqual } from "services/shared/math";
-import LasershowAnimationTimeline from "./lasershow-animation-timeline";
-import { OnTrue } from "components/shared/on-true";
 import { SharedTimeline } from "components/shared/shared-timeline";
 
 export type LasershowTimeLineContextType = {
