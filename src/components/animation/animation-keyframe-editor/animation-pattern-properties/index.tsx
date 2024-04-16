@@ -13,6 +13,7 @@ import {
   Select,
   MenuItem,
   InputLabel,
+  Alert,
 } from "@mui/material";
 
 import React from "react";
@@ -226,7 +227,7 @@ export default function AnimationPatternProperties() {
   };
 
   const labelStyle = { marginBottom: "-11px", marginTop: "2.5px" };
-  return (
+  return selectedAnimationPattern !== null ? (
     <>
       <InputLabel shrink style={{ marginBottom: labelStyle.marginBottom }} size="small" htmlFor="animation-name">
         Name
@@ -346,5 +347,7 @@ export default function AnimationPatternProperties() {
         </Accordion>
       </div>
     </>
+  ) : (
+    <Alert severity="info">Select an animation pattern by clicking it in the timeline</Alert>
   );
 }

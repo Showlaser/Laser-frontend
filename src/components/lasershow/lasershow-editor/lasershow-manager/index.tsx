@@ -8,6 +8,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  TextField,
 } from "@mui/material";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
 import { OnTrue } from "components/shared/on-true";
@@ -16,7 +17,7 @@ import { AvailableAnimationsContext, AvailableAnimationsContextType } from "page
 import { SelectedLasershowContext, SelectedLasershowContextType } from "pages/lasershow-editor";
 import React, { useEffect } from "react";
 import { getAnimationDuration } from "services/logic/animation-logic";
-import { timelineItemWidthWhenDurationIsZero } from "services/shared/config";
+import { canvasPxSize, timelineItemWidthWhenDurationIsZero } from "services/shared/config";
 import { convertAnimationToLasershowAnimation } from "services/shared/converters";
 
 export default function LasershowManager() {
@@ -138,75 +139,88 @@ export default function LasershowManager() {
   return (
     <>
       <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
-      <FormControl fullWidth>
-        <FormLabel>Add animations to lasershow</FormLabel>
-        <List style={{ maxHeight: "200px", overflowY: "auto" }}>
-          {availableAnimations?.map((aa) => (
-            <ListItem key={`lsm-aa-${aa.uuid}`} disablePadding>
-              <ListItemButton
-                role={undefined}
-                onClick={() => handleToggle(aa.uuid, checkedUuidsToAdd, setCheckedUuidsToAdd)}
-              >
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    checked={checkedUuidsToAdd.some((u) => u === aa.uuid)}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{ "aria-labelledby": `lsm-aa-ip-${aa.uuid}` }}
-                  />
-                </ListItemIcon>
-                <ListItemText id={`lsm-aa-ip-${aa.uuid}`} primary={aa.name} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-        <OnTrue onTrue={checkedUuidsToAdd.length > 0}>
-          <Button variant="contained" style={{ marginTop: "10px" }} onClick={addAnimationToLasershow}>
-            Add
-          </Button>
-        </OnTrue>
-      </FormControl>
-      <FormControl fullWidth style={{ marginTop: "20px" }}>
-        <FormLabel>Remove lasershow animations</FormLabel>
-        <List style={{ maxHeight: "200px", overflowY: "auto" }}>
-          {selectedLasershow?.lasershowAnimations.map((la) => (
-            <ListItem key={`la-tr-${la.uuid}`} disablePadding>
-              <ListItemButton
-                role={undefined}
-                onClick={() => handleToggle(la.uuid, checkedUuidsToRemove, setCheckedUuidsToRemove)}
-                dense
-              >
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    checked={checkedUuidsToRemove.some((u) => u === la.uuid)}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{ "aria-labelledby": `la-tr-ip-${la.uuid}` }}
-                  />
-                </ListItemIcon>
-                <ListItemText id={`la-tr-ip-${la.uuid}`} primary={la.name} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-        <OnTrue onTrue={checkedUuidsToRemove.length > 0}>
-          <Button
-            variant="contained"
-            color="error"
-            style={{ marginTop: "10px" }}
-            onClick={() => {
-              let updateModalOptions = { ...modalOptions };
-              updateModalOptions.show = true;
-              updateModalOptions.onDelete = deleteSelectedLasershowAnimations;
-              setModalOptions(updateModalOptions);
+      <div style={{ maxHeight: canvasPxSize - 98, overflowY: "auto" }}>
+        <FormControl fullWidth>
+          <FormLabel htmlFor="lasershow-name">Lasershow name</FormLabel>
+          <TextField
+            style={{ marginBottom: "5px" }}
+            id="lasershow-name"
+            value={selectedLasershow?.name}
+            onChange={(e) => {
+              let lasershowToUpdate = { ...selectedLasershow } as Lasershow;
+              lasershowToUpdate.name = e.target.value;
+              setSelectedLasershow(lasershowToUpdate);
             }}
-          >
-            Delete
-          </Button>
-        </OnTrue>
-      </FormControl>
+          />
+          <FormLabel>Add animations to lasershow</FormLabel>
+          <List style={{ maxHeight: "200px", overflowY: "auto" }}>
+            {availableAnimations?.map((aa) => (
+              <ListItem key={`lsm-aa-${aa.uuid}`} disablePadding>
+                <ListItemButton
+                  role={undefined}
+                  onClick={() => handleToggle(aa.uuid, checkedUuidsToAdd, setCheckedUuidsToAdd)}
+                >
+                  <ListItemIcon>
+                    <Checkbox
+                      edge="start"
+                      checked={checkedUuidsToAdd.some((u) => u === aa.uuid)}
+                      tabIndex={-1}
+                      disableRipple
+                      inputProps={{ "aria-labelledby": `lsm-aa-ip-${aa.uuid}` }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText id={`lsm-aa-ip-${aa.uuid}`} primary={aa.name} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          <OnTrue onTrue={checkedUuidsToAdd.length > 0}>
+            <Button variant="contained" style={{ marginTop: "10px" }} onClick={addAnimationToLasershow}>
+              Add
+            </Button>
+          </OnTrue>
+        </FormControl>
+        <FormControl fullWidth style={{ marginTop: "20px" }}>
+          <FormLabel>Remove lasershow animations</FormLabel>
+          <List style={{ maxHeight: "200px", overflowY: "auto" }}>
+            {selectedLasershow?.lasershowAnimations.map((la) => (
+              <ListItem key={`la-tr-${la.uuid}`} disablePadding>
+                <ListItemButton
+                  role={undefined}
+                  onClick={() => handleToggle(la.uuid, checkedUuidsToRemove, setCheckedUuidsToRemove)}
+                  dense
+                >
+                  <ListItemIcon>
+                    <Checkbox
+                      edge="start"
+                      checked={checkedUuidsToRemove.some((u) => u === la.uuid)}
+                      tabIndex={-1}
+                      disableRipple
+                      inputProps={{ "aria-labelledby": `la-tr-ip-${la.uuid}` }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText id={`la-tr-ip-${la.uuid}`} primary={la.name} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          <OnTrue onTrue={checkedUuidsToRemove.length > 0}>
+            <Button
+              variant="contained"
+              color="error"
+              style={{ marginTop: "10px" }}
+              onClick={() => {
+                let updateModalOptions = { ...modalOptions };
+                updateModalOptions.show = true;
+                updateModalOptions.onDelete = deleteSelectedLasershowAnimations;
+                setModalOptions(updateModalOptions);
+              }}
+            >
+              Delete
+            </Button>
+          </OnTrue>
+        </FormControl>
+      </div>
     </>
   );
 }

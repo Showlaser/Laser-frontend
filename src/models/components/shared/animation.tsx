@@ -14,11 +14,11 @@ export const getAnimationPatternDuration = (animationPattern: AnimationPattern) 
 };
 
 export type AnimationPattern = {
-  uuid: string | undefined;
-  animationUuid: string | undefined;
-  patternUuid: string | undefined;
-  name: string | undefined;
-  pattern: Pattern | undefined;
+  uuid: string;
+  animationUuid: string;
+  patternUuid: string;
+  name: string;
+  pattern: Pattern;
   animationPatternKeyFrames: AnimationPatternKeyFrame[];
   startTimeMs: number;
   timelineId: number;

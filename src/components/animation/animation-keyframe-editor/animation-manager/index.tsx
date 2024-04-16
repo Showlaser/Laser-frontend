@@ -15,17 +15,16 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  TextField,
 } from "@mui/material";
 import { convertPatternToAnimationPattern } from "services/shared/converters";
 import { Animation, AnimationPattern, getAnimationPatternDuration } from "models/components/shared/animation";
-import { timelineItemWidthWhenDurationIsZero } from "services/shared/config";
+import { canvasPxSize, timelineItemWidthWhenDurationIsZero } from "services/shared/config";
 import { OnTrue } from "components/shared/on-true";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
 
 export default function AnimationManager() {
-  const { availablePatterns, setAvailablePatterns } = React.useContext(
-    AvailablePatternsContext
-  ) as AvailablePatternsContextType;
+  const { availablePatterns } = React.useContext(AvailablePatternsContext) as AvailablePatternsContextType;
 
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
     SelectedAnimationContext
@@ -134,76 +133,89 @@ export default function AnimationManager() {
   return (
     <div>
       <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
-      <FormControl fullWidth>
-        <FormLabel>Add patterns to animation</FormLabel>
-        <List style={{ maxHeight: "200px", overflowY: "auto" }}>
-          {availablePatterns?.map((ap) => (
-            <ListItem key={`ap-am-${ap.uuid}`} disablePadding>
-              <ListItemButton
-                role={undefined}
-                onClick={() => handleToggle(ap.uuid, checkedUuidsToAdd, setCheckedUuidsToAdd)}
-                dense
-              >
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    checked={checkedUuidsToAdd.some((u) => u === ap.uuid)}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{ "aria-labelledby": `ap-am-ip-${ap.uuid}` }}
-                  />
-                </ListItemIcon>
-                <ListItemText id={`ap-am-ip-${ap.uuid}`} primary={ap.name} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-        <OnTrue onTrue={checkedUuidsToAdd.length > 0}>
-          <Button variant="contained" style={{ marginTop: "10px" }} onClick={addAnimationPatternsToAnimation}>
-            Add
-          </Button>
-        </OnTrue>
-      </FormControl>
-      <FormControl fullWidth style={{ marginTop: "20px" }}>
-        <FormLabel>Remove animation patterns</FormLabel>
-        <List style={{ maxHeight: "200px", overflowY: "auto" }}>
-          {selectedAnimation?.animationPatterns.map((ap) => (
-            <ListItem key={`ap-am-${ap.uuid}`} disablePadding>
-              <ListItemButton
-                role={undefined}
-                onClick={() => handleToggle(ap.uuid, checkedUuidsToRemove, setCheckedUuidsToRemove)}
-                dense
-              >
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    checked={checkedUuidsToRemove.some((u) => u === ap.uuid)}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{ "aria-labelledby": `ap-am-ip-${ap.uuid}` }}
-                  />
-                </ListItemIcon>
-                <ListItemText id={`ap-am-ip-${ap.uuid}`} primary={ap.name} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-        <OnTrue onTrue={checkedUuidsToRemove.length > 0}>
-          <Button
-            variant="contained"
-            color="error"
-            style={{ marginTop: "10px" }}
-            onClick={() => {
-              let updateModalOptions = { ...modalOptions };
-              updateModalOptions.show = true;
-              updateModalOptions.onDelete = deleteSelectedAnimationPatterns;
-              setModalOptions(updateModalOptions);
+      <div style={{ maxHeight: canvasPxSize - 98, overflowY: "auto" }}>
+        <FormControl fullWidth>
+          <FormLabel htmlFor="animation-name">Animation name</FormLabel>
+          <TextField
+            style={{ marginBottom: "5px" }}
+            id="animation-name"
+            value={selectedAnimation?.name}
+            onChange={(e) => {
+              let animationToUpdate = { ...selectedAnimation } as Animation;
+              animationToUpdate.name = e.target.value;
+              setSelectedAnimation(animationToUpdate);
             }}
-          >
-            Delete
-          </Button>
-        </OnTrue>
-      </FormControl>
+          />
+          <FormLabel>Add patterns to animation</FormLabel>
+          <List>
+            {availablePatterns?.map((ap) => (
+              <ListItem key={`ap-am-${ap.uuid}`} disablePadding>
+                <ListItemButton
+                  role={undefined}
+                  onClick={() => handleToggle(ap.uuid, checkedUuidsToAdd, setCheckedUuidsToAdd)}
+                  dense
+                >
+                  <ListItemIcon>
+                    <Checkbox
+                      edge="start"
+                      checked={checkedUuidsToAdd.some((u) => u === ap.uuid)}
+                      tabIndex={-1}
+                      disableRipple
+                      inputProps={{ "aria-labelledby": `ap-am-ip-${ap.uuid}` }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText id={`ap-am-ip-${ap.uuid}`} primary={ap.name} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          <OnTrue onTrue={checkedUuidsToAdd.length > 0}>
+            <Button variant="contained" style={{ marginTop: "10px" }} onClick={addAnimationPatternsToAnimation}>
+              Add
+            </Button>
+          </OnTrue>
+        </FormControl>
+        <FormControl fullWidth style={{ marginTop: "20px" }}>
+          <FormLabel>Remove animation patterns</FormLabel>
+          <List>
+            {selectedAnimation?.animationPatterns.map((ap) => (
+              <ListItem key={`ap-am-${ap.uuid}`} disablePadding>
+                <ListItemButton
+                  role={undefined}
+                  onClick={() => handleToggle(ap.uuid, checkedUuidsToRemove, setCheckedUuidsToRemove)}
+                  dense
+                >
+                  <ListItemIcon>
+                    <Checkbox
+                      edge="start"
+                      checked={checkedUuidsToRemove.some((u) => u === ap.uuid)}
+                      tabIndex={-1}
+                      disableRipple
+                      inputProps={{ "aria-labelledby": `ap-am-ip-${ap.uuid}` }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText id={`ap-am-ip-${ap.uuid}`} primary={ap.name} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          <OnTrue onTrue={checkedUuidsToRemove.length > 0}>
+            <Button
+              variant="contained"
+              color="error"
+              style={{ marginTop: "10px" }}
+              onClick={() => {
+                let updateModalOptions = { ...modalOptions };
+                updateModalOptions.show = true;
+                updateModalOptions.onDelete = deleteSelectedAnimationPatterns;
+                setModalOptions(updateModalOptions);
+              }}
+            >
+              Delete
+            </Button>
+          </OnTrue>
+        </FormControl>
+      </div>
     </div>
   );
 }

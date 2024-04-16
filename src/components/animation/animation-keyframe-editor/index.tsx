@@ -3,9 +3,6 @@ import PointsDrawer from "components/shared/points-drawer";
 import React, { useEffect, useState } from "react";
 import AnimationPatternProperties from "./animation-pattern-properties";
 import AnimationPatternKeyFrames from "./animation-keyframes";
-import { Point } from "models/components/shared/point";
-import { numberIsBetweenOrEqual } from "services/shared/math";
-import AnimationPatternTimeline from "./animation-pattern-timeline";
 import {
   SelectedAnimationContext,
   SelectedAnimationContextType,
@@ -14,15 +11,13 @@ import {
 } from "pages/animation-editor";
 import TabSelector from "components/tabs";
 import AnimationManager from "./animation-manager";
-import { canvasPxSize, selectableSteps } from "services/shared/config";
-import {
-  getPatternPointsByTimelinePosition,
-  getPreviousCurrentAndNextKeyFramePerProperty,
-} from "services/logic/pattern-logic";
+import { selectableSteps } from "services/shared/config";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SaveIcon from "@mui/icons-material/Save";
 import ClearIcon from "@mui/icons-material/Clear";
 import { getAnimationDuration, getPointsToDrawFromAnimation, saveAnimation } from "services/logic/animation-logic";
+import { SharedTimeline } from "components/shared/shared-timeline";
+import { getAnimationPatternDuration } from "models/components/shared/animation";
 
 export type AnimationTimeLineContextType = {
   timelinePositionMs: number;
@@ -127,16 +122,19 @@ export default function AnimationKeyFrameEditor() {
     }
   };
 
+  const onTimelineItemClick = (uuid: string) => {
+    const selectedAnimationPattern = selectedAnimation?.animationPatterns.find((ap) => ap.uuid === uuid);
+    if (selectedAnimationPattern !== undefined) {
+      setSelectedAnimationPattern(selectedAnimationPattern);
+    }
+  };
+
   return (
     <>
       <Grid container direction="row" spacing={1} key={selectedKeyFrameUuid}>
         {getWrapperContext(
           <Grid item xs={4}>
-            <Paper
-              style={{
-                maxHeight: canvasPxSize,
-              }}
-            >
+            <Paper>
               <TabSelector
                 data={[
                   {
@@ -163,7 +161,28 @@ export default function AnimationKeyFrameEditor() {
         </Grid>
       </Grid>
       <Grid item xs={12}>
-        {getWrapperContext(<AnimationPatternTimeline />)}
+        {selectedAnimation !== null
+          ? getWrapperContext(
+              <SharedTimeline
+                selectedItemUuid={selectedAnimationPattern?.uuid ?? ""}
+                onTimelineItemClick={onTimelineItemClick}
+                play={playAnimation}
+                setPlay={setPlayAnimation}
+                timelinePositionMs={timelinePositionMs}
+                setTimelinePositionMs={setTimelinePositionMs}
+                totalDuration={getAnimationDuration(selectedAnimation)}
+                selectableStepsIndex={selectableStepsIndex}
+                setSelectableStepsIndex={setSelectableStepsIndex}
+                timelineItems={selectedAnimation.animationPatterns.map((ap) => ({
+                  uuid: ap.uuid,
+                  name: ap.name,
+                  startTime: ap.startTimeMs,
+                  duration: getAnimationPatternDuration(ap),
+                  timelineId: ap.timelineId,
+                }))}
+              />
+            )
+          : null}
       </Grid>
       <Grid>
         <SpeedDial

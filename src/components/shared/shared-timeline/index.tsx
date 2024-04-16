@@ -1,59 +1,54 @@
-import { drawLine, drawRoundedRectangleWithText, writeText } from "components/shared/canvas-helper";
-import {
-  SelectedAnimationContext,
-  SelectedAnimationContextType,
-  SelectedAnimationPatternContext,
-  SelectedAnimationPatternContextType,
-} from "pages/animation-editor";
 import React, { useEffect, useState } from "react";
-import { mapNumber, normalize, numberIsBetweenOrEqual } from "services/shared/math";
 import {
-  AnimationPlayAnimationContext,
-  AnimationPlayAnimationContextType,
-  AnimationSelectableStepsIndexContext,
-  AnimationSelectableStepsIndexContextType,
-  AnimationStepsToDrawMaxRangeContext,
-  AnimationTimeLineContextType,
-  AnimationTimeLinePositionContext,
-} from "..";
-import {
-  timelineItemWidthWhenDurationIsZero,
   numberOfTimeLines,
   selectableSteps,
+  timelineItemWidthWhenDurationIsZero,
   timelineNumbersHeight,
 } from "services/shared/config";
-import { LinearProgress, Grid, InputLabel, Input, Select, MenuItem, Tooltip, IconButton, Paper } from "@mui/material";
+import { drawLine, drawRoundedRectangleWithText, writeText } from "../canvas-helper";
+import { Paper, Grid, InputLabel, Input, Select, MenuItem, Tooltip, IconButton, LinearProgress } from "@mui/material";
+import { mapNumber, normalize, numberIsBetweenOrEqual } from "services/shared/math";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { getAnimationPatternsToDrawInTimeline } from "services/logic/pattern-logic";
-import { getAnimationDuration } from "services/logic/animation-logic";
-import { getAnimationPatternDuration } from "models/components/shared/animation";
 
-export default function AnimationPatternTimeline() {
-  const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
-    AnimationTimeLinePositionContext
-  ) as AnimationTimeLineContextType;
+export type SharedTimelineItem = {
+  uuid: string;
+  name: string;
+  startTime: number;
+  duration: number;
+  timelineId: number;
+};
 
-  const { selectableStepsIndex, setSelectableStepsIndex } = React.useContext(
-    AnimationSelectableStepsIndexContext
-  ) as AnimationSelectableStepsIndexContextType;
+export type SharedTimelineProps = {
+  selectedItemUuid: string;
+  onTimelineItemClick: (clickedUuid: string) => void;
+  play: boolean;
+  setPlay: (play: boolean) => void;
+  timelinePositionMs: number;
+  setTimelinePositionMs: (ms: number) => void;
+  totalDuration: number;
+  selectableStepsIndex: number;
+  setSelectableStepsIndex: (steps: number) => void;
+  timelineItems: SharedTimelineItem[];
+};
 
-  const { selectedAnimation } = React.useContext(SelectedAnimationContext) as SelectedAnimationContextType;
-
-  const { selectedAnimationPattern, setSelectedAnimationPattern } = React.useContext(
-    SelectedAnimationPatternContext
-  ) as SelectedAnimationPatternContextType;
-
-  const { playAnimation, setPlayAnimation } = React.useContext(
-    AnimationPlayAnimationContext
-  ) as AnimationPlayAnimationContextType;
-  const stepsToDrawMaxRange = React.useContext(AnimationStepsToDrawMaxRangeContext);
-
-  const animationDuration = getAnimationDuration(selectedAnimation);
+export function SharedTimeline({
+  selectedItemUuid,
+  onTimelineItemClick,
+  play,
+  setPlay,
+  timelinePositionMs,
+  setTimelinePositionMs,
+  totalDuration,
+  selectableStepsIndex,
+  setSelectableStepsIndex,
+  timelineItems,
+}: SharedTimelineProps) {
   const canvasHeight = window.innerHeight / 6;
   const canvasWidth = window.innerWidth - 60;
   const timelineItemHeightOnCanvas = (canvasHeight - 40) / numberOfTimeLines;
+  const stepsToDrawMaxRange = (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
 
   const getTimelineData = () => {
     let generatedTimeline = [];
@@ -73,26 +68,19 @@ export default function AnimationPatternTimeline() {
   const timelines = getTimelineData();
 
   useEffect(() => {
-    const canvas = document.getElementById("animation-pattern-timeline-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     canvas.style.width = `${canvasWidth}px`;
     canvas.style.height = `${canvasHeight}px`;
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     draw(ctx);
-  }, [
-    screenWidthPx,
-    screenHeightPx,
-    timelinePositionMs,
-    selectedAnimation,
-    selectableStepsIndex,
-    selectedAnimationPattern,
-  ]);
+  }, [screenWidthPx, screenHeightPx, timelinePositionMs, selectedItemUuid, selectableStepsIndex, timelineItems]);
 
   const draw = (ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, canvasWidth, ctx.canvas.height);
     drawTimeLines(ctx);
-    drawAnimationPatternsOnTimelines();
+    drawTimelineItems();
   };
 
   const handleResize = () => {
@@ -120,14 +108,14 @@ export default function AnimationPatternTimeline() {
     }
   };
 
-  const onAnimationPatternClick = (x: number, y: number) => {
-    const clickedAnimationPattern = getAnimationPatternFromMouseClick(x, y);
-    if (clickedAnimationPattern !== undefined) {
-      setSelectedAnimationPattern(clickedAnimationPattern);
+  const onItemClick = (x: number, y: number) => {
+    const clickedTimelineItem = getTimelineItemFromMouseClick(x, y);
+    if (clickedTimelineItem !== undefined) {
+      onTimelineItemClick(clickedTimelineItem.uuid);
     }
   };
 
-  const getAnimationPatternFromMouseClick = (x: number, y: number) => {
+  const getTimelineItemFromMouseClick = (x: number, y: number): SharedTimelineItem | undefined => {
     const numberOfTimeLines = timelines.length;
     const timelineIdPressed = getTimelineIdPressed(numberOfTimeLines, canvasHeight, y, timelineItemHeightOnCanvas);
     if (timelineIdPressed === undefined) {
@@ -135,64 +123,77 @@ export default function AnimationPatternTimeline() {
     }
 
     const xMappedToTimelinePosition = mapNumber(x, 0, canvasWidth, timelinePositionMs, stepsToDrawMaxRange);
-    return selectedAnimation?.animationPatterns.find((ap) => {
+    return timelineItems.find((ti) => {
       return (
         numberIsBetweenOrEqual(
           xMappedToTimelinePosition,
-          ap.startTimeMs,
-          getAnimationPatternDuration(ap) === 0
-            ? ap.startTimeMs + timelineItemWidthWhenDurationIsZero
-            : getAnimationPatternDuration(ap)
-        ) && ap.timelineId === timelineIdPressed
+          ti.startTime,
+          ti.duration === 0 ? ti.startTime + timelineItemWidthWhenDurationIsZero : ti.duration
+        ) && ti.timelineId === timelineIdPressed
       );
     });
   };
 
   const onCanvasClick = (e: any) => {
-    const canvas = document.getElementById("animation-pattern-timeline-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
-    onAnimationPatternClick(x, y);
+    onItemClick(x, y);
   };
 
-  const drawAnimationPatternsOnTimelines = () => {
-    const canvas = document.getElementById("animation-pattern-timeline-canvas") as HTMLCanvasElement;
+  const getItemsToDrawInTimeline = (): SharedTimelineItem[] => {
+    return timelineItems.filter((ti) => {
+      const itemStartsBeforeTimeline = ti.startTime < timelinePositionMs;
+      const itemEndsAfterStepsToDraw = ti.startTime + ti.duration > stepsToDrawMaxRange;
+      const itemStartsInTimelineRange = numberIsBetweenOrEqual(ti.startTime, timelinePositionMs, stepsToDrawMaxRange);
+
+      const patternEndsInTimelineRange = numberIsBetweenOrEqual(
+        ti.startTime + ti.duration,
+        timelinePositionMs,
+        stepsToDrawMaxRange
+      );
+
+      return (
+        (itemStartsBeforeTimeline && itemEndsAfterStepsToDraw) ||
+        (itemStartsInTimelineRange && itemEndsAfterStepsToDraw) ||
+        (itemStartsInTimelineRange && patternEndsInTimelineRange) ||
+        (itemStartsBeforeTimeline && patternEndsInTimelineRange)
+      );
+    });
+  };
+
+  const drawTimelineItems = () => {
+    const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    const animationPatternsInRange = getAnimationPatternsToDrawInTimeline(
-      selectedAnimation,
-      timelinePositionMs,
-      stepsToDrawMaxRange
-    );
-    if (animationPatternsInRange === undefined) {
+    const timelineItemsInRange = getItemsToDrawInTimeline();
+    if (timelineItemsInRange === undefined || timelineItemsInRange.length === 0) {
       return;
     }
 
-    const animationPatternsInRangeCount = animationPatternsInRange?.length ?? 0;
+    const timelineItemsInRangeCount = timelineItemsInRange?.length ?? 0;
     const numberOfTimeLines = timelines.length;
-    for (let i = 0; i < animationPatternsInRangeCount; i++) {
-      const animationPattern = animationPatternsInRange[i];
-      const y = ((canvasHeight - timelineNumbersHeight) / numberOfTimeLines) * (animationPattern?.timelineId ?? 0);
-      let animationPatternDuration = getAnimationPatternDuration(animationPattern) ?? 0;
+    for (let i = 0; i < timelineItemsInRangeCount; i++) {
+      const timelineItem = timelineItemsInRange[i];
+      const y = ((canvasHeight - timelineNumbersHeight) / numberOfTimeLines) * (timelineItem?.timelineId ?? 0);
 
-      if (animationPatternDuration === 0) {
+      if (timelineItem.duration === 0) {
         //to prevent the pattern from being to small to click on
-        animationPatternDuration = timelineItemWidthWhenDurationIsZero;
+        timelineItem.duration = timelineItemWidthWhenDurationIsZero;
       }
 
-      const widthToDisplay = (canvasWidth / 10) * (animationPatternDuration / selectableSteps[selectableStepsIndex]);
+      const widthToDisplay = (canvasWidth / 10) * (timelineItem.duration / selectableSteps[selectableStepsIndex]);
       const xPosition =
-        (canvasWidth / 10) *
-        ((animationPattern.startTimeMs - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
+        (canvasWidth / 10) * ((timelineItem.startTime - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
 
-      let rectangleColor = selectedAnimationPattern?.uuid === animationPattern.uuid ? "#6370c2" : "#485cdb";
+      let rectangleColor = selectedItemUuid === timelineItem.uuid ? "#6370c2" : "#485cdb";
       drawRoundedRectangleWithText(
         xPosition,
         y + 5,
         widthToDisplay,
         timelineItemHeightOnCanvas,
-        `${animationPattern?.name}`,
+        `${timelineItem?.name}`,
         "white",
         rectangleColor,
         ctx
@@ -228,7 +229,6 @@ export default function AnimationPatternTimeline() {
         <Grid item>
           <InputLabel id="timeline-position-ms">Timeline position ms</InputLabel>
           <Input
-            disabled={selectedAnimation === null}
             id="timeline-position-ms"
             value={timelinePositionMs}
             onKeyDown={(e) => e.preventDefault()}
@@ -244,7 +244,6 @@ export default function AnimationPatternTimeline() {
         <Grid item ml={1.5}>
           <InputLabel id="steps-select">Steps</InputLabel>
           <Select
-            disabled={selectedAnimation === null}
             labelId="steps-select"
             value={selectableStepsIndex}
             onChange={(e) => setSelectableStepsIndex(Number(e.target.value))}
@@ -258,17 +257,17 @@ export default function AnimationPatternTimeline() {
           <span style={{ marginLeft: "5px" }}>
             <Tooltip title="Reset timeline position to 0">
               <span>
-                <IconButton disabled={selectedAnimation === null} onClick={() => setTimelinePositionMs(0)}>
+                <IconButton onClick={() => setTimelinePositionMs(0)}>
                   <RestartAltIcon />
                 </IconButton>
               </span>
             </Tooltip>
           </span>
           <span>
-            {playAnimation ? (
+            {play ? (
               <Tooltip title="Pause animation">
                 <span>
-                  <IconButton onClick={() => setPlayAnimation(false)} disabled={selectedAnimation === null}>
+                  <IconButton onClick={() => setPlay(false)}>
                     <PauseIcon />
                   </IconButton>
                 </span>
@@ -276,7 +275,7 @@ export default function AnimationPatternTimeline() {
             ) : (
               <Tooltip title="Start animation">
                 <span>
-                  <IconButton onClick={() => setPlayAnimation(true)} disabled={selectedAnimation === null}>
+                  <IconButton onClick={() => setPlay(true)}>
                     <PlayArrowIcon />
                   </IconButton>
                 </span>
@@ -285,13 +284,13 @@ export default function AnimationPatternTimeline() {
           </span>
         </Grid>
       </Grid>
-      <canvas onClick={onCanvasClick} id="animation-pattern-timeline-canvas" />
+      <canvas onClick={onCanvasClick} id="timeline-canvas" />
       <LinearProgress
         sx={{
           transition: "none",
         }}
         variant="determinate"
-        value={timelinePositionMs > animationDuration ? 100 : normalize(timelinePositionMs, 0, animationDuration)}
+        value={timelinePositionMs > totalDuration ? 100 : normalize(timelinePositionMs, 0, totalDuration)}
       />
     </Paper>
   );

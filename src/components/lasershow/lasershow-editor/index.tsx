@@ -16,6 +16,7 @@ import { Point } from "models/components/shared/point";
 import { numberIsBetweenOrEqual } from "services/shared/math";
 import LasershowAnimationTimeline from "./lasershow-animation-timeline";
 import { OnTrue } from "components/shared/on-true";
+import { SharedTimeline } from "components/shared/shared-timeline";
 
 export type LasershowTimeLineContextType = {
   timelinePositionMs: number;
@@ -132,6 +133,10 @@ export default function LasershowEditorContent() {
     return lasershowPoints;
   };
 
+  const onTimelineItemClick = (uuid: string) => {
+    setSelectedLasershowAnimationUuid(uuid);
+  };
+
   return (
     <>
       <Grid container direction="row" spacing={1}>
@@ -164,11 +169,30 @@ export default function LasershowEditorContent() {
           <PointsDrawer pointsToDraw={getPointsToDraw()} />
         </Grid>
       </Grid>
-      <OnTrue onTrue={selectedLasershow !== null}>
-        <Grid item xs={12}>
-          {getWrapperContext(<LasershowAnimationTimeline />)}
-        </Grid>
-      </OnTrue>
+      <Grid item xs={12}>
+        {selectedLasershow !== null
+          ? getWrapperContext(
+              <SharedTimeline
+                selectedItemUuid={selectedLasershowAnimationUuid ?? ""}
+                onTimelineItemClick={onTimelineItemClick}
+                play={playLasershow}
+                setPlay={setPlayLasershow}
+                timelinePositionMs={timelinePositionMs}
+                setTimelinePositionMs={setTimelinePositionMs}
+                totalDuration={getLasershowDuration(selectedLasershow)}
+                selectableStepsIndex={selectableStepsIndex}
+                setSelectableStepsIndex={setSelectableStepsIndex}
+                timelineItems={selectedLasershow.lasershowAnimations.map((la) => ({
+                  uuid: la.uuid,
+                  name: la.name,
+                  startTime: la.startTimeMs,
+                  duration: getAnimationDuration(la.animation),
+                  timelineId: la.timelineId,
+                }))}
+              />
+            )
+          : null}
+      </Grid>
       <Grid>
         <SpeedDial
           ariaLabel="SpeedDial basic example"
