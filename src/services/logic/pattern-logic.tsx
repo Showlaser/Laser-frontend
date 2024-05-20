@@ -22,7 +22,11 @@ export type PreviousCurrentAndNextKeyFramePerProperty = {
 
 export const getPatterns = async (): Promise<Pattern[]> => {
   const result = await sendRequest(() => Get(apiEndpoints.pattern), [200]);
-  return result?.json();
+  if (result?.status === 200) {
+    return result?.json();
+  }
+
+  return [];
 };
 
 export const savePattern = (pattern: Pattern) => {

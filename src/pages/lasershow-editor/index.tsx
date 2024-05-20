@@ -45,8 +45,10 @@ export default function LasershowEditor() {
 
   useEffect(() => {
     if (availableAnimations === null) {
-      getAnimations().then((response) => {
-        setAvailableAnimations(response);
+      getAnimations().then((animations) => {
+        if (animations !== undefined) {
+          setAvailableAnimations(animations);
+        }
       });
     }
   }, []);

@@ -2,7 +2,6 @@ const path = require("path");
 const { app, BrowserWindow } = require("electron");
 const { spawn } = require("node:child_process");
 const isDev = require("electron-is-dev");
-const axios = require("axios");
 const bat = spawn("cmd.exe", [
   "/c",
   "D:/Deze Pc/Documenten/Projecten/Laser projector/Pc software/LaserAPI/LaserAPI/bin/Release/net6.0-windows10.0.22621.0/LaserApi.exe",
@@ -48,8 +47,6 @@ app.whenReady().then(createWindow);
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    console.log("Closing API");
-    axios.get("http://localhost:5004/system/close");
     app.quit();
   }
 });

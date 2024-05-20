@@ -8,13 +8,16 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import CardOverview from "components/shared/card-overview";
 import { Animation, AnimationPattern } from "models/components/shared/animation";
-import { getPatterns, removePattern } from "services/logic/pattern-logic";
-import { getAnimations, removeAnimation } from "services/logic/animation-logic";
+import { getPatterns } from "services/logic/pattern-logic";
+import { getAnimations } from "services/logic/animation-logic";
 import { convertPatternToAnimation } from "services/shared/converters";
 import AnimationKeyFrameEditor from "components/animation/animation-keyframe-editor";
 import { Pattern } from "models/components/shared/pattern";
-import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
 import { OnTrue } from "components/shared/on-true";
+import PatternDeleteModal, { PatternDeleteModalProps } from "components/shared/pattern-delete-modal";
+import AnimationDeleteModal from "components/shared/animation-delete-modal";
+import { Lasershow } from "models/components/shared/lasershow";
+import { getLasershows } from "services/logic/lasershow-logic";
 
 export type SelectedAnimationContextType = {
   selectedAnimation: Animation | null;
@@ -44,15 +47,14 @@ export const SelectedAnimationPatternIndexContext = React.createContext<number>(
 
 export default function AnimationPage() {
   const [selectedAnimation, setSelectedAnimation] = useState<Animation | null>(null);
+  const [availableLasershows, setAvailableLasershows] = useState<Lasershow[] | null>(null);
   const [availableAnimations, setAvailableAnimations] = useState<Animation[] | null>(null);
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
   const [convertPatternModalOpen, setConvertPatternModalOpen] = useState<boolean>(false);
   const [animationsModalOpen, setAnimationsModalOpen] = useState<boolean>(false);
   const [selectedAnimationPattern, setSelectedAnimationPattern] = useState<AnimationPattern | null>(null);
-  const [modalOptions, setModalOptions] = useState<ModalOptions>({
-    show: false,
-    onDelete: () => null,
-  });
+  const [patternToRemove, setPatternToRemove] = useState<Pattern>();
+  const [animationToRemove, setAnimationToRemove] = useState<Animation>();
 
   const selectedAnimationMemo = React.useMemo(() => ({ selectedAnimation, setSelectedAnimation }), [selectedAnimation]);
 
@@ -69,10 +71,23 @@ export default function AnimationPage() {
   );
 
   useEffect(() => {
-    if (availableAnimations === null && availablePatterns === null) {
-      getPatterns().then((patterns) => setAvailablePatterns(patterns ?? []));
-      getAnimations().then((response) => {
-        setAvailableAnimations(response);
+    if (availableAnimations === null && availablePatterns === null && availableLasershows === null) {
+      console.log("Fix this can still be triggered if below if statements are not entered");
+      getPatterns().then((patterns) => {
+        if (patterns !== undefined) {
+          setAvailablePatterns(patterns);
+        }
+      });
+      getAnimations().then((animations) => {
+        if (animations !== undefined) {
+          setAvailableAnimations(animations);
+        }
+      });
+
+      getLasershows().then((lasershows) => {
+        if (lasershows !== undefined) {
+          setAvailableLasershows(lasershows);
+        }
       });
     }
   }, []);
@@ -124,41 +139,47 @@ export default function AnimationPage() {
     </SpeedDial>
   );
 
-  const onPatternDelete = async (uuid: string) => {
-    const result = await removePattern(uuid);
-    if (result?.status === 200 && availablePatterns !== null) {
-      let patterns = [...availablePatterns];
-      const patternIndex = patterns.findIndex((p) => p.uuid === uuid);
-      if (patternIndex === -1) {
-        return;
-      }
-
-      patterns.splice(patternIndex, 1);
-      setAvailablePatterns(patterns);
+  const onAnimationDelete = (uuid: string) => {
+    const animationToRemoveIndex = availableAnimations?.findIndex((aa) => aa.uuid === uuid) ?? -1;
+    if (animationToRemoveIndex !== -1) {
+      let updatedAnimations = [...(availableAnimations ?? [])];
+      updatedAnimations.splice(animationToRemoveIndex, 1);
+      setAvailableAnimations(updatedAnimations);
     }
-
-    setModalOptions({ show: false, onDelete: () => null });
   };
 
-  const onAnimationDelete = async (uuid: string) => {
-    const result = await removeAnimation(uuid);
-    if (result?.status === 200 && availableAnimations !== null) {
-      let animations = [...availableAnimations];
-      const animationIndex = animations.findIndex((a) => a.uuid === uuid);
-      if (animationIndex === -1) {
-        return;
-      }
-
-      animations.splice(animationIndex, 1);
-      setAvailableAnimations(animations);
+  const onPatternDelete = (uuid: string) => {
+    const patternToRemoveIndex = availablePatterns?.findIndex((p) => p.uuid === uuid) ?? -1;
+    if (patternToRemoveIndex !== -1) {
+      let updatedPatterns = [...(availablePatterns ?? [])];
+      updatedPatterns.splice(patternToRemoveIndex, 1);
+      setAvailablePatterns(updatedPatterns);
     }
-
-    setModalOptions({ show: false, onDelete: () => null });
   };
 
   return (
     <SideNav pageName="Animation">
-      <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
+      {patternToRemove !== undefined &&
+      availablePatterns !== null &&
+      availableAnimations !== null &&
+      availableLasershows !== null ? (
+        <PatternDeleteModal
+          availablePatterns={availablePatterns}
+          availableAnimations={availableAnimations}
+          availableLasershows={availableLasershows}
+          pattern={patternToRemove}
+          onCancelClick={setPatternToRemove}
+          onDelete={(uuid: string) => onPatternDelete(uuid)}
+        />
+      ) : null}
+      {animationToRemove !== undefined && availableLasershows !== null ? (
+        <AnimationDeleteModal
+          availableLasershows={availableLasershows}
+          animation={animationToRemove}
+          onCancelClick={setAnimationToRemove}
+          onDelete={(uuid: string) => onAnimationDelete(uuid)}
+        />
+      ) : null}
       {selectedAnimation === null ? getSpeedDial() : getWrapperContext(<AnimationKeyFrameEditor />)}
       <OnTrue onTrue={convertPatternModalOpen}>
         <CardOverview
@@ -166,12 +187,7 @@ export default function AnimationPage() {
           show={convertPatternModalOpen}
           onNoItemsMessageTitle="No patterns saved"
           onNoItemsDescription="Create a new pattern in the pattern editor"
-          onDeleteClick={(uuid) =>
-            setModalOptions({
-              show: true,
-              onDelete: () => onPatternDelete(uuid ?? ""),
-            })
-          }
+          onDeleteClick={(uuid) => setPatternToRemove(availablePatterns?.find((p) => p.uuid === uuid))}
           items={
             availablePatterns?.map((pattern) => ({
               uuid: pattern.uuid,
@@ -196,12 +212,7 @@ export default function AnimationPage() {
           show={animationsModalOpen}
           onNoItemsMessageTitle="No animations saved"
           onNoItemsDescription="Create a new animation first"
-          onDeleteClick={(uuid) =>
-            setModalOptions({
-              show: true,
-              onDelete: () => onAnimationDelete(uuid ?? ""),
-            })
-          }
+          onDeleteClick={(uuid) => setAnimationToRemove(availableAnimations?.find((a) => a.uuid === uuid))}
           items={
             availableAnimations?.map((animation) => ({
               uuid: animation.uuid,

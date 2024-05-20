@@ -4,7 +4,6 @@ import Cookies from "universal-cookie";
 import React, { useEffect, useState } from "react";
 import { Grid, LinearProgress } from "@mui/material";
 import "./index.css";
-import { OnTrue } from "components/shared/on-true";
 
 export default function Logout() {
   const [logoutPending, setLogoutPending] = useState<boolean>(true);
@@ -15,7 +14,7 @@ export default function Logout() {
 
   const onLogoutComplete = () => {
     setLogoutPending(false);
-    setTimeout(() => (window.location.href = paths.Login), 5000);
+    setTimeout(() => (window.location.href = paths.Login), 2500);
   };
 
   const logoutUser = async () => {

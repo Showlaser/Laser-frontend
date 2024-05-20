@@ -12,7 +12,6 @@ import { getVoteData, startVote } from "services/logic/vote-logic";
 import { toCamelCase } from "services/shared/general";
 import { createGuid } from "services/shared/math";
 import Cookies from "universal-cookie";
-import QRCode from "react-qr-code";
 import { voteApiUrl, voteApiWebsocketUrl } from "services/shared/api/api-endpoints";
 import React from "react";
 import { VoteablePlaylist, VoteData } from "models/components/shared/Spotify";
@@ -30,18 +29,18 @@ export default function SpotifyVote() {
   const [voteState, setVoteState] = useState<VoteData | undefined>();
   const [connected, setConnected] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
-  const [qrCodeWidth, setQrCodeWidth] = useState(600);
 
   const handleResize = () => {
     const windowWidth = window.innerWidth;
-    let qrWidth = windowWidth * 0.8;
+    /* let qrWidth = windowWidth * 0.8;
     if (qrWidth > window.innerHeight) {
       qrWidth = window.innerHeight - 100;
     }
 
-    setQrCodeWidth(qrWidth);
+    setQrCodeWidth(qrWidth);*/
   };
 
+  alert("QR package was removed. Add QR code to this page");
   window.addEventListener("resize", handleResize);
 
   useEffect(() => {
@@ -223,10 +222,6 @@ export default function SpotifyVote() {
             margin: "0 15px 0 0",
           }}
         >
-          <QRCode
-            size={qrCodeWidth}
-            value={`${voteApiUrl}?join-code=${joinData?.joinCode}&access-code=${joinData?.accessCode}`}
-          />
           <br />
           <Button startIcon={<CloseIcon />} fullWidth variant="contained" onClick={() => setShowQRCode(false)}>
             Close

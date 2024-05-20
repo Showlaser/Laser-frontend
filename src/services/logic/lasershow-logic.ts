@@ -6,8 +6,14 @@ import { toastSubject } from "services/shared/toast-messages";
 import { getAnimationDuration } from "./animation-logic";
 import { numberIsBetweenOrEqual } from "services/shared/math";
 
-export const getLasershows = async (): Promise<Response | undefined> =>
-  sendRequest(() => Get(apiEndpoints.lasershow), []);
+export const getLasershows = async (): Promise<Lasershow[] | undefined> => {
+  const result = await sendRequest(() => Get(apiEndpoints.lasershow), []);
+  if (result?.status === 200) {
+    return (await result?.json()) as Lasershow[];
+  }
+
+  return undefined;
+};
 
 export const saveLasershow = async (lasershow: Lasershow) =>
   await sendRequest(() => Post(apiEndpoints.lasershow, lasershow), [], toastSubject.changesSaved);

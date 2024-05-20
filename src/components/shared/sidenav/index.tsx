@@ -28,6 +28,7 @@ import AccountPopover from "../account-popover";
 import MovieIcon from "@mui/icons-material/Movie";
 import GridViewIcon from "@mui/icons-material/GridView";
 import { OnTrue } from "../on-true";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
 
 const drawerWidth = 240;
 

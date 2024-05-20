@@ -5,18 +5,23 @@ export type ModalOptions = {
   show: boolean;
   onDelete: () => void;
   title?: string;
+  children?: React.ReactNode;
 };
 
 type Props = {
   setModalOptions: (modalOptions: ModalOptions) => void;
   modalOptions: ModalOptions;
+  onCancelClick?: () => void;
 };
 
-export default function DeleteModal({ setModalOptions, modalOptions }: Props) {
+export default function DeleteModal({ setModalOptions, modalOptions, onCancelClick }: Props) {
   const onModalClose = () => {
     let updatedModalOptions = { ...modalOptions };
     updatedModalOptions.show = false;
     setModalOptions(updatedModalOptions);
+    if (onCancelClick !== undefined) {
+      onCancelClick();
+    }
   };
 
   return (
@@ -34,6 +39,7 @@ export default function DeleteModal({ setModalOptions, modalOptions }: Props) {
             <h3>{modalOptions?.title ?? "Are you sure you want to delete this item?"}</h3>
             <Divider />
             <br />
+            {modalOptions.children}
             <div style={{ float: "right" }}>
               <Button variant="text" onClick={onModalClose}>
                 Cancel

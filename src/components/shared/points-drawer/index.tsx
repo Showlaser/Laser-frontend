@@ -26,11 +26,28 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
       return;
     }
 
-    const dotsToDrawLength = dotsToDraw.length;
-    for (let index = 0; index < dotsToDrawLength; index++) {
-      const point = dotsToDraw[index];
-      const pointIsHighlighted = selectedPointsUuid?.some((sp) => sp === point.uuid) ?? false;
-      drawPoint(ctx, point, pointIsHighlighted, index, dotsToDraw, screenScale);
+    let pointsToSort = [...dotsToDraw];
+    let sortedPoints: Point[][] = [];
+
+    while (pointsToSort.length > 0) {
+      let point = pointsToSort[0];
+      let pointsWithSamePatternUuidSorted = pointsToSort
+        .filter((p) => p.patternUuid === point.patternUuid)
+        .sort((a, b) => a.orderNr - b.orderNr);
+
+      sortedPoints.push(pointsWithSamePatternUuidSorted);
+
+      const itemsToRemoveFromSortedPoints = new Set(pointsWithSamePatternUuidSorted);
+      pointsToSort = pointsToSort.filter((item) => !itemsToRemoveFromSortedPoints.has(item));
+    }
+
+    const sortedPointsLength = sortedPoints.length;
+    for (let index = 0; index < sortedPointsLength; index++) {
+      const points = sortedPoints[index];
+      points.forEach((point) => {
+        const pointIsHighlighted = selectedPointsUuid?.some((sp) => sp === point.uuid) ?? false;
+        drawPoint(ctx, point, pointIsHighlighted, index, points, screenScale);
+      });
     }
   };
 

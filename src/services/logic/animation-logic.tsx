@@ -7,9 +7,13 @@ import { Point } from "models/components/shared/point";
 import { numberIsBetweenOrEqual } from "services/shared/math";
 import { getPreviousCurrentAndNextKeyFramePerProperty, getPatternPointsByTimelinePosition } from "./pattern-logic";
 
-export const getAnimations = async (): Promise<Animation[]> => {
+export const getAnimations = async (): Promise<Animation[] | undefined> => {
   const result = await sendRequest(() => Get(apiEndpoints.animation), []);
-  return (await result?.json()) as Animation[];
+  if (result?.status === 200) {
+    return (await result?.json()) as Animation[];
+  }
+
+  return undefined;
 };
 
 export const saveAnimation = async (animation: Animation) =>

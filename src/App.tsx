@@ -5,6 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import type {} from "@mui/x-tree-view/themeAugmentation";
 
 function App() {
   const theme = React.useMemo(
@@ -37,6 +38,13 @@ function App() {
             defaultProps: {
               enterDelay: 750,
               TransitionProps: { timeout: 250 },
+            },
+          },
+          MuiRichTreeView: {
+            styleOverrides: {
+              root: {
+                backgroundColor: "red",
+              },
             },
           },
         },
