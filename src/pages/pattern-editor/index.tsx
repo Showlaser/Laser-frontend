@@ -8,37 +8,45 @@ import PatternEditor from "components/pattern/svg-to-coordinates-converter";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { getPatternPlaceHolder, Pattern } from "models/components/shared/pattern";
-import { getPatterns, removePattern } from "services/logic/pattern-logic";
+import { getPatterns } from "services/logic/pattern-logic";
 import CardOverview from "components/shared/card-overview";
 import AddIcon from "@mui/icons-material/Add";
 import { OnTrue } from "components/shared/on-true";
-import DeleteModal from "components/shared/delete-modal";
+import { Lasershow } from "models/components/shared/lasershow";
+import PatternDeleteModal from "components/shared/pattern-delete-modal";
+import { Animation } from "models/components/shared/animation";
+import { getAnimations } from "services/logic/animation-logic";
+import { getLasershows } from "services/logic/lasershow-logic";
 
 export default function PatternPage() {
   const [uploadedFile, setUploadedFile] = useState<any>();
+  const [availableLasershows, setAvailableLasershows] = useState<Lasershow[] | null>(null);
+  const [availableAnimations, setAvailableAnimations] = useState<Animation[] | null>(null);
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [convertPatternModalOpen, setConvertPatternModalOpen] = useState<boolean>(false);
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
-  const [modalOptions, setModalOptions] = useState<any>({
-    show: false,
-    onDelete: null,
-  });
+  const [patternToRemove, setPatternToRemove] = useState<Pattern>();
 
   useEffect(() => {
-    if (availablePatterns === undefined) {
-      getPatterns().then((patterns) => setAvailablePatterns(patterns));
-    }
-  }, [availablePatterns]);
+    if (availableAnimations === null && availablePatterns === null && availableLasershows === null) {
+      getPatterns().then((patterns) => {
+        if (patterns !== undefined) {
+          setAvailablePatterns(patterns);
+        }
+      });
+      getAnimations().then((animations) => {
+        if (animations !== undefined) {
+          setAvailableAnimations(animations);
+        }
+      });
 
-  const onOpenModalClick = async () => {
-    const patterns = await getPatterns();
-    if (patterns === undefined) {
-      return;
+      getLasershows().then((lasershows) => {
+        if (lasershows !== undefined) {
+          setAvailableLasershows(lasershows);
+        }
+      });
     }
-
-    setAvailablePatterns(patterns);
-    setModalOpen(true);
-  };
+  }, []);
 
   const getSpeedDial = () => (
     <SpeedDial
@@ -68,7 +76,7 @@ export default function PatternPage() {
       <SpeedDialAction
         key="sd-saved-file"
         tooltipTitle="Get saved pattern"
-        onClick={() => onOpenModalClick()}
+        onClick={() => setConvertPatternModalOpen(true)}
         icon={
           <label style={{ cursor: "pointer", padding: "25px" }}>
             <CloudDownloadIcon style={{ marginTop: "8px" }} />
@@ -78,19 +86,30 @@ export default function PatternPage() {
     </SpeedDial>
   );
 
-  const onDelete = async (uuid: string) => {
-    const result = await removePattern(uuid);
-    if (result?.status === 200 && availablePatterns !== null) {
-      let patterns = [...availablePatterns];
-      const patternIndex = patterns.findIndex((p) => p.uuid === uuid);
-      patterns.splice(patternIndex, 1);
-      setAvailablePatterns(patterns);
+  const onPatternDelete = (uuid: string) => {
+    const patternToRemoveIndex = availablePatterns?.findIndex((p) => p.uuid === uuid) ?? -1;
+    if (patternToRemoveIndex !== -1) {
+      let updatedPatterns = [...(availablePatterns ?? [])];
+      updatedPatterns.splice(patternToRemoveIndex, 1);
+      setAvailablePatterns(updatedPatterns);
     }
   };
 
   return (
     <SideNav pageName="Pattern editor">
-      <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
+      {patternToRemove !== undefined &&
+      availablePatterns !== null &&
+      availableAnimations !== null &&
+      availableLasershows !== null ? (
+        <PatternDeleteModal
+          availablePatterns={availablePatterns}
+          availableAnimations={availableAnimations}
+          availableLasershows={availableLasershows}
+          pattern={patternToRemove}
+          onCancelClick={setPatternToRemove}
+          onDelete={(uuid: string) => onPatternDelete(uuid)}
+        />
+      ) : null}
       <OnTrue onTrue={uploadedFile !== undefined || selectedPattern !== null}>
         <PatternEditor
           patternNamesInUse={
@@ -103,22 +122,22 @@ export default function PatternPage() {
         />
       </OnTrue>
       <CardOverview
-        closeOverview={() => setModalOpen(false)}
-        show={modalOpen}
-        onDeleteClick={(uuid) => setModalOptions({ show: true, onDelete: () => onDelete(uuid ?? "") })}
+        closeOverview={() => setConvertPatternModalOpen(false)}
+        show={convertPatternModalOpen}
+        onNoItemsMessageTitle="No patterns saved"
+        onNoItemsDescription="Create a new pattern in the pattern editor"
+        onDeleteClick={(uuid) => setPatternToRemove(availablePatterns?.find((p) => p.uuid === uuid))}
         items={
           availablePatterns?.map((pattern) => ({
             uuid: pattern.uuid,
             name: pattern.name,
             image: pattern.image,
             onCardClick: () => {
-              setModalOpen(false);
               setSelectedPattern(pattern);
+              setConvertPatternModalOpen(false);
             },
           })) ?? []
         }
-        onNoItemsMessageTitle="No saved patterns"
-        onNoItemsDescription="Create a new pattern first"
       />
       <Box>
         <input

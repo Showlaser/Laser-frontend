@@ -72,7 +72,6 @@ export default function AnimationPage() {
 
   useEffect(() => {
     if (availableAnimations === null && availablePatterns === null && availableLasershows === null) {
-      console.log("Fix this can still be triggered if below if statements are not entered");
       getPatterns().then((patterns) => {
         if (patterns !== undefined) {
           setAvailablePatterns(patterns);
@@ -83,7 +82,6 @@ export default function AnimationPage() {
           setAvailableAnimations(animations);
         }
       });
-
       getLasershows().then((lasershows) => {
         if (lasershows !== undefined) {
           setAvailableLasershows(lasershows);

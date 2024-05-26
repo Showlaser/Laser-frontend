@@ -2,7 +2,7 @@ import { Animation } from "models/components/shared/animation";
 import { Pattern } from "models/components/shared/pattern";
 import React from "react";
 import { useState } from "react";
-import { Divider, List, ListItem, ListItemText } from "@mui/material";
+import { List, ListItem, ListItemText } from "@mui/material";
 import { removePattern } from "services/logic/pattern-logic";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
 import { OnTrue } from "components/shared/on-true";
@@ -62,21 +62,21 @@ export default function PatternDeleteModal({
       <div>
         <img style={{ maxWidth: "25vh" }} src={pattern.image ?? ""} />
         <br />
+        <OnTrue onTrue={(animationsPatternIsUsedIn?.length ?? 0) > 0}>
+          <b>
+            The pattern {pattern.name} will be removed from the following animation
+            {animationsPatternIsUsedIn.length > 1 ? "(s)" : null}
+          </b>
+          {animationsPatternList}
+        </OnTrue>
         <OnTrue onTrue={(lasershowsPatternIsUsedIn?.length ?? 0) > 0}>
           <>
             <b>
-              The pattern {pattern.name} will be removed from the following lasershow
+              Which will effect the following lasershow
               {lasershowsPatternIsUsedIn.length > 1 ? "(s)" : null}
             </b>
             {lasershowPatternsList}
           </>
-        </OnTrue>
-        <OnTrue onTrue={(animationsPatternIsUsedIn?.length ?? 0) > 0}>
-          <b>
-            The pattern {pattern.name} will be removed from the following animations
-            {animationsPatternIsUsedIn.length > 1 ? "(s)" : null}
-          </b>
-          {animationsPatternList}
         </OnTrue>
       </div>
     );

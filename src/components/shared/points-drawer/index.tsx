@@ -19,7 +19,7 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
       return;
     }
 
-    const canvas = document.getElementById("svg-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById("points-drawer-canvas") as HTMLCanvasElement;
     const ctx = prepareCanvas(canvas);
     const screenScale = window.devicePixelRatio || 1;
     if (ctx === null) {
@@ -99,5 +99,5 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
     ctx.stroke();
   };
 
-  return <canvas className="canvas" id="svg-canvas" />;
+  return <canvas className="canvas" id="points-drawer-canvas" />;
 }

@@ -108,7 +108,7 @@ export default function PatternEditor({
       return;
     }
 
-    const canvas: HTMLCanvasElement | null = document.getElementById("svg-canvas") as HTMLCanvasElement;
+    const canvas: HTMLCanvasElement | null = document.getElementById("points-drawer-canvas") as HTMLCanvasElement;
     let patternToUpdate = { ...pattern };
     if (canvas !== null) {
       patternToUpdate.image = canvas.toDataURL("image/webp", 0.4);

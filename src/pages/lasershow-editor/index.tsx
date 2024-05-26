@@ -12,6 +12,7 @@ import { OnTrue } from "components/shared/on-true";
 import { Lasershow, getLasershowPlaceholder } from "models/components/shared/lasershow";
 import AddIcon from "@mui/icons-material/Add";
 import LasershowEditorContent from "components/lasershow/lasershow-editor";
+import { getLasershows } from "services/logic/lasershow-logic";
 
 export type AvailableAnimationsContextType = {
   availableAnimations: Animation[] | null;
@@ -44,6 +45,13 @@ export default function LasershowEditor() {
   );
 
   useEffect(() => {
+    if (availableLasershows === null) {
+      getLasershows().then((lasershows) => {
+        if (lasershows !== undefined) {
+          setAvailableLasershows(lasershows);
+        }
+      });
+    }
     if (availableAnimations === null) {
       getAnimations().then((animations) => {
         if (animations !== undefined) {

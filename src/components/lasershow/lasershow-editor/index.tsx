@@ -104,7 +104,13 @@ export default function LasershowEditorContent() {
 
   const saveLasershowOnApi = async () => {
     if (selectedLasershow !== null) {
-      await saveLasershow(selectedLasershow);
+      const canvas: HTMLCanvasElement | null = document.getElementById("points-drawer-canvas") as HTMLCanvasElement;
+      let lasershowToUpdate = { ...selectedLasershow };
+      if (canvas !== null) {
+        lasershowToUpdate.image = canvas.toDataURL("image/webp", 0.4);
+      }
+
+      await saveLasershow(lasershowToUpdate);
     }
   };
 
