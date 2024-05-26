@@ -44,12 +44,12 @@ export default function PointsSection({
     }
 
     switch (property) {
-      case "connectedToPointOrderNr":
+      case "connectedToPointUuid":
         if (value === "None") {
-          updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = null;
+          updatedPoints[pointToUpdateIndex].connectedToPointUuid = null;
         } else {
-          const substringIndex = value.indexOf("Point") + 5;
-          updatedPoints[pointToUpdateIndex].connectedToPointOrderNr = Number(value.substring(substringIndex)) - 1;
+          const pointIndex = Number(value.substring(6) - 1);
+          updatedPoints[pointToUpdateIndex].connectedToPointUuid = pointsToRender[pointIndex].uuid;
         }
 
         break;
@@ -238,10 +238,13 @@ export default function PointsSection({
               <FormControl style={{ marginLeft: "35px", width: "125px" }}>
                 <Autocomplete
                   defaultValue={{
-                    label: point.connectedToPointOrderNr === null ? "None" : `Point ${point.connectedToPointOrderNr}`,
+                    label:
+                      point.connectedToPointUuid === null
+                        ? "None"
+                        : `Point ${pointsToRender.find((p) => p.uuid === point.connectedToPointUuid)?.orderNr}`,
                   }}
                   disableClearable
-                  onChange={(e, value) => updatePointProperty(point, value?.label, "connectedToPointOrderNr")}
+                  onChange={(e, value) => updatePointProperty(point, value?.label, "connectedToPointUuid")}
                   disablePortal
                   options={connectablePoints.filter((cp) => cp.label !== `Point ${point.orderNr + 1}`)}
                   renderInput={(params) => <TextField {...params} label="Connected to point" />}

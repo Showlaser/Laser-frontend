@@ -8,7 +8,7 @@ export const getPointsPlaceHolder = (parentUuid: string, orderNr: number): Point
     redLaserPowerPwm: 255,
     greenLaserPowerPwm: 255,
     blueLaserPowerPwm: 255,
-    connectedToPointOrderNr: null,
+    connectedToPointUuid: null,
     orderNr,
     x: 0,
     y: 0,

@@ -13,7 +13,7 @@ export const getPointsTestSet = (): Point[] => [
     redLaserPowerPwm: 0,
     greenLaserPowerPwm: 0,
     blueLaserPowerPwm: 0,
-    connectedToPointOrderNr: 0,
+    connectedToPointUuid: null,
     orderNr: 0,
   },
   {
@@ -24,7 +24,7 @@ export const getPointsTestSet = (): Point[] => [
     redLaserPowerPwm: 0,
     greenLaserPowerPwm: 0,
     blueLaserPowerPwm: 0,
-    connectedToPointOrderNr: 0,
+    connectedToPointUuid: null,
     orderNr: 1,
   },
   {
@@ -35,7 +35,7 @@ export const getPointsTestSet = (): Point[] => [
     redLaserPowerPwm: 0,
     greenLaserPowerPwm: 0,
     blueLaserPowerPwm: 0,
-    connectedToPointOrderNr: 0,
+    connectedToPointUuid: null,
     orderNr: 2,
   },
 ];
@@ -49,7 +49,7 @@ export const generatePointsTestSet = (coordinates: { x: number; y: number }[]): 
     redLaserPowerPwm: 0,
     greenLaserPowerPwm: 0,
     blueLaserPowerPwm: 0,
-    connectedToPointOrderNr: 0,
+    connectedToPointUuid: null,
     orderNr: index,
   }));
 

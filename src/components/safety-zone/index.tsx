@@ -65,16 +65,19 @@ export default function SafetyZonesAddOrUpdate({
 
   const addSafetyZone = () => {
     let updatedZones = [...zones];
-    updatedZones.push({
+    const newZone = {
       uuid: createGuid(),
       name: `Safety zone ${zones.length + 1}`,
       appliedOnShowLaserUuid: "",
       description: "New safety zone",
       maxLaserPowerInZonePercentage: 0,
       points: [],
-    });
+    };
+
+    updatedZones.push(newZone);
 
     setZones(updatedZones);
+    setSelectedSafetyZoneUuid(newZone.uuid);
     setTimeout(() => {
       // Delay, because the list does not contain the item yet
       const list = document.getElementById("safety-zone-list");
@@ -92,6 +95,7 @@ export default function SafetyZonesAddOrUpdate({
 
     updatedSafetyZone[property] = value;
     const index = zones.findIndex((z) => z.uuid === updatedSafetyZone.uuid);
+    updatedSafetyZone.points.sort((a: any, b: any) => a.orderNr - b.orderNr);
 
     updatedSafetyZones[index] = updatedSafetyZone;
     setZones(updatedSafetyZones);
@@ -109,11 +113,17 @@ export default function SafetyZonesAddOrUpdate({
     return "error";
   };
 
-  const onVisibilityChange = (safetyZoneUuid: string) => {
+  const onVisibilityChange = (safetyZoneUuid: string, setVisible?: boolean) => {
     let visibilityUuids = [...visibleSafetyZoneUuids];
 
     const zoneIndex = visibilityUuids.findIndex((zUuid) => zUuid === safetyZoneUuid);
-    zoneIndex !== -1 ? visibilityUuids.splice(zoneIndex, 1) : visibilityUuids.push(safetyZoneUuid);
+    const zoneShouldBeVisible = zoneIndex === -1 || setVisible;
+    if (zoneShouldBeVisible) {
+      visibilityUuids.push(safetyZoneUuid);
+    } else {
+      visibilityUuids.splice(zoneIndex, 1);
+    }
+
     setVisibleSafetyZoneUuids(visibilityUuids);
   };
 
@@ -145,7 +155,7 @@ export default function SafetyZonesAddOrUpdate({
 
   const onSelectedSafetyZoneClick = (safetyZoneUuid: string) => {
     setSelectedSafetyZoneUuid(safetyZoneUuid);
-    onVisibilityChange(safetyZoneUuid);
+    onVisibilityChange(safetyZoneUuid, true);
   };
 
   const labelStyle = { marginBottom: "-11px", marginTop: "5px" };
@@ -158,7 +168,7 @@ export default function SafetyZonesAddOrUpdate({
           <List dense style={{ maxHeight: "220px", overflowY: "auto" }} id="safety-zone-list">
             {zones.map((zone) => (
               <ListItem key={`safety-zone-${zone.uuid}`}>
-                <ListItemButton onClick={() => onSelectedSafetyZoneClick(zone.uuid)} style={{ width: "100%" }}>
+                <ListItemButton onClick={() => onSelectedSafetyZoneClick(zone.uuid)}>
                   <ListItemText primary={zone?.name} secondary={zone?.description} />
                 </ListItemButton>
                 <Tooltip title="Toggle visibility" placement="right">

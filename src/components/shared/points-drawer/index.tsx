@@ -6,7 +6,7 @@ import { getHexColorStringFromPoint, getRgbColorStringFromPoint } from "services
 type Props = {
   selectedPointsUuid?: string[];
   showPointNumber?: boolean;
-  pointsToDraw: Point[] | null;
+  pointsToDraw: Point[][] | null;
 };
 
 export default function PointsDrawer({ selectedPointsUuid, showPointNumber, pointsToDraw }: Props) {
@@ -14,7 +14,7 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
     drawOnCanvas(pointsToDraw);
   }, [pointsToDraw]);
 
-  const drawOnCanvas = (dotsToDraw: Point[] | null) => {
+  const drawOnCanvas = (dotsToDraw: Point[][] | null) => {
     if (dotsToDraw === null) {
       return;
     }
@@ -26,29 +26,12 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
       return;
     }
 
-    let pointsToSort = [...dotsToDraw];
-    let sortedPoints: Point[][] = [];
-
-    while (pointsToSort.length > 0) {
-      let point = pointsToSort[0];
-      let pointsWithSamePatternUuidSorted = pointsToSort
-        .filter((p) => p.patternUuid === point.patternUuid)
-        .sort((a, b) => a.orderNr - b.orderNr);
-
-      sortedPoints.push(pointsWithSamePatternUuidSorted);
-
-      const itemsToRemoveFromSortedPoints = new Set(pointsWithSamePatternUuidSorted);
-      pointsToSort = pointsToSort.filter((item) => !itemsToRemoveFromSortedPoints.has(item));
-    }
-
-    const sortedPointsLength = sortedPoints.length;
-    for (let index = 0; index < sortedPointsLength; index++) {
-      const points = sortedPoints[index];
-      points.forEach((point) => {
+    dotsToDraw.forEach((array, index) => {
+      array.forEach((point) => {
         const pointIsHighlighted = selectedPointsUuid?.some((sp) => sp === point.uuid) ?? false;
-        drawPoint(ctx, point, pointIsHighlighted, index, points, screenScale);
+        drawPoint(ctx, point, pointIsHighlighted, index, array, screenScale);
       });
-    }
+    });
   };
 
   const drawPoint = (
@@ -77,10 +60,12 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
       ctx.fillText((index + 1).toString(), point.x + 5, point.y + 3);
     }
 
-    if (point.connectedToPointOrderNr !== null && point.connectedToPointOrderNr >= 0) {
-      const pointToConnectTo = updatedPoints[point.connectedToPointOrderNr];
-      drawLine(point, pointToConnectTo, ctx);
-    } else if (point.connectedToPointOrderNr === null) {
+    if (point.connectedToPointUuid !== null) {
+      const pointToConnectTo = updatedPoints.find((up) => up.uuid === point.connectedToPointUuid);
+      if (pointToConnectTo !== undefined) {
+        drawLine(point, pointToConnectTo, ctx);
+      }
+    } else if (point.connectedToPointUuid === null) {
       drawDot(ctx, point, screenScale, dotThickness);
     }
   };

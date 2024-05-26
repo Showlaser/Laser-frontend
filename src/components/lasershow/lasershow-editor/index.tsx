@@ -114,7 +114,7 @@ export default function LasershowEditorContent() {
     }
   };
 
-  const getPointsToDraw = (): Point[] => {
+  const getPointsToDraw = (): Point[][] => {
     const lasershowAnimationsToPlay = selectedLasershow?.lasershowAnimations.filter((la) =>
       numberIsBetweenOrEqual(timelinePositionMs, la.startTimeMs, getAnimationDuration(la.animation) + la.startTimeMs)
     );
@@ -123,7 +123,7 @@ export default function LasershowEditorContent() {
       return [];
     }
 
-    let lasershowPoints: Point[] = [];
+    let lasershowPoints: Point[][] = [];
     for (let li = 0; li < lasershowAnimationsToPlay.length; li++) {
       const lasershowAnimation = lasershowAnimationsToPlay[li];
       const points = getPointsToDrawFromAnimation(

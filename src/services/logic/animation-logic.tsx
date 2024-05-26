@@ -69,7 +69,7 @@ export const getAnimationDuration = (animation: Animation | null) => {
   return Math.max(...times);
 };
 
-export const getPointsToDrawFromAnimation = (timelinePositionMs: number, animation: Animation | null): Point[] => {
+export const getPointsToDrawFromAnimation = (timelinePositionMs: number, animation: Animation | null): Point[][] => {
   const animationPatternsToPlay = animation?.animationPatterns.filter((ap) =>
     numberIsBetweenOrEqual(timelinePositionMs, ap.startTimeMs, getAnimationPatternDuration(ap) + ap.startTimeMs)
   );
@@ -78,7 +78,7 @@ export const getPointsToDrawFromAnimation = (timelinePositionMs: number, animati
     return [];
   }
 
-  let points: Point[] = [];
+  let points: Point[][] = [];
   for (let i = 0; i < animationPatternsToPlayLength; i++) {
     const animationPattern = animationPatternsToPlay[i];
     if (animationPattern.pattern === undefined) {
@@ -95,7 +95,7 @@ export const getPointsToDrawFromAnimation = (timelinePositionMs: number, animati
       timelinePositionMs
     );
 
-    points = points.concat(patternPoints);
+    points.push(patternPoints);
   }
 
   return points;

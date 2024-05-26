@@ -37,7 +37,7 @@ const createPoint = (x: number, y: number, orderNr: number, patternUuid: string)
   redLaserPowerPwm: 255,
   greenLaserPowerPwm: 255,
   blueLaserPowerPwm: 255,
-  connectedToPointOrderNr: null,
+  connectedToPointUuid: null,
   orderNr: orderNr,
   x,
   y,

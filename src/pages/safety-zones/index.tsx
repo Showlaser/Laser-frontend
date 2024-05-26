@@ -17,12 +17,14 @@ export default function SafetyZones() {
   useEffect(() => {
     if (zones.length === 0) {
       getSafetyZones().then((value: SafetyZone[]) => {
-        let sortedSafetyZones = [...value];
-        sortedSafetyZones.forEach((safetyZone) => {
-          safetyZone.points.sort((a, b) => (a.orderNr > b.orderNr ? 1 : -1));
-        });
+        if (value !== undefined) {
+          let sortedSafetyZones = [...value];
+          sortedSafetyZones.forEach((safetyZone) => {
+            safetyZone.points.sort((a, b) => a.orderNr - b.orderNr);
+          });
 
-        setZones(sortedSafetyZones);
+          setZones(sortedSafetyZones);
+        }
       });
     }
   }, []);
@@ -33,10 +35,7 @@ export default function SafetyZones() {
 
     selectedZones.forEach((selectedSafetyZone) => {
       const points = selectedSafetyZone.points.map((p: SafetyZonePoint, index: number) => {
-        let connectedToPointOrderNr = pointsToRender.length;
-        if (selectedSafetyZone.points.length > index && index > 1) {
-          connectedToPointOrderNr = pointsToRender.length + p.orderNr - 1;
-        }
+        const connectedToPointUuid = selectedSafetyZone.points[(index + 1) % selectedSafetyZone.points.length].uuid;
 
         let point: Point = {
           uuid: p.uuid,
@@ -44,7 +43,7 @@ export default function SafetyZones() {
           redLaserPowerPwm: 255,
           greenLaserPowerPwm: 255,
           blueLaserPowerPwm: 255,
-          connectedToPointOrderNr,
+          connectedToPointUuid: connectedToPointUuid,
           orderNr: p.orderNr,
           x: p.x,
           y: p.y,
@@ -56,7 +55,7 @@ export default function SafetyZones() {
       pointsToRender = pointsToRender.concat(convertPointsToCanvasSize(points));
     });
 
-    return pointsToRender;
+    return [pointsToRender];
   };
 
   const setZoneWrapper = (zones: SafetyZone[]) => {

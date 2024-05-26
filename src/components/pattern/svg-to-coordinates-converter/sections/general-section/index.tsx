@@ -42,21 +42,21 @@ export default function GeneralSection({
     const pointsLength = pattern.points.length;
 
     for (let i = 0; i < pointsLength; i++) {
-      updatedPoints[i].connectedToPointOrderNr = null;
+      updatedPoints[i].connectedToPointUuid = null;
     }
 
     updatePatternProperty("points", updatedPoints);
   };
 
   const connectAllDots = () => {
-    let updatedPoints = [...pattern.points];
+    let updatedPoints = [...pattern.points].sort((a, b) => a.orderNr - b.orderNr);
     const pointsLength = pattern.points.length;
 
     for (let i = 0; i < pointsLength; i++) {
       if (i === pattern.points.length - 1) {
-        updatedPoints[i].connectedToPointOrderNr = 0;
+        updatedPoints[i].connectedToPointUuid = pattern.points.find((p) => p.orderNr === 0)?.uuid ?? null;
       } else {
-        updatedPoints[i].connectedToPointOrderNr = i + 1;
+        updatedPoints[i].connectedToPointUuid = pattern.points.find((p) => p.orderNr === i + 1)?.uuid ?? null;
       }
     }
 
@@ -280,7 +280,7 @@ export default function GeneralSection({
             disabled={!dangerousElementsEnabled}
             control={
               <Checkbox
-                checked={pattern.points.every((p) => p.connectedToPointOrderNr !== null)}
+                checked={pattern.points.every((p) => p.connectedToPointUuid !== null)}
                 onChange={(e) => toggleAllDots(e)}
               />
             }

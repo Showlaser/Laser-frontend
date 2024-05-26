@@ -167,7 +167,7 @@ export default function PatternEditor({
         <PointsDrawer
           selectedPointsUuid={selectedPointsUuid}
           showPointNumber={showPointNumber}
-          pointsToDraw={pointsToDraw}
+          pointsToDraw={[pointsToDraw]}
         />
       </Grid>
       <SpeedDial
