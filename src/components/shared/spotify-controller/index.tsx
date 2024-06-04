@@ -4,7 +4,6 @@ import {
   Divider,
   Fade,
   FormControlLabel,
-  FormLabel,
   Grid,
   IconButton,
   LinearProgress,
@@ -107,7 +106,7 @@ export default function SpotifyController() {
 
     const imageUrl = player?.item?.album?.images?.at(1)?.url ?? player?.item?.album?.images?.at(0)?.url;
     return (
-      <div style={{ padding: "20px" }}>
+      <div style={{ padding: "20px", width: "350px" }}>
         <Fade in={open} timeout={1000}>
           <span>
             {imageUrl === undefined ? (
