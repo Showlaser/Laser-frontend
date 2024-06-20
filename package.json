@@ -22,7 +22,6 @@
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
-    "react-qr-code": "^2.0.7",
     "react-rnd": "^10.3.4",
     "react-router-dom": "^6.4.5",
     "react-scripts": "^5.0.1",
@@ -37,8 +36,7 @@
     "start": "set HTTPS=false&&react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "electron": "concurrently -k \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\""
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -64,7 +62,6 @@
     "@types/react-router-dom": "^5.3.3",
     "electron": "^22.0.0",
     "electron-is-dev": "^2.0.0",
-    "jest": "^27.5.1",
-    "wait-on": "^6.0.1"
+    "jest": "^27.5.1"
   }
 }
