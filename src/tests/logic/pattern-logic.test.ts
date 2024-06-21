@@ -6,7 +6,7 @@ import {
   getKeyFramesPastTimelinePositionSortedByTime,
   getPreviousCurrentAndNextKeyFramePerProperty,
 } from "services/logic/pattern-logic";
-import { getTestAnimationPatternKeyFrames, testAnimation, testAnimationPattern } from "./helper";
+import { getTestAnimationPatternKeyFrames, testAnimation, testAnimationPattern } from "../helper";
 import { Animation, AnimationPattern } from "models/components/shared/animation";
 
 test(

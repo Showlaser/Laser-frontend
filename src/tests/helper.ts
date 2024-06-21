@@ -1,4 +1,5 @@
 import { Animation, AnimationPattern, AnimationPatternKeyFrame } from "models/components/shared/animation";
+import { Lasershow, LasershowAnimation } from "models/components/shared/lasershow";
 import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
 import { propertiesSettings } from "services/logic/animation-logic";
@@ -107,5 +108,26 @@ export const testAnimation = (
     name: "Test animation",
     image: null,
     animationPatterns: [testAnimationPattern(patternStartTime, keyframesStartTime, animationDuration)],
+  };
+};
+
+export const testLasershowAnimation = (startTimeMs: number, animationDuration: number): LasershowAnimation => {
+  return {
+    uuid: "3bd7badd-c3b1-4f95-bd30-553f7fd66753",
+    lasershowUuid: "5c7a1e06-33f5-4f93-bae6-8c0cbb7cc4c4",
+    animationUuid: "cdef5b05-e8aa-44e3-8261-7619e90b0ef0",
+    name: "Test lasershow animation",
+    animation: testAnimation(0, 0, animationDuration),
+    startTimeMs,
+    timelineId: 0,
+  };
+};
+
+export const testLasershow = (startTimeMs: number, animationDuration: number): Lasershow => {
+  return {
+    uuid: "826d257c-48df-4e4d-bd1f-627ff98ce8e2",
+    name: "Test lasershow",
+    image: "",
+    lasershowAnimations: [testLasershowAnimation(startTimeMs, animationDuration)],
   };
 };
