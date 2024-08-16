@@ -50,11 +50,13 @@ export default function PatternPage() {
 
   const getSpeedDial = () => (
     <SpeedDial
+      id="pattern-speeddial"
       ariaLabel="SpeedDial basic example"
       sx={{ position: "absolute", bottom: 30, right: 30 }}
       icon={uploadedFile === undefined && selectedPattern === null ? <SpeedDialIcon /> : <SettingsIcon />}
     >
       <SpeedDialAction
+        id="pattern-new-file"
         key="sd-new-file"
         tooltipTitle="Create a new pattern"
         onClick={() => setSelectedPattern(getPatternPlaceHolder())}

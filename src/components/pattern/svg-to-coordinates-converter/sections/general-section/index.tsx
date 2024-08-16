@@ -196,6 +196,7 @@ export default function GeneralSection({
       </FormLabel>
       <br />
       <Input
+        id="svg-xoffset-input"
         type="number"
         value={pattern.xOffset}
         onChange={(e) => updatePatternProperty("xOffset", Number(e.target.value))}
@@ -203,7 +204,7 @@ export default function GeneralSection({
       <br />
       <FormControl style={{ width: "100%" }}>
         <Slider
-          id="svg-points"
+          id="svg-xoffset"
           size="small"
           value={pattern.xOffset}
           onChange={(e, value) => updatePatternProperty("xOffset", Math.round(Number(value)))}
@@ -226,6 +227,7 @@ export default function GeneralSection({
       </FormLabel>
       <br />
       <Input
+        id="svg-yoffset-input"
         type="number"
         value={pattern.yOffset}
         onChange={(e) => updatePatternProperty("yOffset", Number(e.target.value))}
@@ -233,7 +235,7 @@ export default function GeneralSection({
       <br />
       <FormControl style={{ width: "100%" }}>
         <Slider
-          id="svg-points"
+          id="svg-yoffset"
           size="small"
           value={pattern.yOffset}
           onChange={(e, value) => updatePatternProperty("yOffset", Math.round(Number(value)))}
@@ -257,6 +259,7 @@ export default function GeneralSection({
       </FormLabel>
       <br />
       <Input
+        id="svg-rotation-input"
         type="number"
         value={pattern.rotation}
         onChange={(e) => updatePatternProperty("rotation", Number(e.target.value))}
@@ -264,7 +267,7 @@ export default function GeneralSection({
       <br />
       <FormControl style={{ width: "100%" }}>
         <Slider
-          id="svg-points"
+          id="svg-rotation"
           size="small"
           value={pattern.rotation}
           onChange={(e, value) => updatePatternProperty("rotation", Number(value))}
@@ -280,6 +283,7 @@ export default function GeneralSection({
             disabled={!dangerousElementsEnabled}
             control={
               <Checkbox
+                id="svg-toggle-all-dots"
                 checked={pattern.points.every((p) => p.connectedToPointUuid !== null)}
                 onChange={(e) => toggleAllDots(e)}
               />
@@ -294,6 +298,7 @@ export default function GeneralSection({
         <FormControlLabel
           control={
             <Checkbox
+              id="svg-toggle-dangerous-elements"
               checked={dangerousElementsEnabled}
               onChange={(e) => setDangerousElementsEnabled(e.target.checked)}
             />

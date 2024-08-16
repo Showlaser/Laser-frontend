@@ -172,6 +172,7 @@ export default function PatternEditor({
       </Grid>
       <SpeedDial
         ariaLabel="SpeedDial basic example"
+        id="svg-to-coordinates-converter-speeddial"
         sx={{ position: "fixed", bottom: 30, right: 30 }}
         icon={<SettingsIcon />}
       >

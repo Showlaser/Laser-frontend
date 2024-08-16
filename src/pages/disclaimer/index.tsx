@@ -6,18 +6,7 @@ import { useState } from "react";
 import paths from "services/shared/router-paths";
 
 export default function Disclaimer() {
-  const [countDown, setCountdown] = useState<number>(10);
   const [termsAndConditionsAccepted, setTermsAndConditionsAccepted] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (countDown <= 0) {
-      return;
-    }
-
-    setTimeout(() => {
-      setCountdown(countDown - 1);
-    }, 1000);
-  }, [countDown]);
 
   return (
     <div style={{ textAlign: "center" }}>
@@ -32,21 +21,26 @@ export default function Disclaimer() {
         </p>
         <FormGroup>
           <FormControlLabel
-            control={<Checkbox onClick={() => setTermsAndConditionsAccepted(!termsAndConditionsAccepted)} />}
+            control={
+              <Checkbox
+                id="disclaimer-checkbox"
+                onClick={() => setTermsAndConditionsAccepted(!termsAndConditionsAccepted)}
+              />
+            }
             label="I accept the terms and conditions"
           />
         </FormGroup>
       </div>
       <br />
       <Button
+        id="disclaimer-button"
         variant="contained"
-        disabled={countDown > 0 || !termsAndConditionsAccepted}
         onClick={() => {
           localStorage.setItem("terms-accepted", "true");
           window.location.href = paths.Dashboard;
         }}
       >
-        {countDown > 0 ? `Continue: (${countDown})` : "Continue"}
+        Continue
       </Button>
     </div>
   );
