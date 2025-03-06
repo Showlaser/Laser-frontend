@@ -1,7 +1,14 @@
-import { Card, Typography, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
+import {
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import { SafetyZone } from "models/components/shared/safety-zone";
 import React from "react";
-import CircleIcon from "@mui/icons-material/Circle";
 
 type Props = {
   zones: SafetyZone[];
@@ -10,7 +17,12 @@ type Props = {
 export default function LaserZoneTable({ zones }: Props) {
   return (
     <Card sx={{ m: 2, p: 3 }}>
-      <Typography sx={{ textAlign: "center" }} variant="h5" color="text.primary" gutterBottom>
+      <Typography
+        sx={{ textAlign: "center" }}
+        variant="h5"
+        color="text.primary"
+        gutterBottom
+      >
         Zones
       </Typography>
       <div style={{ height: "90%", overflowY: "auto" }}>

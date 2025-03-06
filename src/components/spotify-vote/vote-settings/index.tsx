@@ -33,12 +33,15 @@ export default function VoteSettings({ setVoteValidTimeInMinutes }: Props) {
 
       setIntervalSet(true);
     }
-  }, []);
+  }, [activeDevice, intervalSet]);
 
   return (
     <div>
       {!activeDevice ? (
-        <Alert severity="error">No active device found! Play a song through Spotify and refresh the page.</Alert>
+        <Alert severity="error">
+          No active device found! Play a song through Spotify and refresh the
+          page.
+        </Alert>
       ) : null}
       <h3>Vote settings</h3>
       <TextField

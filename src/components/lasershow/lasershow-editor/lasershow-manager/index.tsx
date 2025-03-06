@@ -12,12 +12,22 @@ import {
 } from "@mui/material";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
 import { OnTrue } from "components/shared/on-true";
-import { Lasershow, LasershowAnimation } from "models/components/shared/lasershow";
-import { AvailableAnimationsContext, AvailableAnimationsContextType } from "pages/lasershow-editor";
-import { SelectedLasershowContext, SelectedLasershowContextType } from "pages/lasershow-editor";
+import {
+  Lasershow,
+  LasershowAnimation,
+} from "models/components/shared/lasershow";
+import {
+  AvailableAnimationsContext,
+  AvailableAnimationsContextType,
+  SelectedLasershowContext,
+  SelectedLasershowContextType,
+} from "pages/lasershow-editor";
 import React, { useEffect } from "react";
 import { getAnimationDuration } from "services/logic/animation-logic";
-import { canvasPxSize, timelineItemWidthWhenDurationIsZero } from "services/shared/config";
+import {
+  canvasPxSize,
+  timelineItemWidthWhenDurationIsZero,
+} from "services/shared/config";
 import { convertAnimationToLasershowAnimation } from "services/shared/converters";
 
 export default function LasershowManager() {
@@ -29,8 +39,12 @@ export default function LasershowManager() {
     SelectedLasershowContext
   ) as SelectedLasershowContextType;
 
-  const [checkedUuidsToRemove, setCheckedUuidsToRemove] = React.useState<string[]>([]);
-  const [checkedUuidsToAdd, setCheckedUuidsToAdd] = React.useState<string[]>([]);
+  const [checkedUuidsToRemove, setCheckedUuidsToRemove] = React.useState<
+    string[]
+  >([]);
+  const [checkedUuidsToAdd, setCheckedUuidsToAdd] = React.useState<string[]>(
+    []
+  );
 
   const deleteSelectedLasershowAnimations = () => {
     if (selectedLasershow === undefined) {
@@ -55,7 +69,11 @@ export default function LasershowManager() {
 
   useEffect(() => {}, [availableAnimations, checkedUuidsToRemove]);
 
-  const handleToggle = (uuid: string | undefined, arrayToUpdate: string[], updateArray: (array: string[]) => void) => {
+  const handleToggle = (
+    uuid: string | undefined,
+    arrayToUpdate: string[],
+    updateArray: (array: string[]) => void
+  ) => {
     if (uuid === undefined) {
       return;
     }
@@ -73,15 +91,25 @@ export default function LasershowManager() {
     }
 
     let updatedLasershow: Lasershow = { ...selectedLasershow };
-    const animationsToAdd = availableAnimations?.filter((aa) => checkedUuidsToAdd.some((cu) => cu === aa.uuid));
+    const animationsToAdd = availableAnimations?.filter((aa) =>
+      checkedUuidsToAdd.some((cu) => cu === aa.uuid)
+    );
     if (animationsToAdd === undefined) {
       return;
     }
 
     animationsToAdd.forEach((ata) => {
-      const convertedAnimation = convertAnimationToLasershowAnimation(ata, selectedLasershow.uuid);
-      const { timelineId, timeMs } = getAvailableTimelinePositionSpot(convertedAnimation);
-      if (timelineId === null || timeMs === null || convertedAnimation === undefined) {
+      const convertedAnimation = convertAnimationToLasershowAnimation(
+        ata,
+        selectedLasershow.uuid
+      );
+      const { timelineId, timeMs } =
+        getAvailableTimelinePositionSpot(convertedAnimation);
+      if (
+        timelineId === null ||
+        timeMs === null ||
+        convertedAnimation === undefined
+      ) {
         return;
       }
 
@@ -93,15 +121,18 @@ export default function LasershowManager() {
     setSelectedLasershow(updatedLasershow);
   };
 
-  const getAvailableTimelinePositionSpot = (lasershowAnimation: LasershowAnimation) => {
+  const getAvailableTimelinePositionSpot = (
+    lasershowAnimation: LasershowAnimation
+  ) => {
     if (selectedLasershow === null) {
       return { timelineId: 0, timeMs: 0 };
     }
 
     for (let i = 0; i < 3; i++) {
-      const lasershowAnimationsWithSameTimelineId = selectedLasershow.lasershowAnimations?.filter(
-        (la) => la?.timelineId === i
-      );
+      const lasershowAnimationsWithSameTimelineId =
+        selectedLasershow.lasershowAnimations?.filter(
+          (la) => la?.timelineId === i
+        );
       if (lasershowAnimationsWithSameTimelineId.length === 0) {
         return { timelineId: i, timeMs: 0 };
       }
@@ -109,16 +140,23 @@ export default function LasershowManager() {
 
     let lastLasershowAnimationOnTimelines: LasershowAnimation[] = [];
     for (let i = 0; i < 3; i++) {
-      const lastLasershowAnimationOnTimeline = selectedLasershow.lasershowAnimations
-        .filter((la) => la.timelineId === i)
-        ?.at(-1);
+      const lastLasershowAnimationOnTimeline =
+        selectedLasershow.lasershowAnimations
+          .filter((la) => la.timelineId === i)
+          ?.at(-1);
       if (lastLasershowAnimationOnTimeline !== undefined) {
-        lastLasershowAnimationOnTimelines.push(lastLasershowAnimationOnTimeline);
+        lastLasershowAnimationOnTimelines.push(
+          lastLasershowAnimationOnTimeline
+        );
       }
     }
 
     lastLasershowAnimationOnTimelines.sort(
-      (a, b) => getAnimationDuration(a.animation) + a.startTimeMs - getAnimationDuration(b.animation) + b.startTimeMs
+      (a, b) =>
+        getAnimationDuration(a.animation) +
+        a.startTimeMs -
+        getAnimationDuration(b.animation) +
+        b.startTimeMs
     );
     const firstLasershowAnimation = lastLasershowAnimationOnTimelines.at(-1);
     if (firstLasershowAnimation === undefined) {
@@ -128,7 +166,8 @@ export default function LasershowManager() {
     const startTimeMs =
       (getAnimationDuration(firstLasershowAnimation.animation) === 0
         ? timelineItemWidthWhenDurationIsZero * 4
-        : getAnimationDuration(firstLasershowAnimation.animation)) + firstLasershowAnimation.startTimeMs;
+        : getAnimationDuration(firstLasershowAnimation.animation)) +
+      firstLasershowAnimation.startTimeMs;
 
     return {
       timelineId: firstLasershowAnimation.timelineId,
@@ -138,7 +177,10 @@ export default function LasershowManager() {
 
   return (
     <>
-      <DeleteModal modalOptions={modalOptions} setModalOptions={setModalOptions} />
+      <DeleteModal
+        modalOptions={modalOptions}
+        setModalOptions={setModalOptions}
+      />
       <div style={{ maxHeight: canvasPxSize - 98, overflowY: "auto" }}>
         <FormControl fullWidth>
           <FormLabel htmlFor="lasershow-name">Lasershow name</FormLabel>
@@ -158,7 +200,13 @@ export default function LasershowManager() {
               <ListItem key={`lsm-aa-${aa.uuid}`} disablePadding>
                 <ListItemButton
                   role={undefined}
-                  onClick={() => handleToggle(aa.uuid, checkedUuidsToAdd, setCheckedUuidsToAdd)}
+                  onClick={() =>
+                    handleToggle(
+                      aa.uuid,
+                      checkedUuidsToAdd,
+                      setCheckedUuidsToAdd
+                    )
+                  }
                 >
                   <ListItemIcon>
                     <Checkbox
@@ -175,7 +223,11 @@ export default function LasershowManager() {
             ))}
           </List>
           <OnTrue onTrue={checkedUuidsToAdd.length > 0}>
-            <Button variant="contained" style={{ marginTop: "10px" }} onClick={addAnimationToLasershow}>
+            <Button
+              variant="contained"
+              style={{ marginTop: "10px" }}
+              onClick={addAnimationToLasershow}
+            >
               Add
             </Button>
           </OnTrue>
@@ -187,7 +239,13 @@ export default function LasershowManager() {
               <ListItem key={`la-tr-${la.uuid}`} disablePadding>
                 <ListItemButton
                   role={undefined}
-                  onClick={() => handleToggle(la.uuid, checkedUuidsToRemove, setCheckedUuidsToRemove)}
+                  onClick={() =>
+                    handleToggle(
+                      la.uuid,
+                      checkedUuidsToRemove,
+                      setCheckedUuidsToRemove
+                    )
+                  }
                   dense
                 >
                   <ListItemIcon>

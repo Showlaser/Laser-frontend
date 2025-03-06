@@ -1,6 +1,9 @@
-import { testAnimation, testAnimationPattern } from "../helper";
 import { Animation } from "models/components/shared/animation";
-import { getAnimationDuration, getPointsToDrawFromAnimation, propertiesSettings } from "services/logic/animation-logic";
+import {
+  getAnimationDuration,
+  getPointsToDrawFromAnimation,
+} from "services/logic/animation-logic";
+import { testAnimation } from "../helper";
 
 describe("animation-logic", () => {
   describe("getAnimationDuration", () => {
@@ -30,7 +33,9 @@ test(
   () => {
     const animation = testAnimation(0, 100, 0);
     const points = getPointsToDrawFromAnimation(100, animation);
-    expect(points[0].length).toBe(animation.animationPatterns[0].pattern.points.length);
+    expect(points[0].length).toBe(
+      animation.animationPatterns[0].pattern.points.length
+    );
     expect(points.length).toBe(animation.animationPatterns.length);
   }
 );

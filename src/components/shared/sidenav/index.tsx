@@ -1,34 +1,34 @@
-import * as React from "react";
-import { styled, useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
+import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import HiveIcon from "@mui/icons-material/Hive";
+import MenuIcon from "@mui/icons-material/Menu";
+import MovieIcon from "@mui/icons-material/Movie";
+import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
+import TheatersIcon from "@mui/icons-material/Theaters";
+import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
+import { Alert, Fade, Grid, ListItemButton } from "@mui/material";
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
-import paths from "services/shared/router-paths";
-import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
-import TheatersIcon from "@mui/icons-material/Theaters";
-import "./index.css";
-import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
-import SpotifyController from "../spotify-controller";
-import { Alert, Fade, Grid, ListItemButton } from "@mui/material";
-import Button from "@mui/material/Button";
+import { styled, useTheme } from "@mui/material/styles";
+import Toolbar from "@mui/material/Toolbar";
+import * as React from "react";
 import { Link } from "react-router-dom";
+import paths from "services/shared/router-paths";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import AccountPopover from "../account-popover";
-import MovieIcon from "@mui/icons-material/Movie";
-import GridViewIcon from "@mui/icons-material/GridView";
+import NotificationPopover from "../notification-popover";
 import { OnTrue } from "../on-true";
-import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import SpotifyController from "../spotify-controller";
+import "./index.css";
 
 const drawerWidth = 240;
 
@@ -58,6 +58,7 @@ interface AppBarProps extends MuiAppBarProps {
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })<AppBarProps>(({ theme, open }) => ({
+  backgroundColor: "rgba(72, 92, 219, 0.8)",
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -87,7 +88,11 @@ type Props = {
   unsavedChanges?: boolean;
 };
 
-export default function SideNav({ pageName, children, unsavedChanges = false }: Props) {
+export default function SideNav({
+  pageName,
+  children,
+  unsavedChanges = false,
+}: Props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -101,7 +106,9 @@ export default function SideNav({ pageName, children, unsavedChanges = false }: 
 
   const getListItemBackgroundColor = (title: string) => {
     if (unsavedChanges) {
-      return title !== pageName ? "rgba(255, 0, 0, 0.6)" : "rgba(0, 255, 0, 0.6)";
+      return title !== pageName
+        ? "rgba(255, 0, 0, 0.6)"
+        : "rgba(0, 255, 0, 0.6)";
     }
 
     return undefined;
@@ -110,10 +117,14 @@ export default function SideNav({ pageName, children, unsavedChanges = false }: 
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>
-        <Toolbar>
+        <Toolbar variant="dense">
           <Grid container direction="row" spacing={2} alignItems="center">
             <Grid item xs>
-              <Grid display="flex" justifyContent="flex-start" alignItems="center">
+              <Grid
+                display="flex"
+                justifyContent="flex-start"
+                alignItems="center"
+              >
                 <IconButton
                   color="inherit"
                   aria-label="open drawer"
@@ -128,13 +139,18 @@ export default function SideNav({ pageName, children, unsavedChanges = false }: 
             </Grid>
             <Grid item xs container direction="column">
               <Grid display="flex" justifyContent="center">
-                <Button fullWidth color="error" onClick={() => showError(toastSubject.notImplemented)}>
+                <Button
+                  style={{ color: "whitesmoke" }}
+                  variant="contained"
+                  onClick={() => showError(toastSubject.notImplemented)}
+                >
                   Emergency stop
                 </Button>
               </Grid>
             </Grid>
             <Grid item xs container direction="column">
               <Grid display="flex" justifyContent="flex-end">
+                <NotificationPopover />
                 <SpotifyController />
                 <AccountPopover />
               </Grid>
@@ -157,16 +173,26 @@ export default function SideNav({ pageName, children, unsavedChanges = false }: 
       >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "ltr" ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            {theme.direction === "ltr" ? (
+              <ChevronLeftIcon />
+            ) : (
+              <ChevronRightIcon />
+            )}
           </IconButton>
         </DrawerHeader>
         <OnTrue onTrue={unsavedChanges}>
-          <Alert severity="warning">Your current page has unsaved changes!</Alert>
+          <Alert severity="warning">
+            Your current page has unsaved changes!
+          </Alert>
         </OnTrue>
         <Divider />
         <List>
           {[
-            { title: "Dashboard", icon: <DashboardIcon />, path: paths.Dashboard },
+            {
+              title: "Dashboard",
+              icon: <DashboardIcon />,
+              path: paths.Dashboard,
+            },
             {
               title: "Lasershow editor",
               icon: <MovieIcon />,
@@ -183,11 +209,6 @@ export default function SideNav({ pageName, children, unsavedChanges = false }: 
               path: paths.PatternEditor,
             },
             {
-              title: "Safety zones",
-              icon: <GridViewIcon />,
-              path: paths.SafetyZones,
-            },
-            {
               title: "Vote",
               icon: <ThumbsUpDownIcon />,
               path: paths.SpotifyVote,
@@ -196,6 +217,11 @@ export default function SideNav({ pageName, children, unsavedChanges = false }: 
               title: "Lasershow Spotify connector",
               icon: <SettingsInputComponentIcon />,
               path: paths.LasershowSpotifyConnector,
+            },
+            {
+              title: "Showlaser manager",
+              icon: <HiveIcon />,
+              path: paths.ShowlaserManager,
             },
           ].map((item, index) => (
             <ListItemButton

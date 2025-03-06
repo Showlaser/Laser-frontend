@@ -1,29 +1,29 @@
-import React, { useEffect, useState } from "react";
-import LasershowManager from "./lasershow-manager";
+import ClearIcon from "@mui/icons-material/Clear";
+import SaveIcon from "@mui/icons-material/Save";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { Grid, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
-import { canvasPxSize, selectableSteps } from "services/shared/config";
+import PointsDrawer from "components/shared/points-drawer";
+import { SharedTimeline } from "components/shared/shared-timeline";
+import TabSelector from "components/tabs";
+import { Point } from "models/components/shared/point";
 import {
   SelectedLasershowContext,
   SelectedLasershowContextType,
 } from "pages/lasershow-editor";
-import TabSelector from "components/tabs";
-import SettingsIcon from "@mui/icons-material/Settings";
-import SaveIcon from "@mui/icons-material/Save";
-import ClearIcon from "@mui/icons-material/Clear";
-import {
-  getLasershowDuration,
-  saveLasershow,
-} from "services/logic/lasershow-logic";
+import React, { useEffect, useState } from "react";
 import {
   getAnimationDuration,
   getPointsToDrawFromAnimation,
 } from "services/logic/animation-logic";
-import LasershowAnimationProperties from "./lasershow-animation-properties";
-import PointsDrawer from "components/shared/points-drawer";
-import { Point } from "models/components/shared/point";
+import {
+  getLasershowDuration,
+  saveLasershow,
+} from "services/logic/lasershow-logic";
+import { canvasPxSize, selectableSteps } from "services/shared/config";
 import { numberIsBetweenOrEqual } from "services/shared/math";
-import { SharedTimeline } from "components/shared/shared-timeline";
+import LasershowAnimationProperties from "./lasershow-animation-properties";
 import LasershowExport from "./lasershow-export";
+import LasershowManager from "./lasershow-manager";
 
 export type LasershowTimeLineContextType = {
   timelinePositionMs: number;
@@ -116,6 +116,7 @@ export default function LasershowEditorContent() {
     timelinePositionMs,
     selectedLasershowAnimationUuid,
     selectedLasershow,
+    lasershowDuration,
   ]);
 
   useEffect(() => {

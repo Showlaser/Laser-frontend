@@ -1,3 +1,8 @@
+import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import PauseIcon from "@mui/icons-material/Pause";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import SkipNextIcon from "@mui/icons-material/SkipNext";
+import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import {
   Alert,
   Button,
@@ -14,11 +19,6 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import PauseIcon from "@mui/icons-material/Pause";
-import SkipNextIcon from "@mui/icons-material/SkipNext";
-import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
-import { mapNumber } from "services/shared/math";
 import {
   getPlayerState,
   pausePlayer,
@@ -26,8 +26,8 @@ import {
   skipSong,
   startPlayer,
 } from "services/logic/spotify";
+import { mapNumber } from "services/shared/math";
 import paths from "services/shared/router-paths";
-import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import { dataSavingIsEnabled } from "services/shared/user-settings";
 import { OnTrue } from "../on-true";
 
@@ -123,7 +123,7 @@ export default function SpotifyController() {
                 in={imageUrl !== undefined}
                 timeout={1000}
               >
-                <img src={imageUrl} />
+                <img src={imageUrl} alt="Song image" />
               </Fade>
             )}
             <br />

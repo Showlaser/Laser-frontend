@@ -1,4 +1,4 @@
-import { getPointsTestSet, generatePointsTestSet } from "tests/helper";
+import { generatePointsTestSet, getPointsTestSet } from "tests/helper";
 
 test("getPointsTestSet test", () => {
   const testPoints = getPointsTestSet();

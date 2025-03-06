@@ -1,4 +1,8 @@
 import {
+  Animation,
+  AnimationPattern,
+} from "models/components/shared/animation";
+import {
   getAnimationPatternsInsideTimelineRange,
   getAnimationPatternsToDrawInTimeline,
   getCurrentKeyFrame,
@@ -6,8 +10,11 @@ import {
   getKeyFramesPastTimelinePositionSortedByTime,
   getPreviousCurrentAndNextKeyFramePerProperty,
 } from "services/logic/pattern-logic";
-import { getTestAnimationPatternKeyFrames, testAnimation, testAnimationPattern } from "../helper";
-import { Animation, AnimationPattern } from "models/components/shared/animation";
+import {
+  getTestAnimationPatternKeyFrames,
+  testAnimation,
+  testAnimationPattern,
+} from "../helper";
 
 test(
   "Tested: getAnimationPatternsInsideTimelineRange:" +
@@ -16,7 +23,11 @@ test(
     "Then I expect all the patterns to be returned.",
   () => {
     const animation = testAnimation(0, 0, 110);
-    const animationPatterns = getAnimationPatternsInsideTimelineRange(animation, 0, 100);
+    const animationPatterns = getAnimationPatternsInsideTimelineRange(
+      animation,
+      0,
+      100
+    );
     const pattern = animationPatterns?.at(0);
     expect(pattern?.uuid).toBe("4145ab82-6a79-48d1-8425-747a464a4940");
   }
@@ -29,7 +40,11 @@ test(
     "Then I expect an empty array.",
   () => {
     const animation = testAnimation(0, 0, 80);
-    const animationPatterns = getAnimationPatternsInsideTimelineRange(animation, 100, 1000);
+    const animationPatterns = getAnimationPatternsInsideTimelineRange(
+      animation,
+      100,
+      1000
+    );
     expect(animationPatterns).toStrictEqual([]);
   }
 );
@@ -48,7 +63,11 @@ describe("pattern-logic", () => {
     it.each(dataSet)(
       "Returns all patterns that should be visible in the timeline",
       (data: { animation: Animation; shouldBeReturned: boolean }) => {
-        const animationPatterns = getAnimationPatternsToDrawInTimeline(data.animation, 100, 1000);
+        const animationPatterns = getAnimationPatternsToDrawInTimeline(
+          data.animation,
+          100,
+          1000
+        );
         expect(animationPatterns?.length).toBe(data.shouldBeReturned ? 1 : 0);
       }
     );
@@ -62,7 +81,11 @@ test(
     "Then I expect the returned keyframe starttime to be greater than the starttime",
   () => {
     const animationPattern = testAnimationPattern(0, 100, 200);
-    const keyFrames = getKeyFramesPastTimelinePositionSortedByTime("scale", animationPattern, 0);
+    const keyFrames = getKeyFramesPastTimelinePositionSortedByTime(
+      "scale",
+      animationPattern,
+      0
+    );
     const keyFrameTime = keyFrames.at(0)?.timeMs;
 
     expect(keyFrameTime).toBeGreaterThanOrEqual(100);
@@ -76,7 +99,11 @@ test(
     "Then I expect an empty array",
   () => {
     const animationPattern = testAnimationPattern(0, 0, 50);
-    const keyFrames = getKeyFramesPastTimelinePositionSortedByTime("scale", animationPattern, 100);
+    const keyFrames = getKeyFramesPastTimelinePositionSortedByTime(
+      "scale",
+      animationPattern,
+      100
+    );
     expect(keyFrames).toStrictEqual([]);
   }
 );
@@ -98,7 +125,11 @@ test(
     "Then I expect the returned keyframes to be sorted by time",
   () => {
     const animationPattern = getAnimationWithTwoKeyframes();
-    const keyFrames = getKeyFramesPastTimelinePositionSortedByTime("scale", animationPattern, 0);
+    const keyFrames = getKeyFramesPastTimelinePositionSortedByTime(
+      "scale",
+      animationPattern,
+      0
+    );
 
     const firstKeyFrame = keyFrames.at(0);
     const secondKeyFrame = keyFrames.at(1);
@@ -115,7 +146,11 @@ test(
     "Then I expect the returned keyframes to be sorted by time descending",
   () => {
     const animationPattern = getAnimationWithTwoKeyframes();
-    const keyFrames = getKeyFramesBeforeTimelinePositionSortedByTimeDescending("scale", animationPattern, 201);
+    const keyFrames = getKeyFramesBeforeTimelinePositionSortedByTimeDescending(
+      "scale",
+      animationPattern,
+      201
+    );
 
     const firstKeyFrame = keyFrames.at(0);
     const secondKeyFrame = keyFrames.at(1);
@@ -132,7 +167,11 @@ test(
     "Then I expect the returned keyframe starttime to be before the starttime",
   () => {
     const animationPattern = testAnimationPattern(0, 0, 0);
-    const keyFrames = getKeyFramesBeforeTimelinePositionSortedByTimeDescending("scale", animationPattern, 100);
+    const keyFrames = getKeyFramesBeforeTimelinePositionSortedByTimeDescending(
+      "scale",
+      animationPattern,
+      100
+    );
     const keyFrameTime = keyFrames.at(0)?.timeMs;
 
     expect(keyFrameTime).toBeLessThanOrEqual(100);
@@ -146,7 +185,11 @@ test(
     "Then I expect an empty array",
   () => {
     const animationPattern = testAnimationPattern(0, 100, 0);
-    const keyFrames = getKeyFramesBeforeTimelinePositionSortedByTimeDescending("scale", animationPattern, 0);
+    const keyFrames = getKeyFramesBeforeTimelinePositionSortedByTimeDescending(
+      "scale",
+      animationPattern,
+      0
+    );
     expect(keyFrames).toStrictEqual([]);
   }
 );
@@ -159,7 +202,9 @@ test(
   () => {
     const animationPattern = testAnimationPattern(0, 100, 0);
     const keyFrames = getCurrentKeyFrame(animationPattern, 100);
-    expect(keyFrames.length).toBe(animationPattern.animationPatternKeyFrames.length);
+    expect(keyFrames.length).toBe(
+      animationPattern.animationPatternKeyFrames.length
+    );
   }
 );
 
@@ -174,13 +219,17 @@ test(
     const nextKeyFrame = getTestAnimationPatternKeyFrames(200)[0];
 
     let animationPattern = testAnimationPattern(0, 0, 0);
-    animationPattern.animationPatternKeyFrames = animationPattern.animationPatternKeyFrames.concat(
-      previousKeyFrame,
-      currentKeyFrame,
-      nextKeyFrame
-    );
+    animationPattern.animationPatternKeyFrames =
+      animationPattern.animationPatternKeyFrames.concat(
+        previousKeyFrame,
+        currentKeyFrame,
+        nextKeyFrame
+      );
 
-    const keyFrames = getPreviousCurrentAndNextKeyFramePerProperty(animationPattern, 100);
+    const keyFrames = getPreviousCurrentAndNextKeyFramePerProperty(
+      animationPattern,
+      100
+    );
     keyFrames.previous.forEach((kf) => expect(kf.timeMs).toBe(0));
     keyFrames.current.forEach((kf) => expect(kf.timeMs).toBe(100));
     keyFrames.next.forEach((kf) => expect(kf.timeMs).toBe(200));

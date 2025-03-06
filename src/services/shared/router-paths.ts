@@ -1,6 +1,5 @@
 const paths = {
   Dashboard: "/",
-  SafetyZones: "/safety-zones",
   PatternEditor: "/pattern-editor",
   LasershowEditor: "/lasershow-editor",
   AnimationEditor: "/animation-editor",
@@ -16,6 +15,7 @@ const paths = {
   LasershowSpotifyConnector: "/lasershow-spotify-connector",
   Disclaimer: "/disclaimer",
   Logout: "/logout",
+  ShowlaserManager: "/showlaser-manager",
 };
 
 export default paths;
