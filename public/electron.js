@@ -1,7 +1,11 @@
 const path = require("path");
-
 const { app, BrowserWindow } = require("electron");
+const { spawn } = require("node:child_process");
 const isDev = require("electron-is-dev");
+const bat = spawn("cmd.exe", [
+  "/c",
+  "D:/Deze Pc/Documenten/Projecten/Laser projector/Pc software/LaserAPI/LaserAPI/bin/Release/net6.0-windows10.0.22621.0/LaserApi.exe",
+]);
 
 function createWindow() {
   // Create the browser window.
@@ -18,12 +22,20 @@ function createWindow() {
 
   // and load the index.html of the app.
   // win.loadFile("index.html");
-  win.loadURL(
-    isDev
-      ? "http://localhost:3000"
-      : `file://${path.join(__dirname, "../build/index.html")}`
-  );
+  win.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`);
 }
+
+bat.stdout.on("data", (data) => {
+  console.log(data.toString());
+});
+
+bat.stderr.on("data", (data) => {
+  console.error(data.toString());
+});
+
+bat.on("exit", (code) => {
+  console.log(`Child exited with code ${code}`);
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
