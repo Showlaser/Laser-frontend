@@ -1,5 +1,5 @@
 import { Point } from "models/components/shared/point";
-import { createGuid } from "services/shared/math";
+import { createGuid, emptyGuid } from "services/shared/math";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import { range } from "d3-array";
 import { canvasPxSize } from "services/shared/config";
@@ -19,7 +19,10 @@ const pathologize = (original: string) => {
   }
 };
 
-const mapCoordinatesToXAndYPoint = (coordinates: any, patternUuid: string): Point[] => {
+const mapCoordinatesToXAndYPoint = (
+  coordinates: any,
+  patternUuid: string
+): Point[] => {
   const length = coordinates.length;
   const mappedCoordinates = new Array<Point>(length);
   for (let i = 0; i < length; i++) {
@@ -31,19 +34,28 @@ const mapCoordinatesToXAndYPoint = (coordinates: any, patternUuid: string): Poin
   return mappedCoordinates;
 };
 
-const createPoint = (x: number, y: number, orderNr: number, patternUuid: string): Point => ({
+const createPoint = (
+  x: number,
+  y: number,
+  orderNr: number,
+  patternUuid: string
+): Point => ({
   uuid: createGuid(),
   patternUuid,
   redLaserPowerPwm: 255,
   greenLaserPowerPwm: 255,
   blueLaserPowerPwm: 255,
-  connectedToPointUuid: null,
+  connectedToPointUuid: emptyGuid,
   orderNr: orderNr,
   x,
   y,
 });
 
-export const svgToPoints = (svg: any, numberOfPoints: number, patternUuid: string): Point[] => {
+export const svgToPoints = (
+  svg: any,
+  numberOfPoints: number,
+  patternUuid: string
+): Point[] => {
   if (!svg) {
     return [];
   }
@@ -72,7 +84,9 @@ const pathsToCoords = (paths: any, numberOfPoints: number) => {
       //ensures that the total number of points = the actual requested number (because using rounding)
       pointsForPath = numberOfPoints - runningPointsTotal;
     } else {
-      pointsForPath = Math.round((numberOfPoints * item.getTotalLength()) / totalLengthAllPaths);
+      pointsForPath = Math.round(
+        (numberOfPoints * item.getTotalLength()) / totalLengthAllPaths
+      );
       runningPointsTotal += pointsForPath;
     }
     return [...prev, ...polygonize(item, pointsForPath)];
@@ -94,7 +108,9 @@ const getTotalLengthAllPaths = (paths: HTMLCollection) => {
   }, 0);
 };
 
-export const prepareCanvas = (canvas: HTMLCanvasElement): CanvasRenderingContext2D | null => {
+export const prepareCanvas = (
+  canvas: HTMLCanvasElement
+): CanvasRenderingContext2D | null => {
   canvas.width = canvasPxSize;
   canvas.height = canvasPxSize;
   canvas.style.width = canvasPxSize.toString();

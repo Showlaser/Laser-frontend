@@ -2,18 +2,28 @@ import React, { useEffect, useState } from "react";
 import LasershowManager from "./lasershow-manager";
 import { Grid, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
 import { canvasPxSize, selectableSteps } from "services/shared/config";
-import { SelectedLasershowContext, SelectedLasershowContextType } from "pages/lasershow-editor";
+import {
+  SelectedLasershowContext,
+  SelectedLasershowContextType,
+} from "pages/lasershow-editor";
 import TabSelector from "components/tabs";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SaveIcon from "@mui/icons-material/Save";
 import ClearIcon from "@mui/icons-material/Clear";
-import { getLasershowDuration, saveLasershow } from "services/logic/lasershow-logic";
-import { getAnimationDuration, getPointsToDrawFromAnimation } from "services/logic/animation-logic";
+import {
+  getLasershowDuration,
+  saveLasershow,
+} from "services/logic/lasershow-logic";
+import {
+  getAnimationDuration,
+  getPointsToDrawFromAnimation,
+} from "services/logic/animation-logic";
 import LasershowAnimationProperties from "./lasershow-animation-properties";
 import PointsDrawer from "components/shared/points-drawer";
 import { Point } from "models/components/shared/point";
 import { numberIsBetweenOrEqual } from "services/shared/math";
 import { SharedTimeline } from "components/shared/shared-timeline";
+import LasershowExport from "./lasershow-export";
 
 export type LasershowTimeLineContextType = {
   timelinePositionMs: number;
@@ -27,7 +37,9 @@ export type LasershowSelectableStepsIndexContextType = {
 
 export type SelectedLasershowAnimationUuidContextType = {
   selectedLasershowAnimationUuid: string | null;
-  setSelectedLasershowAnimationUuid: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedLasershowAnimationUuid: React.Dispatch<
+    React.SetStateAction<string | null>
+  >;
 };
 
 export type PlayLasershowContextType = {
@@ -35,13 +47,16 @@ export type PlayLasershowContextType = {
   setPlayLasershow: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const LasershowTimeLinePositionContext = React.createContext<LasershowTimeLineContextType | null>(null);
+export const LasershowTimeLinePositionContext =
+  React.createContext<LasershowTimeLineContextType | null>(null);
 export const LasershowSelectableStepsIndexContext =
   React.createContext<LasershowSelectableStepsIndexContextType | null>(null);
 export const SelectedLasershowAnimationUuidContext =
   React.createContext<SelectedLasershowAnimationUuidContextType | null>(null);
-export const PlayLasershowContext = React.createContext<PlayLasershowContextType | null>(null);
-export const LasershowStepsToDrawMaxRangeContext = React.createContext<number>(0);
+export const PlayLasershowContext =
+  React.createContext<PlayLasershowContextType | null>(null);
+export const LasershowStepsToDrawMaxRangeContext =
+  React.createContext<number>(0);
 
 export default function LasershowEditorContent() {
   const { selectedLasershow, setSelectedLasershow } = React.useContext(
@@ -50,7 +65,8 @@ export default function LasershowEditorContent() {
 
   const [timelinePositionMs, setTimelinePositionMs] = useState<number>(0);
   const [selectableStepsIndex, setSelectableStepsIndex] = useState<number>(0);
-  const [selectedLasershowAnimationUuid, setSelectedLasershowAnimationUuid] = useState<string | null>(null);
+  const [selectedLasershowAnimationUuid, setSelectedLasershowAnimationUuid] =
+    useState<string | null>(null);
   const [playLasershow, setPlayLasershow] = useState<boolean>(false);
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
 
@@ -63,26 +79,44 @@ export default function LasershowEditorContent() {
     [selectableStepsIndex]
   );
   const selectedLasershowAnimationUuidMemo = React.useMemo(
-    () => ({ selectedLasershowAnimationUuid, setSelectedLasershowAnimationUuid }),
+    () => ({
+      selectedLasershowAnimationUuid,
+      setSelectedLasershowAnimationUuid,
+    }),
     [selectedLasershowAnimationUuid]
   );
 
-  const stepsToDrawMaxRange = (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
+  const stepsToDrawMaxRange =
+    (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
 
-  const playLasershowMemo = React.useMemo(() => ({ playLasershow, setPlayLasershow }), [playLasershow]);
+  const playLasershowMemo = React.useMemo(
+    () => ({ playLasershow, setPlayLasershow }),
+    [playLasershow]
+  );
+
+  const lasershowDuration = getLasershowDuration(selectedLasershow);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (playLasershow) {
-      if (timelinePositionMs >= getLasershowDuration(selectedLasershow)) {
+      if (timelinePositionMs >= lasershowDuration) {
         setPlayLasershow(false);
       }
 
-      interval = setInterval(() => setTimelinePositionMs(timelinePositionMs + 10), 10);
+      interval = setInterval(
+        () => setTimelinePositionMs(timelinePositionMs + 10),
+        10
+      );
     }
 
     return () => clearInterval(interval);
-  }, [playLasershow, selectableStepsIndex, timelinePositionMs, selectedLasershowAnimationUuid, selectedLasershow]);
+  }, [
+    playLasershow,
+    selectableStepsIndex,
+    timelinePositionMs,
+    selectedLasershowAnimationUuid,
+    selectedLasershow,
+  ]);
 
   useEffect(() => {
     setSelectedTabId(1);
@@ -90,10 +124,16 @@ export default function LasershowEditorContent() {
 
   const getWrapperContext = (reactObject: React.ReactNode) => (
     <LasershowTimeLinePositionContext.Provider value={timelinePositionMemo}>
-      <LasershowSelectableStepsIndexContext.Provider value={lasershowSelectableStepsIndexMemo}>
-        <SelectedLasershowAnimationUuidContext.Provider value={selectedLasershowAnimationUuidMemo}>
+      <LasershowSelectableStepsIndexContext.Provider
+        value={lasershowSelectableStepsIndexMemo}
+      >
+        <SelectedLasershowAnimationUuidContext.Provider
+          value={selectedLasershowAnimationUuidMemo}
+        >
           <PlayLasershowContext.Provider value={playLasershowMemo}>
-            <LasershowStepsToDrawMaxRangeContext.Provider value={stepsToDrawMaxRange}>
+            <LasershowStepsToDrawMaxRangeContext.Provider
+              value={stepsToDrawMaxRange}
+            >
               {reactObject}
             </LasershowStepsToDrawMaxRangeContext.Provider>
           </PlayLasershowContext.Provider>
@@ -104,7 +144,9 @@ export default function LasershowEditorContent() {
 
   const saveLasershowOnApi = async () => {
     if (selectedLasershow !== null) {
-      const canvas: HTMLCanvasElement | null = document.getElementById("points-drawer-canvas") as HTMLCanvasElement;
+      const canvas: HTMLCanvasElement | null = document.getElementById(
+        "points-drawer-canvas"
+      ) as HTMLCanvasElement;
       let lasershowToUpdate = { ...selectedLasershow };
       if (canvas !== null) {
         lasershowToUpdate.image = canvas.toDataURL("image/webp", 0.4);
@@ -114,12 +156,23 @@ export default function LasershowEditorContent() {
     }
   };
 
-  const getPointsToDraw = (): Point[][] => {
-    const lasershowAnimationsToPlay = selectedLasershow?.lasershowAnimations.filter((la) =>
-      numberIsBetweenOrEqual(timelinePositionMs, la.startTimeMs, getAnimationDuration(la.animation) + la.startTimeMs)
-    );
+  const getPointsToDraw = (
+    positionMs: number,
+    convertValuesFromPointsDrawer: boolean
+  ): Point[][] => {
+    const lasershowAnimationsToPlay =
+      selectedLasershow?.lasershowAnimations.filter((la) =>
+        numberIsBetweenOrEqual(
+          positionMs,
+          la.startTimeMs,
+          getAnimationDuration(la.animation) + la.startTimeMs
+        )
+      );
 
-    if (lasershowAnimationsToPlay?.length === 0 || lasershowAnimationsToPlay === undefined) {
+    if (
+      lasershowAnimationsToPlay?.length === 0 ||
+      lasershowAnimationsToPlay === undefined
+    ) {
       return [];
     }
 
@@ -127,8 +180,9 @@ export default function LasershowEditorContent() {
     for (let li = 0; li < lasershowAnimationsToPlay.length; li++) {
       const lasershowAnimation = lasershowAnimationsToPlay[li];
       const points = getPointsToDrawFromAnimation(
-        timelinePositionMs - lasershowAnimation.startTimeMs,
-        lasershowAnimation.animation
+        positionMs - lasershowAnimation.startTimeMs,
+        lasershowAnimation.animation,
+        convertValuesFromPointsDrawer
       );
       lasershowPoints = lasershowPoints.concat(points);
     }
@@ -160,6 +214,16 @@ export default function LasershowEditorContent() {
                     tabName: "Lasershow animation properties",
                     tabChildren: <LasershowAnimationProperties />,
                   },
+                  {
+                    tabName: "Export lasershow",
+                    tabChildren: (
+                      <LasershowExport
+                        selectedLasershow={selectedLasershow}
+                        getPointsToDraw={getPointsToDraw}
+                        lasershowDuration={lasershowDuration}
+                      />
+                    ),
+                  },
                 ]}
                 selectedTabId={selectedTabId}
                 setSelectedTabId={setSelectedTabId}
@@ -169,7 +233,9 @@ export default function LasershowEditorContent() {
           </Grid>
         )}
         <Grid item xs>
-          <PointsDrawer pointsToDraw={getPointsToDraw()} />
+          <PointsDrawer
+            pointsToDraw={getPointsToDraw(timelinePositionMs, true)}
+          />
         </Grid>
       </Grid>
       <Grid item xs={12}>
@@ -182,16 +248,18 @@ export default function LasershowEditorContent() {
                 setPlay={setPlayLasershow}
                 timelinePositionMs={timelinePositionMs}
                 setTimelinePositionMs={setTimelinePositionMs}
-                totalDuration={getLasershowDuration(selectedLasershow)}
+                totalDuration={lasershowDuration}
                 selectableStepsIndex={selectableStepsIndex}
                 setSelectableStepsIndex={setSelectableStepsIndex}
-                timelineItems={selectedLasershow.lasershowAnimations.map((la) => ({
-                  uuid: la.uuid,
-                  name: la.name,
-                  startTime: la.startTimeMs,
-                  duration: getAnimationDuration(la.animation),
-                  timelineId: la.timelineId,
-                }))}
+                timelineItems={selectedLasershow.lasershowAnimations.map(
+                  (la) => ({
+                    uuid: la.uuid,
+                    name: la.name,
+                    startTime: la.startTimeMs,
+                    duration: getAnimationDuration(la.animation),
+                    timelineId: la.timelineId,
+                  })
+                )}
               />
             )
           : null}
@@ -206,13 +274,19 @@ export default function LasershowEditorContent() {
             key="sd-upload-clear"
             icon={<ClearIcon />}
             onClick={() =>
-              window.confirm("Are you sure you want to clear the field? Unsaved changes will be lost")
+              window.confirm(
+                "Are you sure you want to clear the field? Unsaved changes will be lost"
+              )
                 ? setSelectedLasershow(null)
                 : null
             }
             tooltipTitle="Clear editor field"
           />
-          <SpeedDialAction icon={<SaveIcon />} onClick={saveLasershowOnApi} tooltipTitle="Save animation (ctrl + s)" />
+          <SpeedDialAction
+            icon={<SaveIcon />}
+            onClick={saveLasershowOnApi}
+            tooltipTitle="Save animation (ctrl + s)"
+          />
         </SpeedDial>
       </Grid>
     </>

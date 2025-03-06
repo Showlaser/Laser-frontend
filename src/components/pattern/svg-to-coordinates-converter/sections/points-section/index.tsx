@@ -17,9 +17,12 @@ import {
 import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { PatternSectionProps } from "models/components/shared/pattern";
-import { getHexColorStringFromPoint, setLaserPowerFromHexString } from "services/shared/converters";
+import {
+  getHexColorStringFromPoint,
+  setLaserPowerFromHexString,
+} from "services/shared/converters";
 import { showError, toastSubject } from "services/shared/toast-messages";
-import { numberIsBetweenOrEqual } from "services/shared/math";
+import { emptyGuid, numberIsBetweenOrEqual } from "services/shared/math";
 import AddIcon from "@mui/icons-material/Add";
 import { getPointsPlaceHolder } from "services/shared/points";
 import { OnTrue } from "components/shared/on-true";
@@ -33,11 +36,18 @@ export default function PointsSection({
 }: PatternSectionProps) {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsPerPage, setItemsPerPage] = useState<number>(25);
-  const [showColorWarning, setShowColorWarning] = React.useState<boolean>(false);
+  const [showColorWarning, setShowColorWarning] =
+    React.useState<boolean>(false);
 
-  const updatePointProperty = (pointToUpdate: Point, value: any, property: string) => {
+  const updatePointProperty = (
+    pointToUpdate: Point,
+    value: any,
+    property: string
+  ) => {
     let updatedPoints: Point[] = [...pattern.points];
-    const pointToUpdateIndex: number = updatedPoints.findIndex((p: Point) => p.uuid === pointToUpdate.uuid);
+    const pointToUpdateIndex: number = updatedPoints.findIndex(
+      (p: Point) => p.uuid === pointToUpdate.uuid
+    );
 
     if (pointToUpdateIndex === -1) {
       return;
@@ -46,10 +56,11 @@ export default function PointsSection({
     switch (property) {
       case "connectedToPointUuid":
         if (value === "None") {
-          updatedPoints[pointToUpdateIndex].connectedToPointUuid = null;
+          updatedPoints[pointToUpdateIndex].connectedToPointUuid = emptyGuid;
         } else {
           const pointIndex = Number(value.substring(6) - 1);
-          updatedPoints[pointToUpdateIndex].connectedToPointUuid = pointsToRender[pointIndex].uuid;
+          updatedPoints[pointToUpdateIndex].connectedToPointUuid =
+            pointsToRender[pointIndex].uuid;
         }
 
         break;
@@ -77,10 +88,14 @@ export default function PointsSection({
       case "order":
         const substringIndex = value.indexOf("Point") + 5;
         const actualValue = Number(value.substring(substringIndex)) - 1;
-        const pointToSwapOrderWithIndex = updatedPoints.findIndex((p) => p.orderNr === actualValue);
-        const pointToSwapOrderWithOrderNr = updatedPoints[pointToSwapOrderWithIndex].orderNr;
+        const pointToSwapOrderWithIndex = updatedPoints.findIndex(
+          (p) => p.orderNr === actualValue
+        );
+        const pointToSwapOrderWithOrderNr =
+          updatedPoints[pointToSwapOrderWithIndex].orderNr;
 
-        updatedPoints[pointToSwapOrderWithIndex].orderNr = updatedPoints[pointToUpdateIndex].orderNr;
+        updatedPoints[pointToSwapOrderWithIndex].orderNr =
+          updatedPoints[pointToUpdateIndex].orderNr;
         updatedPoints[pointToUpdateIndex].orderNr = pointToSwapOrderWithOrderNr;
         break;
       default:
@@ -95,10 +110,14 @@ export default function PointsSection({
       return;
     }
 
-    const newPoints = pattern.points.filter((pp) => !selectedPointsUuid.some((spu) => spu === pp.uuid));
+    const newPoints = pattern.points.filter(
+      (pp) => !selectedPointsUuid.some((spu) => spu === pp.uuid)
+    );
     newPoints.forEach((np, index) => (np.orderNr = index));
 
-    const selectedPoints = selectedPointsUuid.filter((spu) => newPoints.some((np) => np.uuid === spu));
+    const selectedPoints = selectedPointsUuid.filter((spu) =>
+      newPoints.some((np) => np.uuid === spu)
+    );
     const pageNumberToSet = Math.floor((newPoints.length - 1) / itemsPerPage);
     setCurrentPage(pageNumberToSet);
     updatePatternProperty("points", newPoints);
@@ -130,20 +149,33 @@ export default function PointsSection({
 
   const pointsToRender = [...pattern?.points]
     .sort((a, b) => a.orderNr - b.orderNr)
-    .filter((p) => numberIsBetweenOrEqual(p.orderNr, currentPage * itemsPerPage, getItemsEndIndex()));
+    .filter((p) =>
+      numberIsBetweenOrEqual(
+        p.orderNr,
+        currentPage * itemsPerPage,
+        getItemsEndIndex()
+      )
+    );
 
   const addPoint = () => {
     let updatedPattern = { ...pattern };
-    const newPoint = getPointsPlaceHolder(updatedPattern.uuid, updatedPattern.points.length);
+    const newPoint = getPointsPlaceHolder(
+      updatedPattern.uuid,
+      updatedPattern.points.length
+    );
     updatedPattern.points.push(newPoint);
 
-    const pageNumberToSet = Math.floor((updatedPattern.points.length - 1) / itemsPerPage);
+    const pageNumberToSet = Math.floor(
+      (updatedPattern.points.length - 1) / itemsPerPage
+    );
     setCurrentPage(pageNumberToSet);
     setPattern(updatedPattern);
   };
 
   const toggleAllPoints = (checked: boolean) =>
-    checked ? setSelectedPointsUuid(pattern.points.map((p) => p.uuid)) : setSelectedPointsUuid([]);
+    checked
+      ? setSelectedPointsUuid(pattern.points.map((p) => p.uuid))
+      : setSelectedPointsUuid([]);
 
   const getConnectablePoints = () => {
     let points = [...pattern?.points]
@@ -166,7 +198,10 @@ export default function PointsSection({
       <div style={{ marginLeft: "4px" }}>
         <Tooltip title="Select all">
           <Checkbox
-            checked={selectedPointsUuid.length === pattern.points.length && pattern.points.length > 0}
+            checked={
+              selectedPointsUuid.length === pattern.points.length &&
+              pattern.points.length > 0
+            }
             onClick={(e: any) => toggleAllPoints(e.target.checked)}
           />
         </Tooltip>
@@ -176,7 +211,10 @@ export default function PointsSection({
           </IconButton>
         </Tooltip>
         <Tooltip title="Delete selected points">
-          <IconButton onClick={deleteSelectedPoints} style={{ color: "#d13126" }}>
+          <IconButton
+            onClick={deleteSelectedPoints}
+            style={{ color: "#d13126" }}
+          >
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -186,14 +224,17 @@ export default function PointsSection({
         <OnTrue onTrue={showColorWarning}>
           <Fade in={showColorWarning} timeout={1000}>
             <Alert severity="warning">
-              Warning! Color changes are only applied when clicking next to the color picker!
+              Warning! Color changes are only applied when clicking next to the
+              color picker!
             </Alert>
           </Fade>
         </OnTrue>
         <List dense>
           {pointsToRender.map((point, index) => (
             <ListItem key={`points-section-${point.uuid}`}>
-              <ListItemIcon onClick={(e: any) => onToggle(point.uuid, e.target.checked)}>
+              <ListItemIcon
+                onClick={(e: any) => onToggle(point.uuid, e.target.checked)}
+              >
                 <Checkbox
                   edge="start"
                   checked={selectedPointsUuid.some((sp) => sp === point.uuid)}
@@ -209,18 +250,26 @@ export default function PointsSection({
                     label: `Point ${point.orderNr + 1}`,
                   }}
                   disableClearable
-                  onChange={(e, value) => updatePointProperty(point, value?.label, "order")}
+                  onChange={(e, value) =>
+                    updatePointProperty(point, value?.label, "order")
+                  }
                   disablePortal
                   options={connectablePoints.filter(
-                    (cp) => cp.label !== `Point ${point.orderNr + 1}` && cp.label !== "None"
+                    (cp) =>
+                      cp.label !== `Point ${point.orderNr + 1}` &&
+                      cp.label !== "None"
                   )}
-                  renderInput={(params) => <TextField {...params} label="Point order" />}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Point order" />
+                  )}
                 />
               </FormControl>
               <TextField
                 style={{ marginLeft: "35px" }}
                 defaultValue={point.x ?? undefined}
-                onChange={(e) => updatePointProperty(point, e.target.value, "x")}
+                onChange={(e) =>
+                  updatePointProperty(point, e.target.value, "x")
+                }
                 placeholder="x"
                 type="number"
                 inputProps={{ min: -4000, max: 4000 }}
@@ -229,7 +278,9 @@ export default function PointsSection({
               <TextField
                 style={{ marginLeft: "35px" }}
                 defaultValue={point.y ?? undefined}
-                onChange={(e) => updatePointProperty(point, e.target.value, "y")}
+                onChange={(e) =>
+                  updatePointProperty(point, e.target.value, "y")
+                }
                 placeholder="y"
                 type="number"
                 inputProps={{ min: -4000, max: 4000 }}
@@ -239,15 +290,29 @@ export default function PointsSection({
                 <Autocomplete
                   defaultValue={{
                     label:
-                      point.connectedToPointUuid === null
+                      point.connectedToPointUuid === emptyGuid
                         ? "None"
-                        : `Point ${pointsToRender.find((p) => p.uuid === point.connectedToPointUuid)?.orderNr}`,
+                        : `Point ${
+                            pointsToRender.find(
+                              (p) => p.uuid === point.connectedToPointUuid
+                            )?.orderNr
+                          }`,
                   }}
                   disableClearable
-                  onChange={(e, value) => updatePointProperty(point, value?.label, "connectedToPointUuid")}
+                  onChange={(e, value) =>
+                    updatePointProperty(
+                      point,
+                      value?.label,
+                      "connectedToPointUuid"
+                    )
+                  }
                   disablePortal
-                  options={connectablePoints.filter((cp) => cp.label !== `Point ${point.orderNr + 1}`)}
-                  renderInput={(params) => <TextField {...params} label="Connected to point" />}
+                  options={connectablePoints.filter(
+                    (cp) => cp.label !== `Point ${point.orderNr + 1}`
+                  )}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Connected to point" />
+                  )}
                 />
               </FormControl>
               <TextField
@@ -272,7 +337,9 @@ export default function PointsSection({
         count={pattern?.points.length}
         page={currentPage}
         onPageChange={(e: any, page: number) => setCurrentPage(page)}
-        onRowsPerPageChange={(e: any) => onRowsPerPageChange(Number(e.target.value))}
+        onRowsPerPageChange={(e: any) =>
+          onRowsPerPageChange(Number(e.target.value))
+        }
         rowsPerPage={itemsPerPage}
         rowsPerPageOptions={[25, 50]}
       />

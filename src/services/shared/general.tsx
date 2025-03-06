@@ -22,7 +22,10 @@ export function getFormDataObject(event: any) {
   return object;
 }
 
-export const getDifferenceBetweenTwoDatesInMinutesAndSecondsString = (expirationDate: Date, dateNow: Date) => {
+export const getDifferenceBetweenTwoDatesInMinutesAndSecondsString = (
+  expirationDate: Date,
+  dateNow: Date
+) => {
   const difference = expirationDate.getTime() - dateNow.getTime();
   if (difference <= 0) {
     return "Voting ended!";
@@ -33,7 +36,9 @@ export const getDifferenceBetweenTwoDatesInMinutesAndSecondsString = (expiration
     minutes %= 60;
     seconds %= 60;
 
-    return `${minutes < 10 ? "0" : ""}${minutes} : ${seconds < 10 ? "0" : ""}${seconds}`;
+    return `${minutes < 10 ? "0" : ""}${minutes} : ${
+      seconds < 10 ? "0" : ""
+    }${seconds}`;
   }
 };
 

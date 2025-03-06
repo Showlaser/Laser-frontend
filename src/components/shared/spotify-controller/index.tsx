@@ -21,7 +21,6 @@ import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import { mapNumber } from "services/shared/math";
 import {
   getPlayerState,
-  getTrackAudioFeatures,
   pausePlayer,
   previousSong,
   skipSong,
@@ -34,7 +33,6 @@ import { OnTrue } from "../on-true";
 
 export default function SpotifyController() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [songData, setSongData] = useState<any>({});
   const [player, setPlayer] = useState<any>({});
   const [noActiveDevice, setNoActiveDevice] = useState<boolean>(false);
   const open = Boolean(anchorEl);
@@ -48,15 +46,20 @@ export default function SpotifyController() {
   };
 
   const userIsLoggedIntoSpotify =
-    localStorage.getItem("SpotifyAccessToken") !== null && localStorage.getItem("SpotifyAccessToken") !== "undefined";
+    localStorage.getItem("SpotifyAccessToken") !== null &&
+    localStorage.getItem("SpotifyAccessToken") !== "undefined";
 
   useEffect(() => {
-    const interval = setInterval(() => getData(), dataSavingIsEnabled() ? 5000 : 2000);
+    const interval = setInterval(
+      () => getData(),
+      dataSavingIsEnabled() ? 5000 : 2000
+    );
     return () => clearInterval(interval);
-  }, [player, songData]);
+  }, [player]);
 
   const getData = async () => {
-    const menuClosed = document.getElementById("spotify-controller-menu") === null;
+    const menuClosed =
+      document.getElementById("spotify-controller-menu") === null;
     if (menuClosed) {
       return;
     }
@@ -68,12 +71,6 @@ export default function SpotifyController() {
     }
 
     setNoActiveDevice(false);
-
-    if (playerResult?.item?.id !== songData?.id) {
-      const trackResult = await getTrackAudioFeatures(playerResult?.item?.id ?? "");
-      setSongData(trackResult);
-    }
-
     setPlayer(playerResult);
   };
 
@@ -99,36 +96,54 @@ export default function SpotifyController() {
     if (noActiveDevice) {
       return (
         <div style={{ margin: "10px" }}>
-          <Alert severity="error">Please open Spotify on a device and play a song</Alert>
+          <Alert severity="error">
+            Please open Spotify on a device and play a song
+          </Alert>
         </div>
       );
     }
 
-    const imageUrl = player?.item?.album?.images?.at(1)?.url ?? player?.item?.album?.images?.at(0)?.url;
+    const imageUrl =
+      player?.item?.album?.images?.at(1)?.url ??
+      player?.item?.album?.images?.at(0)?.url;
     return (
       <div style={{ padding: "20px", width: "350px" }}>
         <Fade in={open} timeout={1000}>
           <span>
             {imageUrl === undefined ? (
-              <Skeleton animation="wave" variant="rectangular" width={300} height={282.5} />
+              <Skeleton
+                animation="wave"
+                variant="rectangular"
+                width={300}
+                height={282.5}
+              />
             ) : (
-              <Fade style={{ width: 300, height: 300 }} in={imageUrl !== undefined} timeout={1000}>
+              <Fade
+                style={{ width: 300, height: 300 }}
+                in={imageUrl !== undefined}
+                timeout={1000}
+              >
                 <img src={imageUrl} />
               </Fade>
             )}
             <br />
-            <label style={{ color: isLoading ? "gray" : "whitesmoke", fontSize: "90%" }}>
+            <label
+              style={{
+                color: isLoading ? "gray" : "whitesmoke",
+                fontSize: "90%",
+              }}
+            >
               {`${player?.item?.artists[0]?.name ?? "loading"} / `}
               {`${player?.item?.name ?? "loading"}`}
             </label>
-            <br />
-            <small style={{ color: isLoading ? "gray" : "whitesmoke" }}>
-              {`Bpm: ${parseInt(songData?.tempo ?? 0)}`}
-            </small>
             <Grid container justifyContent="center">
               <Grid>
                 <Tooltip title="Previous song" placement="bottom-end">
-                  <IconButton disabled={isLoading} onClick={previousSong} size="small">
+                  <IconButton
+                    disabled={isLoading}
+                    onClick={previousSong}
+                    size="small"
+                  >
                     <SkipPreviousIcon />
                   </IconButton>
                 </Tooltip>
@@ -142,18 +157,33 @@ export default function SpotifyController() {
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Next song" placement="bottom-start">
-                  <IconButton disabled={isLoading} size="small" onClick={skipSong}>
+                  <IconButton
+                    disabled={isLoading}
+                    size="small"
+                    onClick={skipSong}
+                  >
                     <SkipNextIcon />
                   </IconButton>
                 </Tooltip>
               </Grid>
             </Grid>
             {isLoading ? (
-              <Skeleton animation="wave" variant="rectangular" width={300} height={4} />
+              <Skeleton
+                animation="wave"
+                variant="rectangular"
+                width={300}
+                height={4}
+              />
             ) : (
               <LinearProgress
                 variant="determinate"
-                value={mapNumber(player?.progress_ms, 0, player?.item?.duration_ms, 0, 100)}
+                value={mapNumber(
+                  player?.progress_ms,
+                  0,
+                  player?.item?.duration_ms,
+                  0,
+                  100
+                )}
               />
             )}
             <br />
@@ -164,7 +194,9 @@ export default function SpotifyController() {
               label="Enable lasershow generation"
             />
             <OnTrue onTrue={dataSavingIsEnabled()}>
-              <small style={{ color: palette.warning.main }}>Data saving enabled. Updating every 5 seconds</small>
+              <small style={{ color: palette.warning.main }}>
+                Data saving enabled. Updating every 5 seconds
+              </small>
             </OnTrue>
           </span>
         </Fade>
@@ -175,7 +207,11 @@ export default function SpotifyController() {
   return (
     <>
       <Tooltip title="Spotify / lasershow generator controller">
-        <IconButton onClick={handleClick} area-haspopup="true" id="spotify-controller-button">
+        <IconButton
+          onClick={handleClick}
+          area-haspopup="true"
+          id="spotify-controller-button"
+        >
           <MusicNoteIcon />
         </IconButton>
       </Tooltip>

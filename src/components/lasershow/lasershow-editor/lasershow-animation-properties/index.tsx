@@ -90,6 +90,6 @@ export default function LasershowAnimationProperties() {
       </Select>
     </>
   ) : (
-    <Alert severity="info">Select a lasershow animation first!</Alert>
+    <Alert severity="info">Select a lasershow animation first by clicking it in the timeline!</Alert>
   );
 }

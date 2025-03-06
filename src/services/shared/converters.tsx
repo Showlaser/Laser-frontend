@@ -28,9 +28,13 @@ const hexToRgb = (hex: string) => {
   };
 };
 
-export const getHexColorStringFromPoint = (point: Point): string => rgbToHex(getRgbColorStringFromPoint(point));
+export const getHexColorStringFromPoint = (point: Point): string =>
+  rgbToHex(getRgbColorStringFromPoint(point));
 
-export const setLaserPowerFromHexString = (hex: string, point: Point): Point => {
+export const setLaserPowerFromHexString = (
+  hex: string,
+  point: Point
+): Point => {
   const rgb = hexToRgb(hex);
   point.redLaserPowerPwm = rgb?.r;
   point.greenLaserPowerPwm = rgb?.g;
@@ -73,7 +77,10 @@ export const convertAnimationToLasershowAnimation = (
   };
 };
 
-export const convertPatternToAnimationPattern = (pattern: Pattern, animation: Animation): AnimationPattern => {
+export const convertPatternToAnimationPattern = (
+  pattern: Pattern,
+  animation: Animation
+): AnimationPattern => {
   return {
     uuid: createGuid(),
     animationUuid: animation.uuid,
@@ -86,7 +93,9 @@ export const convertPatternToAnimationPattern = (pattern: Pattern, animation: An
   };
 };
 
-const generateAnimationKeyframesFromPattern = (pattern: Pattern): AnimationPatternKeyFrame[] => {
+const generateAnimationKeyframesFromPattern = (
+  pattern: Pattern
+): AnimationPatternKeyFrame[] => {
   return [
     {
       uuid: createGuid(),
@@ -119,15 +128,24 @@ const generateAnimationKeyframesFromPattern = (pattern: Pattern): AnimationPatte
   ];
 };
 
-export const applyParametersToPointsForCanvasByPattern = (pattern: Pattern): Point[] =>
-  applyParametersToPointsForCanvas(pattern.scale, pattern.xOffset, pattern.yOffset, pattern.rotation, pattern.points);
+export const applyParametersToPointsForCanvasByPattern = (
+  pattern: Pattern
+): Point[] =>
+  applyParametersToPointsForCanvas(
+    pattern.scale,
+    pattern.xOffset,
+    pattern.yOffset,
+    pattern.rotation,
+    pattern.points
+  );
 
 export const applyParametersToPointsForCanvas = (
   scale: number,
   xOffset: number,
   yOffset: number,
   rotation: number,
-  points: Point[]
+  points: Point[],
+  convertValuesFromPointsDrawer: boolean = true
 ): Point[] => {
   const pointsLength = points.length;
   let pointsWithOffsetApplied = [];
@@ -144,8 +162,17 @@ export const applyParametersToPointsForCanvas = (
   const centerX = centerOfPattern.x;
   const centerY = centerOfPattern.y;
 
-  const rotatedPoints = rotatePoints(pointsWithOffsetApplied, rotation, centerX, centerY);
-  return convertPointsToCanvasSize(rotatedPoints);
+  const rotatedPoints = rotatePoints(
+    pointsWithOffsetApplied,
+    rotation,
+    centerX,
+    centerY
+  );
+  if (convertValuesFromPointsDrawer) {
+    return convertPointsToCanvasSize(rotatedPoints);
+  } else {
+    return rotatedPoints;
+  }
 };
 
 export const convertPointsToCanvasSize = (points: Point[]) => {

@@ -30,11 +30,19 @@ export const getPatterns = async (): Promise<Pattern[]> => {
 };
 
 export const savePattern = (pattern: Pattern) => {
-  return sendRequest(() => Post(apiEndpoints.pattern, pattern), [], toastSubject.changesSaved);
+  return sendRequest(
+    () => Post(apiEndpoints.pattern, pattern),
+    [],
+    toastSubject.changesSaved
+  );
 };
 
 export const removePattern = (uuid: string) => {
-  return sendRequest(() => Delete(`${apiEndpoints.pattern}/${uuid}`), [], toastSubject.changesSaved);
+  return sendRequest(
+    () => Delete(`${apiEndpoints.pattern}/${uuid}`),
+    [],
+    toastSubject.changesSaved
+  );
 };
 
 export const playPattern = (pattern: Pattern) => {
@@ -45,7 +53,10 @@ export const getAnimationPatternsInsideTimelineRange = (
   animation: Animation | null,
   startRange: number,
   endRange: number
-) => animation?.animationPatterns.filter((ap) => numberIsBetweenOrEqual(ap.startTimeMs, startRange, endRange));
+) =>
+  animation?.animationPatterns.filter((ap) =>
+    numberIsBetweenOrEqual(ap.startTimeMs, startRange, endRange)
+  );
 
 export const getAnimationPatternsToDrawInTimeline = (
   animation: Animation | null,
@@ -54,7 +65,8 @@ export const getAnimationPatternsToDrawInTimeline = (
 ) => {
   return animation?.animationPatterns?.filter((ap) => {
     const patternStartsBeforeTimeline = ap.startTimeMs < timelinePositionMs;
-    const patternEndsAfterStepsToDraw = ap.startTimeMs + getAnimationPatternDuration(ap) > stepsToDrawMaxRange;
+    const patternEndsAfterStepsToDraw =
+      ap.startTimeMs + getAnimationPatternDuration(ap) > stepsToDrawMaxRange;
     const patternStartsInTimelineRange = numberIsBetweenOrEqual(
       ap.startTimeMs,
       timelinePositionMs,
@@ -84,9 +96,12 @@ export const getKeyFramesPastTimelinePositionSortedByTime = (
   animationPattern?.animationPatternKeyFrames
     .filter(
       (ak: { timeMs: number; propertyEdited: string }) =>
-        ak.timeMs > timelinePositionMs && ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
+        ak.timeMs > timelinePositionMs &&
+        ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
     )
-    .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
+    .sort(
+      (a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs
+    );
 
 export const getKeyFramesBeforeTimelinePositionSortedByTimeDescending = (
   property: string,
@@ -96,11 +111,17 @@ export const getKeyFramesBeforeTimelinePositionSortedByTimeDescending = (
   animationPattern?.animationPatternKeyFrames
     .filter(
       (ak: { timeMs: number; propertyEdited: string }) =>
-        ak.timeMs < timelinePositionMs && ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
+        ak.timeMs < timelinePositionMs &&
+        ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
     )
-    .sort((a: { timeMs: number }, b: { timeMs: number }) => b.timeMs - a.timeMs);
+    .sort(
+      (a: { timeMs: number }, b: { timeMs: number }) => b.timeMs - a.timeMs
+    );
 
-export const getCurrentKeyFrame = (selectedAnimationPattern: AnimationPattern, timelinePositionMs: number) =>
+export const getCurrentKeyFrame = (
+  selectedAnimationPattern: AnimationPattern,
+  timelinePositionMs: number
+) =>
   selectedAnimationPattern?.animationPatternKeyFrames.filter(
     (ak: { timeMs: number }) => ak.timeMs === timelinePositionMs
   );
@@ -109,11 +130,12 @@ export const getPreviousCurrentAndNextKeyFramePerProperty = (
   animationPattern: AnimationPattern,
   timelinePositionMs: number
 ): PreviousCurrentAndNextKeyFramePerProperty => {
-  let previousNextAndCurrentKeyFramePerProperty: PreviousCurrentAndNextKeyFramePerProperty = {
-    previous: [],
-    current: getCurrentKeyFrame(animationPattern, timelinePositionMs) ?? [],
-    next: [],
-  };
+  let previousNextAndCurrentKeyFramePerProperty: PreviousCurrentAndNextKeyFramePerProperty =
+    {
+      previous: [],
+      current: getCurrentKeyFrame(animationPattern, timelinePositionMs) ?? [],
+      next: [],
+    };
 
   propertiesSettings.forEach((propertySetting) => {
     const previous = getKeyFramesBeforeTimelinePositionSortedByTimeDescending(
@@ -141,7 +163,8 @@ export const getPreviousCurrentAndNextKeyFramePerProperty = (
 export const getPatternPointsByTimelinePosition = (
   pattern: Pattern,
   previousNextAndCurrentKeyFrames: PreviousCurrentAndNextKeyFramePerProperty,
-  timelinePositionMs: number
+  timelinePositionMs: number,
+  convertValuesFromPointsDrawer?: boolean
 ): Point[] => {
   if (pattern?.points === undefined) {
     return [];
@@ -157,40 +180,66 @@ export const getPatternPointsByTimelinePosition = (
   for (let i = 0; i < propertiesSettingsLength; i++) {
     const currentPropertySetting = propertiesSettings[i];
     const currentKeyFrame = previousNextAndCurrentKeyFrames.current.find(
-      (kf) => kf.propertyEdited.toLocaleLowerCase() === currentPropertySetting.property.toLocaleLowerCase()
+      (kf) =>
+        kf.propertyEdited.toLocaleLowerCase() ===
+        currentPropertySetting.property.toLocaleLowerCase()
     );
 
     const currentKeyFrameIsAvailable = currentKeyFrame !== undefined;
     const previousKeyFrame = currentKeyFrameIsAvailable
       ? currentKeyFrame
       : previousNextAndCurrentKeyFrames.previous.find(
-          (kf) => kf.propertyEdited.toLocaleLowerCase() === currentPropertySetting.property.toLocaleLowerCase()
+          (kf) =>
+            kf.propertyEdited.toLocaleLowerCase() ===
+            currentPropertySetting.property.toLocaleLowerCase()
         );
 
     const nextKeyFrame = previousNextAndCurrentKeyFrames.next.find(
-      (kf) => kf.propertyEdited.toLocaleLowerCase() === currentPropertySetting.property.toLocaleLowerCase()
+      (kf) =>
+        kf.propertyEdited.toLocaleLowerCase() ===
+        currentPropertySetting.property.toLocaleLowerCase()
     );
 
     const valuesPerPropertyIndex = valuesPerProperty.findIndex(
       (vpp) => vpp.property === currentPropertySetting.property
     );
-    if (valuesPerPropertyIndex !== -1 && previousKeyFrame !== undefined && nextKeyFrame !== undefined) {
-      valuesPerProperty[valuesPerPropertyIndex].value = calculateNewValueByKeyFrames(
-        previousKeyFrame,
-        nextKeyFrame,
-        timelinePositionMs
-      );
-    } else if (valuesPerPropertyIndex !== -1 && previousKeyFrame !== undefined) {
-      valuesPerProperty[valuesPerPropertyIndex].value = previousKeyFrame.propertyValue;
+    if (
+      valuesPerPropertyIndex !== -1 &&
+      previousKeyFrame !== undefined &&
+      nextKeyFrame !== undefined
+    ) {
+      valuesPerProperty[valuesPerPropertyIndex].value =
+        calculateNewValueByKeyFrames(
+          previousKeyFrame,
+          nextKeyFrame,
+          timelinePositionMs
+        );
+    } else if (
+      valuesPerPropertyIndex !== -1 &&
+      previousKeyFrame !== undefined
+    ) {
+      valuesPerProperty[valuesPerPropertyIndex].value =
+        previousKeyFrame.propertyValue;
     }
   }
 
-  const scale = valuesPerProperty.find((vpp) => vpp.property === "scale")?.value ?? 1;
-  const xOffset = valuesPerProperty.find((vpp) => vpp.property === "xOffset")?.value ?? 0;
-  const yOffset = valuesPerProperty.find((vpp) => vpp.property === "yOffset")?.value ?? 0;
-  const rotation = valuesPerProperty.find((vpp) => vpp.property === "rotation")?.value ?? 0;
+  const scale =
+    valuesPerProperty.find((vpp) => vpp.property === "scale")?.value ?? 1;
+  const xOffset =
+    valuesPerProperty.find((vpp) => vpp.property === "xOffset")?.value ?? 0;
+  const yOffset =
+    valuesPerProperty.find((vpp) => vpp.property === "yOffset")?.value ?? 0;
+  const rotation =
+    valuesPerProperty.find((vpp) => vpp.property === "rotation")?.value ?? 0;
 
-  return applyParametersToPointsForCanvas(scale, xOffset, yOffset, rotation, [...points]);
+  return applyParametersToPointsForCanvas(
+    scale,
+    xOffset,
+    yOffset,
+    rotation,
+    [...points],
+    convertValuesFromPointsDrawer
+  );
 };
 
 const calculateNewValueByKeyFrames = (

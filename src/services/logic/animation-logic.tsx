@@ -2,10 +2,16 @@ import { Delete, Get, Post } from "services/shared/api/api-actions";
 import { sendRequest } from "services/shared/api/api-middleware";
 import apiEndpoints from "services/shared/api/api-endpoints";
 import { toastSubject } from "services/shared/toast-messages";
-import { Animation, getAnimationPatternDuration } from "models/components/shared/animation";
+import {
+  Animation,
+  getAnimationPatternDuration,
+} from "models/components/shared/animation";
 import { Point } from "models/components/shared/point";
 import { numberIsBetweenOrEqual } from "services/shared/math";
-import { getPreviousCurrentAndNextKeyFramePerProperty, getPatternPointsByTimelinePosition } from "./pattern-logic";
+import {
+  getPreviousCurrentAndNextKeyFramePerProperty,
+  getPatternPointsByTimelinePosition,
+} from "./pattern-logic";
 
 export const getAnimations = async (): Promise<Animation[] | undefined> => {
   const result = await sendRequest(() => Get(apiEndpoints.animation), []);
@@ -17,10 +23,18 @@ export const getAnimations = async (): Promise<Animation[] | undefined> => {
 };
 
 export const saveAnimation = async (animation: Animation) =>
-  await sendRequest(() => Post(apiEndpoints.animation, animation), [], toastSubject.changesSaved);
+  await sendRequest(
+    () => Post(apiEndpoints.animation, animation),
+    [],
+    toastSubject.changesSaved
+  );
 
 export const removeAnimation = async (uuid: string) =>
-  sendRequest(() => Delete(`${apiEndpoints.animation}/${uuid}`), [], toastSubject.changesSaved);
+  sendRequest(
+    () => Delete(`${apiEndpoints.animation}/${uuid}`),
+    [],
+    toastSubject.changesSaved
+  );
 
 export const playAnimation = async (animation: Animation) =>
   sendRequest(() => Post(apiEndpoints.animation + "/play", animation), []);
@@ -61,7 +75,9 @@ export const getAnimationDuration = (animation: Animation | null) => {
     return 0;
   }
 
-  const times = animation?.animationPatterns.map((ap) => ap.startTimeMs + getAnimationPatternDuration(ap));
+  const times = animation?.animationPatterns.map(
+    (ap) => ap.startTimeMs + getAnimationPatternDuration(ap)
+  );
   if (times === undefined) {
     return 0;
   }
@@ -69,12 +85,23 @@ export const getAnimationDuration = (animation: Animation | null) => {
   return Math.max(...times);
 };
 
-export const getPointsToDrawFromAnimation = (timelinePositionMs: number, animation: Animation | null): Point[][] => {
+export const getPointsToDrawFromAnimation = (
+  timelinePositionMs: number,
+  animation: Animation | null,
+  convertValuesFromPointsDrawer?: boolean
+): Point[][] => {
   const animationPatternsToPlay = animation?.animationPatterns.filter((ap) =>
-    numberIsBetweenOrEqual(timelinePositionMs, ap.startTimeMs, getAnimationPatternDuration(ap) + ap.startTimeMs)
+    numberIsBetweenOrEqual(
+      timelinePositionMs,
+      ap.startTimeMs,
+      getAnimationPatternDuration(ap) + ap.startTimeMs
+    )
   );
   const animationPatternsToPlayLength = animationPatternsToPlay?.length ?? 0;
-  if (animationPatternsToPlayLength === 0 || animationPatternsToPlay === undefined) {
+  if (
+    animationPatternsToPlayLength === 0 ||
+    animationPatternsToPlay === undefined
+  ) {
     return [];
   }
 
@@ -85,14 +112,16 @@ export const getPointsToDrawFromAnimation = (timelinePositionMs: number, animati
       return [];
     }
 
-    const previousCurrentAndNextKeyFrames = getPreviousCurrentAndNextKeyFramePerProperty(
-      animationPattern,
-      timelinePositionMs
-    );
+    const previousCurrentAndNextKeyFrames =
+      getPreviousCurrentAndNextKeyFramePerProperty(
+        animationPattern,
+        timelinePositionMs
+      );
     const patternPoints = getPatternPointsByTimelinePosition(
       animationPattern.pattern,
       previousCurrentAndNextKeyFrames,
-      timelinePositionMs
+      timelinePositionMs,
+      convertValuesFromPointsDrawer
     );
 
     points.push(patternPoints);

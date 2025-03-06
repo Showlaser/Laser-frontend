@@ -1,9 +1,16 @@
-import { Animation, AnimationPattern, AnimationPatternKeyFrame } from "models/components/shared/animation";
-import { Lasershow, LasershowAnimation } from "models/components/shared/lasershow";
+import {
+  Animation,
+  AnimationPattern,
+  AnimationPatternKeyFrame,
+} from "models/components/shared/animation";
+import {
+  Lasershow,
+  LasershowAnimation,
+} from "models/components/shared/lasershow";
 import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
 import { propertiesSettings } from "services/logic/animation-logic";
-import { createGuid } from "services/shared/math";
+import { createGuid, emptyGuid } from "services/shared/math";
 
 export const getPointsTestSet = (): Point[] => [
   {
@@ -14,7 +21,7 @@ export const getPointsTestSet = (): Point[] => [
     redLaserPowerPwm: 0,
     greenLaserPowerPwm: 0,
     blueLaserPowerPwm: 0,
-    connectedToPointUuid: null,
+    connectedToPointUuid: emptyGuid,
     orderNr: 0,
   },
   {
@@ -25,7 +32,7 @@ export const getPointsTestSet = (): Point[] => [
     redLaserPowerPwm: 0,
     greenLaserPowerPwm: 0,
     blueLaserPowerPwm: 0,
-    connectedToPointUuid: null,
+    connectedToPointUuid: emptyGuid,
     orderNr: 1,
   },
   {
@@ -36,12 +43,14 @@ export const getPointsTestSet = (): Point[] => [
     redLaserPowerPwm: 0,
     greenLaserPowerPwm: 0,
     blueLaserPowerPwm: 0,
-    connectedToPointUuid: null,
+    connectedToPointUuid: emptyGuid,
     orderNr: 2,
   },
 ];
 
-export const generatePointsTestSet = (coordinates: { x: number; y: number }[]): Point[] =>
+export const generatePointsTestSet = (
+  coordinates: { x: number; y: number }[]
+): Point[] =>
   coordinates.map((coordinate, index) => ({
     uuid: "test",
     patternUuid: "a4db904a-220a-4d99-86b4-194e8eb72f4d",
@@ -50,11 +59,13 @@ export const generatePointsTestSet = (coordinates: { x: number; y: number }[]): 
     redLaserPowerPwm: 0,
     greenLaserPowerPwm: 0,
     blueLaserPowerPwm: 0,
-    connectedToPointUuid: null,
+    connectedToPointUuid: emptyGuid,
     orderNr: index,
   }));
 
-export const getTestAnimationPatternKeyFrames = (keyframesStartTime: number): AnimationPatternKeyFrame[] =>
+export const getTestAnimationPatternKeyFrames = (
+  keyframesStartTime: number
+): AnimationPatternKeyFrame[] =>
   propertiesSettings.map((propertySetting) => ({
     uuid: createGuid(),
     animationPatternUuid: "10254bbb-fbea-476b-9c85-7ad05185fa71",
@@ -86,13 +97,15 @@ export const testAnimationPattern = (
     name: "Test animation pattern",
     pattern: testPattern,
     startTimeMs: patternStartTime,
-    animationPatternKeyFrames: getTestAnimationPatternKeyFrames(keyframesStartTime),
+    animationPatternKeyFrames:
+      getTestAnimationPatternKeyFrames(keyframesStartTime),
     timelineId: 0,
   };
 
   if (animationDuration > 0) {
     const endKeyframes = getTestAnimationPatternKeyFrames(animationDuration);
-    animationPattern.animationPatternKeyFrames = animationPattern.animationPatternKeyFrames.concat(endKeyframes);
+    animationPattern.animationPatternKeyFrames =
+      animationPattern.animationPatternKeyFrames.concat(endKeyframes);
   }
 
   return animationPattern;
@@ -107,11 +120,20 @@ export const testAnimation = (
     uuid: "cdef5b05-e8aa-44e3-8261-7619e90b0ef0",
     name: "Test animation",
     image: null,
-    animationPatterns: [testAnimationPattern(patternStartTime, keyframesStartTime, animationDuration)],
+    animationPatterns: [
+      testAnimationPattern(
+        patternStartTime,
+        keyframesStartTime,
+        animationDuration
+      ),
+    ],
   };
 };
 
-export const testLasershowAnimation = (startTimeMs: number, animationDuration: number): LasershowAnimation => {
+export const testLasershowAnimation = (
+  startTimeMs: number,
+  animationDuration: number
+): LasershowAnimation => {
   return {
     uuid: "3bd7badd-c3b1-4f95-bd30-553f7fd66753",
     lasershowUuid: "5c7a1e06-33f5-4f93-bae6-8c0cbb7cc4c4",
@@ -123,11 +145,16 @@ export const testLasershowAnimation = (startTimeMs: number, animationDuration: n
   };
 };
 
-export const testLasershow = (startTimeMs: number, animationDuration: number): Lasershow => {
+export const testLasershow = (
+  startTimeMs: number,
+  animationDuration: number
+): Lasershow => {
   return {
     uuid: "826d257c-48df-4e4d-bd1f-627ff98ce8e2",
     name: "Test lasershow",
     image: "",
-    lasershowAnimations: [testLasershowAnimation(startTimeMs, animationDuration)],
+    lasershowAnimations: [
+      testLasershowAnimation(startTimeMs, animationDuration),
+    ],
   };
 };

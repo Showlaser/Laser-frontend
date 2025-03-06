@@ -4,7 +4,7 @@ export type Point = {
   redLaserPowerPwm: number;
   greenLaserPowerPwm: number;
   blueLaserPowerPwm: number;
-  connectedToPointUuid: string | null;
+  connectedToPointUuid: string;
   orderNr: number;
   x: number;
   y: number;

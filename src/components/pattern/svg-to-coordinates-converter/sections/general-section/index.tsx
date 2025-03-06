@@ -21,6 +21,7 @@ import {
 } from "services/shared/converters";
 import { showWarning, toastSubject } from "services/shared/toast-messages";
 import { OnTrue } from "components/shared/on-true";
+import { emptyGuid } from "services/shared/math";
 
 export default function GeneralSection({
   patternNamesInUse,
@@ -32,31 +33,38 @@ export default function GeneralSection({
   showPointNumber,
   setShowPointNumber,
 }: PatternSectionProps) {
-  const [dangerousElementsEnabled, setDangerousElementsEnabled] = React.useState<boolean>(false);
-  const [showColorWarning, setShowColorWarning] = React.useState<boolean>(false);
+  const [dangerousElementsEnabled, setDangerousElementsEnabled] =
+    React.useState<boolean>(false);
+  const [showColorWarning, setShowColorWarning] =
+    React.useState<boolean>(false);
 
-  const toggleAllDots = (e: any) => (e.target.checked ? connectAllDots() : disconnectAllDots());
+  const toggleAllDots = (e: any) =>
+    e.target.checked ? connectAllDots() : disconnectAllDots();
 
   const disconnectAllDots = () => {
     let updatedPoints = [...pattern.points];
     const pointsLength = pattern.points.length;
 
     for (let i = 0; i < pointsLength; i++) {
-      updatedPoints[i].connectedToPointUuid = null;
+      updatedPoints[i].connectedToPointUuid = emptyGuid;
     }
 
     updatePatternProperty("points", updatedPoints);
   };
 
   const connectAllDots = () => {
-    let updatedPoints = [...pattern.points].sort((a, b) => a.orderNr - b.orderNr);
+    let updatedPoints = [...pattern.points].sort(
+      (a, b) => a.orderNr - b.orderNr
+    );
     const pointsLength = pattern.points.length;
 
     for (let i = 0; i < pointsLength; i++) {
       if (i === pattern.points.length - 1) {
-        updatedPoints[i].connectedToPointUuid = pattern.points.find((p) => p.orderNr === 0)?.uuid ?? null;
+        updatedPoints[i].connectedToPointUuid =
+          pattern.points.find((p) => p.orderNr === 0)?.uuid ?? emptyGuid;
       } else {
-        updatedPoints[i].connectedToPointUuid = pattern.points.find((p) => p.orderNr === i + 1)?.uuid ?? null;
+        updatedPoints[i].connectedToPointUuid =
+          pattern.points.find((p) => p.orderNr === i + 1)?.uuid ?? emptyGuid;
       }
     }
 
@@ -74,7 +82,9 @@ export default function GeneralSection({
     }
 
     const firstColor = getRgbColorStringFromPoint(pattern.points[0] ?? "");
-    return pattern?.points?.every((p) => getRgbColorStringFromPoint(p) === firstColor);
+    return pattern?.points?.every(
+      (p) => getRgbColorStringFromPoint(p) === firstColor
+    );
   };
 
   return (
@@ -84,7 +94,11 @@ export default function GeneralSection({
           value={pattern.name}
           label="Pattern name"
           onChange={(e) => {
-            if (patternNamesInUse.some((patternName) => patternName === e.target.value)) {
+            if (
+              patternNamesInUse.some(
+                (patternName) => patternName === e.target.value
+              )
+            ) {
               showWarning(toastSubject.duplicatedName);
               setPatternNameIsInUse(true);
             } else {
@@ -97,15 +111,24 @@ export default function GeneralSection({
       </FormControl>
       <OnTrue onTrue={showColorWarning}>
         <Fade in={showColorWarning} timeout={1000}>
-          <Alert severity="warning">Warning! The color changes are only applied when closing the color picker!</Alert>
+          <Alert severity="warning">
+            Warning! The color changes are only applied when closing the color
+            picker!
+          </Alert>
         </Fade>
       </OnTrue>
-      <FormControl style={{ width: "100%", marginBottom: "10px", marginTop: "10px" }}>
+      <FormControl
+        style={{ width: "100%", marginBottom: "10px", marginTop: "10px" }}
+      >
         <TextField
           onClick={() => setShowColorWarning(true)}
           label="Color"
           type="color"
-          defaultValue={allPointsHaveTheSameColor() ? getHexColorStringFromPoint(pattern?.points[0]) : "#fffff"}
+          defaultValue={
+            allPointsHaveTheSameColor()
+              ? getHexColorStringFromPoint(pattern?.points[0])
+              : "#fffff"
+          }
           onBlur={(e) => {
             let updatedPoints = [...pattern.points];
             const length = updatedPoints.length;
@@ -127,7 +150,9 @@ export default function GeneralSection({
           <Button
             style={{ marginLeft: "10px" }}
             onClick={() =>
-              window.confirm("Are you sure you want to reset this value?") ? updatePatternProperty("scale", 1) : null
+              window.confirm("Are you sure you want to reset this value?")
+                ? updatePatternProperty("scale", 1)
+                : null
             }
           >
             Reset
@@ -154,7 +179,9 @@ export default function GeneralSection({
               disabled={!dangerousElementsEnabled}
               style={{ marginLeft: "10px" }}
               onClick={() =>
-                window.confirm("Are you sure you want to reset this value?") ? setNumberOfPoints(200) : null
+                window.confirm("Are you sure you want to reset this value?")
+                  ? setNumberOfPoints(200)
+                  : null
               }
             >
               Reset
@@ -188,7 +215,9 @@ export default function GeneralSection({
         <Button
           style={{ marginLeft: "10px" }}
           onClick={() =>
-            window.confirm("Are you sure you want to reset this value?") ? updatePatternProperty("xOffset", 0) : null
+            window.confirm("Are you sure you want to reset this value?")
+              ? updatePatternProperty("xOffset", 0)
+              : null
           }
         >
           Reset
@@ -199,7 +228,9 @@ export default function GeneralSection({
         id="svg-xoffset-input"
         type="number"
         value={pattern.xOffset}
-        onChange={(e) => updatePatternProperty("xOffset", Number(e.target.value))}
+        onChange={(e) =>
+          updatePatternProperty("xOffset", Number(e.target.value))
+        }
       />
       <br />
       <FormControl style={{ width: "100%" }}>
@@ -207,7 +238,9 @@ export default function GeneralSection({
           id="svg-xoffset"
           size="small"
           value={pattern.xOffset}
-          onChange={(e, value) => updatePatternProperty("xOffset", Math.round(Number(value)))}
+          onChange={(e, value) =>
+            updatePatternProperty("xOffset", Math.round(Number(value)))
+          }
           min={-4000}
           max={4000}
           aria-label="Small"
@@ -219,7 +252,9 @@ export default function GeneralSection({
         <Button
           style={{ marginLeft: "10px" }}
           onClick={() =>
-            window.confirm("Are you sure you want to reset this value?") ? updatePatternProperty("yOffset", 0) : null
+            window.confirm("Are you sure you want to reset this value?")
+              ? updatePatternProperty("yOffset", 0)
+              : null
           }
         >
           Reset
@@ -230,7 +265,9 @@ export default function GeneralSection({
         id="svg-yoffset-input"
         type="number"
         value={pattern.yOffset}
-        onChange={(e) => updatePatternProperty("yOffset", Number(e.target.value))}
+        onChange={(e) =>
+          updatePatternProperty("yOffset", Number(e.target.value))
+        }
       />
       <br />
       <FormControl style={{ width: "100%" }}>
@@ -238,7 +275,9 @@ export default function GeneralSection({
           id="svg-yoffset"
           size="small"
           value={pattern.yOffset}
-          onChange={(e, value) => updatePatternProperty("yOffset", Math.round(Number(value)))}
+          onChange={(e, value) =>
+            updatePatternProperty("yOffset", Math.round(Number(value)))
+          }
           min={-4000}
           max={4000}
           aria-label="Small"
@@ -251,7 +290,9 @@ export default function GeneralSection({
         <Button
           style={{ marginLeft: "10px" }}
           onClick={() =>
-            window.confirm("Are you sure you want to reset this value?") ? updatePatternProperty("rotation", 0) : null
+            window.confirm("Are you sure you want to reset this value?")
+              ? updatePatternProperty("rotation", 0)
+              : null
           }
         >
           Reset
@@ -262,7 +303,9 @@ export default function GeneralSection({
         id="svg-rotation-input"
         type="number"
         value={pattern.rotation}
-        onChange={(e) => updatePatternProperty("rotation", Number(e.target.value))}
+        onChange={(e) =>
+          updatePatternProperty("rotation", Number(e.target.value))
+        }
       />
       <br />
       <FormControl style={{ width: "100%" }}>
@@ -270,7 +313,9 @@ export default function GeneralSection({
           id="svg-rotation"
           size="small"
           value={pattern.rotation}
-          onChange={(e, value) => updatePatternProperty("rotation", Number(value))}
+          onChange={(e, value) =>
+            updatePatternProperty("rotation", Number(value))
+          }
           min={-360}
           max={360}
           aria-label="Small"
@@ -284,7 +329,9 @@ export default function GeneralSection({
             control={
               <Checkbox
                 id="svg-toggle-all-dots"
-                checked={pattern.points.every((p) => p.connectedToPointUuid !== null)}
+                checked={pattern.points.every(
+                  (p) => p.connectedToPointUuid !== emptyGuid
+                )}
                 onChange={(e) => toggleAllDots(e)}
               />
             }
@@ -292,7 +339,12 @@ export default function GeneralSection({
           />
         </Tooltip>
         <FormControlLabel
-          control={<Checkbox checked={showPointNumber} onChange={(e) => setShowPointNumber(e.target.checked)} />}
+          control={
+            <Checkbox
+              checked={showPointNumber}
+              onChange={(e) => setShowPointNumber(e.target.checked)}
+            />
+          }
           label="Show point numbers"
         />
         <FormControlLabel
