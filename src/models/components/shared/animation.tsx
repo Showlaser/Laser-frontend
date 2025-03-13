@@ -1,11 +1,19 @@
 import { createGuid } from "services/shared/math";
 import { Pattern } from "./pattern";
 
+export enum AnimationProperty {
+  scale = "scale",
+  xOffset = "xOffset",
+  yOffset = "yOffset",
+  rotation = "rotation",
+  undefined = "",
+}
+
 export type AnimationPatternKeyFrame = {
   uuid: string;
   animationPatternUuid: string;
   timeMs: number;
-  propertyEdited: string;
+  propertyEdited: AnimationProperty;
   propertyValue: number;
 };
 

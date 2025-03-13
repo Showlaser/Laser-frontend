@@ -1,17 +1,18 @@
-import { Get, Post, Delete } from "services/shared/api/api-actions";
-import { sendRequest } from "services/shared/api/api-middleware";
-import apiEndpoints from "services/shared/api/api-endpoints";
-import { toastSubject } from "services/shared/toast-messages";
-import { Pattern } from "models/components/shared/pattern";
-import { mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
 import {
   Animation,
   AnimationPattern,
   AnimationPatternKeyFrame,
+  AnimationProperty,
   getAnimationPatternDuration,
 } from "models/components/shared/animation";
+import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
+import { Delete, Get, Post } from "services/shared/api/api-actions";
+import apiEndpoints from "services/shared/api/api-endpoints";
+import { sendRequest } from "services/shared/api/api-middleware";
 import { applyParametersToPointsForCanvas } from "services/shared/converters";
+import { mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
+import { toastSubject } from "services/shared/toast-messages";
 import { propertiesSettings } from "./animation-logic";
 
 export type PreviousCurrentAndNextKeyFramePerProperty = {
@@ -30,11 +31,7 @@ export const getPatterns = async (): Promise<Pattern[]> => {
 };
 
 export const savePattern = (pattern: Pattern) => {
-  return sendRequest(
-    () => Post(apiEndpoints.pattern, pattern),
-    [],
-    toastSubject.changesSaved
-  );
+  return sendRequest(() => Post(apiEndpoints.pattern, pattern), [], toastSubject.changesSaved);
 };
 
 export const removePattern = (uuid: string) => {
@@ -89,34 +86,30 @@ export const getAnimationPatternsToDrawInTimeline = (
 };
 
 export const getKeyFramesPastTimelinePositionSortedByTime = (
-  property: string,
+  property: AnimationProperty,
   animationPattern: AnimationPattern,
   timelinePositionMs: number
 ) =>
   animationPattern?.animationPatternKeyFrames
     .filter(
-      (ak: { timeMs: number; propertyEdited: string }) =>
+      (ak: { timeMs: number; propertyEdited: AnimationProperty }) =>
         ak.timeMs > timelinePositionMs &&
         ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
     )
-    .sort(
-      (a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs
-    );
+    .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
 
 export const getKeyFramesBeforeTimelinePositionSortedByTimeDescending = (
-  property: string,
+  property: AnimationProperty,
   animationPattern: AnimationPattern,
   timelinePositionMs: number
 ) =>
   animationPattern?.animationPatternKeyFrames
     .filter(
-      (ak: { timeMs: number; propertyEdited: string }) =>
+      (ak: { timeMs: number; propertyEdited: AnimationProperty }) =>
         ak.timeMs < timelinePositionMs &&
         ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
     )
-    .sort(
-      (a: { timeMs: number }, b: { timeMs: number }) => b.timeMs - a.timeMs
-    );
+    .sort((a: { timeMs: number }, b: { timeMs: number }) => b.timeMs - a.timeMs);
 
 export const getCurrentKeyFrame = (
   selectedAnimationPattern: AnimationPattern,
@@ -130,12 +123,11 @@ export const getPreviousCurrentAndNextKeyFramePerProperty = (
   animationPattern: AnimationPattern,
   timelinePositionMs: number
 ): PreviousCurrentAndNextKeyFramePerProperty => {
-  let previousNextAndCurrentKeyFramePerProperty: PreviousCurrentAndNextKeyFramePerProperty =
-    {
-      previous: [],
-      current: getCurrentKeyFrame(animationPattern, timelinePositionMs) ?? [],
-      next: [],
-    };
+  let previousNextAndCurrentKeyFramePerProperty: PreviousCurrentAndNextKeyFramePerProperty = {
+    previous: [],
+    current: getCurrentKeyFrame(animationPattern, timelinePositionMs) ?? [],
+    next: [],
+  };
 
   propertiesSettings.forEach((propertySetting) => {
     const previous = getKeyFramesBeforeTimelinePositionSortedByTimeDescending(
@@ -201,36 +193,39 @@ export const getPatternPointsByTimelinePosition = (
     );
 
     const valuesPerPropertyIndex = valuesPerProperty.findIndex(
-      (vpp) => vpp.property === currentPropertySetting.property
+      (vpp) =>
+        vpp.property.toLocaleLowerCase() === currentPropertySetting.property.toLocaleLowerCase()
     );
     if (
       valuesPerPropertyIndex !== -1 &&
       previousKeyFrame !== undefined &&
       nextKeyFrame !== undefined
     ) {
-      valuesPerProperty[valuesPerPropertyIndex].value =
-        calculateNewValueByKeyFrames(
-          previousKeyFrame,
-          nextKeyFrame,
-          timelinePositionMs
-        );
-    } else if (
-      valuesPerPropertyIndex !== -1 &&
-      previousKeyFrame !== undefined
-    ) {
-      valuesPerProperty[valuesPerPropertyIndex].value =
-        previousKeyFrame.propertyValue;
+      valuesPerProperty[valuesPerPropertyIndex].value = calculateNewValueByKeyFrames(
+        previousKeyFrame,
+        nextKeyFrame,
+        timelinePositionMs
+      );
+    } else if (valuesPerPropertyIndex !== -1 && previousKeyFrame !== undefined) {
+      valuesPerProperty[valuesPerPropertyIndex].value = previousKeyFrame.propertyValue;
     }
   }
 
+  const getDefaultPropertyValue = (property: AnimationProperty) =>
+    propertiesSettings.find((p) => p.property === property)?.defaultValue ?? 0;
+
   const scale =
-    valuesPerProperty.find((vpp) => vpp.property === "scale")?.value ?? 1;
+    valuesPerProperty.find((vpp) => vpp.property === AnimationProperty.scale)?.value ??
+    getDefaultPropertyValue(AnimationProperty.scale);
   const xOffset =
-    valuesPerProperty.find((vpp) => vpp.property === "xOffset")?.value ?? 0;
+    valuesPerProperty.find((vpp) => vpp.property === AnimationProperty.xOffset)?.value ??
+    getDefaultPropertyValue(AnimationProperty.xOffset);
   const yOffset =
-    valuesPerProperty.find((vpp) => vpp.property === "yOffset")?.value ?? 0;
+    valuesPerProperty.find((vpp) => vpp.property === AnimationProperty.yOffset)?.value ??
+    getDefaultPropertyValue(AnimationProperty.yOffset);
   const rotation =
-    valuesPerProperty.find((vpp) => vpp.property === "rotation")?.value ?? 0;
+    valuesPerProperty.find((vpp) => vpp.property === AnimationProperty.rotation)?.value ??
+    getDefaultPropertyValue(AnimationProperty.rotation);
 
   return applyParametersToPointsForCanvas(
     scale,

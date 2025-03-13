@@ -1,10 +1,7 @@
 import { Point } from "models/components/shared/point";
 import React, { useEffect } from "react";
 import { prepareCanvas } from "services/logic/svg-to-coordinates-converter";
-import {
-  getHexColorStringFromPoint,
-  getRgbColorStringFromPoint,
-} from "services/shared/converters";
+import { getHexColorStringFromPoint, getRgbColorStringFromPoint } from "services/shared/converters";
 import { emptyGuid } from "services/shared/math";
 
 type Props = {
@@ -13,11 +10,7 @@ type Props = {
   pointsToDraw: Point[][] | null;
 };
 
-export default function PointsDrawer({
-  selectedPointsUuid,
-  showPointNumber,
-  pointsToDraw,
-}: Props) {
+export default function PointsDrawer({ selectedPointsUuid, showPointNumber, pointsToDraw }: Props) {
   useEffect(() => {
     drawOnCanvas(pointsToDraw);
   }, [pointsToDraw]);
@@ -27,19 +20,17 @@ export default function PointsDrawer({
       return;
     }
 
-    const canvas = document.getElementById(
-      "points-drawer-canvas"
-    ) as HTMLCanvasElement;
+    const canvas = document.getElementById("points-drawer-canvas") as HTMLCanvasElement;
     const ctx = prepareCanvas(canvas);
     const screenScale = window.devicePixelRatio || 1;
     if (ctx === null) {
       return;
     }
 
+    console.log(dotsToDraw);
     dotsToDraw.forEach((array, index) => {
       array.forEach((point) => {
-        const pointIsHighlighted =
-          selectedPointsUuid?.some((sp) => sp === point.uuid) ?? false;
+        const pointIsHighlighted = selectedPointsUuid?.some((sp) => sp === point.uuid) ?? false;
         drawPoint(ctx, point, pointIsHighlighted, index, array, screenScale);
       });
     });
@@ -72,9 +63,7 @@ export default function PointsDrawer({
     }
 
     if (point.connectedToPointUuid !== emptyGuid) {
-      const pointToConnectTo = updatedPoints.find(
-        (up) => up.uuid === point.connectedToPointUuid
-      );
+      const pointToConnectTo = updatedPoints.find((up) => up.uuid === point.connectedToPointUuid);
       if (pointToConnectTo !== undefined) {
         drawLine(point, pointToConnectTo, ctx);
       }
@@ -89,23 +78,12 @@ export default function PointsDrawer({
     screenScale: number,
     dotThickness: number
   ) => {
-    ctx.arc(
-      point.x * screenScale,
-      point.y * screenScale,
-      dotThickness,
-      0,
-      2 * Math.PI,
-      true
-    );
+    ctx.arc(point.x * screenScale, point.y * screenScale, dotThickness, 0, 2 * Math.PI, true);
     ctx.fill();
     ctx.closePath();
   };
 
-  const drawLine = (
-    fromPoint: Point,
-    toPoint: Point,
-    ctx: CanvasRenderingContext2D
-  ) => {
+  const drawLine = (fromPoint: Point, toPoint: Point, ctx: CanvasRenderingContext2D) => {
     ctx.moveTo(fromPoint.x, fromPoint.y);
     ctx.lineTo(toPoint.x, toPoint.y);
     ctx.strokeStyle = getHexColorStringFromPoint(toPoint);

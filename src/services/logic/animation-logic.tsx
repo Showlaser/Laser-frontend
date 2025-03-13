@@ -1,16 +1,17 @@
-import { Delete, Get, Post } from "services/shared/api/api-actions";
-import { sendRequest } from "services/shared/api/api-middleware";
-import apiEndpoints from "services/shared/api/api-endpoints";
-import { toastSubject } from "services/shared/toast-messages";
 import {
   Animation,
+  AnimationProperty,
   getAnimationPatternDuration,
 } from "models/components/shared/animation";
 import { Point } from "models/components/shared/point";
+import { Delete, Get, Post } from "services/shared/api/api-actions";
+import apiEndpoints from "services/shared/api/api-endpoints";
+import { sendRequest } from "services/shared/api/api-middleware";
 import { numberIsBetweenOrEqual } from "services/shared/math";
+import { toastSubject } from "services/shared/toast-messages";
 import {
-  getPreviousCurrentAndNextKeyFramePerProperty,
   getPatternPointsByTimelinePosition,
+  getPreviousCurrentAndNextKeyFramePerProperty,
 } from "./pattern-logic";
 
 export const getAnimations = async (): Promise<Animation[] | undefined> => {
@@ -23,46 +24,38 @@ export const getAnimations = async (): Promise<Animation[] | undefined> => {
 };
 
 export const saveAnimation = async (animation: Animation) =>
-  await sendRequest(
-    () => Post(apiEndpoints.animation, animation),
-    [],
-    toastSubject.changesSaved
-  );
+  await sendRequest(() => Post(apiEndpoints.animation, animation), [], toastSubject.changesSaved);
 
 export const removeAnimation = async (uuid: string) =>
-  sendRequest(
-    () => Delete(`${apiEndpoints.animation}/${uuid}`),
-    [],
-    toastSubject.changesSaved
-  );
+  sendRequest(() => Delete(`${apiEndpoints.animation}/${uuid}`), [], toastSubject.changesSaved);
 
 export const playAnimation = async (animation: Animation) =>
   sendRequest(() => Post(apiEndpoints.animation + "/play", animation), []);
 
 export const propertiesSettings = [
   {
-    property: "scale",
+    property: AnimationProperty.scale,
     type: "float",
     defaultValue: 1,
     min: 0.1,
     max: 10,
   },
   {
-    property: "xOffset",
+    property: AnimationProperty.xOffset,
     type: "int",
     defaultValue: 0,
     min: -200,
     max: 200,
   },
   {
-    property: "yOffset",
+    property: AnimationProperty.yOffset,
     type: "int",
     defaultValue: 0,
     min: -200,
     max: 200,
   },
   {
-    property: "rotation",
+    property: AnimationProperty.rotation,
     type: "int",
     defaultValue: 0,
     min: -360,
@@ -98,10 +91,7 @@ export const getPointsToDrawFromAnimation = (
     )
   );
   const animationPatternsToPlayLength = animationPatternsToPlay?.length ?? 0;
-  if (
-    animationPatternsToPlayLength === 0 ||
-    animationPatternsToPlay === undefined
-  ) {
+  if (animationPatternsToPlayLength === 0 || animationPatternsToPlay === undefined) {
     return [];
   }
 
@@ -112,11 +102,10 @@ export const getPointsToDrawFromAnimation = (
       return [];
     }
 
-    const previousCurrentAndNextKeyFrames =
-      getPreviousCurrentAndNextKeyFramePerProperty(
-        animationPattern,
-        timelinePositionMs
-      );
+    const previousCurrentAndNextKeyFrames = getPreviousCurrentAndNextKeyFramePerProperty(
+      animationPattern,
+      timelinePositionMs
+    );
     const patternPoints = getPatternPointsByTimelinePosition(
       animationPattern.pattern,
       previousCurrentAndNextKeyFrames,

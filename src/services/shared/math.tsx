@@ -33,24 +33,15 @@ export const capitalizeFirstLetter = (string: string) =>
 export const convertToMilliWatts = (maxPower: number, currentValue: number) =>
   Math.round((maxPower / 255) * currentValue);
 
-export const valueIsWithinBoundaries = (
-  value: number,
-  min: number,
-  max: number
-) => value <= max && value >= min;
+export const valueIsWithinBoundaries = (value: number, min: number, max: number) =>
+  value <= max && value >= min;
 
-export const numberIsBetweenOrEqual = (
-  number: number,
-  min: number,
-  max: number
-) => {
+export const numberIsBetweenOrEqual = (number: number, min: number, max: number) => {
   return number >= min && number <= max;
 };
 
-export const getLargestNumber = (
-  numberOne: number,
-  numberTwo: number
-): number => (numberOne > numberTwo ? numberOne : numberTwo);
+export const getLargestNumber = (numberOne: number, numberTwo: number): number =>
+  numberOne > numberTwo ? numberOne : numberTwo;
 
 export const roundToZero = (value: number, tolerance = 1e-10) => {
   return Math.abs(value) < tolerance ? 0 : value;
@@ -86,25 +77,18 @@ export const rotatePoints = (
   return updatedPoints;
 };
 
-export const getCenterOfPoints = (
-  points: Point[]
-): { x: number; y: number } => {
+export const getCenterOfPoints = (points: Point[]): { x: number; y: number } => {
   const pointsLength = points.length;
   if (pointsLength === 0) {
     return { x: 0, y: 0 };
   }
 
   const centerX =
-    points
-      .map((p) => p.x)
-      .reduce((previousX, currentX) => previousX + currentX) / pointsLength;
+    points.map((p) => p.x).reduce((previousX, currentX) => previousX + currentX, 0) / pointsLength;
   const centerY =
-    points
-      .map((p) => p.y)
-      .reduce((previousY, currentX) => previousY + currentX) / pointsLength;
+    points.map((p) => p.y).reduce((previousY, currentX) => previousY + currentX, 0) / pointsLength;
 
   return { x: centerX, y: centerY };
 };
 
-export const getRandomNumber = (max: number) =>
-  Math.floor(Math.random() * max + 1);
+export const getRandomNumber = (max: number) => Math.floor(Math.random() * max + 1);
