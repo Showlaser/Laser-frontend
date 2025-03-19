@@ -106,7 +106,7 @@ export default function AnimationPage() {
         }
       });
     }
-  }, []);
+  }, [availableAnimations, availableLasershows, availablePatterns]);
 
   const getWrapperContext = (reactObject: React.ReactNode) => (
     <SelectedAnimationContext.Provider value={selectedAnimationMemo}>

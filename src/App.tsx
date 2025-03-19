@@ -1,11 +1,11 @@
-import React from "react";
-import "./App.css";
-import Routes from "./routes/Routes";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Slide, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import type {} from "@mui/x-tree-view/themeAugmentation";
+import React from "react";
+import { Slide, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
+import Routes from "./routes/Routes";
 
 function App() {
   const theme = React.useMemo(

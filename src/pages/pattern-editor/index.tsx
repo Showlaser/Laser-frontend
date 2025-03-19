@@ -11,10 +11,7 @@ import PatternDeleteModal from "components/shared/pattern-delete-modal";
 import SideNav from "components/shared/sidenav";
 import { Animation } from "models/components/shared/animation";
 import { Lasershow } from "models/components/shared/lasershow";
-import {
-  getPatternPlaceHolder,
-  Pattern,
-} from "models/components/shared/pattern";
+import { getPatternPlaceHolder, Pattern } from "models/components/shared/pattern";
 import React, { useEffect, useState } from "react";
 import { getAnimations } from "services/logic/animation-logic";
 import { getLasershows } from "services/logic/lasershow-logic";
@@ -23,17 +20,10 @@ import "./index.css";
 
 export default function PatternPage() {
   const [uploadedFile, setUploadedFile] = useState<any>();
-  const [availableLasershows, setAvailableLasershows] = useState<
-    Lasershow[] | null
-  >(null);
-  const [availableAnimations, setAvailableAnimations] = useState<
-    Animation[] | null
-  >(null);
-  const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(
-    null
-  );
-  const [convertPatternModalOpen, setConvertPatternModalOpen] =
-    useState<boolean>(false);
+  const [availableLasershows, setAvailableLasershows] = useState<Lasershow[] | null>(null);
+  const [availableAnimations, setAvailableAnimations] = useState<Animation[] | null>(null);
+  const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
+  const [convertPatternModalOpen, setConvertPatternModalOpen] = useState<boolean>(false);
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
   const [patternToRemove, setPatternToRemove] = useState<Pattern>();
 
@@ -60,7 +50,7 @@ export default function PatternPage() {
         }
       });
     }
-  }, []);
+  }, [availableAnimations, availableLasershows, availablePatterns]);
 
   const getSpeedDial = () => (
     <SpeedDial
@@ -90,10 +80,7 @@ export default function PatternPage() {
         key="sd-upload"
         tooltipTitle="Upload local file"
         icon={
-          <label
-            htmlFor="raised-button-file"
-            style={{ cursor: "pointer", padding: "25px" }}
-          >
+          <label htmlFor="raised-button-file" style={{ cursor: "pointer", padding: "25px" }}>
             <AttachFileIcon style={{ marginTop: "8px" }} />
           </label>
         }
@@ -112,8 +99,7 @@ export default function PatternPage() {
   );
 
   const onPatternDelete = (uuid: string) => {
-    const patternToRemoveIndex =
-      availablePatterns?.findIndex((p) => p.uuid === uuid) ?? -1;
+    const patternToRemoveIndex = availablePatterns?.findIndex((p) => p.uuid === uuid) ?? -1;
     if (patternToRemoveIndex !== -1) {
       let updatedPatterns = [...(availablePatterns ?? [])];
       updatedPatterns.splice(patternToRemoveIndex, 1);
@@ -184,9 +170,7 @@ export default function PatternPage() {
             setUploadedFile(e.target.files[0]);
           }}
         />
-        {uploadedFile === undefined && selectedPattern === null
-          ? getSpeedDial()
-          : null}
+        {uploadedFile === undefined && selectedPattern === null ? getSpeedDial() : null}
       </Box>
     </SideNav>
   );

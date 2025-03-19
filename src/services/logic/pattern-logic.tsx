@@ -93,8 +93,7 @@ export const getKeyFramesPastTimelinePositionSortedByTime = (
   animationPattern?.animationPatternKeyFrames
     .filter(
       (ak: { timeMs: number; propertyEdited: AnimationProperty }) =>
-        ak.timeMs > timelinePositionMs &&
-        ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
+        ak.timeMs > timelinePositionMs && ak.propertyEdited === property
     )
     .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
 
@@ -106,8 +105,7 @@ export const getKeyFramesBeforeTimelinePositionSortedByTimeDescending = (
   animationPattern?.animationPatternKeyFrames
     .filter(
       (ak: { timeMs: number; propertyEdited: AnimationProperty }) =>
-        ak.timeMs < timelinePositionMs &&
-        ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
+        ak.timeMs < timelinePositionMs && ak.propertyEdited === property
     )
     .sort((a: { timeMs: number }, b: { timeMs: number }) => b.timeMs - a.timeMs);
 
@@ -172,29 +170,22 @@ export const getPatternPointsByTimelinePosition = (
   for (let i = 0; i < propertiesSettingsLength; i++) {
     const currentPropertySetting = propertiesSettings[i];
     const currentKeyFrame = previousNextAndCurrentKeyFrames.current.find(
-      (kf) =>
-        kf.propertyEdited.toLocaleLowerCase() ===
-        currentPropertySetting.property.toLocaleLowerCase()
+      (kf) => kf.propertyEdited === currentPropertySetting.property
     );
 
     const currentKeyFrameIsAvailable = currentKeyFrame !== undefined;
     const previousKeyFrame = currentKeyFrameIsAvailable
       ? currentKeyFrame
       : previousNextAndCurrentKeyFrames.previous.find(
-          (kf) =>
-            kf.propertyEdited.toLocaleLowerCase() ===
-            currentPropertySetting.property.toLocaleLowerCase()
+          (kf) => kf.propertyEdited === currentPropertySetting.property
         );
 
     const nextKeyFrame = previousNextAndCurrentKeyFrames.next.find(
-      (kf) =>
-        kf.propertyEdited.toLocaleLowerCase() ===
-        currentPropertySetting.property.toLocaleLowerCase()
+      (kf) => kf.propertyEdited === currentPropertySetting.property
     );
 
     const valuesPerPropertyIndex = valuesPerProperty.findIndex(
-      (vpp) =>
-        vpp.property.toLocaleLowerCase() === currentPropertySetting.property.toLocaleLowerCase()
+      (vpp) => vpp.property === currentPropertySetting.property
     );
     if (
       valuesPerPropertyIndex !== -1 &&

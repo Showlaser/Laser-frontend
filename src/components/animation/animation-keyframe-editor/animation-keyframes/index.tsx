@@ -5,13 +5,13 @@ import {
   AnimationPatternKeyFrame,
   AnimationProperty,
 } from "models/components/shared/animation";
-import animation, {
+import {
   SelectedAnimationContext,
   SelectedAnimationContextType,
   SelectedAnimationPatternContext,
   SelectedAnimationPatternContextType,
 } from "pages/animation-editor";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { propertiesSettings } from "services/logic/animation-logic";
 import { canvasPxSize, selectableSteps } from "services/shared/config";
 import { createGuid, mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
@@ -66,26 +66,7 @@ export default function AnimationPatternKeyFrames() {
     ) ?? 0;
 
   const { palette } = useTheme();
-
-  useEffect(() => {
-    drawTimelineOnCanvas();
-  }, [animation, timelinePositionMs, playAnimation, selectableStepsIndex, selectedKeyFrameUuid]);
-
-  const getPropertyFromYPosition = (y: number) =>
-    keyFramesPropertiesPosition.find((prop) =>
-      numberIsBetweenOrEqual(prop.yPosition, y - 20, y + 20)
-    )?.property ?? AnimationProperty.undefined;
-
-  const prepareCanvas = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
-    canvas.width = canvasPxSize;
-    canvas.height = canvasPxSize;
-    canvas.style.width = canvasPxSize.toString();
-    canvas.style.height = canvasPxSize.toString();
-    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    return canvas;
-  };
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const drawTimeStepsAndKeyframes = (canvas: HTMLCanvasElement) => {
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -126,11 +107,47 @@ export default function AnimationPatternKeyFrames() {
     });
   };
 
-  const drawTimelineOnCanvas = () => {
+  const drawTimelineOnCanvas = useCallback(() => {
     let canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     canvas = prepareCanvas(canvas);
     drawProperties(canvas);
     drawTimeStepsAndKeyframes(canvas);
+  }, [
+    selectedAnimationPattern,
+    timelinePositionMs,
+    playAnimation,
+    selectableStepsIndex,
+    drawProperties,
+    drawTimeStepsAndKeyframes,
+    selectedKeyFrameUuid,
+  ]);
+
+  useEffect(() => {
+    canvasRef.current?.focus();
+    drawTimelineOnCanvas();
+  }, [
+    drawTimelineOnCanvas,
+    timelinePositionMs,
+    playAnimation,
+    selectableStepsIndex,
+    selectedKeyFrameUuid,
+    selectedAnimation,
+  ]);
+
+  const getPropertyFromYPosition = (y: number) =>
+    keyFramesPropertiesPosition.find((prop) =>
+      numberIsBetweenOrEqual(prop.yPosition, y - 20, y + 20)
+    )?.property ?? AnimationProperty.undefined;
+
+  const prepareCanvas = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
+    canvas.width = canvasPxSize;
+    canvas.height = canvasPxSize;
+    canvas.style.width = canvasPxSize.toString();
+    canvas.style.height = canvasPxSize.toString();
+    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return canvas;
   };
 
   const drawKeyFrames = (keyFrames: AnimationPatternKeyFrame[], canvas: HTMLCanvasElement) => {
@@ -142,7 +159,7 @@ export default function AnimationPatternKeyFrames() {
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     keyFrames.forEach((keyFrame) => {
       const keyFrameProperty = keyFramesPropertiesPosition.find(
-        (p) => p.property.toLocaleLowerCase() === keyFrame.propertyEdited.toLocaleLowerCase()
+        (p) => p.property === keyFrame.propertyEdited
       );
       if (keyFrameProperty === undefined) {
         return;
@@ -181,16 +198,19 @@ export default function AnimationPatternKeyFrames() {
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
 
     const keyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
+    if (keyFrame === undefined) {
+      return;
+    }
 
-    if (selectedAnimation === null) {
+    deleteKeyframe(keyFrame.uuid);
+  };
+
+  const deleteKeyframe = (keyFrameUuid: string) => {
+    if (selectedAnimation === null || keyFrameUuid.length < 5) {
       return;
     }
 
     let updatedAnimation: Animation = { ...selectedAnimation };
-
-    if (animation === undefined || keyFrame === undefined) {
-      return;
-    }
 
     if (!window.confirm("Are you sure you want to remove this keyframe")) {
       return;
@@ -199,7 +219,7 @@ export default function AnimationPatternKeyFrames() {
     const indexToRemove = updatedAnimation.animationPatterns[
       selectedAnimationPatternIndex
     ].animationPatternKeyFrames.findIndex(
-      (kf: AnimationPatternKeyFrame) => kf.uuid === keyFrame.uuid
+      (kf: AnimationPatternKeyFrame) => kf.uuid === keyFrameUuid
     );
     updatedAnimation.animationPatterns[
       selectedAnimationPatternIndex
@@ -276,7 +296,7 @@ export default function AnimationPatternKeyFrames() {
         const thisKeyFrameIsClicked =
           keyFrame.timeMs >= min &&
           keyFrame.timeMs === x &&
-          keyFrame.propertyEdited.toLocaleLowerCase() === propertyClicked?.toLocaleLowerCase();
+          keyFrame.propertyEdited === propertyClicked;
         return thisKeyFrameIsClicked;
       }
     );
@@ -320,8 +340,18 @@ export default function AnimationPatternKeyFrames() {
     setSelectedKeyFrameUuid(keyFrame.uuid);
   };
 
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Delete") {
+      e.preventDefault();
+      deleteKeyframe(selectedKeyFrameUuid);
+    }
+  };
+
   return (
     <canvas
+      ref={canvasRef}
+      onKeyDown={onKeyDown}
+      tabIndex={0}
       className="canvas"
       id="svg-keyframe-canvas"
       onClick={onCanvasClick}

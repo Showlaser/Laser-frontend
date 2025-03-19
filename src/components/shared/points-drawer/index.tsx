@@ -27,7 +27,6 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
       return;
     }
 
-    console.log(dotsToDraw);
     dotsToDraw.forEach((array, index) => {
       array.forEach((point) => {
         const pointIsHighlighted = selectedPointsUuid?.some((sp) => sp === point.uuid) ?? false;

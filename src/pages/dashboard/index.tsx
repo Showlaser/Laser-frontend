@@ -2,12 +2,7 @@ import { Grid } from "@mui/material";
 import "chart.js/auto";
 import LaserStatusTable from "components/dashboard/laser-status-table";
 import SideNav from "components/shared/sidenav";
-import {
-  LaserHealth,
-  LaserInfo,
-  LaserLog,
-  LaserStatus,
-} from "models/components/shared/lasers";
+import { LaserHealth, LaserInfo, LaserLog, LaserStatus } from "models/components/shared/lasers";
 import React from "react";
 import { subtractMinutesFromCurrentDate } from "services/shared/dateHelper";
 import { getRandomNumber } from "services/shared/math";
@@ -24,15 +19,6 @@ const generateFakeLogForLaser = (laserUuid: string): LaserLog[] =>
     temperature: getRandomNumber(65),
     health: randomProperty(LaserHealth),
   }));
-
-const chartOptions = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: "top" as const,
-    },
-  },
-};
 
 export const sharedTestLasers: LaserInfo[] = [
   {

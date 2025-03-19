@@ -2,10 +2,10 @@ import { createGuid } from "services/shared/math";
 import { Pattern } from "./pattern";
 
 export enum AnimationProperty {
-  scale = "scale",
-  xOffset = "xOffset",
-  yOffset = "yOffset",
-  rotation = "rotation",
+  scale = "Scale",
+  xOffset = "Xoffset",
+  yOffset = "Yoffset",
+  rotation = "Rotation",
   undefined = "",
 }
 
