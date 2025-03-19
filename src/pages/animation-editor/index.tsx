@@ -1,23 +1,23 @@
-import "./index.css";
-import React, { useEffect, useState } from "react";
-import SideNav from "components/shared/sidenav";
-import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-import { SpeedDial, SpeedDialAction } from "@mui/material";
+import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import SettingsIcon from "@mui/icons-material/Settings";
-import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
-import CardOverview from "components/shared/card-overview";
-import { Animation, AnimationPattern } from "models/components/shared/animation";
-import { getPatterns } from "services/logic/pattern-logic";
-import { getAnimations } from "services/logic/animation-logic";
-import { convertPatternToAnimation } from "services/shared/converters";
+import { SpeedDial, SpeedDialAction } from "@mui/material";
+import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import AnimationKeyFrameEditor from "components/animation/animation-keyframe-editor";
-import { Pattern } from "models/components/shared/pattern";
-import { OnTrue } from "components/shared/on-true";
-import PatternDeleteModal, { PatternDeleteModalProps } from "components/shared/pattern-delete-modal";
 import AnimationDeleteModal from "components/shared/animation-delete-modal";
+import CardOverview from "components/shared/card-overview";
+import { OnTrue } from "components/shared/on-true";
+import PatternDeleteModal from "components/shared/pattern-delete-modal";
+import SideNav from "components/shared/sidenav";
+import { Animation, AnimationPattern } from "models/components/shared/animation";
 import { Lasershow } from "models/components/shared/lasershow";
+import { Pattern } from "models/components/shared/pattern";
+import React, { useEffect, useState } from "react";
+import { getAnimations } from "services/logic/animation-logic";
 import { getLasershows } from "services/logic/lasershow-logic";
+import { getPatterns } from "services/logic/pattern-logic";
+import { convertPatternToAnimation } from "services/shared/converters";
+import "./index.css";
 
 export type SelectedAnimationContextType = {
   selectedAnimation: Animation | null;
@@ -39,10 +39,16 @@ export type SelectedAnimationPatternContextType = {
   setSelectedAnimationPattern: React.Dispatch<React.SetStateAction<AnimationPattern | null>>;
 };
 
-export const SelectedAnimationContext = React.createContext<SelectedAnimationContextType | null>(null);
-export const AvailableAnimationsContext = React.createContext<AvailableAnimationsContextType | null>(null);
-export const AvailablePatternsContext = React.createContext<AvailablePatternsContextType | null>(null);
-export const SelectedAnimationPatternContext = React.createContext<SelectedAnimationPatternContextType | null>(null);
+export const SelectedAnimationContext = React.createContext<SelectedAnimationContextType | null>(
+  null
+);
+export const AvailableAnimationsContext =
+  React.createContext<AvailableAnimationsContextType | null>(null);
+export const AvailablePatternsContext = React.createContext<AvailablePatternsContextType | null>(
+  null
+);
+export const SelectedAnimationPatternContext =
+  React.createContext<SelectedAnimationPatternContextType | null>(null);
 export const SelectedAnimationPatternIndexContext = React.createContext<number>(0);
 
 export default function AnimationPage() {
@@ -52,18 +58,26 @@ export default function AnimationPage() {
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
   const [convertPatternModalOpen, setConvertPatternModalOpen] = useState<boolean>(false);
   const [animationsModalOpen, setAnimationsModalOpen] = useState<boolean>(false);
-  const [selectedAnimationPattern, setSelectedAnimationPattern] = useState<AnimationPattern | null>(null);
+  const [selectedAnimationPattern, setSelectedAnimationPattern] = useState<AnimationPattern | null>(
+    null
+  );
   const [patternToRemove, setPatternToRemove] = useState<Pattern>();
   const [animationToRemove, setAnimationToRemove] = useState<Animation>();
 
-  const selectedAnimationMemo = React.useMemo(() => ({ selectedAnimation, setSelectedAnimation }), [selectedAnimation]);
+  const selectedAnimationMemo = React.useMemo(
+    () => ({ selectedAnimation, setSelectedAnimation }),
+    [selectedAnimation]
+  );
 
   const availableAnimationsMemo = React.useMemo(
     () => ({ availableAnimations, setAvailableAnimations }),
     [availableAnimations]
   );
 
-  const availablePatternsMemo = React.useMemo(() => ({ availablePatterns, setAvailablePatterns }), [availablePatterns]);
+  const availablePatternsMemo = React.useMemo(
+    () => ({ availablePatterns, setAvailablePatterns }),
+    [availablePatterns]
+  );
 
   const selectedAnimationPatternMemo = React.useMemo(
     () => ({ selectedAnimationPattern, setSelectedAnimationPattern }),
@@ -71,7 +85,11 @@ export default function AnimationPage() {
   );
 
   useEffect(() => {
-    if (availableAnimations === null && availablePatterns === null && availableLasershows === null) {
+    if (
+      availableAnimations === null &&
+      availablePatterns === null &&
+      availableLasershows === null
+    ) {
       getPatterns().then((patterns) => {
         if (patterns !== undefined) {
           setAvailablePatterns(patterns);
@@ -88,7 +106,7 @@ export default function AnimationPage() {
         }
       });
     }
-  }, []);
+  }, [availableAnimations, availableLasershows, availablePatterns]);
 
   const getWrapperContext = (reactObject: React.ReactNode) => (
     <SelectedAnimationContext.Provider value={selectedAnimationMemo}>
@@ -97,7 +115,9 @@ export default function AnimationPage() {
           <SelectedAnimationPatternContext.Provider value={selectedAnimationPatternMemo}>
             <SelectedAnimationPatternIndexContext.Provider
               value={
-                selectedAnimation?.animationPatterns.findIndex((ap) => ap.uuid === selectedAnimationPattern?.uuid) ?? 0
+                selectedAnimation?.animationPatterns.findIndex(
+                  (ap) => ap.uuid === selectedAnimationPattern?.uuid
+                ) ?? 0
               }
             >
               {reactObject}
@@ -185,7 +205,9 @@ export default function AnimationPage() {
           show={convertPatternModalOpen}
           onNoItemsMessageTitle="No patterns saved"
           onNoItemsDescription="Create a new pattern in the pattern editor"
-          onDeleteClick={(uuid) => setPatternToRemove(availablePatterns?.find((p) => p.uuid === uuid))}
+          onDeleteClick={(uuid) =>
+            setPatternToRemove(availablePatterns?.find((p) => p.uuid === uuid))
+          }
           items={
             availablePatterns?.map((pattern) => ({
               uuid: pattern.uuid,
@@ -210,7 +232,9 @@ export default function AnimationPage() {
           show={animationsModalOpen}
           onNoItemsMessageTitle="No animations saved"
           onNoItemsDescription="Create a new animation first"
-          onDeleteClick={(uuid) => setAnimationToRemove(availableAnimations?.find((a) => a.uuid === uuid))}
+          onDeleteClick={(uuid) =>
+            setAnimationToRemove(availableAnimations?.find((a) => a.uuid === uuid))
+          }
           items={
             availableAnimations?.map((animation) => ({
               uuid: animation.uuid,

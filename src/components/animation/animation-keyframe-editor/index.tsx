@@ -1,23 +1,27 @@
+import ClearIcon from "@mui/icons-material/Clear";
+import SaveIcon from "@mui/icons-material/Save";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { Grid, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
-import React, { useEffect, useState } from "react";
-import AnimationPatternProperties from "./animation-pattern-properties";
-import AnimationPatternKeyFrames from "./animation-keyframes";
+import { SharedTimeline } from "components/shared/shared-timeline";
+import TabSelector from "components/tabs";
+import { getAnimationPatternDuration } from "models/components/shared/animation";
 import {
   SelectedAnimationContext,
   SelectedAnimationContextType,
   SelectedAnimationPatternContext,
   SelectedAnimationPatternContextType,
 } from "pages/animation-editor";
-import TabSelector from "components/tabs";
-import AnimationManager from "./animation-manager";
+import React, { useEffect, useState } from "react";
+import {
+  getAnimationDuration,
+  getPointsToDrawFromAnimation,
+  saveAnimation,
+} from "services/logic/animation-logic";
 import { selectableSteps } from "services/shared/config";
-import SettingsIcon from "@mui/icons-material/Settings";
-import SaveIcon from "@mui/icons-material/Save";
-import ClearIcon from "@mui/icons-material/Clear";
-import { getAnimationDuration, getPointsToDrawFromAnimation, saveAnimation } from "services/logic/animation-logic";
-import { SharedTimeline } from "components/shared/shared-timeline";
-import { getAnimationPatternDuration } from "models/components/shared/animation";
+import AnimationPatternKeyFrames from "./animation-keyframes";
+import AnimationManager from "./animation-manager";
+import AnimationPatternProperties from "./animation-pattern-properties";
 
 export type AnimationTimeLineContextType = {
   timelinePositionMs: number;
@@ -43,13 +47,18 @@ export type AnimationDurationContextType = {
   getAnimationDuration: () => number;
 };
 
-export const AnimationTimeLinePositionContext = React.createContext<AnimationTimeLineContextType | null>(null);
+export const AnimationTimeLinePositionContext =
+  React.createContext<AnimationTimeLineContextType | null>(null);
 export const AnimationSelectableStepsIndexContext =
   React.createContext<AnimationSelectableStepsIndexContextType | null>(null);
-export const AnimationSelectedKeyFrameContext = React.createContext<AnimationSelectedKeyFrameContextType | null>(null);
-export const AnimationPlayAnimationContext = React.createContext<AnimationPlayAnimationContextType | null>(null);
+export const AnimationSelectedKeyFrameContext =
+  React.createContext<AnimationSelectedKeyFrameContextType | null>(null);
+export const AnimationPlayAnimationContext =
+  React.createContext<AnimationPlayAnimationContextType | null>(null);
 export const AnimationStepsToDrawMaxRangeContext = React.createContext<number>(0);
-export const AnimationDurationContext = React.createContext<AnimationDurationContextType | null>(null);
+export const AnimationDurationContext = React.createContext<AnimationDurationContextType | null>(
+  null
+);
 
 export default function AnimationKeyFrameEditor() {
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
@@ -75,7 +84,10 @@ export default function AnimationKeyFrameEditor() {
     () => ({ selectedKeyFrameUuid, setSelectedKeyFrameUuid }),
     [selectedKeyFrameUuid]
   );
-  const playAnimationMemo = React.useMemo(() => ({ playAnimation, setPlayAnimation }), [playAnimation]);
+  const playAnimationMemo = React.useMemo(
+    () => ({ playAnimation, setPlayAnimation }),
+    [playAnimation]
+  );
   const selectableStepsIndexMemo = React.useMemo(
     () => ({ selectableStepsIndex, setSelectableStepsIndex }),
     [selectableStepsIndex]
@@ -96,7 +108,13 @@ export default function AnimationKeyFrameEditor() {
     }
 
     return () => clearInterval(interval);
-  }, [playAnimation, selectableStepsIndex, timelinePositionMs, selectedKeyFrameUuid, selectedAnimation]);
+  }, [
+    playAnimation,
+    selectableStepsIndex,
+    timelinePositionMs,
+    selectedKeyFrameUuid,
+    selectedAnimation,
+  ]);
 
   useEffect(() => {
     setSelectedTabId(1);
@@ -123,14 +141,16 @@ export default function AnimationKeyFrameEditor() {
   };
 
   const onTimelineItemClick = (uuid: string) => {
-    const selectedAnimationPattern = selectedAnimation?.animationPatterns.find((ap) => ap.uuid === uuid);
+    const selectedAnimationPattern = selectedAnimation?.animationPatterns.find(
+      (ap) => ap.uuid === uuid
+    );
     if (selectedAnimationPattern !== undefined) {
       setSelectedAnimationPattern(selectedAnimationPattern);
     }
   };
 
   return (
-    <>
+    <div>
       <Grid container direction="row" spacing={1} key={selectedKeyFrameUuid}>
         {getWrapperContext(
           <Grid item xs={4}>
@@ -157,7 +177,9 @@ export default function AnimationKeyFrameEditor() {
           {getWrapperContext(<AnimationPatternKeyFrames />)}
         </Grid>
         <Grid item xs>
-          <PointsDrawer pointsToDraw={getPointsToDrawFromAnimation(timelinePositionMs, selectedAnimation)} />
+          <PointsDrawer
+            pointsToDraw={getPointsToDrawFromAnimation(timelinePositionMs, selectedAnimation)}
+          />
         </Grid>
       </Grid>
       <Grid item xs={12}>
@@ -194,15 +216,21 @@ export default function AnimationKeyFrameEditor() {
             key="sd-upload-clear"
             icon={<ClearIcon />}
             onClick={() =>
-              window.confirm("Are you sure you want to clear the field? Unsaved changes will be lost")
+              window.confirm(
+                "Are you sure you want to clear the field? Unsaved changes will be lost"
+              )
                 ? setSelectedAnimation(null)
                 : null
             }
             tooltipTitle="Clear editor field"
           />
-          <SpeedDialAction icon={<SaveIcon />} onClick={saveAnimationOnApi} tooltipTitle="Save animation (ctrl + s)" />
+          <SpeedDialAction
+            icon={<SaveIcon />}
+            onClick={saveAnimationOnApi}
+            tooltipTitle="Save animation (ctrl + s)"
+          />
         </SpeedDial>
       </Grid>
-    </>
+    </div>
   );
 }

@@ -17,7 +17,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import { Animation } from "models/components/shared/animation";
+import { Animation, AnimationProperty } from "models/components/shared/animation";
 import {
   SelectedAnimationContext,
   SelectedAnimationContextType,
@@ -43,7 +43,7 @@ export default function AnimationPatternProperties() {
   const { selectedAnimationPattern } = React.useContext(
     SelectedAnimationPatternContext
   ) as SelectedAnimationPatternContextType;
-  const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
+  const { setTimelinePositionMs } = React.useContext(
     AnimationTimeLinePositionContext
   ) as AnimationTimeLineContextType;
   const { selectableStepsIndex } = React.useContext(
@@ -53,21 +53,17 @@ export default function AnimationPatternProperties() {
     AnimationSelectedKeyFrameContext
   ) as AnimationSelectedKeyFrameContextType;
 
-  const selectedAnimationPatternIndex = React.useContext(
-    SelectedAnimationPatternIndexContext
-  );
+  const selectedAnimationPatternIndex = React.useContext(SelectedAnimationPatternIndexContext);
 
-  const selectedKeyFrame =
-    selectedAnimationPattern?.animationPatternKeyFrames?.find(
-      (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
-    );
+  const selectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames?.find(
+    (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
+  );
   const uiComponentsAreDisabled = selectedAnimationPattern === null;
 
   const updateKeyframeProperty = (value: number) => {
-    const selectedKeyFrameIndex =
-      selectedAnimationPattern?.animationPatternKeyFrames.findIndex(
-        (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
-      );
+    const selectedKeyFrameIndex = selectedAnimationPattern?.animationPatternKeyFrames.findIndex(
+      (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
+    );
     if (selectedAnimation === null) {
       return;
     }
@@ -77,38 +73,30 @@ export default function AnimationPatternProperties() {
       updatedAnimation === undefined ||
       selectedKeyFrameIndex === undefined ||
       updatedAnimation?.animationPatterns === undefined ||
-      selectedAnimationPattern?.animationPatternKeyFrames[
-        selectedKeyFrameIndex
-      ] === undefined
+      selectedAnimationPattern?.animationPatternKeyFrames[selectedKeyFrameIndex] === undefined
     ) {
       return;
     }
 
-    updatedAnimation.animationPatterns[
-      selectedAnimationPatternIndex
-    ].animationPatternKeyFrames[selectedKeyFrameIndex].propertyValue = value;
+    updatedAnimation.animationPatterns[selectedAnimationPatternIndex].animationPatternKeyFrames[
+      selectedKeyFrameIndex
+    ].propertyValue = value;
     setSelectedAnimation(updatedAnimation);
   };
 
   const getPropertyValue = (property: string) => {
-    const selectedKeyFrame =
-      selectedAnimationPattern?.animationPatternKeyFrames.find(
-        (kf: { uuid: any; propertyEdited: string }) =>
-          kf.uuid === selectedKeyFrameUuid &&
-          kf.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
-      );
+    const selectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames.find(
+      (kf: { uuid: any; propertyEdited: string }) =>
+        kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property
+    );
 
     return selectedKeyFrame?.propertyValue;
   };
 
-  const getNextOrPreviousKeyframe = (
-    getPrevious: boolean,
-    property: string
-  ) => {
-    const currentSelectedKeyFrame =
-      selectedAnimationPattern?.animationPatternKeyFrames.find(
-        (ak: { uuid: any }) => ak.uuid === selectedKeyFrameUuid
-      );
+  const getNextOrPreviousKeyframe = (getPrevious: boolean, property: string) => {
+    const currentSelectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames.find(
+      (ak: { uuid: any }) => ak.uuid === selectedKeyFrameUuid
+    );
     if (currentSelectedKeyFrame === undefined) {
       onGetNextOrPreviousKeyframeError(property);
       return;
@@ -116,18 +104,14 @@ export default function AnimationPatternProperties() {
 
     const keyFrames = selectedAnimationPattern?.animationPatternKeyFrames
       .filter((ak: { propertyEdited: string; timeMs: number }) => {
-        const propertyIsTheSame =
-          ak.propertyEdited.toLocaleLowerCase() ===
-          property.toLocaleLowerCase();
+        const propertyIsTheSame = ak.propertyEdited === property;
         const isBelowOrUnderCurrentSelectedKeyFrame = getPrevious
           ? ak.timeMs <= currentSelectedKeyFrame?.timeMs
           : ak.timeMs >= currentSelectedKeyFrame?.timeMs;
 
         return propertyIsTheSame && isBelowOrUnderCurrentSelectedKeyFrame;
       })
-      .sort(
-        (a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs
-      );
+      .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
 
     if (keyFrames === undefined) {
       return;
@@ -164,22 +148,14 @@ export default function AnimationPatternProperties() {
     setSelectedKeyFrameUuid(keyFrame.uuid);
   };
 
-  const getLastKeyframe = (
-    property: string,
-    currentSelectedKeyFrameTimeMs: number
-  ) => {
+  const getLastKeyframe = (property: string, currentSelectedKeyFrameTimeMs: number) => {
     const keyFrames = selectedAnimationPattern?.animationPatternKeyFrames
       .filter((ak: { propertyEdited: string; timeMs: number }) => {
-        const propertyIsTheSame =
-          ak.propertyEdited.toLocaleLowerCase() ===
-          property.toLocaleLowerCase();
-        const isOverCurrentSelectedKeyFrame =
-          ak.timeMs >= currentSelectedKeyFrameTimeMs;
+        const propertyIsTheSame = ak.propertyEdited === property;
+        const isOverCurrentSelectedKeyFrame = ak.timeMs >= currentSelectedKeyFrameTimeMs;
         return propertyIsTheSame && isOverCurrentSelectedKeyFrame;
       })
-      .sort(
-        (a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs
-      );
+      .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
 
     if (keyFrames === undefined) {
       return;
@@ -196,13 +172,8 @@ export default function AnimationPatternProperties() {
 
   const onGetNextOrPreviousKeyframeError = (property: string) => {
     const kf = selectedAnimationPattern?.animationPatternKeyFrames
-      .filter(
-        (ak: { propertyEdited: string }) =>
-          ak.propertyEdited.toLocaleLowerCase() === property.toLocaleLowerCase()
-      )
-      .sort(
-        (a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs
-      )
+      .filter((ak: { propertyEdited: string }) => ak.propertyEdited === property)
+      .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs)
       .at(0);
     if (kf === undefined) {
       return;
@@ -242,9 +213,7 @@ export default function AnimationPatternProperties() {
     }
 
     let updatedAnimation: any = { ...selectedAnimation };
-    updatedAnimation.animationPatterns[selectedAnimationPatternIndex][
-      propertyName
-    ] = value;
+    updatedAnimation.animationPatterns[selectedAnimationPatternIndex][propertyName] = value;
     setSelectedAnimation(updatedAnimation);
   };
 
@@ -284,12 +253,7 @@ export default function AnimationPatternProperties() {
         onChange={(e) => updatePatternProperty("name", e.target.value)}
       />
 
-      <InputLabel
-        shrink
-        style={labelStyle}
-        size="small"
-        htmlFor="animation-scale"
-      >
+      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-scale">
         Scale
       </InputLabel>
       <Input
@@ -297,21 +261,15 @@ export default function AnimationPatternProperties() {
         id="animation-scale"
         type="number"
         inputProps={{ min: 0.1, max: 10, step: 0.1 }}
-        value={getPropertyValue("scale")}
+        value={getPropertyValue(AnimationProperty.scale)}
         onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
         disabled={
-          selectedKeyFrame?.propertyEdited.toLocaleLowerCase() !== "scale" ||
-          uiComponentsAreDisabled
+          selectedKeyFrame?.propertyEdited !== AnimationProperty.scale || uiComponentsAreDisabled
         }
       />
-      {nextKeyFrameButton("scale")}
+      {nextKeyFrameButton(AnimationProperty.scale)}
 
-      <InputLabel
-        shrink
-        style={labelStyle}
-        size="small"
-        htmlFor="animation-xoffset"
-      >
+      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-xoffset">
         X offset
       </InputLabel>
       <Input
@@ -319,21 +277,15 @@ export default function AnimationPatternProperties() {
         id="animation-xoffset"
         type="number"
         inputProps={{ min: -4000, max: 4000 }}
-        value={getPropertyValue("xOffset")}
+        value={getPropertyValue(AnimationProperty.xOffset)}
         onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
         disabled={
-          selectedKeyFrame?.propertyEdited.toLocaleLowerCase() !== "xoffset" ||
-          uiComponentsAreDisabled
+          selectedKeyFrame?.propertyEdited !== AnimationProperty.xOffset || uiComponentsAreDisabled
         }
       />
-      {nextKeyFrameButton("xOffset")}
+      {nextKeyFrameButton(AnimationProperty.xOffset)}
 
-      <InputLabel
-        shrink
-        style={labelStyle}
-        size="small"
-        htmlFor="animation-yoffset"
-      >
+      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-yoffset">
         Y offset
       </InputLabel>
       <Input
@@ -341,21 +293,15 @@ export default function AnimationPatternProperties() {
         id="animation-yoffset"
         type="number"
         inputProps={{ min: -4000, max: 4000 }}
-        value={getPropertyValue("yOffset")}
+        value={getPropertyValue(AnimationProperty.yOffset)}
         onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
         disabled={
-          selectedKeyFrame?.propertyEdited.toLocaleLowerCase() !== "yoffset" ||
-          uiComponentsAreDisabled
+          selectedKeyFrame?.propertyEdited !== AnimationProperty.yOffset || uiComponentsAreDisabled
         }
       />
-      {nextKeyFrameButton("yOffset")}
+      {nextKeyFrameButton(AnimationProperty.yOffset)}
 
-      <InputLabel
-        shrink
-        style={labelStyle}
-        size="small"
-        htmlFor="animation-rotation"
-      >
+      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-rotation">
         Rotation
       </InputLabel>
       <Input
@@ -363,21 +309,15 @@ export default function AnimationPatternProperties() {
         id="animation-rotation"
         type="number"
         inputProps={{ min: -360, max: 360 }}
-        value={getPropertyValue("rotation")}
+        value={getPropertyValue(AnimationProperty.rotation)}
         onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
         disabled={
-          selectedKeyFrame?.propertyEdited.toLocaleLowerCase() !== "rotation" ||
-          uiComponentsAreDisabled
+          selectedKeyFrame?.propertyEdited !== AnimationProperty.rotation || uiComponentsAreDisabled
         }
       />
       {nextKeyFrameButton("rotation")}
 
-      <InputLabel
-        shrink
-        style={labelStyle}
-        size="small"
-        htmlFor="animation-starttime"
-      >
+      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-starttime">
         Starttime in Ms
       </InputLabel>
       <Input
@@ -386,9 +326,7 @@ export default function AnimationPatternProperties() {
         type="number"
         inputProps={{ min: 0, max: 100000000, step: "10" }}
         value={selectedAnimationPattern?.startTimeMs}
-        onChange={(e) =>
-          updatePatternProperty("startTimeMs", Number(e.target.value))
-        }
+        onChange={(e) => updatePatternProperty("startTimeMs", Number(e.target.value))}
       />
       <InputLabel shrink style={labelStyle} id="properties-timeline-id">
         Timeline id
@@ -398,9 +336,7 @@ export default function AnimationPatternProperties() {
         labelId="properties-timeline-id"
         value={selectedAnimationPattern?.timelineId}
         label="Timeline id"
-        onChange={(e) =>
-          updatePatternProperty("timelineId", Number(e.target.value))
-        }
+        onChange={(e) => updatePatternProperty("timelineId", Number(e.target.value))}
       >
         {getTimelineMenuItems()}
       </Select>
@@ -408,9 +344,7 @@ export default function AnimationPatternProperties() {
         <Accordion disabled={uiComponentsAreDisabled}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <small>
-              All keyframes (
-              {selectedAnimationPattern?.animationPatternKeyFrames?.length ?? 0}
-              )
+              All keyframes ({selectedAnimationPattern?.animationPatternKeyFrames?.length ?? 0})
             </small>
           </AccordionSummary>
           <AccordionDetails>
@@ -427,16 +361,12 @@ export default function AnimationPatternProperties() {
                     <ListItemButton
                       key={`${keyFrame.uuid}-points`}
                       onClick={() => {
-                        setTimelinePositionMs(
-                          keyFrame.timeMs - xCorrection[selectableStepsIndex]
-                        );
+                        setTimelinePositionMs(keyFrame.timeMs - xCorrection[selectableStepsIndex]);
                         setSelectedKeyFrameUuid(keyFrame.uuid);
                       }}
                     >
                       <ListItemText
-                        primary={`${keyFrame.propertyEdited.toLocaleLowerCase()}: ${
-                          keyFrame.propertyValue
-                        }`}
+                        primary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
                         secondary={`${keyFrame.timeMs} ms`}
                       />
                     </ListItemButton>
@@ -448,8 +378,6 @@ export default function AnimationPatternProperties() {
       </div>
     </>
   ) : (
-    <Alert severity="info">
-      Select an animation pattern by clicking it in the timeline
-    </Alert>
+    <Alert severity="info">Select an animation pattern by clicking it in the timeline</Alert>
   );
 }

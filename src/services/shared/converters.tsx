@@ -4,12 +4,13 @@ import {
   AnimationPattern,
   AnimationPatternKeyFrame,
   animationPlaceholder,
+  AnimationProperty,
 } from "models/components/shared/animation";
+import { LasershowAnimation } from "models/components/shared/lasershow";
 import { Pattern } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
 import { canvasPxSize } from "./config";
 import { createGuid, getCenterOfPoints, mapNumber, rotatePoints } from "./math";
-import { LasershowAnimation } from "models/components/shared/lasershow";
 import { getRandomObjectName } from "./random-object-name-generator";
 
 export const getRgbColorStringFromPoint = (point: Point): string =>
@@ -31,10 +32,7 @@ const hexToRgb = (hex: string) => {
 export const getHexColorStringFromPoint = (point: Point): string =>
   rgbToHex(getRgbColorStringFromPoint(point));
 
-export const setLaserPowerFromHexString = (
-  hex: string,
-  point: Point
-): Point => {
+export const setLaserPowerFromHexString = (hex: string, point: Point): Point => {
   const rgb = hexToRgb(hex);
   point.redLaserPowerPwm = rgb?.r;
   point.greenLaserPowerPwm = rgb?.g;
@@ -93,44 +91,40 @@ export const convertPatternToAnimationPattern = (
   };
 };
 
-const generateAnimationKeyframesFromPattern = (
-  pattern: Pattern
-): AnimationPatternKeyFrame[] => {
+const generateAnimationKeyframesFromPattern = (pattern: Pattern): AnimationPatternKeyFrame[] => {
   return [
     {
       uuid: createGuid(),
       animationPatternUuid: pattern.uuid,
       timeMs: 0,
-      propertyEdited: "scale",
+      propertyEdited: AnimationProperty.scale,
       propertyValue: pattern.scale,
     },
     {
       uuid: createGuid(),
       animationPatternUuid: pattern.uuid,
       timeMs: 0,
-      propertyEdited: "xOffset",
+      propertyEdited: AnimationProperty.xOffset,
       propertyValue: pattern.xOffset,
     },
     {
       uuid: createGuid(),
       animationPatternUuid: pattern.uuid,
       timeMs: 0,
-      propertyEdited: "yOffset",
+      propertyEdited: AnimationProperty.yOffset,
       propertyValue: pattern.yOffset,
     },
     {
       uuid: createGuid(),
       animationPatternUuid: pattern.uuid,
       timeMs: 0,
-      propertyEdited: "rotation",
+      propertyEdited: AnimationProperty.rotation,
       propertyValue: pattern.rotation,
     },
   ];
 };
 
-export const applyParametersToPointsForCanvasByPattern = (
-  pattern: Pattern
-): Point[] =>
+export const applyParametersToPointsForCanvasByPattern = (pattern: Pattern): Point[] =>
   applyParametersToPointsForCanvas(
     pattern.scale,
     pattern.xOffset,
@@ -145,7 +139,7 @@ export const applyParametersToPointsForCanvas = (
   yOffset: number,
   rotation: number,
   points: Point[],
-  convertValuesFromPointsDrawer: boolean = true
+  convertValuesToCanvasSize: boolean = true
 ): Point[] => {
   const pointsLength = points.length;
   let pointsWithOffsetApplied = [];
@@ -162,13 +156,8 @@ export const applyParametersToPointsForCanvas = (
   const centerX = centerOfPattern.x;
   const centerY = centerOfPattern.y;
 
-  const rotatedPoints = rotatePoints(
-    pointsWithOffsetApplied,
-    rotation,
-    centerX,
-    centerY
-  );
-  if (convertValuesFromPointsDrawer) {
+  const rotatedPoints = rotatePoints(pointsWithOffsetApplied, rotation, centerX, centerY);
+  if (convertValuesToCanvasSize) {
     return convertPointsToCanvasSize(rotatedPoints);
   } else {
     return rotatedPoints;
@@ -181,8 +170,8 @@ export const convertPointsToCanvasSize = (points: Point[]) => {
 
   for (let i = 0; i < pointsLength; i++) {
     let point = { ...points[i] };
-    point.x = mapNumber(point.x, -4000, 4000, 0, canvasPxSize);
-    point.y = mapNumber(point.y, -4000, 4000, canvasPxSize, 0);
+    point.x = Math.round(mapNumber(point.x, -4000, 4000, 0, canvasPxSize));
+    point.y = Math.round(mapNumber(point.y, -4000, 4000, canvasPxSize, 0));
     mappedPoints.push(point);
   }
 

@@ -1,8 +1,5 @@
 import { Animation } from "models/components/shared/animation";
-import {
-  getAnimationDuration,
-  getPointsToDrawFromAnimation,
-} from "services/logic/animation-logic";
+import { getAnimationDuration, getPointsToDrawFromAnimation } from "services/logic/animation-logic";
 import { testAnimation } from "../helper";
 
 describe("animation-logic", () => {
@@ -33,9 +30,20 @@ test(
   () => {
     const animation = testAnimation(0, 100, 0);
     const points = getPointsToDrawFromAnimation(100, animation);
-    expect(points[0].length).toBe(
-      animation.animationPatterns[0].pattern.points.length
-    );
+    expect(points[0].length).toBe(animation.animationPatterns[0].pattern.points.length);
+    expect(points.length).toBe(animation.animationPatterns.length);
+  }
+);
+
+test(
+  "Tested: drawKeyFrames:" +
+    "Given the provided points starttime is equal to the specified starttime," +
+    "When I execute the function," +
+    "Then I expect the points with the same starttime to be returned",
+  () => {
+    const animation = testAnimation(0, 100, 0);
+    const points = getPointsToDrawFromAnimation(100, animation);
+    expect(points[0].length).toBe(animation.animationPatterns[0].pattern.points.length);
     expect(points.length).toBe(animation.animationPatterns.length);
   }
 );

@@ -1,3 +1,4 @@
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import {
   Badge,
   Button,
@@ -7,10 +8,9 @@ import {
   Menu,
   Tooltip,
 } from "@mui/material";
-import React, { useState } from "react";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import SelectList from "components/select-list";
 import { Notification } from "models/components/shared/notification";
+import React, { useState } from "react";
 import { OnTrue } from "../on-true";
 
 export default function NotificationPopover() {
