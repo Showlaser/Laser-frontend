@@ -75,7 +75,7 @@ test(
     "When I execute the function," +
     "Then I expect a lasershowAnimation with information from the animation",
   () => {
-    const animation = testAnimation(0, 0, 100);
+    const animation = testAnimation(0, [0], 100);
     const lasershow = convertAnimationToLasershowAnimation(
       animation,
       "b65e77aa-ff6f-45b6-bc7e-8b58ca38c7b2"
@@ -97,7 +97,7 @@ test(
   () => {
     const animationPattern = convertPatternToAnimationPattern(
       testPattern,
-      testAnimation(0, 0, 100)
+      testAnimation(0, [0], 100)
     );
 
     expect(animationPattern.uuid.length).toBeGreaterThan(5);

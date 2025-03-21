@@ -5,6 +5,7 @@ import {
   getCurrentKeyFrame,
   getKeyFramesBeforeTimelinePositionSortedByTimeDescending,
   getKeyFramesPastTimelinePositionSortedByTime,
+  getPatternPointsByTimelinePosition,
   getPreviousCurrentAndNextKeyFramePerProperty,
 } from "services/logic/pattern-logic";
 import { getTestAnimationPatternKeyFrames, testAnimation, testAnimationPattern } from "../helper";
@@ -15,7 +16,7 @@ test(
     "When I execute the function," +
     "Then I expect all the patterns to be returned.",
   () => {
-    const animation = testAnimation(0, 0, 110);
+    const animation = testAnimation(0, [0], 110);
     const animationPatterns = getAnimationPatternsInsideTimelineRange(animation, 0, 100);
     const pattern = animationPatterns?.at(0);
     expect(pattern?.uuid).toBe("4145ab82-6a79-48d1-8425-747a464a4940");
@@ -28,7 +29,7 @@ test(
     "When I execute the function," +
     "Then I expect an empty array.",
   () => {
-    const animation = testAnimation(0, 0, 80);
+    const animation = testAnimation(0, [0], 80);
     const animationPatterns = getAnimationPatternsInsideTimelineRange(animation, 100, 1000);
     expect(animationPatterns).toStrictEqual([]);
   }
@@ -37,12 +38,12 @@ test(
 describe("pattern-logic", () => {
   describe("getAnimationsPatternsToDrawInTimeline", () => {
     const dataSet = [
-      { animation: testAnimation(0, 0, 1100), shouldBeReturned: true },
-      { animation: testAnimation(110, 0, 1100), shouldBeReturned: true },
-      { animation: testAnimation(110, 0, 900), shouldBeReturned: true },
-      { animation: testAnimation(50, 0, 600), shouldBeReturned: true },
-      { animation: testAnimation(1150, 0, 1600), shouldBeReturned: false },
-      { animation: testAnimation(0, 0, 90), shouldBeReturned: false },
+      { animation: testAnimation(0, [0], 1100), shouldBeReturned: true },
+      { animation: testAnimation(110, [0], 1100), shouldBeReturned: true },
+      { animation: testAnimation(110, [0], 900), shouldBeReturned: true },
+      { animation: testAnimation(50, [0], 600), shouldBeReturned: true },
+      { animation: testAnimation(1150, [0], 1600), shouldBeReturned: false },
+      { animation: testAnimation(0, [0], 90), shouldBeReturned: false },
     ];
 
     it.each(dataSet)(
@@ -61,7 +62,7 @@ test(
     "When I execute the function," +
     "Then I expect the returned keyframe starttime to be greater than the starttime",
   () => {
-    const animationPattern = testAnimationPattern(0, 100, 200);
+    const animationPattern = testAnimationPattern(0, [100], 200);
     const keyFrames = getKeyFramesPastTimelinePositionSortedByTime(
       AnimationProperty.scale,
       animationPattern,
@@ -79,7 +80,7 @@ test(
     "When I execute the function," +
     "Then I expect an empty array",
   () => {
-    const animationPattern = testAnimationPattern(0, 0, 50);
+    const animationPattern = testAnimationPattern(0, [0], 50);
     const keyFrames = getKeyFramesPastTimelinePositionSortedByTime(
       AnimationProperty.scale,
       animationPattern,
@@ -90,11 +91,11 @@ test(
 );
 
 const getAnimationWithTwoKeyframes = (): AnimationPattern => {
-  const firstKeyFrame = getTestAnimationPatternKeyFrames(100)[0];
-  const secondKeyframe = getTestAnimationPatternKeyFrames(200)[0];
+  const firstKeyFrame = getTestAnimationPatternKeyFrames([100])[0];
+  const secondKeyframe = getTestAnimationPatternKeyFrames([200])[0];
   const mergedKeyFrames = [firstKeyFrame, secondKeyframe];
 
-  let animationPattern = testAnimationPattern(0, 0, 0);
+  let animationPattern = testAnimationPattern(0, [0], 0);
   animationPattern.animationPatternKeyFrames = mergedKeyFrames;
   return animationPattern;
 };
@@ -147,7 +148,7 @@ test(
     "When I execute the function," +
     "Then I expect the returned keyframe starttime to be before the starttime",
   () => {
-    const animationPattern = testAnimationPattern(0, 0, 0);
+    const animationPattern = testAnimationPattern(0, [0], 0);
     const keyFrames = getKeyFramesBeforeTimelinePositionSortedByTimeDescending(
       AnimationProperty.scale,
       animationPattern,
@@ -165,7 +166,7 @@ test(
     "When I execute the function," +
     "Then I expect an empty array",
   () => {
-    const animationPattern = testAnimationPattern(0, 100, 0);
+    const animationPattern = testAnimationPattern(0, [100], 0);
     const keyFrames = getKeyFramesBeforeTimelinePositionSortedByTimeDescending(
       AnimationProperty.scale,
       animationPattern,
@@ -181,7 +182,7 @@ test(
     "When I execute the function," +
     "Then I expect the provided keyframes returned",
   () => {
-    const animationPattern = testAnimationPattern(0, 100, 0);
+    const animationPattern = testAnimationPattern(0, [100], 0);
     const keyFrames = getCurrentKeyFrame(animationPattern, 100);
     expect(keyFrames.length).toBe(animationPattern.animationPatternKeyFrames.length);
   }
@@ -193,11 +194,11 @@ test(
     "When I execute the function," +
     "Then I expect the provided keyframes returned formatted in previous, current and next",
   () => {
-    const previousKeyFrame = getTestAnimationPatternKeyFrames(0)[0];
-    const currentKeyFrame = getTestAnimationPatternKeyFrames(100)[0];
-    const nextKeyFrame = getTestAnimationPatternKeyFrames(200)[0];
+    const previousKeyFrame = getTestAnimationPatternKeyFrames([0])[0];
+    const currentKeyFrame = getTestAnimationPatternKeyFrames([100])[0];
+    const nextKeyFrame = getTestAnimationPatternKeyFrames([200])[0];
 
-    let animationPattern = testAnimationPattern(0, 0, 0);
+    let animationPattern = testAnimationPattern(0, [0], 0);
     animationPattern.animationPatternKeyFrames = animationPattern.animationPatternKeyFrames.concat(
       previousKeyFrame,
       currentKeyFrame,
@@ -213,10 +214,43 @@ test(
 
 test(
   "Tested: getPatternPointsByTimelinePosition:" +
-    "Add description" +
+    "Given the provided points starttime is equal to the timeline position" +
     "When I execute the function," +
-    "Add description",
+    "Then I expect to get the x value of the inputted points to be equal to the outputted points",
   () => {
-    //TODO add test code
+    const animationPattern = testAnimationPattern(0, [100, 120], 1000);
+    const keyFrames = getPreviousCurrentAndNextKeyFramePerProperty(animationPattern, 100);
+    const result = getPatternPointsByTimelinePosition(
+      animationPattern.pattern,
+      keyFrames,
+      100,
+      false
+    );
+    expect(result[0].x).toBe(animationPattern.pattern.points[0].x);
+  }
+);
+
+test(
+  "Tested: getPatternPointsByTimelinePosition:" +
+    "Given the provided points starttime is not equal to the timeline position" +
+    "When I execute the function," +
+    "Then I expect to get a different x value from the input points",
+  () => {
+    let animationPattern = testAnimationPattern(0, [100, 120], 1000);
+    for (let index = 0; index < animationPattern.animationPatternKeyFrames.length; index++) {
+      const apkf = animationPattern.animationPatternKeyFrames[index];
+      if (apkf.propertyEdited === AnimationProperty.rotation && index > 6) {
+        animationPattern.animationPatternKeyFrames[index].propertyValue = 90;
+      }
+    }
+
+    const keyFrames = getPreviousCurrentAndNextKeyFramePerProperty(animationPattern, 120);
+    const result = getPatternPointsByTimelinePosition(
+      animationPattern.pattern,
+      keyFrames,
+      120,
+      false
+    );
+    expect(result[0].x !== animationPattern.pattern.points[0].x).toBeTruthy();
   }
 );

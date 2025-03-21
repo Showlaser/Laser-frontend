@@ -5,11 +5,11 @@ import { testAnimation } from "../helper";
 describe("animation-logic", () => {
   describe("getAnimationDuration", () => {
     const dataSet = [
-      { animation: testAnimation(0, 0, 10), expectedDuration: 10 },
-      { animation: testAnimation(110, 0, 100), expectedDuration: 210 },
-      { animation: testAnimation(110, 0, 900), expectedDuration: 1010 },
-      { animation: testAnimation(50, 0, 600), expectedDuration: 650 },
-      { animation: testAnimation(50, 0, 1000), expectedDuration: 1050 },
+      { animation: testAnimation(0, [0], 10), expectedDuration: 10 },
+      { animation: testAnimation(110, [0], 100), expectedDuration: 210 },
+      { animation: testAnimation(110, [0], 900), expectedDuration: 1010 },
+      { animation: testAnimation(50, [0], 600), expectedDuration: 650 },
+      { animation: testAnimation(50, [0], 1000), expectedDuration: 1050 },
     ];
 
     it.each(dataSet)(
@@ -28,7 +28,7 @@ test(
     "When I execute the function," +
     "Then I expect the points with the same starttime to be returned",
   () => {
-    const animation = testAnimation(0, 100, 0);
+    const animation = testAnimation(0, [100], 0);
     const points = getPointsToDrawFromAnimation(100, animation);
     expect(points[0].length).toBe(animation.animationPatterns[0].pattern.points.length);
     expect(points.length).toBe(animation.animationPatterns.length);
@@ -41,7 +41,7 @@ test(
     "When I execute the function," +
     "Then I expect the points with the same starttime to be returned",
   () => {
-    const animation = testAnimation(0, 100, 0);
+    const animation = testAnimation(0, [100], 0);
     const points = getPointsToDrawFromAnimation(100, animation);
     expect(points[0].length).toBe(animation.animationPatterns[0].pattern.points.length);
     expect(points.length).toBe(animation.animationPatterns.length);
