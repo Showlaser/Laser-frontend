@@ -1,16 +1,26 @@
-import React, { useEffect, useState } from "react";
+import PauseIcon from "@mui/icons-material/Pause";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import {
+  Grid,
+  IconButton,
+  Input,
+  InputLabel,
+  LinearProgress,
+  MenuItem,
+  Paper,
+  Select,
+  Tooltip,
+} from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
 import {
   numberOfTimeLines,
   selectableSteps,
   timelineItemWidthWhenDurationIsZero,
   timelineNumbersHeight,
 } from "services/shared/config";
-import { drawLine, drawRoundedRectangleWithText, writeText } from "../canvas-helper";
-import { Paper, Grid, InputLabel, Input, Select, MenuItem, Tooltip, IconButton, LinearProgress } from "@mui/material";
 import { mapNumber, normalize, numberIsBetweenOrEqual } from "services/shared/math";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import PauseIcon from "@mui/icons-material/Pause";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { drawLine, drawRoundedRectangleWithText, writeText } from "../canvas-helper";
 
 export type SharedTimelineItem = {
   uuid: string;
@@ -31,6 +41,8 @@ export type SharedTimelineProps = {
   selectableStepsIndex: number;
   setSelectableStepsIndex: (steps: number) => void;
   timelineItems: SharedTimelineItem[];
+  onTimelineItemDelete?: () => void;
+  onMoveTimelineItem?: (forward: boolean) => void;
 };
 
 export function SharedTimeline({
@@ -44,6 +56,8 @@ export function SharedTimeline({
   selectableStepsIndex,
   setSelectableStepsIndex,
   timelineItems,
+  onTimelineItemDelete,
+  onMoveTimelineItem,
 }: SharedTimelineProps) {
   const canvasHeight = window.innerHeight / 6;
   const canvasWidth = window.innerWidth - 60;
@@ -56,7 +70,10 @@ export function SharedTimeline({
       generatedTimeline[i] = {
         id: i,
         hidden: false,
-        timelineCenterY: Math.floor(canvasHeight / numberOfTimeLines / 2) + (i * canvasHeight) / numberOfTimeLines + 5,
+        timelineCenterY:
+          Math.floor(canvasHeight / numberOfTimeLines / 2) +
+          (i * canvasHeight) / numberOfTimeLines +
+          5,
       };
     }
 
@@ -66,8 +83,11 @@ export function SharedTimeline({
   const [screenWidthPx, setScreenWidthPx] = useState<number>(window.innerWidth);
   const [screenHeightPx, setScreenHeightPx] = useState<number>(window.innerHeight);
   const timelines = getTimelineData();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    canvasRef.current?.focus();
+
     const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
@@ -75,7 +95,14 @@ export function SharedTimeline({
     canvas.style.height = `${canvasHeight}px`;
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     draw(ctx);
-  }, [screenWidthPx, screenHeightPx, timelinePositionMs, selectedItemUuid, selectableStepsIndex, timelineItems]);
+  }, [
+    screenWidthPx,
+    screenHeightPx,
+    timelinePositionMs,
+    selectedItemUuid,
+    selectableStepsIndex,
+    timelineItems,
+  ]);
 
   const draw = (ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, canvasWidth, ctx.canvas.height);
@@ -104,7 +131,14 @@ export function SharedTimeline({
 
     for (let i = 0; i < selectedStep + 1; i++) {
       const x = i * distanceBetweenSteps;
-      writeText(x, canvasHeight - 1, (timelinePositionMs + i * selectedStep).toString(), "whitesmoke", ctx, 10);
+      writeText(
+        x,
+        canvasHeight - 1,
+        (timelinePositionMs + i * selectedStep).toString(),
+        "whitesmoke",
+        ctx,
+        10
+      );
     }
   };
 
@@ -117,12 +151,23 @@ export function SharedTimeline({
 
   const getTimelineItemFromMouseClick = (x: number, y: number): SharedTimelineItem | undefined => {
     const numberOfTimeLines = timelines.length;
-    const timelineIdPressed = getTimelineIdPressed(numberOfTimeLines, canvasHeight, y, timelineItemHeightOnCanvas);
+    const timelineIdPressed = getTimelineIdPressed(
+      numberOfTimeLines,
+      canvasHeight,
+      y,
+      timelineItemHeightOnCanvas
+    );
     if (timelineIdPressed === undefined) {
       return undefined;
     }
 
-    const xMappedToTimelinePosition = mapNumber(x, 0, canvasWidth, timelinePositionMs, stepsToDrawMaxRange);
+    const xMappedToTimelinePosition = mapNumber(
+      x,
+      0,
+      canvasWidth,
+      timelinePositionMs,
+      stepsToDrawMaxRange
+    );
     return timelineItems.find((ti) => {
       return (
         numberIsBetweenOrEqual(
@@ -146,7 +191,11 @@ export function SharedTimeline({
     return timelineItems.filter((ti) => {
       const itemStartsBeforeTimeline = ti.startTime < timelinePositionMs;
       const itemEndsAfterStepsToDraw = ti.startTime + ti.duration > stepsToDrawMaxRange;
-      const itemStartsInTimelineRange = numberIsBetweenOrEqual(ti.startTime, timelinePositionMs, stepsToDrawMaxRange);
+      const itemStartsInTimelineRange = numberIsBetweenOrEqual(
+        ti.startTime,
+        timelinePositionMs,
+        stepsToDrawMaxRange
+      );
 
       const patternEndsInTimelineRange = numberIsBetweenOrEqual(
         ti.startTime + ti.duration,
@@ -176,16 +225,20 @@ export function SharedTimeline({
     const numberOfTimeLines = timelines.length;
     for (let i = 0; i < timelineItemsInRangeCount; i++) {
       const timelineItem = timelineItemsInRange[i];
-      const y = ((canvasHeight - timelineNumbersHeight) / numberOfTimeLines) * (timelineItem?.timelineId ?? 0);
+      const y =
+        ((canvasHeight - timelineNumbersHeight) / numberOfTimeLines) *
+        (timelineItem?.timelineId ?? 0);
 
       if (timelineItem.duration === 0) {
         //to prevent the pattern from being to small to click on
         timelineItem.duration = timelineItemWidthWhenDurationIsZero;
       }
 
-      const widthToDisplay = (canvasWidth / 10) * (timelineItem.duration / selectableSteps[selectableStepsIndex]);
+      const widthToDisplay =
+        (canvasWidth / 10) * (timelineItem.duration / selectableSteps[selectableStepsIndex]);
       const xPosition =
-        (canvasWidth / 10) * ((timelineItem.startTime - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
+        (canvasWidth / 10) *
+        ((timelineItem.startTime - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
 
       let rectangleColor = selectedItemUuid === timelineItem.uuid ? "#6370c2" : "#485cdb";
       drawRoundedRectangleWithText(
@@ -220,6 +273,19 @@ export function SharedTimeline({
       if (yPositionIsInTimeline) {
         return i;
       }
+    }
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Delete") {
+      e.preventDefault();
+      onTimelineItemDelete?.();
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      onMoveTimelineItem?.(true);
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      onMoveTimelineItem?.(false);
     }
   };
 
@@ -284,13 +350,21 @@ export function SharedTimeline({
           </span>
         </Grid>
       </Grid>
-      <canvas onClick={onCanvasClick} id="timeline-canvas" />
+      <canvas
+        onClick={onCanvasClick}
+        id="timeline-canvas"
+        onKeyDown={onKeyDown}
+        tabIndex={0}
+        ref={canvasRef}
+      />
       <LinearProgress
         sx={{
           transition: "none",
         }}
         variant="determinate"
-        value={timelinePositionMs > totalDuration ? 100 : normalize(timelinePositionMs, 0, totalDuration)}
+        value={
+          timelinePositionMs > totalDuration ? 100 : normalize(timelinePositionMs, 0, totalDuration)
+        }
       />
     </Paper>
   );

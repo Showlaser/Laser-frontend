@@ -5,12 +5,17 @@ import { Grid, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
 import { SharedTimeline } from "components/shared/shared-timeline";
 import TabSelector from "components/tabs";
-import { getAnimationPatternDuration } from "models/components/shared/animation";
+import {
+  Animation,
+  AnimationPattern,
+  getAnimationPatternDuration,
+} from "models/components/shared/animation";
 import {
   SelectedAnimationContext,
   SelectedAnimationContextType,
   SelectedAnimationPatternContext,
   SelectedAnimationPatternContextType,
+  SelectedAnimationPatternIndexContext,
 } from "pages/animation-editor";
 import React, { useEffect, useState } from "react";
 import {
@@ -61,6 +66,7 @@ export const AnimationDurationContext = React.createContext<AnimationDurationCon
 );
 
 export default function AnimationKeyFrameEditor() {
+  const selectedAnimationPatternIndex = React.useContext(SelectedAnimationPatternIndexContext);
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
     SelectedAnimationContext
   ) as SelectedAnimationContextType;
@@ -140,13 +146,64 @@ export default function AnimationKeyFrameEditor() {
     }
   };
 
+  const updatePatternProperty = (propertyName: string, value: any) => {
+    if (selectedAnimation?.animationPatterns === undefined) {
+      return;
+    }
+
+    let updatedAnimation: any = { ...selectedAnimation };
+    updatedAnimation.animationPatterns[selectedAnimationPatternIndex][propertyName] = value;
+    setSelectedAnimation(updatedAnimation);
+  };
+
   const onTimelineItemClick = (uuid: string) => {
     const selectedAnimationPattern = selectedAnimation?.animationPatterns.find(
       (ap) => ap.uuid === uuid
     );
     if (selectedAnimationPattern !== undefined) {
       setSelectedAnimationPattern(selectedAnimationPattern);
+      setTimelinePositionMs(selectedAnimationPattern.startTimeMs);
     }
+  };
+
+  const onTimelineItemDelete = () => {
+    if (
+      selectedAnimation === undefined ||
+      !window.confirm("Are you sure you want to delete the animation pattern?")
+    ) {
+      return;
+    }
+
+    let updatedAnimation = { ...selectedAnimation } as Animation;
+    const animationPatternsToKeep: AnimationPattern[] = updatedAnimation.animationPatterns.filter(
+      (ap) => ap.uuid !== selectedAnimationPattern?.uuid
+    );
+
+    updatedAnimation.animationPatterns = animationPatternsToKeep;
+    setSelectedAnimation(updatedAnimation);
+    setSelectedAnimationPattern(null);
+  };
+
+  const onMoveTimelineItem = (forward: boolean) => {
+    if (selectedAnimation === undefined) {
+      return;
+    }
+
+    let updatedAnimation = { ...selectedAnimation } as Animation;
+    const animationPatternIndex = updatedAnimation.animationPatterns.findIndex(
+      (ap) => ap.uuid === selectedAnimationPattern?.uuid
+    );
+    if (forward) {
+      updatedAnimation.animationPatterns[animationPatternIndex].startTimeMs += 10;
+      setTimelinePositionMs(updatedAnimation.animationPatterns[animationPatternIndex].startTimeMs);
+    } else if (
+      !forward &&
+      updatedAnimation.animationPatterns[animationPatternIndex].startTimeMs > 0
+    ) {
+      updatedAnimation.animationPatterns[animationPatternIndex].startTimeMs -= 10;
+    }
+
+    setSelectedAnimation(updatedAnimation);
   };
 
   return (
@@ -163,7 +220,9 @@ export default function AnimationKeyFrameEditor() {
                   },
                   {
                     tabName: "Animation pattern properties",
-                    tabChildren: <AnimationPatternProperties />,
+                    tabChildren: (
+                      <AnimationPatternProperties updatePatternProperty={updatePatternProperty} />
+                    ),
                   },
                 ]}
                 selectedTabId={selectedTabId}
@@ -195,6 +254,8 @@ export default function AnimationKeyFrameEditor() {
                 totalDuration={getAnimationDuration(selectedAnimation)}
                 selectableStepsIndex={selectableStepsIndex}
                 setSelectableStepsIndex={setSelectableStepsIndex}
+                onTimelineItemDelete={onTimelineItemDelete}
+                onMoveTimelineItem={onMoveTimelineItem}
                 timelineItems={selectedAnimation.animationPatterns.map((ap) => ({
                   uuid: ap.uuid,
                   name: ap.name,

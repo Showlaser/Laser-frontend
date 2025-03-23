@@ -107,7 +107,7 @@ export const getPointsToDrawFromAnimation = (
       timelinePositionMs
     );
     const patternPoints = getPatternPointsByTimelinePosition(
-      animationPattern.pattern,
+      animationPattern,
       previousCurrentAndNextKeyFrames,
       timelinePositionMs,
       convertValuesFromPointsDrawer

@@ -220,12 +220,7 @@ test(
   () => {
     const animationPattern = testAnimationPattern(0, [100, 120], 1000);
     const keyFrames = getPreviousCurrentAndNextKeyFramePerProperty(animationPattern, 100);
-    const result = getPatternPointsByTimelinePosition(
-      animationPattern.pattern,
-      keyFrames,
-      100,
-      false
-    );
+    const result = getPatternPointsByTimelinePosition(animationPattern, keyFrames, 100, false);
     expect(result[0].x).toBe(animationPattern.pattern.points[0].x);
   }
 );
@@ -245,12 +240,7 @@ test(
     }
 
     const keyFrames = getPreviousCurrentAndNextKeyFramePerProperty(animationPattern, 120);
-    const result = getPatternPointsByTimelinePosition(
-      animationPattern.pattern,
-      keyFrames,
-      120,
-      false
-    );
+    const result = getPatternPointsByTimelinePosition(animationPattern, keyFrames, 120, false);
     expect(result[0].x !== animationPattern.pattern.points[0].x).toBeTruthy();
   }
 );

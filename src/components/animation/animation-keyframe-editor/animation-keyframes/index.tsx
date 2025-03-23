@@ -60,6 +60,19 @@ export default function AnimationPatternKeyFrames() {
     { property: AnimationProperty.rotation, yPosition: canvasPxSize * 0.8 },
   ];
 
+  const getCorrectedTimelinePosition = () => {
+    const correctedPosition = timelinePositionMs - (selectedAnimationPattern?.startTimeMs ?? 0);
+    if (correctedPosition < 0) {
+      return 0;
+    }
+
+    return correctedPosition;
+  };
+
+  const correctedTimelinePosition = getCorrectedTimelinePosition();
+  const correctedStepsToDrawMaxRange =
+    stepsToDrawMaxRange - (selectedAnimationPattern?.startTimeMs ?? 0);
+
   const selectedAnimationPatternIndex =
     selectedAnimation?.animationPatterns?.findIndex(
       (ap: { uuid: string | undefined }) => ap.uuid === selectedAnimationPattern?.uuid
@@ -76,8 +89,8 @@ export default function AnimationPatternKeyFrames() {
 
     let xPos = canvasPxSize / 10 + 35;
     for (
-      let i = timelinePositionMs;
-      i < stepsToDrawMaxRange + 1;
+      let i = correctedTimelinePosition;
+      i < correctedStepsToDrawMaxRange + 1;
       i += selectableSteps[selectableStepsIndex]
     ) {
       ctx.fillText(i.toString(), xPos, canvasPxSize - 3);
@@ -85,7 +98,14 @@ export default function AnimationPatternKeyFrames() {
     }
 
     const keyFramesInRange = selectedAnimationPattern?.animationPatternKeyFrames.filter(
-      (keyframe) => numberIsBetweenOrEqual(keyframe.timeMs, timelinePositionMs, stepsToDrawMaxRange)
+      (keyframe) => {
+        const istrue = numberIsBetweenOrEqual(
+          keyframe.timeMs,
+          correctedTimelinePosition,
+          correctedStepsToDrawMaxRange
+        );
+        return istrue;
+      }
     );
 
     if (keyFramesInRange === undefined) {
@@ -107,9 +127,16 @@ export default function AnimationPatternKeyFrames() {
     });
   };
 
-  const drawTimelineOnCanvas = useCallback(() => {
+  const drawOnCanvas = useCallback(() => {
     let canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     canvas = prepareCanvas(canvas);
+    if (
+      (selectedAnimationPattern?.startTimeMs ?? 0) > timelinePositionMs ||
+      selectedAnimationPattern === null
+    ) {
+      return;
+    }
+
     drawProperties(canvas);
     drawTimeStepsAndKeyframes(canvas);
   }, [
@@ -124,9 +151,9 @@ export default function AnimationPatternKeyFrames() {
 
   useEffect(() => {
     canvasRef.current?.focus();
-    drawTimelineOnCanvas();
+    drawOnCanvas();
   }, [
-    drawTimelineOnCanvas,
+    drawOnCanvas,
     timelinePositionMs,
     playAnimation,
     selectableStepsIndex,
@@ -168,8 +195,8 @@ export default function AnimationPatternKeyFrames() {
       const y = keyFrameProperty.yPosition;
       const x = mapNumber(
         keyFrame.timeMs,
-        timelinePositionMs,
-        stepsToDrawMaxRange,
+        correctedTimelinePosition,
+        correctedStepsToDrawMaxRange,
         80,
         canvasPxSize
       );
@@ -194,7 +221,13 @@ export default function AnimationPatternKeyFrames() {
     const mouseXPosition = e.clientX - rect.left;
     const mouseYPosition = e.clientY - rect.top;
     const mappedX: number =
-      mapNumber(mouseXPosition, 80, canvasPxSize, timelinePositionMs, stepsToDrawMaxRange) | 0;
+      mapNumber(
+        mouseXPosition,
+        80,
+        canvasPxSize,
+        correctedTimelinePosition,
+        correctedStepsToDrawMaxRange
+      ) | 0;
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
 
     const keyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
@@ -228,7 +261,7 @@ export default function AnimationPatternKeyFrames() {
   };
 
   const showMouseXAxis = (event: any) => {
-    drawTimelineOnCanvas();
+    drawOnCanvas();
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     const mouseXPosition = event.clientX - rect.left;
@@ -238,7 +271,13 @@ export default function AnimationPatternKeyFrames() {
     }
 
     const mappedX: number =
-      mapNumber(mouseXPosition, 80, canvasPxSize, timelinePositionMs, stepsToDrawMaxRange) | 0;
+      mapNumber(
+        mouseXPosition,
+        80,
+        canvasPxSize,
+        correctedTimelinePosition,
+        correctedStepsToDrawMaxRange
+      ) | 0;
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
     const hoveredKeyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
 
@@ -266,7 +305,7 @@ export default function AnimationPatternKeyFrames() {
     }
 
     const mappedX: number =
-      mapNumber(x, 80, canvasPxSize, timelinePositionMs, stepsToDrawMaxRange) | 0;
+      mapNumber(x, 80, canvasPxSize, correctedTimelinePosition, correctedStepsToDrawMaxRange) | 0;
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
 
     const y = event.clientY - rect.top;
@@ -356,7 +395,7 @@ export default function AnimationPatternKeyFrames() {
       id="svg-keyframe-canvas"
       onClick={onCanvasClick}
       onMouseMove={showMouseXAxis}
-      onMouseLeave={drawTimelineOnCanvas}
+      onMouseLeave={drawOnCanvas}
       onMouseDown={onMiddleMouseClick}
     />
   );
