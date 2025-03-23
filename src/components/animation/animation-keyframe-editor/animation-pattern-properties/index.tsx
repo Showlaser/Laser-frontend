@@ -36,7 +36,13 @@ import {
   AnimationTimeLinePositionContext,
 } from "..";
 
-export default function AnimationPatternProperties() {
+export type AnimationPatternProps = {
+  updatePatternProperty: (propertyName: string, value: any) => void;
+};
+
+export default function AnimationPatternProperties({
+  updatePatternProperty,
+}: AnimationPatternProps) {
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
     SelectedAnimationContext
   ) as SelectedAnimationContextType;
@@ -206,16 +212,6 @@ export default function AnimationPatternProperties() {
       </Tooltip>
     </span>
   );
-
-  const updatePatternProperty = (propertyName: string, value: any) => {
-    if (selectedAnimation?.animationPatterns === undefined) {
-      return;
-    }
-
-    let updatedAnimation: any = { ...selectedAnimation };
-    updatedAnimation.animationPatterns[selectedAnimationPatternIndex][propertyName] = value;
-    setSelectedAnimation(updatedAnimation);
-  };
 
   const getTimelineMenuItems = () => {
     let items = [];

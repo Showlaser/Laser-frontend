@@ -93,7 +93,8 @@ export const getKeyFramesPastTimelinePositionSortedByTime = (
   animationPattern?.animationPatternKeyFrames
     .filter(
       (ak: { timeMs: number; propertyEdited: AnimationProperty }) =>
-        ak.timeMs > timelinePositionMs && ak.propertyEdited === property
+        ak.timeMs + animationPattern.startTimeMs > timelinePositionMs &&
+        ak.propertyEdited === property
     )
     .sort((a: { timeMs: number }, b: { timeMs: number }) => a.timeMs - b.timeMs);
 
@@ -101,20 +102,24 @@ export const getKeyFramesBeforeTimelinePositionSortedByTimeDescending = (
   property: AnimationProperty,
   animationPattern: AnimationPattern,
   timelinePositionMs: number
-) =>
-  animationPattern?.animationPatternKeyFrames
-    .filter(
-      (ak: { timeMs: number; propertyEdited: AnimationProperty }) =>
-        ak.timeMs < timelinePositionMs && ak.propertyEdited === property
-    )
+) => {
+  return animationPattern?.animationPatternKeyFrames
+    .filter((ak: { timeMs: number; propertyEdited: AnimationProperty }) => {
+      return (
+        ak.timeMs + animationPattern.startTimeMs < timelinePositionMs &&
+        ak.propertyEdited === property
+      );
+    })
     .sort((a: { timeMs: number }, b: { timeMs: number }) => b.timeMs - a.timeMs);
+};
 
 export const getCurrentKeyFrame = (
   selectedAnimationPattern: AnimationPattern,
   timelinePositionMs: number
 ) =>
   selectedAnimationPattern?.animationPatternKeyFrames.filter(
-    (ak: { timeMs: number }) => ak.timeMs === timelinePositionMs
+    (ak: { timeMs: number }) =>
+      ak.timeMs + selectedAnimationPattern.startTimeMs === timelinePositionMs
   );
 
 export const getPreviousCurrentAndNextKeyFramePerProperty = (
@@ -151,16 +156,16 @@ export const getPreviousCurrentAndNextKeyFramePerProperty = (
 };
 
 export const getPatternPointsByTimelinePosition = (
-  pattern: Pattern,
+  animationPattern: AnimationPattern,
   previousNextAndCurrentKeyFrames: PreviousCurrentAndNextKeyFramePerProperty,
   timelinePositionMs: number,
   convertValuesFromPointsDrawer?: boolean
 ): Point[] => {
-  if (pattern?.points === undefined) {
+  if (animationPattern?.pattern?.points === undefined) {
     return [];
   }
 
-  let points: Point[] = [...pattern.points];
+  let points: Point[] = [...animationPattern.pattern.points];
   let valuesPerProperty = propertiesSettings.map((propertiesSetting) => ({
     property: propertiesSetting.property,
     value: propertiesSetting.defaultValue,
@@ -193,6 +198,7 @@ export const getPatternPointsByTimelinePosition = (
       nextKeyFrame !== undefined
     ) {
       valuesPerProperty[valuesPerPropertyIndex].value = calculateNewValueByKeyFrames(
+        animationPattern,
         previousKeyFrame,
         nextKeyFrame,
         timelinePositionMs
@@ -229,14 +235,15 @@ export const getPatternPointsByTimelinePosition = (
 };
 
 const calculateNewValueByKeyFrames = (
+  animationPattern: AnimationPattern,
   previousKeyFrame: AnimationPatternKeyFrame,
   nextKeyFrame: AnimationPatternKeyFrame,
   timelinePositionMs: number
 ) => {
   const newPropertyValue = mapNumber(
     timelinePositionMs,
-    previousKeyFrame.timeMs,
-    nextKeyFrame.timeMs,
+    previousKeyFrame.timeMs + animationPattern.startTimeMs,
+    nextKeyFrame.timeMs + +animationPattern.startTimeMs,
     previousKeyFrame.propertyValue,
     nextKeyFrame.propertyValue
   );

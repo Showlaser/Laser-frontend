@@ -5,20 +5,14 @@ import { Grid, SpeedDial, SpeedDialAction } from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
 import ToLaserProjector from "components/shared/to-laser-projector";
 import TabSelector, { TabSelectorData } from "components/tabs";
-import {
-  Pattern,
-  getPatternPlaceHolder,
-} from "models/components/shared/pattern";
+import { Pattern, getPatternPlaceHolder } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
 import * as React from "react";
+import { useEffect } from "react";
 import { savePattern } from "services/logic/pattern-logic";
 import { svgToPoints } from "services/logic/svg-to-coordinates-converter";
 import { applyParametersToPointsForCanvasByPattern } from "services/shared/converters";
-import {
-  showError,
-  showSuccess,
-  toastSubject,
-} from "services/shared/toast-messages";
+import { showError, showSuccess, toastSubject } from "services/shared/toast-messages";
 import { addItemToVersionHistory } from "services/shared/version-history";
 import GeneralSection from "./sections/general-section";
 import PointsSection from "./sections/points-section";
@@ -45,11 +39,8 @@ export default function PatternEditor({
   );
   const [numberOfPoints, setNumberOfPoints] = React.useState<number>(200);
   const [showPointNumber, setShowPointNumber] = React.useState<boolean>(false);
-  const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>(
-    []
-  );
-  const [patternNameIsInUse, setPatternNameIsInUse] =
-    React.useState<boolean>(false);
+  const [selectedPointsUuid, setSelectedPointsUuid] = React.useState<string[]>([]);
+  const [patternNameIsInUse, setPatternNameIsInUse] = React.useState<boolean>(false);
   const [pointsToDraw, setPointToDraw] = React.useState<Point[]>([]);
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
 
@@ -70,9 +61,8 @@ export default function PatternEditor({
     };
   }, [uploadedFile, numberOfPoints]);
 
-  React.useEffect(() => {
-    const pointsToDraw: Point[] =
-      applyParametersToPointsForCanvasByPattern(pattern);
+  useEffect(() => {
+    const pointsToDraw: Point[] = applyParametersToPointsForCanvasByPattern(pattern);
     setPointToDraw(pointsToDraw);
   }, [showPointNumber, selectedPointsUuid, pattern]);
 
@@ -204,9 +194,7 @@ export default function PatternEditor({
           key="sd-upload-clear"
           icon={<ClearIcon />}
           onClick={() =>
-            window.confirm(
-              "Are you sure you want to clear the field? Unsaved changes will be lost"
-            )
+            window.confirm("Are you sure you want to clear the field? Unsaved changes will be lost")
               ? clearEditor()
               : null
           }
