@@ -1,6 +1,7 @@
 import CloseIcon from "@mui/icons-material/Close";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
-  Button,
   Card,
   CardActionArea,
   CardContent,
@@ -11,12 +12,12 @@ import {
   InputBase,
   Modal,
   Paper,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useState } from "react";
 import { OnTrue } from "../on-true";
-
 type CardOverviewItems = {
   uuid: string | null;
   name: string | null;
@@ -112,7 +113,7 @@ export default function CardOverview({
                   key={`card ${index}`}
                 >
                   <Card
-                    sx={{ width: "20%", minWidth: "30vh", margin: 1 }}
+                    sx={{ width: "20%", minWidth: "40vh", margin: 1 }}
                     key={item.name + "card-overview"}
                   >
                     <CardActionArea onClick={() => item.onCardClick(item)}>
@@ -128,13 +129,25 @@ export default function CardOverview({
                         </Typography>
                       </CardContent>
                     </CardActionArea>
-                    <Button fullWidth onClick={() => onDeleteClick(item?.uuid)}>
-                      Delete
-                    </Button>
+                    <Tooltip title={`Delete ${item.name}`}>
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => onDeleteClick(item?.uuid)}
+                        color="error"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
                     <OnTrue onTrue={onDuplicateClick !== undefined}>
-                      <Button fullWidth onClick={() => onDuplicateClick?.(item?.uuid)}>
-                        Duplicate
-                      </Button>
+                      <Tooltip title={`Duplicate ${item.name}`}>
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() => onDuplicateClick?.(item?.uuid)}
+                          color="primary"
+                        >
+                          <ContentCopyIcon />
+                        </IconButton>
+                      </Tooltip>
                     </OnTrue>
                   </Card>
                 </Grow>

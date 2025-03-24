@@ -135,7 +135,9 @@ export default function AnimationPatternKeyFrames() {
       ctx.fillStyle = "whitesmoke";
 
       ctx.fillText(
-        `Out of animation pattern range (${selectedAnimationPattern?.startTimeMs}ms/${
+        `Out of ${selectedAnimationPattern.name} range (${
+          selectedAnimationPattern?.startTimeMs
+        }ms/${
           getAnimationPatternDuration(selectedAnimationPattern) +
           selectedAnimationPattern.startTimeMs
         }ms)`,
@@ -145,10 +147,16 @@ export default function AnimationPatternKeyFrames() {
     }
   };
 
+  const timelineIsOutSelectedAnimationPatternRange =
+    (selectedAnimationPattern?.startTimeMs ?? 0) > timelinePositionMs ||
+    getAnimationPatternDuration(selectedAnimationPattern) +
+      (selectedAnimationPattern?.startTimeMs ?? 0) <
+      timelinePositionMs;
+
   const drawOnCanvas = useCallback(() => {
     let canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     canvas = prepareCanvas(canvas);
-    if ((selectedAnimationPattern?.startTimeMs ?? 0) > timelinePositionMs) {
+    if (timelineIsOutSelectedAnimationPatternRange) {
       drawOutsideRange(canvas);
       return;
     } else if (selectedAnimationPattern === null) {
@@ -281,6 +289,14 @@ export default function AnimationPatternKeyFrames() {
   const showMouseXAxis = (event: any) => {
     drawOnCanvas();
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
+    if (timelineIsOutSelectedAnimationPatternRange) {
+      drawOutsideRange(canvas);
+      return;
+    }
+    if (selectedAnimationPattern === null) {
+      return;
+    }
+
     const rect = canvas.getBoundingClientRect();
     const mouseXPosition = event.clientX - rect.left;
     const mouseYPosition = event.clientY - rect.top;
