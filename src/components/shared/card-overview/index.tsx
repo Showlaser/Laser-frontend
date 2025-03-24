@@ -31,6 +31,7 @@ type CardOverviewProps = {
   onNoItemsMessageTitle: string;
   onNoItemsDescription: string;
   onDeleteClick: (uuid: string | null) => void;
+  onDuplicateClick?: (uuid: string | null) => void;
 };
 
 export default function CardOverview({
@@ -40,18 +41,18 @@ export default function CardOverview({
   onNoItemsMessageTitle: onEmptyMessageTitle,
   onNoItemsDescription: onEmptyMessageDescription,
   onDeleteClick,
+  onDuplicateClick,
 }: CardOverviewProps) {
   const [searchValue, setSearchValue] = useState<string>("");
 
+  const onKeyDown = (e: any) => {
+    if (e.kkey === "Escape") {
+      closeOverview();
+    }
+  };
+
   return (
-    <Modal
-      open={show}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") {
-          closeOverview();
-        }
-      }}
-    >
+    <Modal open={show} onKeyDown={onKeyDown}>
       <Box style={{ textAlign: "center", marginTop: "40px" }}>
         <IconButton style={{ marginLeft: "95%" }} onClick={closeOverview}>
           <CloseIcon />
@@ -130,6 +131,11 @@ export default function CardOverview({
                     <Button fullWidth onClick={() => onDeleteClick(item?.uuid)}>
                       Delete
                     </Button>
+                    <OnTrue onTrue={onDuplicateClick !== undefined}>
+                      <Button fullWidth onClick={() => onDuplicateClick?.(item?.uuid)}>
+                        Duplicate
+                      </Button>
+                    </OnTrue>
                   </Card>
                 </Grow>
               ))}

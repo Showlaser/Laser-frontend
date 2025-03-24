@@ -108,6 +108,7 @@ export default function AnimationPatternProperties({
       return;
     }
 
+    console.log("test");
     const keyFrames = selectedAnimationPattern?.animationPatternKeyFrames
       .filter((ak: { propertyEdited: string; timeMs: number }) => {
         const propertyIsTheSame = ak.propertyEdited === property;
@@ -150,7 +151,7 @@ export default function AnimationPatternProperties({
       return;
     }
 
-    setTimelinePositionMs(keyFrame?.timeMs);
+    setTimelinePositionMs(keyFrame?.timeMs + (selectedAnimationPattern?.startTimeMs ?? 0));
     setSelectedKeyFrameUuid(keyFrame.uuid);
   };
 
@@ -311,7 +312,7 @@ export default function AnimationPatternProperties({
           selectedKeyFrame?.propertyEdited !== AnimationProperty.rotation || uiComponentsAreDisabled
         }
       />
-      {nextKeyFrameButton("rotation")}
+      {nextKeyFrameButton(AnimationProperty.rotation)}
 
       <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-starttime">
         Starttime in Ms

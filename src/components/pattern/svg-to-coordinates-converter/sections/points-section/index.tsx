@@ -281,8 +281,8 @@ export default function PointsSection({
                       point.connectedToPointUuid === emptyGuid
                         ? notConnectedToPointValue
                         : `Point ${
-                            pointsToRender.find((p) => p.uuid === point.connectedToPointUuid)
-                              ?.orderNr
+                            (pointsToRender.find((p) => p.uuid === point.connectedToPointUuid)
+                              ?.orderNr ?? 0) + 1
                           }`,
                   }}
                   disableClearable
