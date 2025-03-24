@@ -4,6 +4,7 @@ import {
   Animation,
   AnimationPatternKeyFrame,
   AnimationProperty,
+  getAnimationPatternDuration,
 } from "models/components/shared/animation";
 import {
   SelectedAnimationContext,
@@ -127,13 +128,38 @@ export default function AnimationPatternKeyFrames() {
     });
   };
 
+  const drawOutsideRange = (canvas: HTMLCanvasElement) => {
+    if (selectedAnimationPattern !== null) {
+      const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+      ctx.font = "20px sans-serif";
+      ctx.fillStyle = "whitesmoke";
+
+      ctx.fillText(
+        `Out of ${selectedAnimationPattern.name} range (${
+          selectedAnimationPattern?.startTimeMs
+        }ms/${
+          getAnimationPatternDuration(selectedAnimationPattern) +
+          selectedAnimationPattern.startTimeMs
+        }ms)`,
+        canvasPxSize / 16,
+        canvasPxSize / 2
+      );
+    }
+  };
+
+  const timelineIsOutSelectedAnimationPatternRange =
+    (selectedAnimationPattern?.startTimeMs ?? 0) > timelinePositionMs ||
+    getAnimationPatternDuration(selectedAnimationPattern) +
+      (selectedAnimationPattern?.startTimeMs ?? 0) <
+      timelinePositionMs;
+
   const drawOnCanvas = useCallback(() => {
     let canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     canvas = prepareCanvas(canvas);
-    if (
-      (selectedAnimationPattern?.startTimeMs ?? 0) > timelinePositionMs ||
-      selectedAnimationPattern === null
-    ) {
+    if (timelineIsOutSelectedAnimationPatternRange) {
+      drawOutsideRange(canvas);
+      return;
+    } else if (selectedAnimationPattern === null) {
       return;
     }
 
@@ -263,6 +289,14 @@ export default function AnimationPatternKeyFrames() {
   const showMouseXAxis = (event: any) => {
     drawOnCanvas();
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
+    if (timelineIsOutSelectedAnimationPatternRange) {
+      drawOutsideRange(canvas);
+      return;
+    }
+    if (selectedAnimationPattern === null) {
+      return;
+    }
+
     const rect = canvas.getBoundingClientRect();
     const mouseXPosition = event.clientX - rect.left;
     const mouseYPosition = event.clientY - rect.top;
@@ -322,7 +356,7 @@ export default function AnimationPatternKeyFrames() {
       return;
     }
 
-    setTimelinePositionMs(selectedKeyFrame.timeMs);
+    setTimelinePositionMs(selectedKeyFrame.timeMs + (selectedAnimationPattern?.startTimeMs ?? 0));
     setSelectedKeyFrameUuid(selectedKeyFrame.uuid);
   };
 

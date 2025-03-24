@@ -13,10 +13,11 @@ import { Animation, AnimationPattern } from "models/components/shared/animation"
 import { Lasershow } from "models/components/shared/lasershow";
 import { Pattern } from "models/components/shared/pattern";
 import React, { useEffect, useState } from "react";
-import { getAnimations } from "services/logic/animation-logic";
+import { getAnimations, saveAnimation } from "services/logic/animation-logic";
 import { getLasershows } from "services/logic/lasershow-logic";
 import { getPatterns } from "services/logic/pattern-logic";
 import { convertPatternToAnimation } from "services/shared/converters";
+import { createGuid } from "services/shared/math";
 import "./index.css";
 
 export type SelectedAnimationContextType = {
@@ -175,6 +176,38 @@ export default function AnimationPage() {
     }
   };
 
+  const onDuplicateAnimationClick = (uuid: string | null) => {
+    let animationToDuplicate = {
+      ...availableAnimations?.find((a) => a.uuid === uuid),
+    } as Animation;
+    if (animationToDuplicate === undefined) {
+      return;
+    }
+
+    animationToDuplicate.uuid = createGuid();
+    animationToDuplicate.name += `-duplicated-${new Date().toLocaleDateString()}`;
+    for (let index = 0; index < animationToDuplicate.animationPatterns.length; index++) {
+      animationToDuplicate.animationPatterns[index].animationUuid = animationToDuplicate.uuid;
+      animationToDuplicate.animationPatterns[index].uuid = createGuid();
+      for (
+        let apIndex = 0;
+        apIndex < animationToDuplicate.animationPatterns[index].animationPatternKeyFrames.length;
+        apIndex++
+      ) {
+        animationToDuplicate.animationPatterns[index].animationPatternKeyFrames[apIndex].uuid =
+          createGuid();
+        animationToDuplicate.animationPatterns[index].animationPatternKeyFrames[
+          apIndex
+        ].animationPatternUuid = animationToDuplicate.animationPatterns[index].uuid;
+      }
+    }
+
+    let animationsToUpdate = [...(availableAnimations ?? [])];
+    animationsToUpdate.push(animationToDuplicate);
+    setAvailableAnimations(animationsToUpdate);
+    saveAnimation(animationToDuplicate);
+  };
+
   return (
     <SideNav pageName="Animation">
       {patternToRemove !== undefined &&
@@ -235,6 +268,7 @@ export default function AnimationPage() {
           onDeleteClick={(uuid) =>
             setAnimationToRemove(availableAnimations?.find((a) => a.uuid === uuid))
           }
+          onDuplicateClick={onDuplicateAnimationClick}
           items={
             availableAnimations?.map((animation) => ({
               uuid: animation.uuid,

@@ -58,7 +58,9 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
         ctx.font = "20px sans-serif";
       }
 
-      ctx.fillText((index + 1).toString(), point.x + 5, point.y + 3);
+      ctx.fillStyle = "whitesmoke";
+      ctx.fillText((1 + point.orderNr).toString(), point.x + 5, point.y - 5);
+      ctx.fillStyle = color;
     }
 
     if (point.connectedToPointUuid !== emptyGuid) {

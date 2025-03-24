@@ -15,7 +15,8 @@ import { getPatternPlaceHolder, Pattern } from "models/components/shared/pattern
 import React, { useEffect, useState } from "react";
 import { getAnimations } from "services/logic/animation-logic";
 import { getLasershows } from "services/logic/lasershow-logic";
-import { getPatterns } from "services/logic/pattern-logic";
+import { getPatterns, savePattern } from "services/logic/pattern-logic";
+import { createGuid } from "services/shared/math";
 import "./index.css";
 
 export default function PatternPage() {
@@ -107,6 +108,36 @@ export default function PatternPage() {
     }
   };
 
+  const onDuplicatePatternClick = (uuid: string | null) => {
+    let patternToDuplicate = {
+      ...availablePatterns?.find((p) => p.uuid === uuid),
+    } as Pattern;
+    if (patternToDuplicate === undefined) {
+      return;
+    }
+
+    patternToDuplicate.uuid = createGuid();
+    patternToDuplicate.name += `-duplicated-${new Date().toLocaleDateString()}`;
+    for (let index = 0; index < patternToDuplicate.points.length; index++) {
+      patternToDuplicate.points[index].patternUuid = patternToDuplicate.uuid;
+      const ppUuid = createGuid();
+      const patternPointsToUpdate = patternToDuplicate.points.filter(
+        (pp) => pp.connectedToPointUuid === patternToDuplicate.points[index].uuid
+      );
+
+      for (let pptuIndex = 0; pptuIndex < patternPointsToUpdate.length; pptuIndex++) {
+        patternPointsToUpdate[pptuIndex].connectedToPointUuid = ppUuid;
+      }
+
+      patternToDuplicate.points[index].uuid = ppUuid;
+    }
+
+    let patternsToUpdate = [...(availablePatterns ?? [])];
+    patternsToUpdate.push(patternToDuplicate);
+    setAvailablePatterns(patternsToUpdate);
+    savePattern(patternToDuplicate);
+  };
+
   return (
     <SideNav pageName="Pattern editor">
       {patternToRemove !== undefined &&
@@ -143,6 +174,7 @@ export default function PatternPage() {
         onDeleteClick={(uuid) =>
           setPatternToRemove(availablePatterns?.find((p) => p.uuid === uuid))
         }
+        onDuplicateClick={onDuplicatePatternClick}
         items={
           availablePatterns?.map((pattern) => ({
             uuid: pattern.uuid,

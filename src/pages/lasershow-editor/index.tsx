@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from "react";
-import SideNav from "components/shared/sidenav";
-import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-import { SpeedDial, SpeedDialAction } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { SpeedDial, SpeedDialAction } from "@mui/material";
+import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+import LasershowEditorContent from "components/lasershow/lasershow-editor";
 import CardOverview from "components/shared/card-overview";
-import { Animation } from "models/components/shared/animation";
-import { getAnimations, removeAnimation } from "services/logic/animation-logic";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
 import { OnTrue } from "components/shared/on-true";
+import SideNav from "components/shared/sidenav";
+import { Animation } from "models/components/shared/animation";
 import { Lasershow, getLasershowPlaceholder } from "models/components/shared/lasershow";
-import AddIcon from "@mui/icons-material/Add";
-import LasershowEditorContent from "components/lasershow/lasershow-editor";
-import { getLasershows } from "services/logic/lasershow-logic";
+import React, { useEffect, useState } from "react";
+import { getAnimations } from "services/logic/animation-logic";
+import { getLasershows, removeLasershow, saveLasershow } from "services/logic/lasershow-logic";
+import { createGuid } from "services/shared/math";
 
 export type AvailableAnimationsContextType = {
   availableAnimations: Animation[] | null;
@@ -24,8 +25,11 @@ export type SelectedLasershowContextType = {
   setSelectedLasershow: React.Dispatch<React.SetStateAction<Lasershow | null>>;
 };
 
-export const AvailableAnimationsContext = React.createContext<AvailableAnimationsContextType | null>(null);
-export const SelectedLasershowContext = React.createContext<SelectedLasershowContextType | null>(null);
+export const AvailableAnimationsContext =
+  React.createContext<AvailableAnimationsContextType | null>(null);
+export const SelectedLasershowContext = React.createContext<SelectedLasershowContextType | null>(
+  null
+);
 
 export default function LasershowEditor() {
   const [selectedLasershow, setSelectedLasershow] = useState<Lasershow | null>(null);
@@ -37,7 +41,10 @@ export default function LasershowEditor() {
     onDelete: () => null,
   });
 
-  const selectedLasershowMemo = React.useMemo(() => ({ selectedLasershow, setSelectedLasershow }), [selectedLasershow]);
+  const selectedLasershowMemo = React.useMemo(
+    () => ({ selectedLasershow, setSelectedLasershow }),
+    [selectedLasershow]
+  );
 
   const availableAnimationsMemo = React.useMemo(
     () => ({ availableAnimations, setAvailableAnimations }),
@@ -63,7 +70,9 @@ export default function LasershowEditor() {
 
   const getWrapperContext = (reactObject: React.ReactNode) => (
     <AvailableAnimationsContext.Provider value={availableAnimationsMemo}>
-      <SelectedLasershowContext.Provider value={selectedLasershowMemo}>{reactObject}</SelectedLasershowContext.Provider>
+      <SelectedLasershowContext.Provider value={selectedLasershowMemo}>
+        {reactObject}
+      </SelectedLasershowContext.Provider>
     </AvailableAnimationsContext.Provider>
   );
 
@@ -96,23 +105,42 @@ export default function LasershowEditor() {
     </SpeedDial>
   );
 
-  const onAnimationDelete = async (uuid: string) => {
-    const result = await removeAnimation(uuid);
-    if (result?.status === 200 && availableAnimations !== null) {
-      let animations = [...availableAnimations];
-      const animationIndex = animations.findIndex((a) => a.uuid === uuid);
-      if (animationIndex === -1) {
+  const onLasershowDelete = async (uuid: string) => {
+    const result = await removeLasershow(uuid);
+    if (result?.status === 200 && availableLasershows !== null) {
+      let lasershows = [...availableLasershows];
+      const lasershowIndex = lasershows.findIndex((a) => a.uuid === uuid);
+      if (lasershowIndex === -1) {
         return;
       }
 
-      animations.splice(animationIndex, 1);
-      setAvailableAnimations(animations);
+      lasershows.splice(lasershowIndex, 1);
+      setAvailableLasershows(lasershows);
     }
 
     setModalOptions({ show: false, onDelete: () => null });
   };
 
-  const onLasershowDelete = () => {};
+  const onDuplicateLasershow = (uuid: string | null) => {
+    let lasershowToDuplicate = {
+      ...availableLasershows?.find((a) => a.uuid === uuid),
+    } as Lasershow;
+    if (lasershowToDuplicate === undefined) {
+      return;
+    }
+
+    lasershowToDuplicate.uuid = createGuid();
+    lasershowToDuplicate.name += `-duplicated-${new Date().toLocaleDateString()}`;
+    for (let index = 0; index < lasershowToDuplicate.lasershowAnimations.length; index++) {
+      lasershowToDuplicate.lasershowAnimations[index].lasershowUuid = lasershowToDuplicate.uuid;
+      lasershowToDuplicate.lasershowAnimations[index].uuid = createGuid();
+    }
+
+    let lasershowsToUpdate = [...(availableLasershows ?? [])];
+    lasershowsToUpdate.push(lasershowToDuplicate);
+    setAvailableLasershows(lasershowsToUpdate);
+    saveLasershow(lasershowToDuplicate);
+  };
 
   return (
     <SideNav pageName="Lasershow editor">
@@ -127,9 +155,10 @@ export default function LasershowEditor() {
           onDeleteClick={(uuid) =>
             setModalOptions({
               show: true,
-              onDelete: () => onAnimationDelete(uuid ?? ""),
+              onDelete: () => onLasershowDelete(uuid ?? ""),
             })
           }
+          onDuplicateClick={onDuplicateLasershow}
           items={
             availableLasershows?.map((lasershow) => ({
               uuid: lasershow.uuid,

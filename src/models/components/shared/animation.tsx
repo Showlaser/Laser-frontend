@@ -17,7 +17,10 @@ export type AnimationPatternKeyFrame = {
   propertyValue: number;
 };
 
-export const getAnimationPatternDuration = (animationPattern: AnimationPattern) => {
+export const getAnimationPatternDuration = (animationPattern: AnimationPattern | null) => {
+  if (animationPattern === null) {
+    return 0;
+  }
   return Math.max(...animationPattern.animationPatternKeyFrames.map((akf) => akf.timeMs));
 };
 
