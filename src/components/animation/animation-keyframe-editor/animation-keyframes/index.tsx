@@ -12,7 +12,7 @@ import {
   SelectedAnimationPatternContext,
   SelectedAnimationPatternContextType,
 } from "pages/animation-editor";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { propertiesSettings } from "services/logic/animation-logic";
 import { canvasPxSize, selectableSteps } from "services/shared/config";
 import { createGuid, mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
@@ -29,6 +29,8 @@ import {
 } from "..";
 
 export default function AnimationPatternKeyFrames() {
+  const [mouseIsHoveringOver, setMouseIsHoveringOver] = useState<boolean>(false);
+
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
     SelectedAnimationContext
   ) as SelectedAnimationContextType;
@@ -80,7 +82,6 @@ export default function AnimationPatternKeyFrames() {
     ) ?? 0;
 
   const { palette } = useTheme();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const drawTimeStepsAndKeyframes = (canvas: HTMLCanvasElement) => {
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -153,6 +154,12 @@ export default function AnimationPatternKeyFrames() {
       (selectedAnimationPattern?.startTimeMs ?? 0) <
       timelinePositionMs;
 
+  const onMouseLeaving = () => {
+    if (mouseIsHoveringOver) {
+      setMouseIsHoveringOver(false);
+    }
+  };
+
   const drawOnCanvas = useCallback(() => {
     let canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     canvas = prepareCanvas(canvas);
@@ -176,7 +183,6 @@ export default function AnimationPatternKeyFrames() {
   ]);
 
   useEffect(() => {
-    canvasRef.current?.focus();
     drawOnCanvas();
   }, [
     drawOnCanvas,
@@ -185,6 +191,7 @@ export default function AnimationPatternKeyFrames() {
     selectableStepsIndex,
     selectedKeyFrameUuid,
     selectedAnimation,
+    mouseIsHoveringOver,
   ]);
 
   const getPropertyFromYPosition = (y: number) =>
@@ -287,6 +294,10 @@ export default function AnimationPatternKeyFrames() {
   };
 
   const showMouseXAxis = (event: any) => {
+    if (!mouseIsHoveringOver) {
+      setMouseIsHoveringOver(true);
+    }
+
     drawOnCanvas();
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     if (timelineIsOutSelectedAnimationPatternRange) {
@@ -413,23 +424,14 @@ export default function AnimationPatternKeyFrames() {
     setSelectedKeyFrameUuid(keyFrame.uuid);
   };
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Delete") {
-      e.preventDefault();
-      deleteKeyframe(selectedKeyFrameUuid);
-    }
-  };
-
   return (
     <canvas
-      ref={canvasRef}
-      onKeyDown={onKeyDown}
       tabIndex={0}
       className="canvas"
       id="svg-keyframe-canvas"
       onClick={onCanvasClick}
       onMouseMove={showMouseXAxis}
-      onMouseLeave={drawOnCanvas}
+      onMouseLeave={() => onMouseLeaving()}
       onMouseDown={onMiddleMouseClick}
     />
   );

@@ -15,10 +15,7 @@ import {
   playPlaylist,
 } from "services/logic/spotify";
 import { getVoteData, startVote } from "services/logic/vote-logic";
-import {
-  voteApiUrl,
-  voteApiWebsocketUrl,
-} from "services/shared/api/api-endpoints";
+import { voteApiWebsocketUrl, voteFrontendUrl } from "services/shared/api/api-endpoints";
 import { toCamelCase } from "services/shared/general";
 import { createGuid } from "services/shared/math";
 import Cookies from "universal-cookie";
@@ -29,9 +26,9 @@ export default function SpotifyVote() {
   const voteCookie = cookie.get("vote-started");
   const voteInProgress = voteCookie !== undefined;
 
-  const [userPlaylists, setUserPlaylists] = useState<
-    SpotifyApi.PlaylistObjectSimplified[]
-  >([]);
+  const [userPlaylists, setUserPlaylists] = useState<SpotifyApi.PlaylistObjectSimplified[] | null>(
+    null
+  );
   const [voteValidTimeInMinutes, setVoteValidTimeInMinutes] = useState(5);
   const [voteStarted, setVoteStarted] = useState(voteInProgress);
   const [joinData, setJoinData] = useState(voteCookie?.joinInfo ?? undefined);
@@ -49,7 +46,6 @@ export default function SpotifyVote() {
     setQrCodeWidth(qrWidth);*/
   };
 
-  alert("QR package was removed. Add QR code to this page");
   window.addEventListener("resize", handleResize);
 
   useEffect(() => {
@@ -57,29 +53,27 @@ export default function SpotifyVote() {
       return;
     }
 
-    getUserPlaylists().then((data) => {
-      const playlistsWithTracks = data.items.filter(
-        (playlist: SpotifyApi.PlaylistObjectSimplified) =>
-          playlist.tracks.total > 0
-      );
-      setUserPlaylists(playlistsWithTracks);
-    });
+    if (userPlaylists === null) {
+      getUserPlaylists().then((data) => {
+        const playlistsWithTracks = data.items.filter(
+          (playlist: SpotifyApi.PlaylistObjectSimplified) => playlist.tracks.total > 0
+        );
+        setUserPlaylists(playlistsWithTracks);
+      });
+    }
+
     if (!voteStarted) {
       return;
     }
 
     if (!connected) {
-      connectToWebsocketServer(
-        voteCookie.joinInfo.joinCode,
-        voteCookie.joinInfo.accessCode
-      ).then((conn) => setConnected(conn));
+      connectToWebsocketServer(voteCookie.joinInfo.joinCode, voteCookie.joinInfo.accessCode).then(
+        (conn) => setConnected(conn)
+      );
     }
   }, [voteStarted, accessToken, window.innerWidth]);
 
-  const connectToWebsocketServer = async (
-    joinCode: string,
-    accessCode: string
-  ) => {
+  const connectToWebsocketServer = async (joinCode: string, accessCode: string) => {
     const response = await getVoteData({ joinCode, accessCode });
     if (response?.status !== 200) {
       return false;
@@ -111,17 +105,11 @@ export default function SpotifyVote() {
     return true;
   };
 
-  const sideNavSettings = {
-    pageName: "Vote",
-  };
-
   const onVoteStart = async (
     selectedPlaylistIds: string[]
   ): Promise<VoteablePlaylist | undefined> => {
     const expirationDate = new Date();
-    expirationDate.setUTCMinutes(
-      expirationDate.getUTCMinutes() + voteValidTimeInMinutes
-    );
+    expirationDate.setUTCMinutes(expirationDate.getUTCMinutes() + voteValidTimeInMinutes);
 
     const voteDataUuid = createGuid();
     const voteData = {
@@ -130,7 +118,7 @@ export default function SpotifyVote() {
       voteablePlaylistCollection: await Promise.all(
         selectedPlaylistIds.map(async (playlistId) => {
           {
-            const playlist = userPlaylists.find(
+            const playlist = userPlaylists?.find(
               (p: SpotifyApi.PlaylistBaseObject) => p.id === playlistId
             );
             const playlistSongs = await getPlaylistSongs(playlistId);
@@ -141,17 +129,15 @@ export default function SpotifyVote() {
               playlistName: playlist?.name,
               spotifyPlaylistId: playlistId,
               playlistImageUrl: playlist?.images?.at(0)?.url,
-              songsInPlaylist: playlistSongs.map(
-                (track: SpotifyApi.TrackObjectFull) => {
-                  return {
-                    uuid: createGuid(),
-                    playlistUuid: playlistUuid,
-                    songName: track.name,
-                    artistName: track.artists.at(0)?.name,
-                    songImageUrl: track.album.images.at(0)?.url,
-                  };
-                }
-              ),
+              songsInPlaylist: playlistSongs.map((track: SpotifyApi.TrackObjectFull) => {
+                return {
+                  uuid: createGuid(),
+                  playlistUuid: playlistUuid,
+                  songName: track.name,
+                  artistName: track.artists.at(0)?.name,
+                  songImageUrl: track.album.images.at(0)?.url,
+                };
+              }),
             };
           }
         })
@@ -182,10 +168,7 @@ export default function SpotifyVote() {
     });
   };
 
-  const onVoteEnded = async (joinInfo: {
-    joinCode: string;
-    accessCode: string;
-  }) => {
+  const onVoteEnded = async (joinInfo: { joinCode: string; accessCode: string }) => {
     const { joinCode, accessCode } = joinInfo;
     const response = await getVoteData({ joinCode, accessCode });
     if (response?.status !== 200 || voteState === undefined) {
@@ -220,10 +203,7 @@ export default function SpotifyVote() {
 
     playPlaylistAfterCurrentPlayingSongEnded
       ? await playPlaylistAfterSongEnds(mostVotedPlaylist, oldPlayerState)
-      : playPlaylist(
-          mostVotedPlaylist.spotifyPlaylistId,
-          oldPlayerState.device.id
-        );
+      : playPlaylist(mostVotedPlaylist.spotifyPlaylistId, oldPlayerState.device.id);
   };
 
   const playPlaylistAfterSongEnds = async (
@@ -232,18 +212,12 @@ export default function SpotifyVote() {
   ) => {
     const interval = setInterval(async () => {
       const currentPlayerState = await getPlayerState();
-      if (
-        currentPlayerState?.item === null ||
-        currentPlayerState?.device?.id === null
-      ) {
+      if (currentPlayerState?.item === null || currentPlayerState?.device?.id === null) {
         return;
       }
 
       if (currentPlayerState.item.id !== oldPlayerState?.item?.id) {
-        playPlaylist(
-          mostVotedPlaylist.spotifyPlaylistId,
-          currentPlayerState.device.id
-        );
+        playPlaylist(mostVotedPlaylist.spotifyPlaylistId, currentPlayerState.device.id);
         clearInterval(interval);
       }
     }, 5000);
@@ -251,11 +225,7 @@ export default function SpotifyVote() {
 
   const voteComponents = voteStarted ? (
     <>
-      <Modal
-        open={showQRCode}
-        onClose={() => setShowQRCode(false)}
-        style={{ marginLeft: "15px" }}
-      >
+      <Modal open={showQRCode} onClose={() => setShowQRCode(false)} style={{ marginLeft: "15px" }}>
         <div
           style={{
             textAlign: "center",
@@ -277,7 +247,7 @@ export default function SpotifyVote() {
       </Modal>
 
       <p>
-        {`Users can join the session at ${voteApiUrl} with the following codes:`}
+        {`Users can join the session at ${voteFrontendUrl} with the following codes:`}
         <br />
         Join code: {joinData?.joinCode}
         <br />
@@ -309,9 +279,7 @@ export default function SpotifyVote() {
       <SpotifyPlaylist
         voteStarted={voteStarted}
         userPlaylists={userPlaylists}
-        onVoteStart={(selectedPlaylistIds: string[]) =>
-          onVoteStart(selectedPlaylistIds)
-        }
+        onVoteStart={(selectedPlaylistIds: string[]) => onVoteStart(selectedPlaylistIds)}
       />
     </>
   );
@@ -321,9 +289,7 @@ export default function SpotifyVote() {
       {accessToken !== null ? (
         voteComponents
       ) : (
-        <Alert severity="error">
-          You are not logged in to Spotify. Login in the settings page
-        </Alert>
+        <Alert severity="error">You are not logged in to Spotify. Login in the settings page</Alert>
       )}
     </SideNav>
   );

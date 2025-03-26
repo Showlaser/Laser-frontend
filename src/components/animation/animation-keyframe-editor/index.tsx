@@ -166,17 +166,22 @@ export default function AnimationKeyFrameEditor() {
     }
   };
 
-  const onTimelineItemDelete = () => {
-    if (
-      selectedAnimation === undefined ||
-      !window.confirm("Are you sure you want to delete the animation pattern?")
-    ) {
+  const onTimelineItemDelete = (uuid: string) => {
+    const animationPatternToRemove = selectedAnimation?.animationPatterns.find(
+      (lsa) => lsa.uuid === uuid
+    );
+
+    if (selectedAnimation === null || animationPatternToRemove === undefined) {
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to remove ${animationPatternToRemove.name}?`)) {
       return;
     }
 
     let updatedAnimation = { ...selectedAnimation } as Animation;
     const animationPatternsToKeep: AnimationPattern[] = updatedAnimation.animationPatterns.filter(
-      (ap) => ap.uuid !== selectedAnimationPattern?.uuid
+      (ap) => ap.uuid !== uuid
     );
 
     updatedAnimation.animationPatterns = animationPatternsToKeep;
@@ -195,7 +200,6 @@ export default function AnimationKeyFrameEditor() {
     );
     if (forward) {
       updatedAnimation.animationPatterns[animationPatternIndex].startTimeMs += 10;
-      setTimelinePositionMs(updatedAnimation.animationPatterns[animationPatternIndex].startTimeMs);
     } else if (
       !forward &&
       updatedAnimation.animationPatterns[animationPatternIndex].startTimeMs > 0
@@ -204,6 +208,7 @@ export default function AnimationKeyFrameEditor() {
     }
 
     setSelectedAnimation(updatedAnimation);
+    setTimelinePositionMs(updatedAnimation.animationPatterns[animationPatternIndex].startTimeMs);
   };
 
   return (

@@ -26,7 +26,7 @@ import {
   SelectedAnimationPatternIndexContext,
 } from "pages/animation-editor";
 import React from "react";
-import { numberOfTimeLines, xCorrection } from "services/shared/config";
+import { numberOfTimeLines } from "services/shared/config";
 import {
   AnimationSelectableStepsIndexContext,
   AnimationSelectableStepsIndexContextType,
@@ -108,7 +108,6 @@ export default function AnimationPatternProperties({
       return;
     }
 
-    console.log("test");
     const keyFrames = selectedAnimationPattern?.animationPatternKeyFrames
       .filter((ak: { propertyEdited: string; timeMs: number }) => {
         const propertyIsTheSame = ak.propertyEdited === property;
@@ -173,7 +172,7 @@ export default function AnimationPatternProperties({
     }
 
     const keyFrame = keyFrames[keyFrames.length - 1];
-    setTimelinePositionMs(keyFrame?.timeMs);
+    setTimelinePositionMs(keyFrame?.timeMs + (selectedAnimationPattern?.startTimeMs ?? 0));
     setSelectedKeyFrameUuid(keyFrame.uuid);
   };
 
@@ -185,7 +184,8 @@ export default function AnimationPatternProperties({
     if (kf === undefined) {
       return;
     }
-    setTimelinePositionMs(kf?.timeMs);
+
+    setTimelinePositionMs(kf?.timeMs + (selectedAnimationPattern?.startTimeMs ?? 0));
     setSelectedKeyFrameUuid(kf.uuid);
   };
 
@@ -358,7 +358,9 @@ export default function AnimationPatternProperties({
                     <ListItemButton
                       key={`${keyFrame.uuid}-points`}
                       onClick={() => {
-                        setTimelinePositionMs(keyFrame.timeMs - xCorrection[selectableStepsIndex]);
+                        setTimelinePositionMs(
+                          keyFrame.timeMs + selectedAnimationPattern.startTimeMs
+                        );
                         setSelectedKeyFrameUuid(keyFrame.uuid);
                       }}
                     >

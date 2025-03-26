@@ -1,29 +1,25 @@
 import { Alert, Input, InputLabel, MenuItem, Select } from "@mui/material";
+import { SelectedLasershowContext, SelectedLasershowContextType } from "pages/lasershow-editor";
 import React from "react";
 import { numberOfTimeLines } from "services/shared/config";
-import { SelectedLasershowAnimationUuidContext, SelectedLasershowAnimationUuidContextType } from "..";
-import { SelectedLasershowContext, SelectedLasershowContextType } from "pages/lasershow-editor";
+import { SelectedLasershowAnimationContext, SelectedLasershowAnimationContextType } from "..";
 
 export default function LasershowAnimationProperties() {
-  const { selectedLasershowAnimationUuid, setSelectedLasershowAnimationUuid } = React.useContext(
-    SelectedLasershowAnimationUuidContext
-  ) as SelectedLasershowAnimationUuidContextType;
+  const { selectedLasershowAnimation, setSelectedLasershowAnimation } = React.useContext(
+    SelectedLasershowAnimationContext
+  ) as SelectedLasershowAnimationContextType;
 
   const { selectedLasershow, setSelectedLasershow } = React.useContext(
     SelectedLasershowContext
   ) as SelectedLasershowContextType;
 
-  const selectedLasershowAnimation = selectedLasershow?.lasershowAnimations.find(
-    (la) => la.uuid === selectedLasershowAnimationUuid
-  );
-
   const updateLasershowAnimationProperty = (propertyName: string, value: any) => {
-    if (selectedLasershowAnimationUuid === undefined) {
+    if (selectedLasershowAnimation === null) {
       return;
     }
 
     const selectedLasershowAnimationIndex = selectedLasershow?.lasershowAnimations.findIndex(
-      (la) => la.uuid === selectedLasershowAnimationUuid
+      (la) => la.uuid === selectedLasershowAnimation?.uuid
     );
     if (selectedLasershowAnimationIndex === undefined) {
       return;
@@ -38,7 +34,11 @@ export default function LasershowAnimationProperties() {
     let items = [];
     for (let i = 0; i < numberOfTimeLines; i++) {
       items.push(
-        <MenuItem key={`${i}-menu-items`} selected={(selectedLasershowAnimation?.timelineId ?? 0) === i} value={i}>
+        <MenuItem
+          key={`${i}-menu-items`}
+          selected={(selectedLasershowAnimation?.timelineId ?? 0) === i}
+          value={i}
+        >
           {i + 1}
         </MenuItem>
       );
@@ -90,6 +90,8 @@ export default function LasershowAnimationProperties() {
       </Select>
     </>
   ) : (
-    <Alert severity="info">Select a lasershow animation first by clicking it in the timeline!</Alert>
+    <Alert severity="info">
+      Select a lasershow animation first by clicking it in the timeline!
+    </Alert>
   );
 }

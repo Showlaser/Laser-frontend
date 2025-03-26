@@ -5,7 +5,6 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import HiveIcon from "@mui/icons-material/Hive";
 import MenuIcon from "@mui/icons-material/Menu";
 import MovieIcon from "@mui/icons-material/Movie";
-import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
 import TheatersIcon from "@mui/icons-material/Theaters";
 import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
 import { Alert, Fade, Grid, ListItemButton } from "@mui/material";
@@ -212,11 +211,6 @@ export default function SideNav({
               title: "Vote",
               icon: <ThumbsUpDownIcon />,
               path: paths.SpotifyVote,
-            },
-            {
-              title: "Lasershow Spotify connector",
-              icon: <SettingsInputComponentIcon />,
-              path: paths.LasershowSpotifyConnector,
             },
             {
               title: "Showlaser manager",
