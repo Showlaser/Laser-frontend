@@ -12,7 +12,7 @@ import {
   Select,
   Tooltip,
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   numberOfTimeLines,
   selectableSteps,
@@ -41,7 +41,7 @@ export type SharedTimelineProps = {
   selectableStepsIndex: number;
   setSelectableStepsIndex: (steps: number) => void;
   timelineItems: SharedTimelineItem[];
-  onTimelineItemDelete?: () => void;
+  onTimelineItemDelete?: (uuid: string) => void;
   onMoveTimelineItem?: (forward: boolean) => void;
 };
 
@@ -83,11 +83,8 @@ export function SharedTimeline({
   const [screenWidthPx, setScreenWidthPx] = useState<number>(window.innerWidth);
   const [screenHeightPx, setScreenHeightPx] = useState<number>(window.innerHeight);
   const timelines = getTimelineData();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    canvasRef.current?.focus();
-
     const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
@@ -277,15 +274,30 @@ export function SharedTimeline({
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Delete") {
-      e.preventDefault();
-      onTimelineItemDelete?.();
-    } else if (e.key === "ArrowRight") {
+    if (e.key === "ArrowRight") {
       e.preventDefault();
       onMoveTimelineItem?.(true);
     } else if (e.key === "ArrowLeft") {
       e.preventDefault();
       onMoveTimelineItem?.(false);
+    }
+  };
+
+  const onMiddleMouseClick = (e: any) => {
+    if (e.button !== 1) {
+      return;
+    }
+
+    e.preventDefault();
+
+    const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
+    const rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    const clickedTimelineItem = getTimelineItemFromMouseClick(x, y);
+    if (clickedTimelineItem !== undefined) {
+      onTimelineItemDelete?.(clickedTimelineItem.uuid);
     }
   };
 
@@ -354,8 +366,8 @@ export function SharedTimeline({
         onClick={onCanvasClick}
         id="timeline-canvas"
         onKeyDown={onKeyDown}
+        onMouseDown={onMiddleMouseClick}
         tabIndex={0}
-        ref={canvasRef}
       />
       <LinearProgress
         sx={{

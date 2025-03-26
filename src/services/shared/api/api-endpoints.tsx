@@ -1,7 +1,8 @@
 const laserApiUrl = "http://localhost:5004/";
 const authApiUrl = "http://localhost:5001/";
 export const voteApiUrl = "http://localhost:5002/";
-export const voteApiWebsocketUrl = "wss://laser-vote-api.vdarwinkel.nl/ws";
+export const voteApiWebsocketUrl = "wss://localhost:5002/ws";
+export const voteFrontendUrl = "http://localhost:3001/";
 
 const apiEndpoints = {
   pattern: `${laserApiUrl}pattern`,

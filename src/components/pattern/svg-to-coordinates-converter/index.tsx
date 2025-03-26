@@ -49,7 +49,7 @@ export default function PatternEditor({
     e.returnValue = "Are you sure you want to leave the page?";
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (uploadedFile === undefined) {
       return;
     }
