@@ -424,16 +424,8 @@ export default function AnimationPatternKeyFrames() {
     setSelectedKeyFrameUuid(keyFrame.uuid);
   };
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Delete") {
-      e.preventDefault();
-      deleteKeyframe(selectedKeyFrameUuid);
-    }
-  };
-
   return (
     <canvas
-      onKeyDown={onKeyDown}
       tabIndex={0}
       className="canvas"
       id="svg-keyframe-canvas"
