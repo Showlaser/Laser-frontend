@@ -301,6 +301,20 @@ export function SharedTimeline({
     }
   };
 
+  const onScroll = (e: any) => {
+    if (e === undefined) {
+      return;
+    }
+
+    if (e.deltaY === 100 && timelinePositionMs - selectableSteps[selectableStepsIndex] >= 0) {
+      // scroll down
+      setTimelinePositionMs(timelinePositionMs - selectableSteps[selectableStepsIndex]);
+    }
+    if (e.deltaY === -100) {
+      setTimelinePositionMs(timelinePositionMs + selectableSteps[selectableStepsIndex]);
+    }
+  };
+
   return (
     <Paper style={{ marginTop: "25px" }}>
       <Grid container direction="row" sx={{ padding: "10px" }}>
@@ -363,6 +377,7 @@ export function SharedTimeline({
         </Grid>
       </Grid>
       <canvas
+        onWheel={onScroll}
         onClick={onCanvasClick}
         id="timeline-canvas"
         onKeyDown={onKeyDown}

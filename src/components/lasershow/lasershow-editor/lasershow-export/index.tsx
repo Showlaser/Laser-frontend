@@ -6,7 +6,7 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { LaserCommand, LaserCommandModel } from "models/components/shared/laser-command";
+import { LaserCommandModel } from "models/components/shared/laser-command";
 import { Lasershow } from "models/components/shared/lasershow";
 import { Point } from "models/components/shared/point";
 import React from "react";
@@ -28,7 +28,7 @@ export default function LasershowExport({
     setGalvoSpeed(Number(event.target.value));
   };
 
-  const generateLasershow = (): LaserCommand[][] => {
+  const generateLasershow = (): LaserCommandModel[][] => {
     let laserCommands: LaserCommandModel[][] = [];
     for (let timelinePosition = 0; timelinePosition < lasershowDuration; timelinePosition += 10) {
       const lasershowPointsAtTimelinePosition = getPointsToDraw(timelinePosition, false);
@@ -51,6 +51,7 @@ export default function LasershowExport({
           const y: number = Math.ceil(ptd.y);
 
           lasershowAnimationCommands.push({
+            orderNr: ptd.orderNr,
             time: timelinePosition,
             patternUuid: ptd.patternUuid,
             r: ptd.redLaserPowerPwm,
@@ -63,6 +64,7 @@ export default function LasershowExport({
           if (pointToConnectTo === undefined) {
             // If not connected to another point, add a dummy point with turned off lasers, so no line is drawn.
             lasershowAnimationCommands.push({
+              orderNr: ptd.orderNr,
               time: timelinePosition,
               patternUuid: ptd.patternUuid,
               r: 0,
@@ -71,11 +73,12 @@ export default function LasershowExport({
               x,
               y,
             });
-          } else if (lasershowAnimationPointsToDraw.length === index - 1) {
+          } else if (index === lasershowAnimationPointsToDraw.length - 1) {
             // Display a line to the connected point
             lasershowAnimationCommands.push({
+              orderNr: index + 1,
               time: timelinePosition,
-              patternUuid: ptd.patternUuid,
+              patternUuid: pointToConnectTo.patternUuid,
               r: ptd.redLaserPowerPwm,
               g: ptd.greenLaserPowerPwm,
               b: ptd.blueLaserPowerPwm,
@@ -89,10 +92,10 @@ export default function LasershowExport({
       }
     }
 
-    return [];
+    return laserCommands;
   };
 
-  const downloadLaserShow = (laserCommands: LaserCommand[][]) => {
+  const downloadLaserShow = (laserCommands: LaserCommandModel[][]) => {
     const jsonModel = {
       kpps: galvoSpeed,
       laserCommands: laserCommands,
@@ -111,7 +114,7 @@ export default function LasershowExport({
   };
 
   const onClick = () => {
-    let generatedLasershow: LaserCommand[][] = generateLasershow();
+    let generatedLasershow: LaserCommandModel[][] = generateLasershow();
     downloadLaserShow(generatedLasershow);
   };
 

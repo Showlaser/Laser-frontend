@@ -223,7 +223,7 @@ export default function LasershowEditorContent() {
     <>
       <Grid container direction="row" spacing={1}>
         {getWrapperContext(
-          <Grid item xs={4}>
+          <Grid item>
             <Paper
               style={{
                 maxHeight: canvasPxSize,
