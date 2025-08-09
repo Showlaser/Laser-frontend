@@ -14,7 +14,12 @@ type Props = {
   disableAnimation?: boolean;
 };
 
-export default function TabSelector({ data, selectedTabId, setSelectedTabId, disableAnimation }: Props) {
+export default function TabSelector({
+  data,
+  selectedTabId,
+  setSelectedTabId,
+  disableAnimation,
+}: Props) {
   function a11yProps(index: number) {
     return {
       id: `simple-tab-${index}`,
@@ -25,7 +30,11 @@ export default function TabSelector({ data, selectedTabId, setSelectedTabId, dis
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={selectedTabId} onChange={(e, value) => setSelectedTabId(value)} aria-label="basic tabs example">
+        <Tabs
+          value={selectedTabId}
+          onChange={(e, value) => setSelectedTabId(value)}
+          aria-label="basic tabs example"
+        >
           {data.map((tab, index) => (
             <Tab key={tab.tabName + index} label={tab.tabName} {...a11yProps(index)} />
           ))}

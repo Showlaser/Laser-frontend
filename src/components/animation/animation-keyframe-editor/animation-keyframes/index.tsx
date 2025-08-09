@@ -363,7 +363,7 @@ export default function AnimationPatternKeyFrames() {
     const selectedKeyFrame = getKeyFrameFromMousePosition(mappedXToStep, y);
     if (selectedKeyFrame === undefined) {
       createNewKeyframe(y, mappedXToStep);
-      setTimelinePositionMs(mappedXToStep);
+      setTimelinePositionMs(mappedXToStep + (selectedAnimationPattern?.startTimeMs ?? 0));
       return;
     }
 

@@ -6,17 +6,14 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { LaserCommand } from "models/components/shared/laser-command";
+import { LaserCommandModel } from "models/components/shared/laser-command";
 import { Lasershow } from "models/components/shared/lasershow";
 import { Point } from "models/components/shared/point";
 import React from "react";
 
 type Props = {
   selectedLasershow: Lasershow | null;
-  getPointsToDraw: (
-    positionMs: number,
-    convertValuesFromPointsDrawer: boolean
-  ) => Point[][];
+  getPointsToDraw: (positionMs: number, convertValuesFromPointsDrawer: boolean) => Point[][];
   lasershowDuration: number;
 };
 
@@ -31,51 +28,74 @@ export default function LasershowExport({
     setGalvoSpeed(Number(event.target.value));
   };
 
-  const generateLasershow = (): LaserCommand[][] => {
-    let laserCommands: LaserCommand[][] = [];
-    for (let i = 0; i < lasershowDuration; i += 10) {
-      const pointsToDraw = getPointsToDraw(i, false)[0].sort(
-        (a, b) => a.orderNr - b.orderNr
-      );
+  const generateLasershow = (): LaserCommandModel[][] => {
+    let laserCommands: LaserCommandModel[][] = [];
+    for (let timelinePosition = 0; timelinePosition < lasershowDuration; timelinePosition += 10) {
+      const lasershowPointsAtTimelinePosition = getPointsToDraw(timelinePosition, false);
+      let lasershowAnimationCommands: LaserCommandModel[] = [];
 
-      let commands: LaserCommand[] = [];
-      pointsToDraw.forEach((ptd) => {
-        const pointToConnectTo = pointsToDraw.find(
-          (up) => up.uuid === ptd.connectedToPointUuid
-        );
+      for (
+        let lasershowAnimationIndex = 0;
+        lasershowAnimationIndex < lasershowPointsAtTimelinePosition.length;
+        lasershowAnimationIndex++
+      ) {
+        const lasershowAnimationPointsToDraw = lasershowPointsAtTimelinePosition[
+          lasershowAnimationIndex
+        ].sort((a, b) => a.orderNr - b.orderNr);
 
-        const x: number = Math.ceil(ptd.x);
-        const y: number = Math.ceil(ptd.y);
+        lasershowAnimationPointsToDraw.forEach((ptd, index) => {
+          const pointToConnectTo = lasershowAnimationPointsToDraw.find(
+            (up) => up.uuid === ptd.connectedToPointUuid
+          );
+          const x: number = Math.ceil(ptd.x);
+          const y: number = Math.ceil(ptd.y);
 
-        commands.push([
-          ptd.redLaserPowerPwm,
-          ptd.greenLaserPowerPwm,
-          ptd.blueLaserPowerPwm,
-          x,
-          y,
-        ]);
+          lasershowAnimationCommands.push({
+            orderNr: ptd.orderNr,
+            time: timelinePosition,
+            patternUuid: ptd.patternUuid,
+            r: ptd.redLaserPowerPwm,
+            g: ptd.greenLaserPowerPwm,
+            b: ptd.blueLaserPowerPwm,
+            x,
+            y,
+          });
 
-        if (pointToConnectTo === undefined) {
-          // If not connected to another point, display a point
-          commands.push([0, 0, 0, x, y]);
-        } else {
-          // Display a line to the connected point
-          commands.push([
-            pointToConnectTo.redLaserPowerPwm,
-            pointToConnectTo.greenLaserPowerPwm,
-            pointToConnectTo.blueLaserPowerPwm,
-            Math.ceil(pointToConnectTo.x),
-            Math.ceil(pointToConnectTo.y),
-          ]);
-        }
-      });
+          if (pointToConnectTo === undefined) {
+            // If not connected to another point, add a dummy point with turned off lasers, so no line is drawn.
+            lasershowAnimationCommands.push({
+              orderNr: ptd.orderNr,
+              time: timelinePosition,
+              patternUuid: ptd.patternUuid,
+              r: 0,
+              g: 0,
+              b: 0,
+              x,
+              y,
+            });
+          } else if (index === lasershowAnimationPointsToDraw.length - 1) {
+            // Display a line to the connected point
+            lasershowAnimationCommands.push({
+              orderNr: index + 1,
+              time: timelinePosition,
+              patternUuid: pointToConnectTo.patternUuid,
+              r: ptd.redLaserPowerPwm,
+              g: ptd.greenLaserPowerPwm,
+              b: ptd.blueLaserPowerPwm,
+              x: Math.ceil(pointToConnectTo.x),
+              y: Math.ceil(pointToConnectTo.y),
+            });
+          }
+        });
 
-      laserCommands.push(commands);
+        laserCommands.push(lasershowAnimationCommands);
+      }
     }
+
     return laserCommands;
   };
 
-  const downloadLaserShow = (laserCommands: LaserCommand[][]) => {
+  const downloadLaserShow = (laserCommands: LaserCommandModel[][]) => {
     const jsonModel = {
       kpps: galvoSpeed,
       laserCommands: laserCommands,
@@ -94,16 +114,14 @@ export default function LasershowExport({
   };
 
   const onClick = () => {
-    let generatedLasershow: LaserCommand[][] = generateLasershow();
+    let generatedLasershow: LaserCommandModel[][] = generateLasershow();
     downloadLaserShow(generatedLasershow);
   };
 
   return (
     <div>
       <FormControl fullWidth style={{ marginBottom: "15px" }}>
-        <InputLabel id="lasershow-export-select-label">
-          Showlaser galvo speed (kpps)
-        </InputLabel>
+        <InputLabel id="lasershow-export-select-label">Showlaser galvo speed (kpps)</InputLabel>
         <Select
           labelId="lasershow-export-select-label"
           id="lasershow-export-select"
