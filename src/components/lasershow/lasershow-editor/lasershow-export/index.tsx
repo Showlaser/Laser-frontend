@@ -39,8 +39,8 @@ export default function LasershowExport({
         lasershowAnimationIndex < lasershowPointsAtTimelinePosition.length;
         lasershowAnimationIndex++
       ) {
-        const lasershowAnimationPointsToDraw = lasershowPointsAtTimelinePosition[
-          lasershowAnimationIndex
+        const lasershowAnimationPointsToDraw = [
+          ...lasershowPointsAtTimelinePosition[lasershowAnimationIndex],
         ].sort((a, b) => a.orderNr - b.orderNr);
 
         lasershowAnimationPointsToDraw.forEach((ptd, index) => {
