@@ -1,7 +1,14 @@
-import * as React from "react";
-import { Checkbox, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import {
+  Checkbox,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import * as React from "react";
 
 type Item = {
   uuid: string;
@@ -16,6 +23,7 @@ type SelectListProps = {
   style?: any;
   unCheckedCustomIcon?: any;
   checkedCustomIcon?: any;
+  allowSelectMultiple?: boolean;
 };
 
 export default function SelectList({
@@ -25,6 +33,7 @@ export default function SelectList({
   style,
   unCheckedCustomIcon,
   checkedCustomIcon,
+  allowSelectMultiple = true,
 }: SelectListProps) {
   const [checked, setChecked] = React.useState<string[]>([]);
 
@@ -32,7 +41,13 @@ export default function SelectList({
     const currentIndex = checked.findIndex((c) => c === uuid);
     const newChecked = [...checked];
 
-    if (currentIndex === -1) {
+    if (!allowSelectMultiple && checked.length > 0) {
+      newChecked.splice(currentIndex, 1);
+
+      if (!checked.includes(uuid)) {
+        newChecked.push(uuid);
+      }
+    } else if (currentIndex === -1) {
       newChecked.push(uuid);
     } else {
       newChecked.splice(currentIndex, 1);
@@ -46,7 +61,12 @@ export default function SelectList({
     <List style={style}>
       {items.map((item) => (
         <ListItem key={item.uuid} disablePadding>
-          <ListItemButton disabled={disabled} role={undefined} onClick={handleToggle(item.uuid)} dense>
+          <ListItemButton
+            disabled={disabled}
+            role={undefined}
+            onClick={handleToggle(item.uuid)}
+            dense
+          >
             <ListItemIcon>
               <Checkbox
                 icon={unCheckedCustomIcon ?? <CheckBoxOutlineBlankIcon />}
@@ -60,7 +80,11 @@ export default function SelectList({
                 }}
               />
             </ListItemIcon>
-            <ListItemText id={`checkbox-list-label-${item.uuid}`} primary={item.name} secondary={item?.description} />
+            <ListItemText
+              id={`checkbox-list-label-${item.uuid}`}
+              primary={item.name}
+              secondary={item?.description}
+            />
           </ListItemButton>
         </ListItem>
       ))}

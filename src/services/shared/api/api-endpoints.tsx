@@ -27,6 +27,7 @@ const apiEndpoints = {
   lasershowGenerator: `${laserApiUrl}lasershow-generator`,
   spotifyConnector: `${laserApiUrl}spotify-connector`,
   currentComDevice: `${laserApiUrl}settings/current-com-device`,
+  udpBroadcast: `${laserApiUrl}adoption`,
 };
 
 export default apiEndpoints;
