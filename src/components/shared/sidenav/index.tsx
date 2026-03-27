@@ -6,7 +6,6 @@ import HiveIcon from "@mui/icons-material/Hive";
 import MenuIcon from "@mui/icons-material/Menu";
 import MovieIcon from "@mui/icons-material/Movie";
 import TheatersIcon from "@mui/icons-material/Theaters";
-import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
 import { Alert, Fade, Grid, ListItemButton } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -87,11 +86,7 @@ type Props = {
   unsavedChanges?: boolean;
 };
 
-export default function SideNav({
-  pageName,
-  children,
-  unsavedChanges = false,
-}: Props) {
+export default function SideNav({ pageName, children, unsavedChanges = false }: Props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -105,9 +100,7 @@ export default function SideNav({
 
   const getListItemBackgroundColor = (title: string) => {
     if (unsavedChanges) {
-      return title !== pageName
-        ? "rgba(255, 0, 0, 0.6)"
-        : "rgba(0, 255, 0, 0.6)";
+      return title !== pageName ? "rgba(255, 0, 0, 0.6)" : "rgba(0, 255, 0, 0.6)";
     }
 
     return undefined;
@@ -119,11 +112,7 @@ export default function SideNav({
         <Toolbar variant="dense">
           <Grid container direction="row" spacing={2} alignItems="center">
             <Grid item xs>
-              <Grid
-                display="flex"
-                justifyContent="flex-start"
-                alignItems="center"
-              >
+              <Grid display="flex" justifyContent="flex-start" alignItems="center">
                 <IconButton
                   color="inherit"
                   aria-label="open drawer"
@@ -172,17 +161,11 @@ export default function SideNav({
       >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "ltr" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
+            {theme.direction === "ltr" ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
         <OnTrue onTrue={unsavedChanges}>
-          <Alert severity="warning">
-            Your current page has unsaved changes!
-          </Alert>
+          <Alert severity="warning">Your current page has unsaved changes!</Alert>
         </OnTrue>
         <Divider />
         <List>
@@ -206,11 +189,6 @@ export default function SideNav({
               title: "Pattern editor",
               icon: <AllInclusiveIcon />,
               path: paths.PatternEditor,
-            },
-            {
-              title: "Vote",
-              icon: <ThumbsUpDownIcon />,
-              path: paths.SpotifyVote,
             },
             {
               title: "Showlaser manager",
