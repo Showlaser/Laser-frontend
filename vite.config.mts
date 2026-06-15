@@ -12,7 +12,9 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   server: {
-    // Match the URL Electron loads in dev (electron.js -> http://localhost:3000)
+    // Bind to the loopback IP (not "localhost") so the dev URL is http://127.0.0.1:3000.
+    // Spotify's OAuth no longer accepts "localhost" redirect URIs, only 127.0.0.1.
+    host: "127.0.0.1",
     port: 3000,
   },
   build: {
