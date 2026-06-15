@@ -73,7 +73,7 @@ export async function sendRequest(
       return response;
     }
     return response;
-  } catch (error) {
+  } catch {
     showError(toastSubject.apiUnavailable);
   }
 }

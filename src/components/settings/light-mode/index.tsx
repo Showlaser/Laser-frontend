@@ -2,7 +2,7 @@ import Switch from "@mui/material/Switch";
 import { styled, useColorScheme } from "@mui/material/styles";
 import React from "react";
 
-const MaterialUISwitch = styled(Switch)(({ theme }) => ({
+const MaterialUISwitch = styled(Switch)(() => ({
   width: 62,
   height: 34,
   padding: 7,

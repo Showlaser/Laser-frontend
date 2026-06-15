@@ -14,7 +14,7 @@ const pathologize = (original: string) => {
 
   try {
     return flattenSVG(removedStyle);
-  } catch (e) {
+  } catch {
     return original;
   }
 };

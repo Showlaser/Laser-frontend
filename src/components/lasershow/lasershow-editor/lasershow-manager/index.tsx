@@ -31,7 +31,7 @@ import {
 import { convertAnimationToLasershowAnimation } from "services/shared/converters";
 
 export default function LasershowManager() {
-  const { availableAnimations, setAvailableAnimations } = React.useContext(
+  const { availableAnimations } = React.useContext(
     AvailableAnimationsContext
   ) as AvailableAnimationsContextType;
 
@@ -126,7 +126,7 @@ export default function LasershowManager() {
   };
 
   const getAvailableTimelinePositionSpot = (
-    lasershowAnimation: LasershowAnimation
+    _lasershowAnimation: LasershowAnimation
   ) => {
     if (selectedLasershow === null) {
       return { timelineId: 0, timeMs: 0 };

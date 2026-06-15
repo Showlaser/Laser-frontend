@@ -11,11 +11,11 @@ type Laser = {
   online: boolean;
 };
 
-export default function ToLaserProjector({ pattern, updatePatternProperty }: PatternSectionProps) {
+export default function ToLaserProjector(_props: PatternSectionProps) {
   const [isPlaying, setIsPlaying] = React.useState<boolean>(localStorage.getItem("lasers-are-playing") !== null);
   const [selectedLasersUuid, setSelectedLasersUuid] = React.useState<string[]>([]);
   const [searchValue, setSearchValue] = React.useState<string>();
-  const [availableLasers, setAvailableLasers] = React.useState<Laser[]>([
+  const [availableLasers] = React.useState<Laser[]>([
     {
       name: "test laser",
       uuid: "45ad82c4-8432-468b-89f7-370459b4d000",

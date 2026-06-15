@@ -5,7 +5,7 @@ import { numberOfTimeLines } from "services/shared/config";
 import { SelectedLasershowAnimationContext, SelectedLasershowAnimationContextType } from "..";
 
 export default function LasershowAnimationProperties() {
-  const { selectedLasershowAnimation, setSelectedLasershowAnimation } = React.useContext(
+  const { selectedLasershowAnimation } = React.useContext(
     SelectedLasershowAnimationContext
   ) as SelectedLasershowAnimationContextType;
 

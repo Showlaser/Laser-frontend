@@ -21,7 +21,7 @@ export default function ShowlaserManager() {
   const [pendingAdoptions, setPendingAdoptions] = useState<UDPBroadcast[] | null>(null);
   const [selectedPendingAdoptions, setSelectedPendingAdoptions] = useState<string[]>([]);
 
-  const [registeredLasersUuid, setRegisteredLasersUuid] = useState<string[]>([]);
+  const [, setRegisteredLasersUuid] = useState<string[]>([]);
   const [laserToRegister, setLaserToRegister] = useState<RegisteredLaser | null>(null);
   const [registeredLasers, setRegisteredLasers] = useState<RegisteredLaser[] | null>(null);
 

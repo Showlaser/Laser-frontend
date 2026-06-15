@@ -28,8 +28,6 @@ import {
 import React from "react";
 import { numberOfTimeLines } from "services/shared/config";
 import {
-  AnimationSelectableStepsIndexContext,
-  AnimationSelectableStepsIndexContextType,
   AnimationSelectedKeyFrameContext,
   AnimationSelectedKeyFrameContextType,
   AnimationTimeLineContextType,
@@ -52,9 +50,6 @@ export default function AnimationPatternProperties({
   const { setTimelinePositionMs } = React.useContext(
     AnimationTimeLinePositionContext
   ) as AnimationTimeLineContextType;
-  const { selectableStepsIndex } = React.useContext(
-    AnimationSelectableStepsIndexContext
-  ) as AnimationSelectableStepsIndexContextType;
   const { selectedKeyFrameUuid, setSelectedKeyFrameUuid } = React.useContext(
     AnimationSelectedKeyFrameContext
   ) as AnimationSelectedKeyFrameContextType;
