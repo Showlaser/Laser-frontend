@@ -33,7 +33,9 @@ import { OnTrue } from "../on-true";
 
 export default function SpotifyController() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [player, setPlayer] = useState<any>({});
+  const [player, setPlayer] = useState<SpotifyApi.CurrentlyPlayingObject>(
+    {} as SpotifyApi.CurrentlyPlayingObject
+  );
   const [noActiveDevice, setNoActiveDevice] = useState<boolean>(false);
   const open = Boolean(anchorEl);
   const { palette } = useTheme();
@@ -178,9 +180,9 @@ export default function SpotifyController() {
               <LinearProgress
                 variant="determinate"
                 value={mapNumber(
-                  player?.progress_ms,
+                  player?.progress_ms ?? 0,
                   0,
-                  player?.item?.duration_ms,
+                  player?.item?.duration_ms ?? 0,
                   0,
                   100
                 )}

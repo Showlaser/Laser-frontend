@@ -3,7 +3,7 @@ import { sendRequest } from "services/shared/api/api-middleware";
 import apiEndpoints from "services/shared/api/api-endpoints";
 import { toastSubject } from "services/shared/toast-messages";
 
-export async function addLasershowToSpotifyConnector(connector: any) {
+export async function addLasershowToSpotifyConnector(connector: unknown) {
   return sendRequest(() => Post(apiEndpoints.spotifyConnector, connector), [], toastSubject.changesSaved);
 }
 

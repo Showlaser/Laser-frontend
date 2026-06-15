@@ -20,7 +20,7 @@ import { createGuid } from "services/shared/math";
 import "./index.css";
 
 export default function PatternPage() {
-  const [uploadedFile, setUploadedFile] = useState<any>();
+  const [uploadedFile, setUploadedFile] = useState<File | undefined>();
   const [availableLasershows, setAvailableLasershows] = useState<Lasershow[] | null>(null);
   const [availableAnimations, setAvailableAnimations] = useState<Animation[] | null>(null);
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);

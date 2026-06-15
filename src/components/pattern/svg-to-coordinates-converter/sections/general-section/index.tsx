@@ -38,7 +38,7 @@ export default function GeneralSection({
   const [showColorWarning, setShowColorWarning] =
     React.useState<boolean>(false);
 
-  const toggleAllDots = (e: any) =>
+  const toggleAllDots = (e: React.ChangeEvent<HTMLInputElement>) =>
     e.target.checked ? connectAllDots() : disconnectAllDots();
 
   const disconnectAllDots = () => {

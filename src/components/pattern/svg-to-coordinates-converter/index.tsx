@@ -19,7 +19,7 @@ import PointsSection from "./sections/points-section";
 
 type Props = {
   patternNamesInUse: string[];
-  uploadedFile: File;
+  uploadedFile: File | undefined;
   setUploadedFile: (file: File | undefined) => void;
   patternFromServer: Pattern | null;
   clearServerPattern: () => void;

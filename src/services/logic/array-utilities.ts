@@ -87,7 +87,7 @@ export const copyArray = <T>(array: T[]): T[] => {
  * @param keyFn - Function that extracts unique key from item
  * @returns Array with duplicates removed
  */
-export const deduplicateArray = <T>(array: T[], keyFn: (item: T) => any): T[] => {
+export const deduplicateArray = <T>(array: T[], keyFn: (item: T) => unknown): T[] => {
   const seen = new Set();
   return array.filter((item) => {
     const key = keyFn(item);
