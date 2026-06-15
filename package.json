@@ -49,6 +49,7 @@
     "@eslint/js": "^9.39.4",
     "@types/d3-array": "^3.0.2",
     "@types/react-router-dom": "^5.3.3",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/coverage-v8": "^4.1.9",
     "electron": "^22.0.0",
