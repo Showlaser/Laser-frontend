@@ -25,6 +25,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
+    "build:api": "vite build && node scripts/copy-to-wwwroot.mjs",
     "serve": "vite preview",
     "test": "vitest",
     "lint": "eslint ."

@@ -3,8 +3,9 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  // Relative base so the production build works when Electron loads it via file://
-  base: "./",
+  // Absolute base: the build is served from the web root by the LaserAPI backend.
+  // (Use "./" instead only if loading via file:// in Electron.)
+  base: "/",
   plugins: [react()],
   resolve: {
     // Resolve the tsconfig "baseUrl: src" absolute imports (built into Vite 8+).
