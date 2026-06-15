@@ -3,6 +3,7 @@ export const timelineItemWidthWhenDurationIsZero = 10; // Used to prevent the pa
 
 // timelines
 export const numberOfTimeLines = 3;
-export const selectableSteps = [10, 100, 1000, 10000];
+export const selectableSteps = [500, 1000, 10000];
+export const playbackFrameRateInFps = 40;
 export const timelineNumbersHeight = 10;
 export const xCorrection = [20, 350, 3000, 8000];

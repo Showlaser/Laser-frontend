@@ -11,7 +11,7 @@ import {
 import * as React from "react";
 
 type Item = {
-  uuid: string;
+  uuid: string | undefined;
   name: string;
   description?: string;
 };
@@ -37,7 +37,8 @@ export default function SelectList({
 }: SelectListProps) {
   const [checked, setChecked] = React.useState<string[]>([]);
 
-  const handleToggle = (uuid: string) => () => {
+  const handleToggle = (uuid: string | undefined) => () => {
+    uuid = uuid ?? "";
     const currentIndex = checked.findIndex((c) => c === uuid);
     const newChecked = [...checked];
 
@@ -64,7 +65,7 @@ export default function SelectList({
           <ListItemButton
             disabled={disabled}
             role={undefined}
-            onClick={handleToggle(item.uuid)}
+            onClick={handleToggle(item?.uuid)}
             dense
           >
             <ListItemIcon>

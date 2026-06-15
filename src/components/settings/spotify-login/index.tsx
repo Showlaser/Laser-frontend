@@ -12,8 +12,7 @@ import paths from "services/shared/router-paths";
 import { showSuccess, toastSubject } from "services/shared/toast-messages";
 
 export default function SpotifyLogin() {
-  const accessTokenAvailable: boolean =
-    localStorage.getItem("SpotifyAccessToken") !== null;
+  const accessTokenAvailable: boolean = localStorage.getItem("SpotifyAccessToken") !== null;
   const [loggedIn, setLoggedIn] = useState<boolean>(accessTokenAvailable);
 
   useEffect(() => {
@@ -33,9 +32,7 @@ export default function SpotifyLogin() {
 
   const login = () => {
     grandSpotifyAccess().then((response) =>
-      response
-        ?.text()
-        .then((responseText) => (window.location.href = responseText))
+      response?.text().then((responseText) => (window.location.href = responseText)),
     );
   };
 
@@ -47,17 +44,11 @@ export default function SpotifyLogin() {
 
   const testForceRefreshREMOVEINPRODUCTION = async () => {
     const refreshToken = localStorage.getItem("SpotifyRefreshToken");
-    if (
-      refreshToken === undefined ||
-      stringIsEmpty(refreshToken) ||
-      refreshToken === null
-    ) {
+    if (refreshToken === undefined || stringIsEmpty(refreshToken) || refreshToken === null) {
       return;
     }
 
-    const tokens: SpotifyTokens | null = await refreshSpotifyAccessToken(
-      refreshToken
-    );
+    const tokens: SpotifyTokens | null = await refreshSpotifyAccessToken(refreshToken);
     if (tokens === null) {
       alert("Tokens null");
       return;
@@ -72,26 +63,16 @@ export default function SpotifyLogin() {
   return (
     <div style={{ textAlign: "left" }}>
       <h2>
-        <img
-          src="icons/spotify-icon.svg"
-          style={{ maxWidth: "20px", marginRight: "5px" }}
-        />
+        <img src="icons/spotify-icon.svg" style={{ maxWidth: "20px", marginRight: "5px" }} />
         Spotify
       </h2>
       {loggedIn ? (
         <span>
           <p>You are logged in to Spotify</p>
           <Button onClick={removeSpotifyTokens}>Logout of Spotify</Button>
-          <Button onClick={() => testForceRefreshREMOVEINPRODUCTION()}>
-            Force token refresh NOTE: DEVELOPMENT ONLY REMOVE IN PRODUCTION
-          </Button>
         </span>
       ) : (
-        <Button
-          variant="contained"
-          style={{ backgroundColor: "#1DB954" }}
-          onClick={login}
-        >
+        <Button variant="contained" style={{ backgroundColor: "#1DB954" }} onClick={login}>
           Login to Spotify
         </Button>
       )}

@@ -1,5 +1,9 @@
 import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import {
+  Experimental_CssVarsProvider as CssVarsProvider,
+  experimental_extendTheme as extendTheme,
+  useColorScheme,
+} from "@mui/material/styles";
 import type {} from "@mui/x-tree-view/themeAugmentation";
 import React from "react";
 import { Slide, ToastContainer } from "react-toastify";
@@ -7,59 +11,100 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import Routes from "./routes/Routes";
 
-function App() {
-  const theme = React.useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode: "dark",
-          ...{
-            background: {
-              default: "#2b2b2b",
-              paper: "#2b2b2b",
-            },
-          },
-          primary: {
-            main: "#485cdb",
-          },
+const theme = extendTheme({
+  colorSchemes: {
+    light: {
+      palette: {
+        background: {
+          default: "#ffffff",
+          paper: "#ffffff",
         },
-        components: {
-          MuiSelect: {
-            defaultProps: {
-              variant: "standard",
-            },
-          },
-          MuiTextField: {
-            defaultProps: {
-              variant: "standard",
-            },
-          },
-          MuiTooltip: {
-            defaultProps: {
-              enterDelay: 750,
-              TransitionProps: { timeout: 250 },
-            },
-          },
-          MuiRichTreeView: {
-            styleOverrides: {
-              root: {
-                backgroundColor: "red",
-              },
-            },
-          },
+        primary: {
+          main: "#485cdb",
         },
-      }),
-    []
-  );
+      },
+    },
+    dark: {
+      palette: {
+        background: {
+          default: "#2b2b2b",
+          paper: "#2b2b2b",
+        },
+        primary: {
+          main: "#485cdb",
+        },
+      },
+    },
+  },
+  components: {
+    MuiSelect: {
+      defaultProps: {
+        variant: "standard",
+      },
+    },
+    MuiTextField: {
+      defaultProps: {
+        variant: "standard",
+      },
+    },
+    MuiTooltip: {
+      defaultProps: {
+        enterDelay: 750,
+        TransitionProps: { timeout: 250 },
+      },
+    },
+    MuiRichTreeView: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "red",
+        },
+      },
+    },
+    MuiPaper: {
+      defaultProps: {
+        elevation: 4,
+      },
+    },
+    MuiFormControlLabel: {
+      styleOverrides: {
+        label: {
+          color: "var(--mui-palette-text-primary)",
+        },
+      },
+    },
+    MuiFormLabel: {
+      styleOverrides: {
+        root: {
+          color: "var(--mui-palette-text-primary)",
+        },
+      },
+    },
+  },
+});
+
+function AppContent() {
+  const { mode, systemMode } = useColorScheme();
+  const resolvedMode = (mode === "system" ? systemMode : mode) ?? "dark";
 
   return (
-    <ThemeProvider theme={theme}>
+    <div className="App">
+      <Routes />
+      <ToastContainer
+        autoClose={6000}
+        position="bottom-center"
+        transition={Slide}
+        theme={resolvedMode}
+      />
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <CssVarsProvider theme={theme} defaultMode="dark">
       <CssBaseline />
-      <div className="App">
-        <Routes />
-        <ToastContainer autoClose={6000} position="bottom-center" transition={Slide} theme="dark" />
-      </div>
-    </ThemeProvider>
+      <AppContent />
+    </CssVarsProvider>
   );
 }
 

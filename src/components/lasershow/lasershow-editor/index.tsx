@@ -11,7 +11,7 @@ import { SelectedLasershowContext, SelectedLasershowContextType } from "pages/la
 import React, { useEffect, useState } from "react";
 import { getAnimationDuration, getPointsToDrawFromAnimation } from "services/logic/animation-logic";
 import { getLasershowDuration, saveLasershow } from "services/logic/lasershow-logic";
-import { canvasPxSize, selectableSteps } from "services/shared/config";
+import { canvasPxSize, playbackFrameRateInFps, selectableSteps } from "services/shared/config";
 import { numberIsBetweenOrEqual } from "services/shared/math";
 import LasershowAnimationProperties from "./lasershow-animation-properties";
 import LasershowExport from "./lasershow-export";
@@ -48,7 +48,7 @@ export const LasershowStepsToDrawMaxRangeContext = React.createContext<number>(0
 
 export default function LasershowEditorContent() {
   const { selectedLasershow, setSelectedLasershow } = React.useContext(
-    SelectedLasershowContext
+    SelectedLasershowContext,
   ) as SelectedLasershowContextType;
 
   const [timelinePositionMs, setTimelinePositionMs] = useState<number>(0);
@@ -60,25 +60,25 @@ export default function LasershowEditorContent() {
 
   const timelinePositionMemo = React.useMemo(
     () => ({ timelinePositionMs, setTimelinePositionMs }),
-    [timelinePositionMs]
+    [timelinePositionMs],
   );
   const lasershowSelectableStepsIndexMemo = React.useMemo(
     () => ({ selectableStepsIndex, setSelectableStepsIndex }),
-    [selectableStepsIndex]
+    [selectableStepsIndex],
   );
   const selectedLasershowAnimationMemo = React.useMemo(
     () => ({
       selectedLasershowAnimation,
       setSelectedLasershowAnimation,
     }),
-    [selectedLasershowAnimation]
+    [selectedLasershowAnimation],
   );
 
   const stepsToDrawMaxRange = (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
 
   const playLasershowMemo = React.useMemo(
     () => ({ playLasershow, setPlayLasershow }),
-    [playLasershow]
+    [playLasershow],
   );
 
   const lasershowDuration = getLasershowDuration(selectedLasershow);
@@ -90,7 +90,10 @@ export default function LasershowEditorContent() {
         setPlayLasershow(false);
       }
 
-      interval = setInterval(() => setTimelinePositionMs(timelinePositionMs + 10), 10);
+      interval = setInterval(
+        () => setTimelinePositionMs(timelinePositionMs + 1000 / playbackFrameRateInFps),
+        10,
+      );
     }
 
     return () => clearInterval(interval);
@@ -124,7 +127,7 @@ export default function LasershowEditorContent() {
   const saveLasershowOnApi = async () => {
     if (selectedLasershow !== null) {
       const canvas: HTMLCanvasElement | null = document.getElementById(
-        "points-drawer-canvas"
+        "points-drawer-canvas",
       ) as HTMLCanvasElement;
       let lasershowToUpdate = { ...selectedLasershow };
       if (canvas !== null) {
@@ -137,14 +140,14 @@ export default function LasershowEditorContent() {
 
   const getPointsToDraw = (
     positionMs: number,
-    convertValuesFromPointsDrawer: boolean
+    convertValuesFromPointsDrawer: boolean,
   ): Point[][] => {
     const lasershowAnimationsToPlay = selectedLasershow?.lasershowAnimations.filter((la) =>
       numberIsBetweenOrEqual(
         positionMs,
         la.startTimeMs,
-        getAnimationDuration(la.animation) + la.startTimeMs
-      )
+        getAnimationDuration(la.animation) + la.startTimeMs,
+      ),
     );
 
     if (lasershowAnimationsToPlay?.length === 0 || lasershowAnimationsToPlay === undefined) {
@@ -157,7 +160,7 @@ export default function LasershowEditorContent() {
       const points = getPointsToDrawFromAnimation(
         positionMs - lasershowAnimation.startTimeMs,
         lasershowAnimation.animation,
-        convertValuesFromPointsDrawer
+        convertValuesFromPointsDrawer,
       );
       lasershowPoints = lasershowPoints.concat(points);
     }
@@ -167,7 +170,7 @@ export default function LasershowEditorContent() {
 
   const onTimelineItemClick = (uuid: string) => {
     const lasershowAnimation = selectedLasershow?.lasershowAnimations.find(
-      (lsa) => lsa.uuid === uuid
+      (lsa) => lsa.uuid === uuid,
     );
     if (lasershowAnimation !== undefined) {
       setSelectedLasershowAnimation(lasershowAnimation);
@@ -177,7 +180,7 @@ export default function LasershowEditorContent() {
 
   const deleteSelectedLasershowAnimations = (uuid: string) => {
     const lasershowAnimationToRemove = selectedLasershow?.lasershowAnimations.find(
-      (lsa) => lsa.uuid === uuid
+      (lsa) => lsa.uuid === uuid,
     );
 
     if (selectedLasershow === undefined || lasershowAnimationToRemove === undefined) {
@@ -202,7 +205,7 @@ export default function LasershowEditorContent() {
 
     let updatedLasershow = { ...selectedLasershow } as Lasershow;
     const lasershowAnimationIndex = updatedLasershow.lasershowAnimations.findIndex(
-      (ap) => ap.uuid === selectedLasershowAnimation?.uuid
+      (ap) => ap.uuid === selectedLasershowAnimation?.uuid,
     );
     if (forward) {
       updatedLasershow.lasershowAnimations[lasershowAnimationIndex].startTimeMs += 10;
@@ -215,7 +218,7 @@ export default function LasershowEditorContent() {
 
     setSelectedLasershow(updatedLasershow);
     setTimelinePositionMs(
-      updatedLasershow.lasershowAnimations[lasershowAnimationIndex].startTimeMs
+      updatedLasershow.lasershowAnimations[lasershowAnimationIndex].startTimeMs,
     );
   };
 
@@ -255,7 +258,7 @@ export default function LasershowEditorContent() {
                 disableAnimation={true}
               />
             </Paper>
-          </Grid>
+          </Grid>,
         )}
         <Grid item xs>
           <PointsDrawer pointsToDraw={getPointsToDraw(timelinePositionMs, true)} />
@@ -283,7 +286,7 @@ export default function LasershowEditorContent() {
                   duration: getAnimationDuration(la.animation),
                   timelineId: la.timelineId,
                 }))}
-              />
+              />,
             )
           : null}
       </Grid>
@@ -298,7 +301,7 @@ export default function LasershowEditorContent() {
             icon={<ClearIcon />}
             onClick={() =>
               window.confirm(
-                "Are you sure you want to clear the field? Unsaved changes will be lost"
+                "Are you sure you want to clear the field? Unsaved changes will be lost",
               )
                 ? setSelectedLasershow(null)
                 : null

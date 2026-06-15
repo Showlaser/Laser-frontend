@@ -134,7 +134,7 @@ export function SharedTimeline({
         (timelinePositionMs + i * selectedStep).toString(),
         "whitesmoke",
         ctx,
-        10
+        10,
       );
     }
   };
@@ -152,7 +152,7 @@ export function SharedTimeline({
       numberOfTimeLines,
       canvasHeight,
       y,
-      timelineItemHeightOnCanvas
+      timelineItemHeightOnCanvas,
     );
     if (timelineIdPressed === undefined) {
       return undefined;
@@ -163,14 +163,14 @@ export function SharedTimeline({
       0,
       canvasWidth,
       timelinePositionMs,
-      stepsToDrawMaxRange
+      stepsToDrawMaxRange,
     );
     return timelineItems.find((ti) => {
       return (
         numberIsBetweenOrEqual(
           xMappedToTimelinePosition,
           ti.startTime,
-          ti.duration === 0 ? ti.startTime + timelineItemWidthWhenDurationIsZero : ti.duration
+          ti.duration === 0 ? ti.startTime + timelineItemWidthWhenDurationIsZero : ti.duration,
         ) && ti.timelineId === timelineIdPressed
       );
     });
@@ -191,13 +191,13 @@ export function SharedTimeline({
       const itemStartsInTimelineRange = numberIsBetweenOrEqual(
         ti.startTime,
         timelinePositionMs,
-        stepsToDrawMaxRange
+        stepsToDrawMaxRange,
       );
 
       const patternEndsInTimelineRange = numberIsBetweenOrEqual(
         ti.startTime + ti.duration,
         timelinePositionMs,
-        stepsToDrawMaxRange
+        stepsToDrawMaxRange,
       );
 
       return (
@@ -246,7 +246,7 @@ export function SharedTimeline({
         `${timelineItem?.name}`,
         "white",
         rectangleColor,
-        ctx
+        ctx,
       );
     }
   };
@@ -255,7 +255,7 @@ export function SharedTimeline({
     numberOfTimeLines: number,
     canvasHeight: number,
     y: number,
-    animationPatternHeightOnCanvas: number
+    animationPatternHeightOnCanvas: number,
   ) => {
     for (let i = 0; i < numberOfTimeLines; i++) {
       const timelineCanvasYPosition =
@@ -265,7 +265,7 @@ export function SharedTimeline({
       const yPositionIsInTimeline = numberIsBetweenOrEqual(
         y,
         timelineCanvasYPosition - animationPatternHeightOnCanvas - 5,
-        timelineCanvasYPosition
+        timelineCanvasYPosition,
       );
       if (yPositionIsInTimeline) {
         return i;

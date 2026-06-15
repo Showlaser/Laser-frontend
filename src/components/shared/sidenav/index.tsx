@@ -22,6 +22,7 @@ import * as React from "react";
 import { Link } from "react-router-dom";
 import paths from "services/shared/router-paths";
 import { showError, toastSubject } from "services/shared/toast-messages";
+import LightMode from "../../settings/light-mode";
 import AccountPopover from "../account-popover";
 import NotificationPopover from "../notification-popover";
 import { OnTrue } from "../on-true";
@@ -137,7 +138,8 @@ export default function SideNav({ pageName, children, unsavedChanges = false }: 
               </Grid>
             </Grid>
             <Grid item xs container direction="column">
-              <Grid display="flex" justifyContent="flex-end">
+              <Grid display="flex" justifyContent="flex-end" alignItems="center">
+                <LightMode />
                 <NotificationPopover />
                 <SpotifyController />
                 <AccountPopover />

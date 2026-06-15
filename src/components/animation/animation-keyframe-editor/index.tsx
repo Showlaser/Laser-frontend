@@ -23,7 +23,7 @@ import {
   getPointsToDrawFromAnimation,
   saveAnimation,
 } from "services/logic/animation-logic";
-import { selectableSteps } from "services/shared/config";
+import { playbackFrameRateInFps, selectableSteps } from "services/shared/config";
 import AnimationPatternKeyFrames from "./animation-keyframes";
 import AnimationManager from "./animation-manager";
 import AnimationPatternProperties from "./animation-pattern-properties";
@@ -62,16 +62,16 @@ export const AnimationPlayAnimationContext =
   React.createContext<AnimationPlayAnimationContextType | null>(null);
 export const AnimationStepsToDrawMaxRangeContext = React.createContext<number>(0);
 export const AnimationDurationContext = React.createContext<AnimationDurationContextType | null>(
-  null
+  null,
 );
 
 export default function AnimationKeyFrameEditor() {
   const selectedAnimationPatternIndex = React.useContext(SelectedAnimationPatternIndexContext);
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
-    SelectedAnimationContext
+    SelectedAnimationContext,
   ) as SelectedAnimationContextType;
   const { selectedAnimationPattern, setSelectedAnimationPattern } = React.useContext(
-    SelectedAnimationPatternContext
+    SelectedAnimationPatternContext,
   ) as SelectedAnimationPatternContextType;
 
   const [timelinePositionMs, setTimelinePositionMs] = useState<number>(0);
@@ -84,19 +84,19 @@ export default function AnimationKeyFrameEditor() {
 
   const timelinePositionMemo = React.useMemo(
     () => ({ timelinePositionMs, setTimelinePositionMs }),
-    [timelinePositionMs]
+    [timelinePositionMs],
   );
   const selectedKeyFrameMemo = React.useMemo(
     () => ({ selectedKeyFrameUuid, setSelectedKeyFrameUuid }),
-    [selectedKeyFrameUuid]
+    [selectedKeyFrameUuid],
   );
   const playAnimationMemo = React.useMemo(
     () => ({ playAnimation, setPlayAnimation }),
-    [playAnimation]
+    [playAnimation],
   );
   const selectableStepsIndexMemo = React.useMemo(
     () => ({ selectableStepsIndex, setSelectableStepsIndex }),
-    [selectableStepsIndex]
+    [selectableStepsIndex],
   );
 
   useEffect(() => {
@@ -110,7 +110,10 @@ export default function AnimationKeyFrameEditor() {
         setPlayAnimation(false);
       }
 
-      interval = setInterval(() => setTimelinePositionMs(timelinePositionMs + 10), 10);
+      interval = setInterval(
+        () => setTimelinePositionMs(timelinePositionMs + 1000 / playbackFrameRateInFps),
+        10,
+      );
     }
 
     return () => clearInterval(interval);
@@ -158,7 +161,7 @@ export default function AnimationKeyFrameEditor() {
 
   const onTimelineItemClick = (uuid: string) => {
     const selectedAnimationPattern = selectedAnimation?.animationPatterns.find(
-      (ap) => ap.uuid === uuid
+      (ap) => ap.uuid === uuid,
     );
     if (selectedAnimationPattern !== undefined) {
       setSelectedAnimationPattern(selectedAnimationPattern);
@@ -168,7 +171,7 @@ export default function AnimationKeyFrameEditor() {
 
   const onTimelineItemDelete = (uuid: string) => {
     const animationPatternToRemove = selectedAnimation?.animationPatterns.find(
-      (lsa) => lsa.uuid === uuid
+      (lsa) => lsa.uuid === uuid,
     );
 
     if (selectedAnimation === null || animationPatternToRemove === undefined) {
@@ -181,7 +184,7 @@ export default function AnimationKeyFrameEditor() {
 
     let updatedAnimation = { ...selectedAnimation } as Animation;
     const animationPatternsToKeep: AnimationPattern[] = updatedAnimation.animationPatterns.filter(
-      (ap) => ap.uuid !== uuid
+      (ap) => ap.uuid !== uuid,
     );
 
     updatedAnimation.animationPatterns = animationPatternsToKeep;
@@ -196,7 +199,7 @@ export default function AnimationKeyFrameEditor() {
 
     let updatedAnimation = { ...selectedAnimation } as Animation;
     const animationPatternIndex = updatedAnimation.animationPatterns.findIndex(
-      (ap) => ap.uuid === selectedAnimationPattern?.uuid
+      (ap) => ap.uuid === selectedAnimationPattern?.uuid,
     );
     if (forward) {
       updatedAnimation.animationPatterns[animationPatternIndex].startTimeMs += 10;
@@ -235,7 +238,7 @@ export default function AnimationKeyFrameEditor() {
                 disableAnimation={true}
               />
             </Paper>
-          </Grid>
+          </Grid>,
         )}
         <Grid item xs>
           {getWrapperContext(<AnimationPatternKeyFrames />)}
@@ -268,7 +271,7 @@ export default function AnimationKeyFrameEditor() {
                   duration: getAnimationPatternDuration(ap),
                   timelineId: ap.timelineId,
                 }))}
-              />
+              />,
             )
           : null}
       </Grid>
@@ -283,7 +286,7 @@ export default function AnimationKeyFrameEditor() {
             icon={<ClearIcon />}
             onClick={() =>
               window.confirm(
-                "Are you sure you want to clear the field? Unsaved changes will be lost"
+                "Are you sure you want to clear the field? Unsaved changes will be lost",
               )
                 ? setSelectedAnimation(null)
                 : null

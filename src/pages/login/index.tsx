@@ -24,7 +24,7 @@ export default function Login() {
         {
           path: "/",
           sameSite: true,
-        }
+        },
       );
 
       let redirectUrl = getUrlCode();

@@ -12,11 +12,11 @@ export enum LaserModel {
 }
 
 export type RegisteredLaser = {
-  uuid?: String;
-  name?: String;
+  uuid?: string;
+  name?: string;
   modelType?: LaserModel;
   status?: LaserStatus;
-  ipAddress?: String;
+  ipAddress?: string;
 };
 
 export const getRegisteredLaserPlaceholder = (): RegisteredLaser => {

@@ -9,12 +9,21 @@ import {
 } from "models/components/shared/registered-laser";
 import { UDPBroadcast } from "models/components/shared/UPDBroadcast";
 import React, { useEffect, useState } from "react";
-import { adoptShowlasers, getPendingAdoptions } from "services/logic/showlaser-manager";
+import {
+  adoptShowlasers,
+  getPendingAdoptions,
+  getRegisteredLasers,
+} from "services/logic/showlaser-manager";
+import { stringIsEmpty } from "services/shared/general";
+import { showError, toastSubject } from "services/shared/toast-messages";
 
 export default function ShowlaserManager() {
   const [pendingAdoptions, setPendingAdoptions] = useState<UDPBroadcast[] | null>(null);
   const [selectedPendingAdoptions, setSelectedPendingAdoptions] = useState<string[]>([]);
-  const [registeredLaser, setRegisteredLaser] = useState<RegisteredLaser | null>(null);
+
+  const [registeredLasersUuid, setRegisteredLasersUuid] = useState<string[]>([]);
+  const [laserToRegister, setLaserToRegister] = useState<RegisteredLaser | null>(null);
+  const [registeredLasers, setRegisteredLasers] = useState<RegisteredLaser[] | null>(null);
 
   useEffect(() => {
     if (pendingAdoptions === null) {
@@ -25,24 +34,34 @@ export default function ShowlaserManager() {
       });
     }
 
+    if (registeredLasers === null) {
+      getRegisteredLasers().then((registered) => {
+        if (registered !== undefined) {
+          setRegisteredLasers(registered);
+        }
+      });
+    }
+
     const selectedShowlaser = pendingAdoptions?.find(
-      (pa) => pa.uuid === selectedPendingAdoptions.at(0)
+      (pa) => pa.uuid === selectedPendingAdoptions.at(0),
     );
-    let updatedRegisteredLaser = { ...registeredLaser };
+
+    let updatedRegisteredLaser = { ...laserToRegister };
     updatedRegisteredLaser.status = LaserStatus.PendingConnection;
     updatedRegisteredLaser.uuid = selectedShowlaser?.uuid;
     updatedRegisteredLaser.modelType = selectedShowlaser?.modelType ?? LaserModel.Version5;
     updatedRegisteredLaser.ipAddress = selectedShowlaser?.ip;
 
-    setRegisteredLaser(updatedRegisteredLaser);
+    setLaserToRegister(updatedRegisteredLaser);
   }, [pendingAdoptions, selectedPendingAdoptions]);
 
   const onAdopt = async () => {
-    if (registeredLaser === null) {
+    if (laserToRegister === null || stringIsEmpty(laserToRegister?.name ?? "")) {
+      showError(toastSubject.formNotComplete, "Showlaser name is empty");
       return;
     }
 
-    await adoptShowlasers(registeredLaser);
+    await adoptShowlasers(laserToRegister);
   };
 
   return (
@@ -69,25 +88,38 @@ export default function ShowlaserManager() {
                 <TextField
                   style={{ marginBottom: "5px" }}
                   id="showlaser-name"
-                  value={registeredLaser?.name}
+                  value={laserToRegister?.name}
+                  required
                   onChange={(e) => {
-                    let updatedRegisteredLaser = { ...registeredLaser };
+                    let updatedRegisteredLaser = { ...laserToRegister };
                     if (updatedRegisteredLaser !== null) {
                       updatedRegisteredLaser.name = e.target.value;
-                      setRegisteredLaser(updatedRegisteredLaser);
+                      setLaserToRegister(updatedRegisteredLaser);
                     }
                   }}
                 />
-                <small>IP: {registeredLaser?.ipAddress}</small>
-                <small>UUID: {registeredLaser?.uuid}</small>
-                <small>ModelType: {registeredLaser?.modelType}</small>
-                <small>Status: {registeredLaser?.status}</small>
+                <small>IP: {laserToRegister?.ipAddress}</small>
+                <small>UUID: {laserToRegister?.uuid}</small>
+                <small>ModelType: {laserToRegister?.modelType}</small>
+                <small>Status: {laserToRegister?.status}</small>
               </FormControl>
               <Button variant="contained" onClick={onAdopt} style={{ marginTop: "10px" }}>
                 Adopt selected
               </Button>
             </>
           </OnTrue>
+
+          <SelectList
+            allowSelectMultiple={false}
+            onSelect={setRegisteredLasersUuid}
+            items={
+              registeredLasers?.map((laser: RegisteredLaser) => ({
+                uuid: laser.uuid,
+                name: laser?.name ?? "",
+                description: "",
+              })) ?? []
+            }
+          />
         </Paper>
       </Grid>
     </SideNav>

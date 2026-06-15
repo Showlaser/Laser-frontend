@@ -99,7 +99,8 @@ export const toastSubject: ToastSubject = {
     id: 22,
   },
   accountCreated: {
-    message: "Your account is created! Activate your account by clicking the link in the email you received.",
+    message:
+      "Your account is created! Activate your account by clicking the link in the email you received.",
     id: 23,
   },
   noLongerAvailable: {
@@ -113,6 +114,10 @@ export const toastSubject: ToastSubject = {
   unauthorized: {
     message: "Your not authorized",
     id: 26,
+  },
+  formNotComplete: {
+    message: "Please fill in all required fields",
+    id: 27,
   },
 };
 
