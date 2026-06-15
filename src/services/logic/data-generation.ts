@@ -10,7 +10,7 @@
  * @param obj - Object to select a random value from
  * @returns Random value from the object
  */
-export const randomProperty = (obj: any): any => {
+export const randomProperty = <T>(obj: Record<string, T>): T => {
   const keys = Object.keys(obj);
   return obj[keys[(keys.length * Math.random()) << 0]];
 };
@@ -33,7 +33,7 @@ export interface LaserLogEntry {
 
 export const generateFakeLogForLaser = (
   laserUuid: string,
-  laserHealthEnum: any,
+  laserHealthEnum: Record<string, string>,
   timePoints: number[] = [30, 20, 10, 0],
   temperatureMax: number = 65,
 ): LaserLogEntry[] => {

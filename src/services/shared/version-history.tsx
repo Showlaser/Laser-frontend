@@ -10,7 +10,7 @@ const getVersionHistory = () => {
   return versionHistory;
 };
 
-export const getStateById: any = (stateId: number) => {
+export const getStateById = (stateId: number) => {
   const versionHistory = getVersionHistory();
   if (versionHistory === undefined) {
     return;
@@ -19,7 +19,7 @@ export const getStateById: any = (stateId: number) => {
   return versionHistory.find((state) => state.id === stateId)?.state;
 };
 
-export const addItemToVersionHistory = (pageName: string, state: any) => {
+export const addItemToVersionHistory = (pageName: string, state: unknown) => {
   const versionHistory = getVersionHistory() ?? [];
   let versionHistoryLength = versionHistory.length;
   if (versionHistoryLength === 10) {

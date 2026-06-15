@@ -18,7 +18,7 @@ export interface PatternSectionProps {
   setPatternNameIsInUse: (state: boolean) => void;
   pattern: Pattern;
   setPattern: (pattern: Pattern) => void;
-  updatePatternProperty: (property: string, value: any) => void;
+  updatePatternProperty: (property: string, value: unknown) => void;
   numberOfPoints: number;
   setNumberOfPoints: (count: number) => void;
   showPointNumber: boolean;

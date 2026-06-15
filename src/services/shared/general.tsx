@@ -1,3 +1,4 @@
+import type { FormEvent } from "react";
 import { Point } from "models/components/shared/point";
 
 export function stringIsEmpty(str: string | null | undefined) {
@@ -9,13 +10,13 @@ export function getRgbStringFromPoint(point: Point) {
   return `rgb(${redLaserPowerPwm},${greenLaserPowerPwm},${blueLaserPowerPwm})`;
 }
 
-export function getFormDataObject(event: any) {
+export function getFormDataObject(event: FormEvent) {
   if (event === undefined || event === null) {
     return;
   }
 
-  const formData = new FormData(event.target);
-  const object: any = {};
+  const formData = new FormData(event.target as HTMLFormElement);
+  const object: Record<string, FormDataEntryValue> = {};
   formData.forEach(function (value, key) {
     object[key] = value;
   });
@@ -42,12 +43,13 @@ export const getDifferenceBetweenTwoDatesInMinutesAndSecondsString = (
   }
 };
 
-export function toCamelCase(key: any, value: any) {
+export function toCamelCase(key: string, value: unknown) {
   if (value && typeof value === "object") {
-    for (const k in value) {
-      if (/^[A-Z]/.test(k) && Object.hasOwnProperty.call(value, k)) {
-        value[k.charAt(0).toLowerCase() + k.substring(1)] = value[k];
-        delete value[k];
+    const obj = value as Record<string, unknown>;
+    for (const k in obj) {
+      if (/^[A-Z]/.test(k) && Object.hasOwnProperty.call(obj, k)) {
+        obj[k.charAt(0).toLowerCase() + k.substring(1)] = obj[k];
+        delete obj[k];
       }
     }
   }

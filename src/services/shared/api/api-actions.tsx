@@ -8,7 +8,7 @@ export const Get = async (endpoint: string): Promise<Response> =>
     referrerPolicy: "no-referrer",
   });
 
-export const Post = async (endpoint: string, data: any = null): Promise<Response> =>
+export const Post = async (endpoint: string, data: unknown = null): Promise<Response> =>
   fetch(endpoint, {
     method: "POST",
     mode: "cors",
@@ -22,7 +22,7 @@ export const Post = async (endpoint: string, data: any = null): Promise<Response
     body: JSON.stringify(data),
   });
 
-export const Put = async (endpoint: string, data: any = null): Promise<Response> =>
+export const Put = async (endpoint: string, data: unknown = null): Promise<Response> =>
   fetch(endpoint, {
     method: "PUT",
     mode: "cors",
@@ -36,7 +36,7 @@ export const Put = async (endpoint: string, data: any = null): Promise<Response>
     body: JSON.stringify(data),
   });
 
-export const Delete = async (endpoint: string, data: any = null): Promise<Response> =>
+export const Delete = async (endpoint: string, data: BodyInit | null = null): Promise<Response> =>
   fetch(endpoint, {
     method: "DELETE",
     mode: "cors",

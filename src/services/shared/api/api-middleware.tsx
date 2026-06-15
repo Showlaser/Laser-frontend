@@ -9,7 +9,7 @@ const handleErrorMessage = (statusCode: number, ignoredStatusCodes: number[]) =>
     return;
   }
 
-  const statusCodes: any = {
+  const statusCodes: Record<number, ToastSubjectObject> = {
     400: toastSubject.apiBadRequest,
     401: toastSubject.unauthorized,
     404: toastSubject.apiNotFound,
@@ -34,7 +34,7 @@ const refreshUserTokensIfExpired = async () => {
   const loginTimeIsNotValid = isNaN(loginTime);
   const jwtExpired = currentTime - loginTime > jwtExpirationTimeMs || loginTimeIsNotValid;
   if (jwtExpired) {
-    const refreshResponse: any = await Post(apiEndpoints.refreshToken, null);
+    const refreshResponse = await Post(apiEndpoints.refreshToken, null);
     if (refreshResponse.status !== 200) {
       return false;
     }
