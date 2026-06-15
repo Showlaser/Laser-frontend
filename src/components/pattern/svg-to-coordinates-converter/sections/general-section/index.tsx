@@ -42,7 +42,7 @@ export default function GeneralSection({
     e.target.checked ? connectAllDots() : disconnectAllDots();
 
   const disconnectAllDots = () => {
-    let updatedPoints = [...pattern.points];
+    const updatedPoints = [...pattern.points];
     const pointsLength = pattern.points.length;
 
     for (let i = 0; i < pointsLength; i++) {
@@ -53,7 +53,7 @@ export default function GeneralSection({
   };
 
   const connectAllDots = () => {
-    let updatedPoints = [...pattern.points].sort(
+    const updatedPoints = [...pattern.points].sort(
       (a, b) => a.orderNr - b.orderNr
     );
     const pointsLength = pattern.points.length;
@@ -130,7 +130,7 @@ export default function GeneralSection({
               : "#fffff"
           }
           onBlur={(e) => {
-            let updatedPoints = [...pattern.points];
+            const updatedPoints = [...pattern.points];
             const length = updatedPoints.length;
 
             for (let i = 0; i < length; i++) {

@@ -15,7 +15,7 @@ export function getFormDataObject(event: any) {
   }
 
   const formData = new FormData(event.target);
-  let object: any = {};
+  const object: any = {};
   formData.forEach(function (value, key) {
     object[key] = value;
   });
@@ -44,7 +44,7 @@ export const getDifferenceBetweenTwoDatesInMinutesAndSecondsString = (
 
 export function toCamelCase(key: any, value: any) {
   if (value && typeof value === "object") {
-    for (var k in value) {
+    for (const k in value) {
       if (/^[A-Z]/.test(k) && Object.hasOwnProperty.call(value, k)) {
         value[k.charAt(0).toLowerCase() + k.substring(1)] = value[k];
         delete value[k];

@@ -154,7 +154,7 @@ export default function AnimationKeyFrameEditor() {
       return;
     }
 
-    let updatedAnimation: any = { ...selectedAnimation };
+    const updatedAnimation: any = { ...selectedAnimation };
     updatedAnimation.animationPatterns[selectedAnimationPatternIndex][propertyName] = value;
     setSelectedAnimation(updatedAnimation);
   };
@@ -182,7 +182,7 @@ export default function AnimationKeyFrameEditor() {
       return;
     }
 
-    let updatedAnimation = { ...selectedAnimation } as Animation;
+    const updatedAnimation = { ...selectedAnimation } as Animation;
     const animationPatternsToKeep: AnimationPattern[] = updatedAnimation.animationPatterns.filter(
       (ap) => ap.uuid !== uuid,
     );
@@ -197,7 +197,7 @@ export default function AnimationKeyFrameEditor() {
       return;
     }
 
-    let updatedAnimation = { ...selectedAnimation } as Animation;
+    const updatedAnimation = { ...selectedAnimation } as Animation;
     const animationPatternIndex = updatedAnimation.animationPatterns.findIndex(
       (ap) => ap.uuid === selectedAnimationPattern?.uuid,
     );

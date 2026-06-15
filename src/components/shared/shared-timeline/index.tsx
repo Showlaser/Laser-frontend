@@ -65,7 +65,7 @@ export function SharedTimeline({
   const stepsToDrawMaxRange = (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
 
   const getTimelineData = () => {
-    let generatedTimeline = [];
+    const generatedTimeline = [];
     for (let i = 0; i < numberOfTimeLines; i++) {
       generatedTimeline[i] = {
         id: i,
@@ -179,8 +179,8 @@ export function SharedTimeline({
   const onCanvasClick = (e: any) => {
     const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
     onItemClick(x, y);
   };
 
@@ -237,7 +237,7 @@ export function SharedTimeline({
         (canvasWidth / 10) *
         ((timelineItem.startTime - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
 
-      let rectangleColor = selectedItemUuid === timelineItem.uuid ? "#6370c2" : "#485cdb";
+      const rectangleColor = selectedItemUuid === timelineItem.uuid ? "#6370c2" : "#485cdb";
       drawRoundedRectangleWithText(
         xPosition,
         y + 5,
@@ -292,8 +292,8 @@ export function SharedTimeline({
 
     const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
     const clickedTimelineItem = getTimelineItemFromMouseClick(x, y);
     if (clickedTimelineItem !== undefined) {

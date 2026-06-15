@@ -95,7 +95,7 @@ export const getPointsToDrawFromAnimation = (
     return [];
   }
 
-  let points: Point[][] = [];
+  const points: Point[][] = [];
   for (let i = 0; i < animationPatternsToPlayLength; i++) {
     const animationPattern = animationPatternsToPlay[i];
     if (animationPattern.pattern === undefined) {

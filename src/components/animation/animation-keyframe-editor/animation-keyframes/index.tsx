@@ -276,7 +276,7 @@ export default function AnimationPatternKeyFrames() {
       return;
     }
 
-    let updatedAnimation: Animation = { ...selectedAnimation };
+    const updatedAnimation: Animation = { ...selectedAnimation };
 
     if (!window.confirm("Are you sure you want to remove this keyframe")) {
       return;
@@ -412,7 +412,7 @@ export default function AnimationPatternKeyFrames() {
       return;
     }
 
-    let updatedAnimation: Animation = { ...selectedAnimation };
+    const updatedAnimation: Animation = { ...selectedAnimation };
     if (updatedAnimation?.animationPatterns === undefined) {
       return;
     }

@@ -25,13 +25,13 @@ export default function LasershowAnimationProperties() {
       return;
     }
 
-    let updatedLasershow = { ...selectedLasershow } as any;
+    const updatedLasershow = { ...selectedLasershow } as any;
     updatedLasershow.lasershowAnimations[selectedLasershowAnimationIndex][propertyName] = value;
     setSelectedLasershow(updatedLasershow);
   };
 
   const getTimelineMenuItems = () => {
-    let items = [];
+    const items = [];
     for (let i = 0; i < numberOfTimeLines; i++) {
       items.push(
         <MenuItem

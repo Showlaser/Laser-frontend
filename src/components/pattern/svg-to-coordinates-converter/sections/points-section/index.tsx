@@ -39,7 +39,7 @@ export default function PointsSection({
   const [showColorWarning, setShowColorWarning] = React.useState<boolean>(false);
 
   const getDataToUpdate = (pointToUpdate: Point) => {
-    let updatedPoints: Point[] = [...pattern.points];
+    const updatedPoints: Point[] = [...pattern.points];
     const pointToUpdateIndex: number = updatedPoints.findIndex(
       (p: Point) => p.uuid === pointToUpdate.uuid
     );
@@ -139,7 +139,7 @@ export default function PointsSection({
   };
 
   const onToggle = (pointUuid: string, checked: boolean) => {
-    let selectedPoints = [...selectedPointsUuid];
+    const selectedPoints = [...selectedPointsUuid];
 
     if (!checked) {
       const pointIndex = selectedPoints.findIndex((sp) => sp === pointUuid);
@@ -161,14 +161,14 @@ export default function PointsSection({
       ? pattern?.points.length
       : currentPage * itemsPerPage + itemsPerPage - 1;
 
-  const pointsToRender = [...pattern?.points]
+  const pointsToRender = [...(pattern?.points ?? [])]
     .sort((a, b) => a.orderNr - b.orderNr)
     .filter((p) =>
       numberIsBetweenOrEqual(p.orderNr, currentPage * itemsPerPage, getItemsEndIndex())
     );
 
   const addPoint = () => {
-    let updatedPattern = { ...pattern };
+    const updatedPattern = { ...pattern };
     const newPoint = getPointsPlaceHolder(updatedPattern.uuid, updatedPattern.points.length);
     updatedPattern.points.push(newPoint);
 
@@ -181,7 +181,7 @@ export default function PointsSection({
     checked ? setSelectedPointsUuid(pattern.points.map((p) => p.uuid)) : setSelectedPointsUuid([]);
 
   const getConnectablePoints = () => {
-    let points = [...pattern?.points]
+    const points = [...(pattern?.points ?? [])]
       .sort((a, b) => a.orderNr - b.orderNr)
       .map((p) => ({ label: `Point ${p.orderNr + 1}` }));
 

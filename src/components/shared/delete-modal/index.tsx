@@ -16,7 +16,7 @@ type Props = {
 
 export default function DeleteModal({ setModalOptions, modalOptions, onCancelClick }: Props) {
   const onModalClose = () => {
-    let updatedModalOptions = { ...modalOptions };
+    const updatedModalOptions = { ...modalOptions };
     updatedModalOptions.show = false;
     setModalOptions(updatedModalOptions);
     if (onCancelClick !== undefined) {

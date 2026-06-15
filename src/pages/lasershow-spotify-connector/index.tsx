@@ -68,7 +68,7 @@ export default function LasershowSpotifyConnector() {
     };
 
     addLasershowToSpotifyConnector(connector);
-    let newExistingConnectors = [...existingConnectors];
+    const newExistingConnectors = [...existingConnectors];
     newExistingConnectors.push(connector);
     setExistingConnectors(newExistingConnectors);
   };

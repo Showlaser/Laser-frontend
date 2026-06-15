@@ -95,7 +95,7 @@ const getAnimationWithTwoKeyframes = (): AnimationPattern => {
   const secondKeyframe = getTestAnimationPatternKeyFrames([200])[0];
   const mergedKeyFrames = [firstKeyFrame, secondKeyframe];
 
-  let animationPattern = testAnimationPattern(0, [0], 0);
+  const animationPattern = testAnimationPattern(0, [0], 0);
   animationPattern.animationPatternKeyFrames = mergedKeyFrames;
   return animationPattern;
 };
@@ -198,7 +198,7 @@ test(
     const currentKeyFrame = getTestAnimationPatternKeyFrames([100])[0];
     const nextKeyFrame = getTestAnimationPatternKeyFrames([200])[0];
 
-    let animationPattern = testAnimationPattern(0, [0], 0);
+    const animationPattern = testAnimationPattern(0, [0], 0);
     animationPattern.animationPatternKeyFrames = animationPattern.animationPatternKeyFrames.concat(
       previousKeyFrame,
       currentKeyFrame,
@@ -231,7 +231,7 @@ test(
     "When I execute the function," +
     "Then I expect to get a different x value from the input points",
   () => {
-    let animationPattern = testAnimationPattern(0, [100, 120], 1000);
+    const animationPattern = testAnimationPattern(0, [100, 120], 1000);
     for (let index = 0; index < animationPattern.animationPatternKeyFrames.length; index++) {
       const apkf = animationPattern.animationPatternKeyFrames[index];
       if (apkf.propertyEdited === AnimationProperty.rotation && index > 6) {

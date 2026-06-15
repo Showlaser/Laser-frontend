@@ -161,7 +161,7 @@ export default function AnimationPage() {
   const onAnimationDelete = (uuid: string) => {
     const animationToRemoveIndex = availableAnimations?.findIndex((aa) => aa.uuid === uuid) ?? -1;
     if (animationToRemoveIndex !== -1) {
-      let updatedAnimations = [...(availableAnimations ?? [])];
+      const updatedAnimations = [...(availableAnimations ?? [])];
       updatedAnimations.splice(animationToRemoveIndex, 1);
       setAvailableAnimations(updatedAnimations);
     }
@@ -170,14 +170,14 @@ export default function AnimationPage() {
   const onPatternDelete = (uuid: string) => {
     const patternToRemoveIndex = availablePatterns?.findIndex((p) => p.uuid === uuid) ?? -1;
     if (patternToRemoveIndex !== -1) {
-      let updatedPatterns = [...(availablePatterns ?? [])];
+      const updatedPatterns = [...(availablePatterns ?? [])];
       updatedPatterns.splice(patternToRemoveIndex, 1);
       setAvailablePatterns(updatedPatterns);
     }
   };
 
   const onDuplicateAnimationClick = (uuid: string | null) => {
-    let animationToDuplicate = {
+    const animationToDuplicate = {
       ...availableAnimations?.find((a) => a.uuid === uuid),
     } as Animation;
     if (animationToDuplicate === undefined) {
@@ -202,7 +202,7 @@ export default function AnimationPage() {
       }
     }
 
-    let animationsToUpdate = [...(availableAnimations ?? [])];
+    const animationsToUpdate = [...(availableAnimations ?? [])];
     animationsToUpdate.push(animationToDuplicate);
     setAvailableAnimations(animationsToUpdate);
     saveAnimation(animationToDuplicate);
@@ -248,7 +248,7 @@ export default function AnimationPage() {
               image: pattern.image,
               onCardClick: () => {
                 setConvertPatternModalOpen(false);
-                let availableAnimationsToUpdate = availableAnimations ?? [];
+                const availableAnimationsToUpdate = availableAnimations ?? [];
                 const convertedAnimation = convertPatternToAnimation(pattern);
                 setSelectedAnimationPattern(convertedAnimation.animationPatterns[0]);
                 availableAnimations?.push(convertedAnimation);

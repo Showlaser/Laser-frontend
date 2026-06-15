@@ -3,7 +3,7 @@ import { createGuid, emptyGuid } from "services/shared/math";
 import { showError, toastSubject } from "services/shared/toast-messages";
 import { range } from "d3-array";
 import { canvasPxSize } from "services/shared/config";
-const flattenSVG = require("flatten-svg");
+import { flattenSVG } from "flatten-svg";
 
 const pathologize = (original: string) => {
   //handles issues with pathologist not parsing text and style elements
@@ -61,7 +61,7 @@ export const svgToPoints = (
   }
 
   const pathsOnly = pathologize(svg);
-  let newDiv = document.createElement("div");
+  const newDiv = document.createElement("div");
   newDiv.innerHTML = pathsOnly;
 
   const paths: any = newDiv?.getElementsByTagName("path");

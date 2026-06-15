@@ -36,7 +36,7 @@ export default function Account() {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitInProgress(true);
-    let formData: any = getFormDataFromEvent(e);
+    const formData: any = getFormDataFromEvent(e);
     const passwordShouldBeUpdated =
       !stringIsEmpty(formData?.newPassword) && !stringIsEmpty(formData?.newPasswordRepeat);
 
@@ -105,9 +105,7 @@ export default function Account() {
                   defaultValue={userData?.email}
                   required
                   onChange={(e) => {
-                    userData?.email !== e.target.value
-                      ? setEmailChanged(true)
-                      : setEmailChanged(false);
+                    setEmailChanged(userData?.email !== e.target.value);
                   }}
                 />
                 <TextField
@@ -151,7 +149,7 @@ export default function Account() {
                   size="small"
                   variant="text"
                   onClick={() => {
-                    let updatedModalOptions = { ...modalOptions };
+                    const updatedModalOptions = { ...modalOptions };
                     updatedModalOptions.show = true;
                     setModalOptions(updatedModalOptions);
                   }}

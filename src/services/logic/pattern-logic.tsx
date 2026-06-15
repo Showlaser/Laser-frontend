@@ -126,7 +126,7 @@ export const getPreviousCurrentAndNextKeyFramePerProperty = (
   animationPattern: AnimationPattern,
   timelinePositionMs: number
 ): PreviousCurrentAndNextKeyFramePerProperty => {
-  let previousNextAndCurrentKeyFramePerProperty: PreviousCurrentAndNextKeyFramePerProperty = {
+  const previousNextAndCurrentKeyFramePerProperty: PreviousCurrentAndNextKeyFramePerProperty = {
     previous: [],
     current: getCurrentKeyFrame(animationPattern, timelinePositionMs) ?? [],
     next: [],
@@ -165,8 +165,8 @@ export const getPatternPointsByTimelinePosition = (
     return [];
   }
 
-  let points: Point[] = [...animationPattern.pattern.points];
-  let valuesPerProperty = propertiesSettings.map((propertiesSetting) => ({
+  const points: Point[] = [...animationPattern.pattern.points];
+  const valuesPerProperty = propertiesSettings.map((propertiesSetting) => ({
     property: propertiesSetting.property,
     value: propertiesSetting.defaultValue,
   }));

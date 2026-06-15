@@ -44,7 +44,7 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
     screenScale: number
   ) => {
     let dotThickness: number = 3;
-    let color: string = getRgbColorStringFromPoint(point);
+    const color: string = getRgbColorStringFromPoint(point);
     if (pointIsHighlighted) {
       dotThickness = 6;
     }

@@ -102,14 +102,14 @@ export default function PatternPage() {
   const onPatternDelete = (uuid: string) => {
     const patternToRemoveIndex = availablePatterns?.findIndex((p) => p.uuid === uuid) ?? -1;
     if (patternToRemoveIndex !== -1) {
-      let updatedPatterns = [...(availablePatterns ?? [])];
+      const updatedPatterns = [...(availablePatterns ?? [])];
       updatedPatterns.splice(patternToRemoveIndex, 1);
       setAvailablePatterns(updatedPatterns);
     }
   };
 
   const onDuplicatePatternClick = (uuid: string | null) => {
-    let patternToDuplicate = {
+    const patternToDuplicate = {
       ...availablePatterns?.find((p) => p.uuid === uuid),
     } as Pattern;
     if (patternToDuplicate === undefined) {
@@ -132,7 +132,7 @@ export default function PatternPage() {
       patternToDuplicate.points[index].uuid = ppUuid;
     }
 
-    let patternsToUpdate = [...(availablePatterns ?? [])];
+    const patternsToUpdate = [...(availablePatterns ?? [])];
     patternsToUpdate.push(patternToDuplicate);
     setAvailablePatterns(patternsToUpdate);
     savePattern(patternToDuplicate);

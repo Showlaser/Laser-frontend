@@ -74,7 +74,7 @@ export default function AnimationPatternProperties({
       return;
     }
 
-    let updatedAnimation: Animation = { ...selectedAnimation };
+    const updatedAnimation: Animation = { ...selectedAnimation };
     if (
       updatedAnimation === undefined ||
       selectedKeyFrameIndex === undefined ||
@@ -215,7 +215,7 @@ export default function AnimationPatternProperties({
   );
 
   const getTimelineMenuItems = () => {
-    let items = [];
+    const items = [];
     for (let i = 0; i < numberOfTimeLines; i++) {
       items.push(
         <MenuItem

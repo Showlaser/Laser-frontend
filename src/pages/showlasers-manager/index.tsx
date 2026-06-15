@@ -46,7 +46,7 @@ export default function ShowlaserManager() {
       (pa) => pa.uuid === selectedPendingAdoptions.at(0),
     );
 
-    let updatedRegisteredLaser = { ...laserToRegister };
+    const updatedRegisteredLaser = { ...laserToRegister };
     updatedRegisteredLaser.status = LaserStatus.PendingConnection;
     updatedRegisteredLaser.uuid = selectedShowlaser?.uuid;
     updatedRegisteredLaser.modelType = selectedShowlaser?.modelType ?? LaserModel.Version5;
@@ -91,7 +91,7 @@ export default function ShowlaserManager() {
                   value={laserToRegister?.name}
                   required
                   onChange={(e) => {
-                    let updatedRegisteredLaser = { ...laserToRegister };
+                    const updatedRegisteredLaser = { ...laserToRegister };
                     if (updatedRegisteredLaser !== null) {
                       updatedRegisteredLaser.name = e.target.value;
                       setLaserToRegister(updatedRegisteredLaser);

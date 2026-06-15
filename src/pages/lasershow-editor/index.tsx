@@ -108,7 +108,7 @@ export default function LasershowEditor() {
   const onLasershowDelete = async (uuid: string) => {
     const result = await removeLasershow(uuid);
     if (result?.status === 200 && availableLasershows !== null) {
-      let lasershows = [...availableLasershows];
+      const lasershows = [...availableLasershows];
       const lasershowIndex = lasershows.findIndex((a) => a.uuid === uuid);
       if (lasershowIndex === -1) {
         return;
@@ -122,7 +122,7 @@ export default function LasershowEditor() {
   };
 
   const onDuplicateLasershow = (uuid: string | null) => {
-    let lasershowToDuplicate = {
+    const lasershowToDuplicate = {
       ...availableLasershows?.find((a) => a.uuid === uuid),
     } as Lasershow;
     if (lasershowToDuplicate === undefined) {
@@ -136,7 +136,7 @@ export default function LasershowEditor() {
       lasershowToDuplicate.lasershowAnimations[index].uuid = createGuid();
     }
 
-    let lasershowsToUpdate = [...(availableLasershows ?? [])];
+    const lasershowsToUpdate = [...(availableLasershows ?? [])];
     lasershowsToUpdate.push(lasershowToDuplicate);
     setAvailableLasershows(lasershowsToUpdate);
     saveLasershow(lasershowToDuplicate);

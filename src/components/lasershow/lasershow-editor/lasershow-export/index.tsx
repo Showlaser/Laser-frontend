@@ -33,10 +33,10 @@ export default function LasershowExport({
   };
 
   const generateLasershow = (): ExportedLasershow => {
-    let laserCommands: ExportedLasershow = [];
+    const laserCommands: ExportedLasershow = [];
     for (let timelinePosition = 0; timelinePosition < lasershowDuration; timelinePosition += 10) {
       const lasershowPointsAtTimelinePosition = getPointsToDraw(timelinePosition, false);
-      let laserCommandModelCluster: LaserCommandModelCluster = {
+      const laserCommandModelCluster: LaserCommandModelCluster = {
         timeMs: timelinePosition,
         commands: [],
       };
@@ -46,7 +46,7 @@ export default function LasershowExport({
         lasershowAnimationIndex < lasershowPointsAtTimelinePosition.length;
         lasershowAnimationIndex++
       ) {
-        let animationPatternCommands: LaserCommandModel[] = [];
+        const animationPatternCommands: LaserCommandModel[] = [];
         const lasershowAnimationPointsToDraw = [
           ...lasershowPointsAtTimelinePosition[lasershowAnimationIndex],
         ].sort((a, b) => a.orderNr - b.orderNr);
@@ -115,7 +115,7 @@ export default function LasershowExport({
   };
 
   const onClick = () => {
-    let generatedLasershow: ExportedLasershow = generateLasershow();
+    const generatedLasershow: ExportedLasershow = generateLasershow();
     downloadLaserShow(generatedLasershow);
   };
 

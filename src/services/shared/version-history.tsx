@@ -20,7 +20,7 @@ export const getStateById: any = (stateId: number) => {
 };
 
 export const addItemToVersionHistory = (pageName: string, state: any) => {
-  let versionHistory = getVersionHistory() ?? [];
+  const versionHistory = getVersionHistory() ?? [];
   let versionHistoryLength = versionHistory.length;
   if (versionHistoryLength === 10) {
     versionHistory.splice(0, 1);

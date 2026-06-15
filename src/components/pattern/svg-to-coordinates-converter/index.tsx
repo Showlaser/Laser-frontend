@@ -77,7 +77,7 @@ export default function PatternEditor({
   };
 
   const updatePatternProperty = (property: string, value: any) => {
-    let updatedPattern: any = { ...pattern };
+    const updatedPattern: any = { ...pattern };
     updatedPattern[property] = value;
     setPattern(updatedPattern);
   };
@@ -112,7 +112,7 @@ export default function PatternEditor({
     const canvas: HTMLCanvasElement | null = document.getElementById(
       "points-drawer-canvas"
     ) as HTMLCanvasElement;
-    let patternToUpdate = { ...pattern };
+    const patternToUpdate = { ...pattern };
     if (canvas !== null) {
       patternToUpdate.image = canvas.toDataURL("image/webp", 0.4);
       setPattern(patternToUpdate);

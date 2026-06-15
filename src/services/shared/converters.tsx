@@ -41,7 +41,7 @@ export const setLaserPowerFromHexString = (hex: string, point: Point): Point => 
 };
 
 export const convertPatternToAnimation = (pattern: Pattern): Animation => {
-  let animation: Animation = animationPlaceholder();
+  const animation: Animation = animationPlaceholder();
   const animationPattern: AnimationPattern = {
     uuid: createGuid(),
     animationUuid: animation.uuid,
@@ -142,9 +142,9 @@ export const applyParametersToPointsForCanvas = (
   convertValuesToCanvasSize: boolean = true
 ): Point[] => {
   const pointsLength = points.length;
-  let pointsWithOffsetApplied = [];
+  const pointsWithOffsetApplied = [];
   for (let i = 0; i < pointsLength; i++) {
-    let point = { ...points[i] };
+    const point = { ...points[i] };
     point.x *= scale;
     point.y *= scale;
     point.x += xOffset;
@@ -165,11 +165,11 @@ export const applyParametersToPointsForCanvas = (
 };
 
 export const convertPointsToCanvasSize = (points: Point[]) => {
-  let mappedPoints: Point[] = [];
+  const mappedPoints: Point[] = [];
   const pointsLength = points.length;
 
   for (let i = 0; i < pointsLength; i++) {
-    let point = { ...points[i] };
+    const point = { ...points[i] };
     point.x = Math.round(mapNumber(point.x, -4000, 4000, 0, canvasPxSize));
     point.y = Math.round(mapNumber(point.y, -4000, 4000, canvasPxSize, 0));
     mappedPoints.push(point);

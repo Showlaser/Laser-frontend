@@ -129,7 +129,7 @@ export default function LasershowEditorContent() {
       const canvas: HTMLCanvasElement | null = document.getElementById(
         "points-drawer-canvas",
       ) as HTMLCanvasElement;
-      let lasershowToUpdate = { ...selectedLasershow };
+      const lasershowToUpdate = { ...selectedLasershow };
       if (canvas !== null) {
         lasershowToUpdate.image = canvas.toDataURL("image/webp", 0.4);
       }
@@ -191,7 +191,7 @@ export default function LasershowEditorContent() {
       return;
     }
 
-    let updatedLasershow = { ...selectedLasershow } as Lasershow;
+    const updatedLasershow = { ...selectedLasershow } as Lasershow;
     const animationsToKeep = updatedLasershow.lasershowAnimations?.filter((a) => a.uuid !== uuid);
 
     updatedLasershow.lasershowAnimations = animationsToKeep;
@@ -203,7 +203,7 @@ export default function LasershowEditorContent() {
       return;
     }
 
-    let updatedLasershow = { ...selectedLasershow } as Lasershow;
+    const updatedLasershow = { ...selectedLasershow } as Lasershow;
     const lasershowAnimationIndex = updatedLasershow.lasershowAnimations.findIndex(
       (ap) => ap.uuid === selectedLasershowAnimation?.uuid,
     );
