@@ -38,6 +38,7 @@ export default function LasershowSpotifyConnector() {
     if (existingConnectors.length === 0) {
       getAllConnectors().then((data) => setExistingConnectors(data));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch once on mount (length-guarded)
   }, [setSearchResults]);
 
   const onSearchInput = (searchValue: string) => {

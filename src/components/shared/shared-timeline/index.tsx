@@ -92,6 +92,7 @@ export function SharedTimeline({
     canvas.style.height = `${canvasHeight}px`;
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     draw(ctx);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- redraw on the listed view deps only
   }, [
     screenWidthPx,
     screenHeightPx,

@@ -59,6 +59,7 @@ export default function PatternEditor({
     return () => {
       window.removeEventListener("beforeunload", alertUser);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run when the uploaded file/point count changes
   }, [uploadedFile, numberOfPoints]);
 
   useEffect(() => {

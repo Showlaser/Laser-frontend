@@ -53,6 +53,7 @@ export default function ShowlaserManager() {
     updatedRegisteredLaser.ipAddress = selectedShowlaser?.ip;
 
     setLaserToRegister(updatedRegisteredLaser);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- adding laserToRegister/registeredLasers would loop on setState
   }, [pendingAdoptions, selectedPendingAdoptions]);
 
   const onAdopt = async () => {

@@ -66,6 +66,7 @@ export default function LasershowEditor() {
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch once on mount (null-guarded)
   }, []);
 
   const getWrapperContext = (reactObject: React.ReactNode) => (

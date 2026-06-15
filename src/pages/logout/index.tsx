@@ -10,6 +10,7 @@ export default function Logout() {
 
   useEffect(() => {
     logoutUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run logout once on mount
   }, []);
 
   const onLogoutComplete = () => {

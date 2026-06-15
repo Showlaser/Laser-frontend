@@ -172,6 +172,7 @@ export default function AnimationPatternKeyFrames() {
 
     drawProperties(canvas);
     drawTimeStepsAndKeyframes(canvas);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- captures the current draw helpers intentionally
   }, [
     selectedAnimationPattern,
     timelinePositionMs,
