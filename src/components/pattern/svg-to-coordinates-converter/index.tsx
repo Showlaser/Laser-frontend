@@ -92,6 +92,10 @@ export default function PatternEditor({
     const reader = new FileReader();
     reader.onload = function () {
       const result = reader.result;
+      if (typeof result !== "string") {
+        onInvalidFile();
+        return;
+      }
       const convertedPoints = svgToPoints(result, numberOfPoints, pattern.uuid);
       if (convertedPoints.length === 0) {
         onInvalidFile();

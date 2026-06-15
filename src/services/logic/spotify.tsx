@@ -7,7 +7,7 @@ import SpotifyWebApi from "spotify-web-api-js";
 
 const Spotify = new SpotifyWebApi();
 
-const onError = async (errorCode: any) => {
+const onError = async (errorCode: unknown) => {
   const code = Number(errorCode);
   if (code === 401) {
     const refreshToken = localStorage.getItem("SpotifyRefreshToken");
@@ -54,18 +54,18 @@ export const refreshSpotifyAccessToken = async (
   return await response.json();
 };
 
-const executeRequest = async (request: () => any) => {
+const executeRequest = async <T,>(request: () => Promise<T>): Promise<T> => {
   const accessToken = localStorage.getItem("SpotifyAccessToken");
   if (accessToken === null || accessToken === "undefined") {
-    return;
+    return undefined as T;
   }
 
   Spotify.setAccessToken(accessToken);
   return request()
-    .then((data: any) => data)
-    .catch(async (error: any) => {
+    .then((data) => data)
+    .catch(async (error: { status?: number }) => {
       await onError(error.status);
-      return request().then((data: any) => data);
+      return request().then((data) => data);
     });
 };
 
@@ -79,7 +79,7 @@ export const getPlaylistSongs = (
   executeRequest(() =>
     Spotify.getPlaylistTracks(selectedPlaylistId).then((data) => {
       const items = data.items;
-      return items.map((track) => track.track);
+      return items.map((track) => track.track) as SpotifyApi.TrackObjectFull[];
     }),
   );
 

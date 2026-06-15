@@ -20,7 +20,7 @@ const pathologize = (original: string) => {
 };
 
 const mapCoordinatesToXAndYPoint = (
-  coordinates: any,
+  coordinates: number[][],
   patternUuid: string
 ): Point[] => {
   const length = coordinates.length;
@@ -52,7 +52,7 @@ const createPoint = (
 });
 
 export const svgToPoints = (
-  svg: any,
+  svg: string,
   numberOfPoints: number,
   patternUuid: string
 ): Point[] => {
@@ -64,7 +64,7 @@ export const svgToPoints = (
   const newDiv = document.createElement("div");
   newDiv.innerHTML = pathsOnly;
 
-  const paths: any = newDiv?.getElementsByTagName("path");
+  const paths = newDiv.getElementsByTagName("path") as HTMLCollectionOf<SVGPathElement>;
   if (paths.length === 0) {
     showError(toastSubject.invalidFile);
     return [];
@@ -74,11 +74,11 @@ export const svgToPoints = (
   return mapCoordinatesToXAndYPoint(coordinates, patternUuid);
 };
 
-const pathsToCoords = (paths: any, numberOfPoints: number) => {
-  const totalLengthAllPaths: any = getTotalLengthAllPaths(paths);
+const pathsToCoords = (paths: HTMLCollectionOf<SVGPathElement>, numberOfPoints: number) => {
+  const totalLengthAllPaths = getTotalLengthAllPaths(paths);
 
   let runningPointsTotal = 0;
-  return Array.from(paths).reduce((prev: any, item: any, index) => {
+  return Array.from(paths).reduce<number[][]>((prev, item, index) => {
     let pointsForPath;
     if (index + 1 === paths.length) {
       //ensures that the total number of points = the actual requested number (because using rounding)
@@ -93,17 +93,17 @@ const pathsToCoords = (paths: any, numberOfPoints: number) => {
   }, []);
 };
 
-const polygonize = (path: any, numPoints: any) => {
+const polygonize = (path: SVGPathElement, numPoints: number) => {
   //Thank you Noah!! http://bl.ocks.org/veltman/fc96dddae1711b3d756e0a13e7f09f24
   const length = path.getTotalLength();
-  return range(numPoints).map(function (i: any) {
+  return range(numPoints).map(function (i: number) {
     const point = path.getPointAtLength((length * i) / numPoints);
     return [point.x, point.y];
   });
 };
 
-const getTotalLengthAllPaths = (paths: HTMLCollection) => {
-  return Array.from(paths).reduce((prev: any, curr: any) => {
+const getTotalLengthAllPaths = (paths: HTMLCollectionOf<SVGPathElement>) => {
+  return Array.from(paths).reduce((prev: number, curr: SVGPathElement) => {
     return prev + curr.getTotalLength();
   }, 0);
 };
