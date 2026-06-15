@@ -84,7 +84,7 @@ export default function LasershowEditorContent() {
   const lasershowDuration = getLasershowDuration(selectedLasershow);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setTimeout>;
     if (playLasershow) {
       if (timelinePositionMs >= lasershowDuration) {
         setPlayLasershow(false);

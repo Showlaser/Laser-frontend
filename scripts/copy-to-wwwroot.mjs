@@ -27,7 +27,5 @@ if (!existsSync(laserApiDir)) {
 rmSync(wwwroot, { recursive: true, force: true });
 mkdirSync(wwwroot, { recursive: true });
 cpSync(buildDir, wwwroot, { recursive: true });
-// electron.js lives in public/ for the legacy Electron shell; it is not a web asset.
-rmSync(resolve(wwwroot, "electron.js"), { force: true });
 
 console.log(`[copy-to-wwwroot] Copied ${buildDir} -> ${wwwroot}`);

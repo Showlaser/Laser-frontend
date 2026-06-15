@@ -21,13 +21,13 @@
     "typescript": "^4.9.4",
     "universal-cookie": "^4.0.4"
   },
-  "main": "public/electron.js",
   "scripts": {
     "start": "vite",
     "build": "vite build",
     "build:api": "vite build && node scripts/copy-to-wwwroot.mjs",
     "serve": "vite preview",
     "test": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint ."
   },
   "engines": {
@@ -48,19 +48,16 @@
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@types/d3-array": "^3.0.2",
-    "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/coverage-v8": "^4.1.9",
-    "electron": "^22.0.0",
-    "electron-is-dev": "^2.0.0",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.6.0",
     "jsdom": "^27.4.0",
     "typescript-eslint": "^8.61.0",
-    "vite": "^8.0.16",
+    "vite": "8.0.13",
     "vitest": "^4.1.9"
   }
 }

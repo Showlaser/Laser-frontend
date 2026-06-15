@@ -5,8 +5,8 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 
 export default tseslint.config(
-  // Don't lint build output, deps, Cypress, or the Electron main process (CommonJS Node script)
-  { ignores: ["build", "node_modules", "cypress", "public/electron.js"] },
+  // Don't lint build output, deps, or Cypress
+  { ignores: ["build", "node_modules", "cypress"] },
   {
     files: ["src/**/*.{ts,tsx}"],
     extends: [js.configs.recommended, ...tseslint.configs.recommended],

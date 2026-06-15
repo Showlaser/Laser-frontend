@@ -2,6 +2,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
+  Box,
   Card,
   CardActionArea,
   CardContent,
@@ -15,7 +16,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { Box } from "@mui/system";
 import React, { useState } from "react";
 import { OnTrue } from "../on-true";
 type CardOverviewItems = {

@@ -100,7 +100,7 @@ export default function AnimationKeyFrameEditor() {
   );
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setTimeout>;
     if (playAnimation) {
       if (selectedAnimation === null) {
         return;
