@@ -20,9 +20,9 @@ type SelectListProps = {
   items: Item[];
   disabled?: boolean;
   onSelect: (uuidCollection: string[]) => void;
-  style?: any;
-  unCheckedCustomIcon?: any;
-  checkedCustomIcon?: any;
+  style?: React.CSSProperties;
+  unCheckedCustomIcon?: React.ReactNode;
+  checkedCustomIcon?: React.ReactNode;
   allowSelectMultiple?: boolean;
 };
 

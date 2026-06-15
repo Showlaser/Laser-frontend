@@ -35,7 +35,7 @@ import {
 } from "..";
 
 export type AnimationPatternProps = {
-  updatePatternProperty: (propertyName: string, value: any) => void;
+  updatePatternProperty: (propertyName: string, value: unknown) => void;
 };
 
 export default function AnimationPatternProperties({
@@ -57,13 +57,13 @@ export default function AnimationPatternProperties({
   const selectedAnimationPatternIndex = React.useContext(SelectedAnimationPatternIndexContext);
 
   const selectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames?.find(
-    (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
+    (kf) => kf.uuid === selectedKeyFrameUuid
   );
   const uiComponentsAreDisabled = selectedAnimationPattern === null;
 
   const updateKeyframeProperty = (value: number) => {
     const selectedKeyFrameIndex = selectedAnimationPattern?.animationPatternKeyFrames.findIndex(
-      (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
+      (kf) => kf.uuid === selectedKeyFrameUuid
     );
     if (selectedAnimation === null) {
       return;
@@ -87,8 +87,7 @@ export default function AnimationPatternProperties({
 
   const getPropertyValue = (property: string) => {
     const selectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames.find(
-      (kf: { uuid: any; propertyEdited: string }) =>
-        kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property
+      (kf) => kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property
     );
 
     return selectedKeyFrame?.propertyValue;
@@ -96,7 +95,7 @@ export default function AnimationPatternProperties({
 
   const getNextOrPreviousKeyframe = (getPrevious: boolean, property: string) => {
     const currentSelectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames.find(
-      (ak: { uuid: any }) => ak.uuid === selectedKeyFrameUuid
+      (ak) => ak.uuid === selectedKeyFrameUuid
     );
     if (currentSelectedKeyFrame === undefined) {
       onGetNextOrPreviousKeyframeError(property);
@@ -119,7 +118,7 @@ export default function AnimationPatternProperties({
     }
 
     const currentPositionInArray = keyFrames?.findIndex(
-      (ak: { uuid: any }) => ak.uuid === currentSelectedKeyFrame.uuid
+      (ak) => ak.uuid === currentSelectedKeyFrame.uuid
     );
     if (currentPositionInArray === -1) {
       onGetNextOrPreviousKeyframeError(property);
@@ -344,12 +343,7 @@ export default function AnimationPatternProperties({
               {selectedAnimationPattern?.animationPatternKeyFrames
                 .sort((a, b) => a.timeMs - b.timeMs)
                 ?.map(
-                  (keyFrame: {
-                    uuid: any;
-                    timeMs: number;
-                    propertyEdited: any;
-                    propertyValue: any;
-                  }) => (
+                  (keyFrame) => (
                     <ListItemButton
                       key={`${keyFrame.uuid}-points`}
                       onClick={() => {

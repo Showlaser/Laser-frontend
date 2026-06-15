@@ -36,7 +36,7 @@ export default function Account() {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitInProgress(true);
-    const formData: any = getFormDataFromEvent(e);
+    const formData = getFormDataFromEvent(e) as Record<string, string>;
     const passwordShouldBeUpdated =
       !stringIsEmpty(formData?.newPassword) && !stringIsEmpty(formData?.newPasswordRepeat);
 
@@ -49,15 +49,15 @@ export default function Account() {
       }
     }
 
-    updateUser(formData).then((result: any) => {
-      if (result.status === 401) {
+    updateUser(formData).then((result) => {
+      if (result?.status === 401) {
         showError(toastSubject.invalidPassword);
       }
       setSubmitInProgress(false);
     });
   };
 
-  const getSectionComponent = (text: string, children: any) => (
+  const getSectionComponent = (text: string, children: React.ReactNode) => (
     <Paper style={{ padding: "15px", marginBottom: "15px" }}>
       <h2
         style={{
