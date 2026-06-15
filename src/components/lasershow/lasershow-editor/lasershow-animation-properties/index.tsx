@@ -13,7 +13,7 @@ export default function LasershowAnimationProperties() {
     SelectedLasershowContext
   ) as SelectedLasershowContextType;
 
-  const updateLasershowAnimationProperty = (propertyName: string, value: any) => {
+  const updateLasershowAnimationProperty = (propertyName: string, value: unknown) => {
     if (selectedLasershowAnimation === null) {
       return;
     }
@@ -25,8 +25,9 @@ export default function LasershowAnimationProperties() {
       return;
     }
 
-    const updatedLasershow = { ...selectedLasershow } as any;
-    updatedLasershow.lasershowAnimations[selectedLasershowAnimationIndex][propertyName] = value;
+    const updatedLasershow = { ...selectedLasershow } as NonNullable<typeof selectedLasershow>;
+    (updatedLasershow.lasershowAnimations[selectedLasershowAnimationIndex] as Record<string, unknown>)[propertyName] =
+      value;
     setSelectedLasershow(updatedLasershow);
   };
 

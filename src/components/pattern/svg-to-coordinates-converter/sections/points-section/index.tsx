@@ -204,7 +204,7 @@ export default function PointsSection({
             checked={
               selectedPointsUuid.length === pattern.points.length && pattern.points.length > 0
             }
-            onClick={(e: any) => toggleAllPoints(e.target.checked)}
+            onClick={(e) => toggleAllPoints((e.target as HTMLInputElement).checked)}
           />
         </Tooltip>
         <Tooltip title="Add point">
@@ -230,7 +230,7 @@ export default function PointsSection({
         <List dense>
           {pointsToRender.map((point, index) => (
             <ListItem key={`points-section-${point.uuid}`}>
-              <ListItemIcon onClick={(e: any) => onToggle(point.uuid, e.target.checked)}>
+              <ListItemIcon onClick={(e) => onToggle(point.uuid, (e.target as HTMLInputElement).checked)}>
                 <Checkbox
                   edge="start"
                   checked={selectedPointsUuid.some((sp) => sp === point.uuid)}
@@ -315,8 +315,8 @@ export default function PointsSection({
         component="div"
         count={pattern?.points.length}
         page={currentPage}
-        onPageChange={(e: any, page: number) => setCurrentPage(page)}
-        onRowsPerPageChange={(e: any) => onRowsPerPageChange(Number(e.target.value))}
+        onPageChange={(_e, page) => setCurrentPage(page)}
+        onRowsPerPageChange={(e) => onRowsPerPageChange(Number(e.target.value))}
         rowsPerPage={itemsPerPage}
         rowsPerPageOptions={[25, 50]}
       />

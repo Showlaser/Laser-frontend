@@ -177,7 +177,7 @@ export function SharedTimeline({
     });
   };
 
-  const onCanvasClick = (e: any) => {
+  const onCanvasClick = (e: React.MouseEvent) => {
     const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -284,7 +284,7 @@ export function SharedTimeline({
     }
   };
 
-  const onMiddleMouseClick = (e: any) => {
+  const onMiddleMouseClick = (e: React.MouseEvent) => {
     if (e.button !== 1) {
       return;
     }
@@ -302,7 +302,7 @@ export function SharedTimeline({
     }
   };
 
-  const onScroll = (e: any) => {
+  const onScroll = (e: React.WheelEvent) => {
     if (e === undefined) {
       return;
     }

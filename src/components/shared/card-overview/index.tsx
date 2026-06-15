@@ -22,7 +22,7 @@ type CardOverviewItems = {
   uuid: string | null;
   name: string | null;
   image: string | null;
-  onCardClick: (item: any) => void;
+  onCardClick: (item: CardOverviewItems) => void;
 };
 
 type CardOverviewProps = {
@@ -46,8 +46,8 @@ export default function CardOverview({
 }: CardOverviewProps) {
   const [searchValue, setSearchValue] = useState<string>("");
 
-  const onKeyDown = (e: any) => {
-    if (e.kkey === "Escape") {
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
       closeOverview();
     }
   };

@@ -149,13 +149,13 @@ export default function AnimationKeyFrameEditor() {
     }
   };
 
-  const updatePatternProperty = (propertyName: string, value: any) => {
+  const updatePatternProperty = (propertyName: string, value: unknown) => {
     if (selectedAnimation?.animationPatterns === undefined) {
       return;
     }
 
-    const updatedAnimation: any = { ...selectedAnimation };
-    updatedAnimation.animationPatterns[selectedAnimationPatternIndex][propertyName] = value;
+    const updatedAnimation = { ...selectedAnimation } as NonNullable<typeof selectedAnimation>;
+    (updatedAnimation.animationPatterns[selectedAnimationPatternIndex] as Record<string, unknown>)[propertyName] = value;
     setSelectedAnimation(updatedAnimation);
   };
 

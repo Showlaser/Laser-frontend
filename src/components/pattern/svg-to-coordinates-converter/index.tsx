@@ -20,7 +20,7 @@ import PointsSection from "./sections/points-section";
 type Props = {
   patternNamesInUse: string[];
   uploadedFile: File;
-  setUploadedFile: (file: any) => void;
+  setUploadedFile: (file: File | undefined) => void;
   patternFromServer: Pattern | null;
   clearServerPattern: () => void;
 };
@@ -77,9 +77,9 @@ export default function PatternEditor({
     clearServerPattern();
   };
 
-  const updatePatternProperty = (property: string, value: any) => {
-    const updatedPattern: any = { ...pattern };
-    updatedPattern[property] = value;
+  const updatePatternProperty = (property: string, value: unknown) => {
+    const updatedPattern = { ...pattern };
+    (updatedPattern as Record<string, unknown>)[property] = value;
     setPattern(updatedPattern);
   };
 

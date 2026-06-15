@@ -243,7 +243,7 @@ export default function AnimationPatternKeyFrames() {
     });
   };
 
-  const onMiddleMouseClick = (e: any) => {
+  const onMiddleMouseClick = (e: React.MouseEvent) => {
     if (e.button !== 1) {
       return;
     }
@@ -294,7 +294,7 @@ export default function AnimationPatternKeyFrames() {
     setSelectedAnimation(updatedAnimation);
   };
 
-  const showMouseXAxis = (event: any) => {
+  const showMouseXAxis = (event: React.MouseEvent) => {
     if (!mouseIsHoveringOver) {
       setMouseIsHoveringOver(true);
     }
@@ -342,7 +342,7 @@ export default function AnimationPatternKeyFrames() {
     }
   };
 
-  const onCanvasClick = (event: any) => {
+  const onCanvasClick = (event: React.MouseEvent) => {
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     let x = event.clientX - rect.left;
