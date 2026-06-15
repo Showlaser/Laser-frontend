@@ -27,9 +27,13 @@ export default tseslint.config(
       // Pre-existing tech debt: surface as warnings instead of blocking the build.
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
-      // react-compiler advisory rules (react-hooks v7): keep visible but non-blocking for now.
-      "react-hooks/immutability": "warn",
-      "react-hooks/set-state-in-effect": "warn",
+      // Off by choice: react-hooks v7 ships React Compiler readiness rules. This project
+      // does not use the React Compiler, so they add little here. Re-enable (and fix the
+      // flagged spots) if the compiler is adopted later.
+      "react-hooks/immutability": "off",
+      "react-hooks/set-state-in-effect": "off",
+      // Keep exhaustive-deps active to catch real issues in new code; existing intentional
+      // cases are documented with targeted eslint-disable-next-line comments.
       "react-hooks/exhaustive-deps": "warn",
     },
   }
