@@ -43,7 +43,17 @@ const keyFramesPropertiesPosition = [
 ];
 
 // Vertical room (in px) the value curve uses around each property baseline.
-const keyFrameBandAmplitude = canvasPxSize * 0.07;
+// Just under half the gap between baselines so neighbouring bands never overlap.
+const keyFrameBandAmplitude = canvasPxSize * 0.09;
+
+// Each property maps its full allowed range onto the band, so the configured
+// maximum sits at the top of the band and the minimum at the bottom.
+const propertyValueRanges: Record<string, { min: number; max: number }> = {
+  [AnimationProperty.scale]: { min: 0.1, max: 10 },
+  [AnimationProperty.xOffset]: { min: -4000, max: 4000 },
+  [AnimationProperty.yOffset]: { min: -4000, max: 4000 },
+  [AnimationProperty.rotation]: { min: -360, max: 360 },
+};
 
 export default function AnimationPatternKeyFrames({
   deleteKeyframe,
@@ -95,22 +105,6 @@ export default function AnimationPatternKeyFrames({
 
   const { palette } = useTheme();
 
-  // Min/max of each property's keyframe values so the curve auto-fits the band.
-  // Computed every render (not memoized) because keyframe values are mutated in
-  // place, which would not change a memo dependency reference and would leave
-  // the bounds stale while editing a value.
-  const valueBounds: Record<string, { min: number; max: number }> = {};
-  const patternKeyFrames = selectedAnimationPattern?.animationPatternKeyFrames ?? [];
-  keyFramesPropertiesPosition.forEach(({ property }) => {
-    const values = patternKeyFrames
-      .filter((kf) => kf.propertyEdited === property)
-      .map((kf) => kf.propertyValue);
-    valueBounds[property] =
-      values.length > 0
-        ? { min: Math.min(...values), max: Math.max(...values) }
-        : { min: 0, max: 0 };
-  });
-
   const getKeyFrameCanvasPosition = (keyFrame: AnimationPatternKeyFrame) => {
     const baseline =
       keyFramesPropertiesPosition.find((p) => p.property === keyFrame.propertyEdited)?.yPosition ??
@@ -122,10 +116,12 @@ export default function AnimationPatternKeyFrames({
       80,
       canvasPxSize,
     );
-    const { min, max } = valueBounds[keyFrame.propertyEdited] ?? { min: 0, max: 0 };
-    const rawNormalized = max === min ? 0 : mapNumber(keyFrame.propertyValue, min, max, -1, 1);
-    // Clamp so a keyframe can never leave its band (and the canvas), even while
-    // its value is being dragged past the current min/max.
+    const range = propertyValueRanges[keyFrame.propertyEdited] ?? { min: 0, max: 1 };
+    const rawNormalized =
+      range.max === range.min
+        ? 0
+        : mapNumber(keyFrame.propertyValue, range.min, range.max, -1, 1);
+    // Clamp so a keyframe can never leave its band (and the canvas).
     const normalized = Math.max(-1, Math.min(1, rawNormalized));
     const y = baseline - normalized * keyFrameBandAmplitude;
     return { x, y };
