@@ -207,12 +207,12 @@ export function SharedTimeline({
       stepsToDrawMaxRange,
     );
     return timelineItems.find((ti) => {
+      const endTime =
+        ti.startTime +
+        (ti.duration === 0 ? timelineItemWidthWhenDurationIsZero : ti.duration);
       return (
-        numberIsBetweenOrEqual(
-          xMappedToTimelinePosition,
-          ti.startTime,
-          ti.duration === 0 ? ti.startTime + timelineItemWidthWhenDurationIsZero : ti.duration,
-        ) && ti.timelineId === timelineIdPressed
+        numberIsBetweenOrEqual(xMappedToTimelinePosition, ti.startTime, endTime) &&
+        ti.timelineId === timelineIdPressed
       );
     });
   };
