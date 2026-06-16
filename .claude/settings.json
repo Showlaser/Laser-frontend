@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx eslint *)",
+      "Bash(node -e ' *)",
+      "Bash(npm run *)",
+      "Bash(echo \"--- total tsc errors: $\\(npm run typecheck 2>&1)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('version:', p.version\\); console.log\\('react-scripts:', p.dependencies['react-scripts']||p.devDependencies&&p.devDependencies['react-scripts']\\); console.log\\('vite:', \\(p.devDependencies&&p.devDependencies.vite\\)||p.dependencies.vite\\)\")",
+      "Bash(node -e \"const t=require\\('./tsconfig.json'\\); console.log\\('resolveJsonModule:', t.compilerOptions && t.compilerOptions.resolveJsonModule\\)\")",
+      "Bash(ls vite.config.*)"
+    ]
+  }
+}

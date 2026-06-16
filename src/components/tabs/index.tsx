@@ -30,11 +30,7 @@ export default function TabSelector({
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={selectedTabId}
-          onChange={(e, value) => setSelectedTabId(value)}
-          aria-label="basic tabs example"
-        >
+        <Tabs value={selectedTabId} onChange={(e, value) => setSelectedTabId(value)}>
           {data.map((tab, index) => (
             <Tab key={tab.tabName + index} label={tab.tabName} {...a11yProps(index)} />
           ))}

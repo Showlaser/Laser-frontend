@@ -28,31 +28,37 @@ import {
   AnimationTimeLinePositionContext,
 } from "..";
 
-export default function AnimationPatternKeyFrames() {
+export type AnimationPatternKeyFramesProps = {
+  deleteKeyframe: (property: string) => void;
+};
+
+export default function AnimationPatternKeyFrames({
+  deleteKeyframe,
+}: AnimationPatternKeyFramesProps) {
   const [mouseIsHoveringOver, setMouseIsHoveringOver] = useState<boolean>(false);
 
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
-    SelectedAnimationContext
+    SelectedAnimationContext,
   ) as SelectedAnimationContextType;
 
   const { selectedAnimationPattern } = React.useContext(
-    SelectedAnimationPatternContext
+    SelectedAnimationPatternContext,
   ) as SelectedAnimationPatternContextType;
 
   const { timelinePositionMs, setTimelinePositionMs } = React.useContext(
-    AnimationTimeLinePositionContext
+    AnimationTimeLinePositionContext,
   ) as AnimationTimeLineContextType;
 
   const { selectableStepsIndex } = React.useContext(
-    AnimationSelectableStepsIndexContext
+    AnimationSelectableStepsIndexContext,
   ) as AnimationSelectableStepsIndexContextType;
 
   const { selectedKeyFrameUuid, setSelectedKeyFrameUuid } = React.useContext(
-    AnimationSelectedKeyFrameContext
+    AnimationSelectedKeyFrameContext,
   ) as AnimationSelectedKeyFrameContextType;
 
   const { playAnimation } = React.useContext(
-    AnimationPlayAnimationContext
+    AnimationPlayAnimationContext,
   ) as AnimationPlayAnimationContextType;
   const stepsToDrawMaxRange = React.useContext(AnimationStepsToDrawMaxRangeContext);
 
@@ -78,7 +84,7 @@ export default function AnimationPatternKeyFrames() {
 
   const selectedAnimationPatternIndex =
     selectedAnimation?.animationPatterns?.findIndex(
-      (ap: { uuid: string | undefined }) => ap.uuid === selectedAnimationPattern?.uuid
+      (ap: { uuid: string | undefined }) => ap.uuid === selectedAnimationPattern?.uuid,
     ) ?? 0;
 
   const { palette } = useTheme();
@@ -104,10 +110,10 @@ export default function AnimationPatternKeyFrames() {
         const istrue = numberIsBetweenOrEqual(
           keyframe.timeMs,
           correctedTimelinePosition,
-          correctedStepsToDrawMaxRange
+          correctedStepsToDrawMaxRange,
         );
         return istrue;
-      }
+      },
     );
 
     if (keyFramesInRange === undefined) {
@@ -143,7 +149,7 @@ export default function AnimationPatternKeyFrames() {
           selectedAnimationPattern.startTimeMs
         }ms)`,
         canvasPxSize / 16,
-        canvasPxSize / 2
+        canvasPxSize / 2,
       );
     }
   };
@@ -197,7 +203,7 @@ export default function AnimationPatternKeyFrames() {
 
   const getPropertyFromYPosition = (y: number) =>
     keyFramesPropertiesPosition.find((prop) =>
-      numberIsBetweenOrEqual(prop.yPosition, y - 20, y + 20)
+      numberIsBetweenOrEqual(prop.yPosition, y - 20, y + 20),
     )?.property ?? AnimationProperty.undefined;
 
   const prepareCanvas = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
@@ -220,7 +226,7 @@ export default function AnimationPatternKeyFrames() {
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     keyFrames.forEach((keyFrame) => {
       const keyFrameProperty = keyFramesPropertiesPosition.find(
-        (p) => p.property === keyFrame.propertyEdited
+        (p) => p.property === keyFrame.propertyEdited,
       );
       if (keyFrameProperty === undefined) {
         return;
@@ -232,7 +238,7 @@ export default function AnimationPatternKeyFrames() {
         correctedTimelinePosition,
         correctedStepsToDrawMaxRange,
         80,
-        canvasPxSize
+        canvasPxSize,
       );
 
       const isSelected = keyFrame.uuid === selectedKeyFrameUuid;
@@ -260,38 +266,16 @@ export default function AnimationPatternKeyFrames() {
         80,
         canvasPxSize,
         correctedTimelinePosition,
-        correctedStepsToDrawMaxRange
+        correctedStepsToDrawMaxRange,
       ) | 0;
-    const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
 
+    const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
     const keyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
     if (keyFrame === undefined) {
       return;
     }
 
     deleteKeyframe(keyFrame.uuid);
-  };
-
-  const deleteKeyframe = (keyFrameUuid: string) => {
-    if (selectedAnimation === null || keyFrameUuid.length < 5) {
-      return;
-    }
-
-    const updatedAnimation: Animation = { ...selectedAnimation };
-
-    if (!window.confirm("Are you sure you want to remove this keyframe")) {
-      return;
-    }
-
-    const indexToRemove = updatedAnimation.animationPatterns[
-      selectedAnimationPatternIndex
-    ].animationPatternKeyFrames.findIndex(
-      (kf: AnimationPatternKeyFrame) => kf.uuid === keyFrameUuid
-    );
-    updatedAnimation.animationPatterns[
-      selectedAnimationPatternIndex
-    ].animationPatternKeyFrames.splice(indexToRemove, 1);
-    setSelectedAnimation(updatedAnimation);
   };
 
   const showMouseXAxis = (event: React.MouseEvent) => {
@@ -322,7 +306,7 @@ export default function AnimationPatternKeyFrames() {
         80,
         canvasPxSize,
         correctedTimelinePosition,
-        correctedStepsToDrawMaxRange
+        correctedStepsToDrawMaxRange,
       ) | 0;
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
     const hoveredKeyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
@@ -337,7 +321,7 @@ export default function AnimationPatternKeyFrames() {
         mouseYPosition,
         `${hoveredKeyFrame.propertyEdited}: ${hoveredKeyFrame.propertyValue}`,
         "whitesmoke",
-        ctx
+        ctx,
       );
     }
   };
@@ -383,7 +367,7 @@ export default function AnimationPatternKeyFrames() {
           keyFrame.timeMs === x &&
           keyFrame.propertyEdited === propertyClicked;
         return thisKeyFrameIsClicked;
-      }
+      },
     );
 
     return selectedKeyFrame;

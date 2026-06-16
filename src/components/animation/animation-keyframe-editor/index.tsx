@@ -8,6 +8,7 @@ import TabSelector from "components/tabs";
 import {
   Animation,
   AnimationPattern,
+  AnimationPatternKeyFrame,
   getAnimationPatternDuration,
 } from "models/components/shared/animation";
 import {
@@ -155,7 +156,9 @@ export default function AnimationKeyFrameEditor() {
     }
 
     const updatedAnimation = { ...selectedAnimation } as NonNullable<typeof selectedAnimation>;
-    (updatedAnimation.animationPatterns[selectedAnimationPatternIndex] as Record<string, unknown>)[propertyName] = value;
+    (updatedAnimation.animationPatterns[selectedAnimationPatternIndex] as Record<string, unknown>)[
+      propertyName
+    ] = value;
     setSelectedAnimation(updatedAnimation);
   };
 
@@ -214,6 +217,44 @@ export default function AnimationKeyFrameEditor() {
     setTimelinePositionMs(updatedAnimation.animationPatterns[animationPatternIndex].startTimeMs);
   };
 
+  const deleteKeyframe = (keyFrameUuid: string) => {
+    if (selectedAnimation === null || keyFrameUuid.length < 5) {
+      return;
+    }
+
+    const updatedAnimation: Animation = { ...selectedAnimation };
+
+    if (!window.confirm("Are you sure you want to remove this keyframe")) {
+      return;
+    }
+
+    const keyFrames =
+      updatedAnimation.animationPatterns[selectedAnimationPatternIndex].animationPatternKeyFrames;
+    const indexToRemove = keyFrames.findIndex(
+      (kf: AnimationPatternKeyFrame) => kf.uuid === keyFrameUuid,
+    );
+    if (indexToRemove === -1) {
+      return;
+    }
+
+    const removedKeyFrame = keyFrames[indexToRemove];
+    keyFrames.splice(indexToRemove, 1);
+
+    const samePropertyKeyFrames = keyFrames
+      .filter(
+        (kf: AnimationPatternKeyFrame) => kf.propertyEdited === removedKeyFrame.propertyEdited,
+      )
+      .sort((a: AnimationPatternKeyFrame, b: AnimationPatternKeyFrame) => a.timeMs - b.timeMs);
+    const previousKeyFrame =
+      [...samePropertyKeyFrames]
+        .reverse()
+        .find((kf: AnimationPatternKeyFrame) => kf.timeMs <= removedKeyFrame.timeMs) ??
+      samePropertyKeyFrames[0];
+
+    setSelectedKeyFrameUuid(previousKeyFrame?.uuid ?? "");
+    setSelectedAnimation(updatedAnimation);
+  };
+
   return (
     <div>
       <Grid container direction="row" spacing={1} key={selectedKeyFrameUuid}>
@@ -229,7 +270,10 @@ export default function AnimationKeyFrameEditor() {
                   {
                     tabName: "Animation pattern properties",
                     tabChildren: (
-                      <AnimationPatternProperties updatePatternProperty={updatePatternProperty} />
+                      <AnimationPatternProperties
+                        updatePatternProperty={updatePatternProperty}
+                        deleteKeyframe={deleteKeyframe}
+                      />
                     ),
                   },
                 ]}
@@ -241,7 +285,7 @@ export default function AnimationKeyFrameEditor() {
           </Grid>,
         )}
         <Grid item xs>
-          {getWrapperContext(<AnimationPatternKeyFrames />)}
+          {getWrapperContext(<AnimationPatternKeyFrames deleteKeyframe={deleteKeyframe} />)}
         </Grid>
         <Grid item xs>
           <PointsDrawer

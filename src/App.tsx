@@ -5,7 +5,6 @@ import {
   useColorScheme,
 } from "@mui/material/styles";
 import type {} from "@mui/x-tree-view/themeAugmentation";
-import React from "react";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
@@ -63,6 +62,18 @@ const theme = extendTheme({
     MuiPaper: {
       defaultProps: {
         elevation: 4,
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        // Static neon glow on primary buttons to match the sidenav accent
+        // (#485cdb = rgb(72, 92, 219)). No animation.
+        containedPrimary: {
+          boxShadow: "0 0 12px rgba(72, 92, 219, 0.55)",
+          "&:hover": {
+            boxShadow: "0 0 18px rgba(72, 92, 219, 0.75)",
+          },
+        },
       },
     },
     MuiFormControlLabel: {

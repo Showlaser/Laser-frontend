@@ -14,6 +14,7 @@ import {
   Tooltip,
 } from "@mui/material";
 
+import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
@@ -36,34 +37,36 @@ import {
 
 export type AnimationPatternProps = {
   updatePatternProperty: (propertyName: string, value: unknown) => void;
+  deleteKeyframe: (property: string) => void;
 };
 
 export default function AnimationPatternProperties({
   updatePatternProperty,
+  deleteKeyframe,
 }: AnimationPatternProps) {
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
-    SelectedAnimationContext
+    SelectedAnimationContext,
   ) as SelectedAnimationContextType;
   const { selectedAnimationPattern } = React.useContext(
-    SelectedAnimationPatternContext
+    SelectedAnimationPatternContext,
   ) as SelectedAnimationPatternContextType;
   const { setTimelinePositionMs } = React.useContext(
-    AnimationTimeLinePositionContext
+    AnimationTimeLinePositionContext,
   ) as AnimationTimeLineContextType;
   const { selectedKeyFrameUuid, setSelectedKeyFrameUuid } = React.useContext(
-    AnimationSelectedKeyFrameContext
+    AnimationSelectedKeyFrameContext,
   ) as AnimationSelectedKeyFrameContextType;
 
   const selectedAnimationPatternIndex = React.useContext(SelectedAnimationPatternIndexContext);
 
   const selectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames?.find(
-    (kf) => kf.uuid === selectedKeyFrameUuid
+    (kf) => kf.uuid === selectedKeyFrameUuid,
   );
   const uiComponentsAreDisabled = selectedAnimationPattern === null;
 
   const updateKeyframeProperty = (value: number) => {
     const selectedKeyFrameIndex = selectedAnimationPattern?.animationPatternKeyFrames.findIndex(
-      (kf) => kf.uuid === selectedKeyFrameUuid
+      (kf) => kf.uuid === selectedKeyFrameUuid,
     );
     if (selectedAnimation === null) {
       return;
@@ -87,7 +90,7 @@ export default function AnimationPatternProperties({
 
   const getPropertyValue = (property: string) => {
     const selectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames.find(
-      (kf) => kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property
+      (kf) => kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property,
     );
 
     return selectedKeyFrame?.propertyValue;
@@ -95,7 +98,7 @@ export default function AnimationPatternProperties({
 
   const getNextOrPreviousKeyframe = (getPrevious: boolean, property: string) => {
     const currentSelectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames.find(
-      (ak) => ak.uuid === selectedKeyFrameUuid
+      (ak) => ak.uuid === selectedKeyFrameUuid,
     );
     if (currentSelectedKeyFrame === undefined) {
       onGetNextOrPreviousKeyframeError(property);
@@ -118,7 +121,7 @@ export default function AnimationPatternProperties({
     }
 
     const currentPositionInArray = keyFrames?.findIndex(
-      (ak) => ak.uuid === currentSelectedKeyFrame.uuid
+      (ak) => ak.uuid === currentSelectedKeyFrame.uuid,
     );
     if (currentPositionInArray === -1) {
       onGetNextOrPreviousKeyframeError(property);
@@ -205,6 +208,16 @@ export default function AnimationPatternProperties({
           </IconButton>
         </span>
       </Tooltip>
+      <Tooltip title={`Delete ${property} keyframe`}>
+        <span>
+          <IconButton
+            disabled={uiComponentsAreDisabled || selectedKeyFrame?.propertyEdited !== property}
+            onClick={() => deleteKeyframe(property)}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
     </span>
   );
 
@@ -218,7 +231,7 @@ export default function AnimationPatternProperties({
           value={i}
         >
           {i + 1}
-        </MenuItem>
+        </MenuItem>,
       );
     }
 
@@ -342,24 +355,20 @@ export default function AnimationPatternProperties({
             <List dense={true}>
               {selectedAnimationPattern?.animationPatternKeyFrames
                 .sort((a, b) => a.timeMs - b.timeMs)
-                ?.map(
-                  (keyFrame) => (
-                    <ListItemButton
-                      key={`${keyFrame.uuid}-points`}
-                      onClick={() => {
-                        setTimelinePositionMs(
-                          keyFrame.timeMs + selectedAnimationPattern.startTimeMs
-                        );
-                        setSelectedKeyFrameUuid(keyFrame.uuid);
-                      }}
-                    >
-                      <ListItemText
-                        primary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
-                        secondary={`${keyFrame.timeMs} ms`}
-                      />
-                    </ListItemButton>
-                  )
-                )}
+                ?.map((keyFrame) => (
+                  <ListItemButton
+                    key={`${keyFrame.uuid}-points`}
+                    onClick={() => {
+                      setTimelinePositionMs(keyFrame.timeMs + selectedAnimationPattern.startTimeMs);
+                      setSelectedKeyFrameUuid(keyFrame.uuid);
+                    }}
+                  >
+                    <ListItemText
+                      primary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
+                      secondary={`${keyFrame.timeMs} ms`}
+                    />
+                  </ListItemButton>
+                ))}
             </List>
           </AccordionDetails>
         </Accordion>
