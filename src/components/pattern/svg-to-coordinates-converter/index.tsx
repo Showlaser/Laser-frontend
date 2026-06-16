@@ -1,9 +1,11 @@
 import ClearIcon from "@mui/icons-material/Clear";
+import HistoryIcon from "@mui/icons-material/History";
 import SaveIcon from "@mui/icons-material/Save";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { Badge, Grid, SpeedDial, SpeedDialAction } from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
 import ToLaserProjector from "components/shared/to-laser-projector";
+import VersionHistoryModal from "components/shared/version-history-modal";
 import TabSelector, { TabSelectorData } from "components/tabs";
 import { Pattern, getPatternPlaceHolder } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
@@ -45,6 +47,7 @@ export default function PatternEditor({
   const [patternNameIsInUse, setPatternNameIsInUse] = React.useState<boolean>(false);
   const [pointsToDraw, setPointToDraw] = React.useState<Point[]>([]);
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
+  const [versionHistoryOpen, setVersionHistoryOpen] = React.useState<boolean>(false);
 
   const { isDirty, markSaved } = useUnsavedChanges(pattern, pattern.uuid);
   const { undo, redo } = useUndoRedo(pattern, setPattern, pattern.uuid);
@@ -121,7 +124,10 @@ export default function PatternEditor({
 
     await savePattern(patternToUpdate);
     localStorage.setItem("pattern", JSON.stringify(patternToUpdate));
-    addItemToVersionHistory("Pattern editor", patternToUpdate);
+    addItemToVersionHistory("Pattern editor", patternToUpdate, {
+      name: patternToUpdate.name,
+      image: patternToUpdate.image,
+    });
     showSuccess(toastSubject.changesSaved);
     setPattern(patternToUpdate);
     markSaved(patternToUpdate);
@@ -224,7 +230,19 @@ export default function PatternEditor({
             isDirty ? "Save pattern — unsaved changes (ctrl + s)" : "Save pattern (ctrl + s)"
           }
         />
+        <SpeedDialAction
+          key="sd-version-history"
+          icon={<HistoryIcon />}
+          onClick={() => setVersionHistoryOpen(true)}
+          tooltipTitle="Version history"
+        />
       </SpeedDial>
+      <VersionHistoryModal
+        open={versionHistoryOpen}
+        pageName="Pattern editor"
+        onClose={() => setVersionHistoryOpen(false)}
+        onRestore={(state) => setPattern(state as Pattern)}
+      />
     </Grid>
   );
 }

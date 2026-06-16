@@ -1,8 +1,10 @@
 import ClearIcon from "@mui/icons-material/Clear";
+import HistoryIcon from "@mui/icons-material/History";
 import SaveIcon from "@mui/icons-material/Save";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { Badge, Grid, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
+import VersionHistoryModal from "components/shared/version-history-modal";
 import { SharedTimeline } from "components/shared/shared-timeline";
 import TabSelector from "components/tabs";
 import {
@@ -27,6 +29,7 @@ import {
 import { playbackFrameRateInFps, selectableSteps } from "services/shared/config";
 import { useUnsavedChanges } from "services/shared/use-unsaved-changes";
 import { useUndoRedo } from "services/shared/use-undo-redo";
+import { addItemToVersionHistory } from "services/shared/version-history";
 import AnimationPatternKeyFrames from "./animation-keyframes";
 import AnimationManager from "./animation-manager";
 import AnimationPatternProperties from "./animation-pattern-properties";
@@ -82,6 +85,7 @@ export default function AnimationKeyFrameEditor() {
   const [selectedKeyFrameUuid, setSelectedKeyFrameUuid] = useState<string>("");
   const [playAnimation, setPlayAnimation] = useState<boolean>(false);
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
+  const [versionHistoryOpen, setVersionHistoryOpen] = useState<boolean>(false);
   const { isDirty, markSaved } = useUnsavedChanges(
     selectedAnimation,
     selectedAnimation?.uuid ?? null,
@@ -170,6 +174,11 @@ export default function AnimationKeyFrameEditor() {
     if (selectedAnimation !== null) {
       await saveAnimation(selectedAnimation);
       markSaved();
+      const canvas = document.getElementById("points-drawer-canvas") as HTMLCanvasElement | null;
+      addItemToVersionHistory("Animation", selectedAnimation, {
+        name: selectedAnimation.name,
+        image: canvas?.toDataURL("image/webp", 0.4),
+      });
     }
   };
 
@@ -414,8 +423,20 @@ export default function AnimationKeyFrameEditor() {
               isDirty ? "Save animation — unsaved changes (ctrl + s)" : "Save animation (ctrl + s)"
             }
           />
+          <SpeedDialAction
+            key="sd-version-history"
+            icon={<HistoryIcon />}
+            onClick={() => setVersionHistoryOpen(true)}
+            tooltipTitle="Version history"
+          />
         </SpeedDial>
       </Grid>
+      <VersionHistoryModal
+        open={versionHistoryOpen}
+        pageName="Animation"
+        onClose={() => setVersionHistoryOpen(false)}
+        onRestore={(state) => applyAnimation(state as Animation)}
+      />
     </div>
   );
 }

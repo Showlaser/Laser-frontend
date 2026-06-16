@@ -1,4 +1,5 @@
 import ClearIcon from "@mui/icons-material/Clear";
+import HistoryIcon from "@mui/icons-material/History";
 import SaveIcon from "@mui/icons-material/Save";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { Badge, Grid, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
@@ -19,6 +20,8 @@ import LasershowAnimationProperties from "./lasershow-animation-properties";
 import LasershowExport from "./lasershow-export";
 import LasershowManager from "./lasershow-manager";
 import LasershowOverview from "./lasershow-overview";
+import VersionHistoryModal from "components/shared/version-history-modal";
+import { addItemToVersionHistory } from "services/shared/version-history";
 
 export type LasershowTimeLineContextType = {
   timelinePositionMs: number;
@@ -60,6 +63,7 @@ export default function LasershowEditorContent() {
     useState<LasershowAnimation | null>(null);
   const [playLasershow, setPlayLasershow] = useState<boolean>(false);
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
+  const [versionHistoryOpen, setVersionHistoryOpen] = useState<boolean>(false);
   const { isDirty, markSaved } = useUnsavedChanges(
     selectedLasershow,
     selectedLasershow?.uuid ?? null,
@@ -159,6 +163,10 @@ export default function LasershowEditorContent() {
 
       await saveLasershow(lasershowToUpdate);
       markSaved();
+      addItemToVersionHistory("Lasershow editor", lasershowToUpdate, {
+        name: lasershowToUpdate.name,
+        image: lasershowToUpdate.image,
+      });
     }
   };
 
@@ -394,8 +402,20 @@ export default function LasershowEditorContent() {
               isDirty ? "Save lasershow — unsaved changes (ctrl + s)" : "Save lasershow (ctrl + s)"
             }
           />
+          <SpeedDialAction
+            key="sd-version-history"
+            icon={<HistoryIcon />}
+            onClick={() => setVersionHistoryOpen(true)}
+            tooltipTitle="Version history"
+          />
         </SpeedDial>
       </Grid>
+      <VersionHistoryModal
+        open={versionHistoryOpen}
+        pageName="Lasershow editor"
+        onClose={() => setVersionHistoryOpen(false)}
+        onRestore={(state) => applyLasershow(state as Lasershow)}
+      />
     </>
   );
 }
