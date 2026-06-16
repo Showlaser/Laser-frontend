@@ -217,6 +217,24 @@ export default function AnimationKeyFrameEditor() {
     setTimelinePositionMs(updatedAnimation.animationPatterns[animationPatternIndex].startTimeMs);
   };
 
+  const onTimelineItemMove = (uuid: string, newStartTimeMs: number, newTimelineId: number) => {
+    if (selectedAnimation === null) {
+      return;
+    }
+
+    const updatedAnimation = { ...selectedAnimation } as Animation;
+    const index = updatedAnimation.animationPatterns.findIndex((ap) => ap.uuid === uuid);
+    if (index === -1) {
+      return;
+    }
+
+    updatedAnimation.animationPatterns[index].startTimeMs = newStartTimeMs;
+    updatedAnimation.animationPatterns[index].timelineId = newTimelineId;
+    setSelectedAnimation(updatedAnimation);
+    setSelectedAnimationPattern(updatedAnimation.animationPatterns[index]);
+    setTimelinePositionMs(newStartTimeMs);
+  };
+
   const deleteKeyframe = (keyFrameUuid: string) => {
     if (selectedAnimation === null || keyFrameUuid.length < 5) {
       return;
@@ -308,6 +326,7 @@ export default function AnimationKeyFrameEditor() {
                 setSelectableStepsIndex={setSelectableStepsIndex}
                 onTimelineItemDelete={onTimelineItemDelete}
                 onMoveTimelineItem={onMoveTimelineItem}
+                onTimelineItemMove={onTimelineItemMove}
                 timelineItems={selectedAnimation.animationPatterns.map((ap) => ({
                   uuid: ap.uuid,
                   name: ap.name,

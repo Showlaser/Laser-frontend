@@ -222,6 +222,24 @@ export default function LasershowEditorContent() {
     );
   };
 
+  const onTimelineItemMove = (uuid: string, newStartTimeMs: number, newTimelineId: number) => {
+    if (selectedLasershow === null) {
+      return;
+    }
+
+    const updatedLasershow = { ...selectedLasershow } as Lasershow;
+    const index = updatedLasershow.lasershowAnimations.findIndex((la) => la.uuid === uuid);
+    if (index === -1) {
+      return;
+    }
+
+    updatedLasershow.lasershowAnimations[index].startTimeMs = newStartTimeMs;
+    updatedLasershow.lasershowAnimations[index].timelineId = newTimelineId;
+    setSelectedLasershow(updatedLasershow);
+    setSelectedLasershowAnimation(updatedLasershow.lasershowAnimations[index]);
+    setTimelinePositionMs(newStartTimeMs);
+  };
+
   return (
     <>
       <Grid container direction="row" spacing={1}>
@@ -279,6 +297,7 @@ export default function LasershowEditorContent() {
                 setSelectableStepsIndex={setSelectableStepsIndex}
                 onTimelineItemDelete={deleteSelectedLasershowAnimations}
                 onMoveTimelineItem={onMoveTimelineItem}
+                onTimelineItemMove={onTimelineItemMove}
                 timelineItems={selectedLasershow.lasershowAnimations.map((la) => ({
                   uuid: la.uuid,
                   name: la.name,

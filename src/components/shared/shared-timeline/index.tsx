@@ -30,6 +30,16 @@ export type SharedTimelineItem = {
   timelineId: number;
 };
 
+type DragState = {
+  uuid: string;
+  startMouseX: number;
+  startMouseY: number;
+  originalStartTime: number;
+  previewStartTime: number;
+  previewTimelineId: number;
+  hasMoved: boolean;
+};
+
 export type SharedTimelineProps = {
   selectedItemUuid: string;
   onTimelineItemClick: (clickedUuid: string) => void;
@@ -43,6 +53,7 @@ export type SharedTimelineProps = {
   timelineItems: SharedTimelineItem[];
   onTimelineItemDelete?: (uuid: string) => void;
   onMoveTimelineItem?: (forward: boolean) => void;
+  onTimelineItemMove?: (uuid: string, newStartTimeMs: number, newTimelineId: number) => void;
 };
 
 export function SharedTimeline({
@@ -58,6 +69,7 @@ export function SharedTimeline({
   timelineItems,
   onTimelineItemDelete,
   onMoveTimelineItem,
+  onTimelineItemMove,
 }: SharedTimelineProps) {
   const canvasHeight = window.innerHeight / 6;
   const canvasWidth = window.innerWidth - 60;
@@ -82,7 +94,17 @@ export function SharedTimeline({
 
   const [screenWidthPx, setScreenWidthPx] = useState<number>(window.innerWidth);
   const [screenHeightPx, setScreenHeightPx] = useState<number>(window.innerHeight);
+  const [dragState, setDragState] = useState<DragState | null>(null);
   const timelines = getTimelineData();
+
+  const getMousePosition = (e: React.MouseEvent) => {
+    const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
+    const rect = canvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  };
+
+  const pixelsToMs = (deltaPx: number) =>
+    (deltaPx * selectableSteps[selectableStepsIndex]) / (canvasWidth / 10);
 
   useEffect(() => {
     const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
@@ -100,6 +122,7 @@ export function SharedTimeline({
     selectedItemUuid,
     selectableStepsIndex,
     timelineItems,
+    dragState,
   ]);
 
   const draw = (ctx: CanvasRenderingContext2D) => {
@@ -143,13 +166,6 @@ export function SharedTimeline({
     }
   };
 
-  const onItemClick = (x: number, y: number) => {
-    const clickedTimelineItem = getTimelineItemFromMouseClick(x, y);
-    if (clickedTimelineItem !== undefined) {
-      onTimelineItemClick(clickedTimelineItem.uuid);
-    }
-  };
-
   const getTimelineItemFromMouseClick = (x: number, y: number): SharedTimelineItem | undefined => {
     const numberOfTimeLines = timelines.length;
     const timelineIdPressed = getTimelineIdPressed(
@@ -178,14 +194,6 @@ export function SharedTimeline({
         ) && ti.timelineId === timelineIdPressed
       );
     });
-  };
-
-  const onCanvasClick = (e: React.MouseEvent) => {
-    const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    onItemClick(x, y);
   };
 
   const getItemsToDrawInTimeline = (): SharedTimelineItem[] => {
@@ -218,17 +226,29 @@ export function SharedTimeline({
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
     const timelineItemsInRange = getItemsToDrawInTimeline();
-    if (timelineItemsInRange === undefined || timelineItemsInRange.length === 0) {
+    // Keep the dragged item visible even when its preview leaves the range.
+    const draggedItem =
+      dragState !== null ? timelineItems.find((ti) => ti.uuid === dragState.uuid) : undefined;
+    if (
+      draggedItem !== undefined &&
+      !timelineItemsInRange.some((ti) => ti.uuid === draggedItem.uuid)
+    ) {
+      timelineItemsInRange.push(draggedItem);
+    }
+
+    if (timelineItemsInRange.length === 0) {
       return;
     }
 
-    const timelineItemsInRangeCount = timelineItemsInRange?.length ?? 0;
     const numberOfTimeLines = timelines.length;
-    for (let i = 0; i < timelineItemsInRangeCount; i++) {
+    for (let i = 0; i < timelineItemsInRange.length; i++) {
       const timelineItem = timelineItemsInRange[i];
+      const isDragged = dragState?.uuid === timelineItem.uuid;
+      const itemStartTime = isDragged ? dragState.previewStartTime : timelineItem.startTime;
+      const itemTimelineId = isDragged ? dragState.previewTimelineId : timelineItem.timelineId;
+
       const y =
-        ((canvasHeight - timelineNumbersHeight) / numberOfTimeLines) *
-        (timelineItem?.timelineId ?? 0);
+        ((canvasHeight - timelineNumbersHeight) / numberOfTimeLines) * (itemTimelineId ?? 0);
 
       // Use a local minimum width so zero-duration items stay clickable
       // without mutating the shared timeline item data.
@@ -241,9 +261,10 @@ export function SharedTimeline({
         (canvasWidth / 10) * (itemDuration / selectableSteps[selectableStepsIndex]);
       const xPosition =
         (canvasWidth / 10) *
-        ((timelineItem.startTime - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
+        ((itemStartTime - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
 
-      const rectangleColor = selectedItemUuid === timelineItem.uuid ? "#6370c2" : "#485cdb";
+      const rectangleColor =
+        selectedItemUuid === timelineItem.uuid || isDragged ? "#6370c2" : "#485cdb";
       drawRoundedRectangleWithText(
         xPosition,
         y + 5,
@@ -289,21 +310,95 @@ export function SharedTimeline({
     }
   };
 
-  const onMiddleMouseClick = (e: React.MouseEvent) => {
-    if (e.button !== 1) {
+  const onCanvasMouseDown = (e: React.MouseEvent) => {
+    const { x, y } = getMousePosition(e);
+
+    // Middle mouse button deletes the item under the cursor.
+    if (e.button === 1) {
+      e.preventDefault();
+      const clickedTimelineItem = getTimelineItemFromMouseClick(x, y);
+      if (clickedTimelineItem !== undefined) {
+        onTimelineItemDelete?.(clickedTimelineItem.uuid);
+      }
       return;
     }
 
-    e.preventDefault();
-
-    const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    if (e.button !== 0) {
+      return;
+    }
 
     const clickedTimelineItem = getTimelineItemFromMouseClick(x, y);
-    if (clickedTimelineItem !== undefined) {
-      onTimelineItemDelete?.(clickedTimelineItem.uuid);
+    if (clickedTimelineItem === undefined) {
+      return;
+    }
+
+    setDragState({
+      uuid: clickedTimelineItem.uuid,
+      startMouseX: x,
+      startMouseY: y,
+      originalStartTime: clickedTimelineItem.startTime,
+      previewStartTime: clickedTimelineItem.startTime,
+      previewTimelineId: clickedTimelineItem.timelineId,
+      hasMoved: false,
+    });
+  };
+
+  const onCanvasMouseMove = (e: React.MouseEvent) => {
+    const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
+    const { x, y } = getMousePosition(e);
+
+    if (dragState === null) {
+      canvas.style.cursor =
+        getTimelineItemFromMouseClick(x, y) !== undefined ? "grab" : "default";
+      return;
+    }
+
+    canvas.style.cursor = "grabbing";
+    const newStartTimeMs = Math.max(
+      0,
+      Math.round((dragState.originalStartTime + pixelsToMs(x - dragState.startMouseX)) / 10) * 10,
+    );
+    const timelineIdUnderMouse = getTimelineIdPressed(
+      timelines.length,
+      canvasHeight,
+      y,
+      timelineItemHeightOnCanvas,
+    );
+    const hasMoved =
+      dragState.hasMoved ||
+      Math.abs(x - dragState.startMouseX) > 3 ||
+      Math.abs(y - dragState.startMouseY) > 3;
+
+    setDragState({
+      ...dragState,
+      previewStartTime: newStartTimeMs,
+      previewTimelineId: timelineIdUnderMouse ?? dragState.previewTimelineId,
+      hasMoved,
+    });
+  };
+
+  const onCanvasMouseUp = () => {
+    if (dragState === null) {
+      return;
+    }
+
+    const { uuid, hasMoved, previewStartTime, previewTimelineId } = dragState;
+    setDragState(null);
+
+    // A press without movement is a plain selection click.
+    if (!hasMoved) {
+      onTimelineItemClick(uuid);
+      return;
+    }
+
+    onTimelineItemMove?.(uuid, previewStartTime, previewTimelineId);
+  };
+
+  const onCanvasMouseLeave = () => {
+    const canvas = document.getElementById("timeline-canvas") as HTMLCanvasElement;
+    canvas.style.cursor = "default";
+    if (dragState !== null) {
+      setDragState(null);
     }
   };
 
@@ -384,10 +479,12 @@ export function SharedTimeline({
       </Grid>
       <canvas
         onWheel={onScroll}
-        onClick={onCanvasClick}
         id="timeline-canvas"
         onKeyDown={onKeyDown}
-        onMouseDown={onMiddleMouseClick}
+        onMouseDown={onCanvasMouseDown}
+        onMouseMove={onCanvasMouseMove}
+        onMouseUp={onCanvasMouseUp}
+        onMouseLeave={onCanvasMouseLeave}
         tabIndex={0}
       />
       <LinearProgress
