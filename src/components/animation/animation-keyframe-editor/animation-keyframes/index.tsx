@@ -13,9 +13,12 @@ import {
   SelectedAnimationPatternContextType,
 } from "pages/animation-editor";
 import React, { useCallback, useEffect, useState } from "react";
-import { propertiesSettings } from "services/logic/animation-logic";
+import {
+  getAnimationPropertyColor,
+  propertiesSettings,
+} from "services/logic/animation-logic";
 import { canvasPxSize, selectableSteps } from "services/shared/config";
-import { createGuid, mapNumber, numberIsBetweenOrEqual } from "services/shared/math";
+import { createGuid, mapNumber } from "services/shared/math";
 import {
   AnimationPlayAnimationContext,
   AnimationPlayAnimationContextType,
@@ -31,6 +34,16 @@ import {
 export type AnimationPatternKeyFramesProps = {
   deleteKeyframe: (property: string) => void;
 };
+
+const keyFramesPropertiesPosition = [
+  { property: AnimationProperty.scale, yPosition: canvasPxSize * 0.2 },
+  { property: AnimationProperty.xOffset, yPosition: canvasPxSize * 0.4 },
+  { property: AnimationProperty.yOffset, yPosition: canvasPxSize * 0.6 },
+  { property: AnimationProperty.rotation, yPosition: canvasPxSize * 0.8 },
+];
+
+// Vertical room (in px) the value curve uses around each property baseline.
+const keyFrameBandAmplitude = canvasPxSize * 0.07;
 
 export default function AnimationPatternKeyFrames({
   deleteKeyframe,
@@ -62,13 +75,6 @@ export default function AnimationPatternKeyFrames({
   ) as AnimationPlayAnimationContextType;
   const stepsToDrawMaxRange = React.useContext(AnimationStepsToDrawMaxRangeContext);
 
-  const keyFramesPropertiesPosition = [
-    { property: AnimationProperty.scale, yPosition: canvasPxSize * 0.2 },
-    { property: AnimationProperty.xOffset, yPosition: canvasPxSize * 0.4 },
-    { property: AnimationProperty.yOffset, yPosition: canvasPxSize * 0.6 },
-    { property: AnimationProperty.rotation, yPosition: canvasPxSize * 0.8 },
-  ];
-
   const getCorrectedTimelinePosition = () => {
     const correctedPosition = timelinePositionMs - (selectedAnimationPattern?.startTimeMs ?? 0);
     if (correctedPosition < 0) {
@@ -89,7 +95,59 @@ export default function AnimationPatternKeyFrames({
 
   const { palette } = useTheme();
 
-  const drawTimeStepsAndKeyframes = (canvas: HTMLCanvasElement) => {
+  // Min/max of each property's keyframe values so the curve auto-fits the band.
+  const valueBounds = React.useMemo(() => {
+    const bounds: Record<string, { min: number; max: number }> = {};
+    const keyFrames = selectedAnimationPattern?.animationPatternKeyFrames ?? [];
+    keyFramesPropertiesPosition.forEach(({ property }) => {
+      const values = keyFrames
+        .filter((kf) => kf.propertyEdited === property)
+        .map((kf) => kf.propertyValue);
+      bounds[property] =
+        values.length > 0
+          ? { min: Math.min(...values), max: Math.max(...values) }
+          : { min: 0, max: 0 };
+    });
+    return bounds;
+  }, [selectedAnimationPattern]);
+
+  const getKeyFrameCanvasPosition = (keyFrame: AnimationPatternKeyFrame) => {
+    const baseline =
+      keyFramesPropertiesPosition.find((p) => p.property === keyFrame.propertyEdited)?.yPosition ??
+      0;
+    const x = mapNumber(
+      keyFrame.timeMs,
+      correctedTimelinePosition,
+      correctedStepsToDrawMaxRange,
+      80,
+      canvasPxSize,
+    );
+    const { min, max } = valueBounds[keyFrame.propertyEdited] ?? { min: 0, max: 0 };
+    const normalized = max === min ? 0 : mapNumber(keyFrame.propertyValue, min, max, -1, 1);
+    const y = baseline - normalized * keyFrameBandAmplitude;
+    return { x, y };
+  };
+
+  const getKeyFrameNearMouse = (mouseX: number, mouseY: number, radius = 9) => {
+    const keyFrames = selectedAnimationPattern?.animationPatternKeyFrames ?? [];
+    let nearest: AnimationPatternKeyFrame | undefined;
+    let nearestDistance = radius;
+    keyFrames.forEach((keyFrame) => {
+      const { x, y } = getKeyFrameCanvasPosition(keyFrame);
+      if (x < 80 || x > canvasPxSize) {
+        return;
+      }
+
+      const distance = Math.hypot(mouseX - x, mouseY - y);
+      if (distance <= nearestDistance) {
+        nearestDistance = distance;
+        nearest = keyFrame;
+      }
+    });
+    return nearest;
+  };
+
+  const drawTimeSteps = (canvas: HTMLCanvasElement) => {
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     ctx.beginPath();
     ctx.font = "12px sans-serif";
@@ -104,35 +162,65 @@ export default function AnimationPatternKeyFrames({
       ctx.fillText(i.toString(), xPos, canvasPxSize - 3);
       xPos += canvasPxSize / 13;
     }
-
-    const keyFramesInRange = selectedAnimationPattern?.animationPatternKeyFrames.filter(
-      (keyframe) => {
-        const istrue = numberIsBetweenOrEqual(
-          keyframe.timeMs,
-          correctedTimelinePosition,
-          correctedStepsToDrawMaxRange,
-        );
-        return istrue;
-      },
-    );
-
-    if (keyFramesInRange === undefined) {
-      return;
-    }
-
-    drawKeyFrames(keyFramesInRange, canvas);
   };
 
   const drawProperties = (canvas: HTMLCanvasElement) => {
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-    ctx.fillStyle = "whitesmoke";
 
     drawLine(80, canvasPxSize, 80, 0, ctx);
     keyFramesPropertiesPosition.forEach((keyframe) => {
       drawLine(80, keyframe.yPosition, canvasPxSize, keyframe.yPosition, ctx);
       ctx.font = "16px sans-serif";
+      ctx.fillStyle = getAnimationPropertyColor(keyframe.property);
       ctx.fillText(keyframe.property, 5, keyframe.yPosition);
     });
+  };
+
+  const drawPropertyCurves = (canvas: HTMLCanvasElement) => {
+    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    const keyFrames = selectedAnimationPattern?.animationPatternKeyFrames ?? [];
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(80, 0, canvasPxSize - 80, canvasPxSize);
+    ctx.clip();
+
+    keyFramesPropertiesPosition.forEach(({ property }) => {
+      const color = getAnimationPropertyColor(property);
+      const propertyKeyFrames = keyFrames
+        .filter((kf) => kf.propertyEdited === property)
+        .sort((a, b) => a.timeMs - b.timeMs)
+        .map((keyFrame) => ({ keyFrame, ...getKeyFrameCanvasPosition(keyFrame) }));
+
+      if (propertyKeyFrames.length > 1) {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        propertyKeyFrames.forEach((point, index) =>
+          index === 0 ? ctx.moveTo(point.x, point.y) : ctx.lineTo(point.x, point.y),
+        );
+        ctx.stroke();
+      }
+
+      propertyKeyFrames.forEach(({ keyFrame, x, y }) => {
+        if (x < 80 || x > canvasPxSize) {
+          return;
+        }
+
+        const isSelected = keyFrame.uuid === selectedKeyFrameUuid;
+        ctx.beginPath();
+        ctx.arc(x, y, isSelected ? 8 : 6, 0, 2 * Math.PI);
+        ctx.fillStyle = isSelected ? palette.primary.main : color;
+        ctx.fill();
+        if (isSelected) {
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = "#ffffff";
+          ctx.stroke();
+        }
+      });
+    });
+
+    ctx.restore();
   };
 
   const drawOutsideRange = (canvas: HTMLCanvasElement) => {
@@ -177,16 +265,16 @@ export default function AnimationPatternKeyFrames({
     }
 
     drawProperties(canvas);
-    drawTimeStepsAndKeyframes(canvas);
+    drawTimeSteps(canvas);
+    drawPropertyCurves(canvas);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- captures the current draw helpers intentionally
   }, [
     selectedAnimationPattern,
     timelinePositionMs,
     playAnimation,
     selectableStepsIndex,
-    drawProperties,
-    drawTimeStepsAndKeyframes,
     selectedKeyFrameUuid,
+    valueBounds,
   ]);
 
   useEffect(() => {
@@ -203,7 +291,7 @@ export default function AnimationPatternKeyFrames({
 
   const getPropertyFromYPosition = (y: number) =>
     keyFramesPropertiesPosition.find((prop) =>
-      numberIsBetweenOrEqual(prop.yPosition, y - 20, y + 20),
+      Math.abs(prop.yPosition - y) <= keyFrameBandAmplitude + 12,
     )?.property ?? AnimationProperty.undefined;
 
   const prepareCanvas = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
@@ -217,38 +305,6 @@ export default function AnimationPatternKeyFrames({
     return canvas;
   };
 
-  const drawKeyFrames = (keyFrames: AnimationPatternKeyFrame[], canvas: HTMLCanvasElement) => {
-    if (keyFrames.length === 0) {
-      return;
-    }
-
-    const stepsCorrection = [-2, 1, 1, 1, 1];
-    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-    keyFrames.forEach((keyFrame) => {
-      const keyFrameProperty = keyFramesPropertiesPosition.find(
-        (p) => p.property === keyFrame.propertyEdited,
-      );
-      if (keyFrameProperty === undefined) {
-        return;
-      }
-
-      const y = keyFrameProperty.yPosition;
-      const x = mapNumber(
-        keyFrame.timeMs,
-        correctedTimelinePosition,
-        correctedStepsToDrawMaxRange,
-        80,
-        canvasPxSize,
-      );
-
-      const isSelected = keyFrame.uuid === selectedKeyFrameUuid;
-      ctx.beginPath();
-      ctx.arc(x + stepsCorrection[selectableStepsIndex], y, isSelected ? 8 : 6, 0, 2 * Math.PI);
-      ctx.fillStyle = isSelected ? palette.primary.main : "white";
-      ctx.fill();
-    });
-  };
-
   const onMiddleMouseClick = (e: React.MouseEvent) => {
     if (e.button !== 1) {
       return;
@@ -258,19 +314,10 @@ export default function AnimationPatternKeyFrames({
 
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
-    const mouseXPosition = e.clientX - rect.left;
-    const mouseYPosition = e.clientY - rect.top;
-    const mappedX: number =
-      mapNumber(
-        mouseXPosition,
-        80,
-        canvasPxSize,
-        correctedTimelinePosition,
-        correctedStepsToDrawMaxRange,
-      ) | 0;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
 
-    const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
-    const keyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
+    const keyFrame = getKeyFrameNearMouse(mouseX, mouseY);
     if (keyFrame === undefined) {
       return;
     }
@@ -300,21 +347,22 @@ export default function AnimationPatternKeyFrames({
       return;
     }
 
-    const mappedX: number =
-      mapNumber(
-        mouseXPosition,
-        80,
-        canvasPxSize,
-        correctedTimelinePosition,
-        correctedStepsToDrawMaxRange,
-      ) | 0;
-    const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
-    const hoveredKeyFrame = getKeyFrameFromMousePosition(mappedXToStep, mouseYPosition);
-
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    ctx.beginPath();
     drawLine(mouseXPosition, 0, mouseXPosition, canvasPxSize, ctx);
+
+    const hoveredKeyFrame = getKeyFrameNearMouse(mouseXPosition, mouseYPosition);
     if (hoveredKeyFrame === undefined) {
-      writeText(mouseXPosition, mouseYPosition, mappedXToStep.toString() + " x", "whitesmoke", ctx);
+      const mappedX: number =
+        mapNumber(
+          mouseXPosition,
+          80,
+          canvasPxSize,
+          correctedTimelinePosition,
+          correctedStepsToDrawMaxRange,
+        ) | 0;
+      const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
+      writeText(mouseXPosition, mouseYPosition, `${mappedXToStep} ms`, "whitesmoke", ctx);
     } else {
       writeText(
         mouseXPosition,
@@ -329,7 +377,17 @@ export default function AnimationPatternKeyFrames({
   const onCanvasClick = (event: React.MouseEvent) => {
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
-    let x = event.clientX - rect.left;
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    const clickedKeyFrame = getKeyFrameNearMouse(mouseX, mouseY);
+    if (clickedKeyFrame !== undefined) {
+      setTimelinePositionMs(clickedKeyFrame.timeMs + (selectedAnimationPattern?.startTimeMs ?? 0));
+      setSelectedKeyFrameUuid(clickedKeyFrame.uuid);
+      return;
+    }
+
+    let x = mouseX;
     if (x < 85) {
       x = 85;
     }
@@ -337,40 +395,13 @@ export default function AnimationPatternKeyFrames({
     const mappedX: number =
       mapNumber(x, 80, canvasPxSize, correctedTimelinePosition, correctedStepsToDrawMaxRange) | 0;
     const mappedXToStep = mapXPositionToStepsXPosition(mappedX);
-
-    const y = event.clientY - rect.top;
-    const propertyClicked = getPropertyFromYPosition(y);
-
-    if (propertyClicked === undefined) {
+    const propertyClicked = getPropertyFromYPosition(mouseY);
+    if (propertyClicked === AnimationProperty.undefined) {
       return;
     }
 
-    const selectedKeyFrame = getKeyFrameFromMousePosition(mappedXToStep, y);
-    if (selectedKeyFrame === undefined) {
-      createNewKeyframe(y, mappedXToStep);
-      setTimelinePositionMs(mappedXToStep + (selectedAnimationPattern?.startTimeMs ?? 0));
-      return;
-    }
-
-    setTimelinePositionMs(selectedKeyFrame.timeMs + (selectedAnimationPattern?.startTimeMs ?? 0));
-    setSelectedKeyFrameUuid(selectedKeyFrame.uuid);
-  };
-
-  const getKeyFrameFromMousePosition = (x: number, y: number) => {
-    const propertyClicked = getPropertyFromYPosition(y);
-
-    const selectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames.find(
-      (keyFrame) => {
-        const min = (x - selectableSteps[selectableStepsIndex] / 5 - 1) | 0;
-        const thisKeyFrameIsClicked =
-          keyFrame.timeMs >= min &&
-          keyFrame.timeMs === x &&
-          keyFrame.propertyEdited === propertyClicked;
-        return thisKeyFrameIsClicked;
-      },
-    );
-
-    return selectedKeyFrame;
+    createNewKeyframe(mouseY, mappedXToStep);
+    setTimelinePositionMs(mappedXToStep + (selectedAnimationPattern?.startTimeMs ?? 0));
   };
 
   const mapXPositionToStepsXPosition = (x: number) => {

@@ -29,6 +29,7 @@ import {
 import React from "react";
 import { numberOfTimeLines } from "services/shared/config";
 import PropertyControl from "components/shared/property-control";
+import { getAnimationPropertyColor } from "services/logic/animation-logic";
 import {
   AnimationSelectedKeyFrameContext,
   AnimationSelectedKeyFrameContextType,
@@ -361,6 +362,16 @@ export default function AnimationPatternProperties({
                       setSelectedKeyFrameUuid(keyFrame.uuid);
                     }}
                   >
+                    <span
+                      style={{
+                        width: "10px",
+                        height: "10px",
+                        borderRadius: "50%",
+                        marginRight: "8px",
+                        flexShrink: 0,
+                        backgroundColor: getAnimationPropertyColor(keyFrame.propertyEdited),
+                      }}
+                    />
                     <ListItemText
                       primary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
                       secondary={`${keyFrame.timeMs} ms`}

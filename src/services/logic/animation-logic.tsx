@@ -63,6 +63,18 @@ export const propertiesSettings = [
   },
 ];
 
+// Shared colour per animation property so the keyframe graph and the
+// keyframe list use the same colour coding.
+export const animationPropertyColors: Record<string, string> = {
+  [AnimationProperty.scale]: "#4caf50",
+  [AnimationProperty.xOffset]: "#42a5f5",
+  [AnimationProperty.yOffset]: "#ffa726",
+  [AnimationProperty.rotation]: "#ec407a",
+};
+
+export const getAnimationPropertyColor = (property: string) =>
+  animationPropertyColors[property] ?? "#ffffff";
+
 export const getAnimationDuration = (animation: Animation | null) => {
   if (animation === null) {
     return 0;
