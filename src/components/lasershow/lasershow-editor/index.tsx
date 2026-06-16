@@ -13,6 +13,7 @@ import { getAnimationDuration, getPointsToDrawFromAnimation } from "services/log
 import { getLasershowDuration, saveLasershow } from "services/logic/lasershow-logic";
 import { canvasPxSize, playbackFrameRateInFps, selectableSteps } from "services/shared/config";
 import { useUnsavedChanges } from "services/shared/use-unsaved-changes";
+import { useUndoRedo } from "services/shared/use-undo-redo";
 import { numberIsBetweenOrEqual } from "services/shared/math";
 import LasershowAnimationProperties from "./lasershow-animation-properties";
 import LasershowExport from "./lasershow-export";
@@ -61,6 +62,22 @@ export default function LasershowEditorContent() {
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
   const { isDirty, markSaved } = useUnsavedChanges(
     selectedLasershow,
+    selectedLasershow?.uuid ?? null,
+  );
+
+  const applyLasershow = (lasershow: Lasershow) => {
+    setSelectedLasershow(lasershow);
+    const syncedAnimation = lasershow.lasershowAnimations.find(
+      (la) => la.uuid === selectedLasershowAnimation?.uuid,
+    );
+    if (syncedAnimation !== undefined) {
+      setSelectedLasershowAnimation(syncedAnimation);
+    }
+  };
+
+  const { undo, redo } = useUndoRedo(
+    selectedLasershow,
+    applyLasershow,
     selectedLasershow?.uuid ?? null,
   );
 
@@ -147,16 +164,26 @@ export default function LasershowEditorContent() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === "s") {
+      if (!e.ctrlKey) {
+        return;
+      }
+
+      if (e.key === "s") {
         e.preventDefault();
         saveLasershowOnApi();
+      } else if (e.key === "z") {
+        e.preventDefault();
+        undo();
+      } else if (e.key === "y") {
+        e.preventDefault();
+        redo();
       }
     };
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- rebind when the lasershow to save changes
-  }, [selectedLasershow]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- rebind when the lasershow/undo handlers change
+  }, [selectedLasershow, undo, redo]);
 
   const getPointsToDraw = (
     positionMs: number,

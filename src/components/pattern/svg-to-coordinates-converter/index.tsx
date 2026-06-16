@@ -15,6 +15,7 @@ import { applyParametersToPointsForCanvasByPattern } from "services/shared/conve
 import { showError, showSuccess, toastSubject } from "services/shared/toast-messages";
 import { addItemToVersionHistory } from "services/shared/version-history";
 import { useUnsavedChanges } from "services/shared/use-unsaved-changes";
+import { useUndoRedo } from "services/shared/use-undo-redo";
 import GeneralSection from "./sections/general-section";
 import PointsSection from "./sections/points-section";
 
@@ -46,6 +47,7 @@ export default function PatternEditor({
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
 
   const { isDirty, markSaved } = useUnsavedChanges(pattern, pattern.uuid);
+  const { undo, redo } = useUndoRedo(pattern, setPattern, pattern.uuid);
 
   useEffect(() => {
     if (uploadedFile === undefined) {
@@ -155,9 +157,19 @@ export default function PatternEditor({
   ];
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.ctrlKey && e.key === "s") {
+    if (!e.ctrlKey) {
+      return;
+    }
+
+    if (e.key === "s") {
       e.preventDefault();
       onSave();
+    } else if (e.key === "z") {
+      e.preventDefault();
+      undo();
+    } else if (e.key === "y") {
+      e.preventDefault();
+      redo();
     }
   };
 

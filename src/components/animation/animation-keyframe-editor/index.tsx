@@ -26,6 +26,7 @@ import {
 } from "services/logic/animation-logic";
 import { playbackFrameRateInFps, selectableSteps } from "services/shared/config";
 import { useUnsavedChanges } from "services/shared/use-unsaved-changes";
+import { useUndoRedo } from "services/shared/use-undo-redo";
 import AnimationPatternKeyFrames from "./animation-keyframes";
 import AnimationManager from "./animation-manager";
 import AnimationPatternProperties from "./animation-pattern-properties";
@@ -83,6 +84,22 @@ export default function AnimationKeyFrameEditor() {
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
   const { isDirty, markSaved } = useUnsavedChanges(
     selectedAnimation,
+    selectedAnimation?.uuid ?? null,
+  );
+
+  const applyAnimation = (animation: Animation) => {
+    setSelectedAnimation(animation);
+    const syncedPattern = animation.animationPatterns.find(
+      (ap) => ap.uuid === selectedAnimationPattern?.uuid,
+    );
+    if (syncedPattern !== undefined) {
+      setSelectedAnimationPattern(syncedPattern);
+    }
+  };
+
+  const { undo, redo } = useUndoRedo(
+    selectedAnimation,
+    applyAnimation,
     selectedAnimation?.uuid ?? null,
   );
 
@@ -158,16 +175,26 @@ export default function AnimationKeyFrameEditor() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === "s") {
+      if (!e.ctrlKey) {
+        return;
+      }
+
+      if (e.key === "s") {
         e.preventDefault();
         saveAnimationOnApi();
+      } else if (e.key === "z") {
+        e.preventDefault();
+        undo();
+      } else if (e.key === "y") {
+        e.preventDefault();
+        redo();
       }
     };
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- rebind when the animation to save changes
-  }, [selectedAnimation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- rebind when the animation/undo handlers change
+  }, [selectedAnimation, undo, redo]);
 
   const updatePatternProperty = (propertyName: string, value: unknown) => {
     if (selectedAnimation?.animationPatterns === undefined) {
