@@ -267,6 +267,7 @@ export default function AnimationPatternProperties({
         min={0.1}
         max={10}
         step={0.1}
+        showSlider
         disabled={
           selectedKeyFrame?.propertyEdited !== AnimationProperty.scale || uiComponentsAreDisabled
         }
@@ -281,6 +282,7 @@ export default function AnimationPatternProperties({
         onChange={(value) => updateKeyframeProperty(value)}
         min={-4000}
         max={4000}
+        showSlider
         disabled={
           selectedKeyFrame?.propertyEdited !== AnimationProperty.xOffset || uiComponentsAreDisabled
         }
@@ -295,6 +297,7 @@ export default function AnimationPatternProperties({
         onChange={(value) => updateKeyframeProperty(value)}
         min={-4000}
         max={4000}
+        showSlider
         disabled={
           selectedKeyFrame?.propertyEdited !== AnimationProperty.yOffset || uiComponentsAreDisabled
         }
@@ -309,6 +312,7 @@ export default function AnimationPatternProperties({
         onChange={(value) => updateKeyframeProperty(value)}
         min={-360}
         max={360}
+        showSlider
         disabled={
           selectedKeyFrame?.propertyEdited !== AnimationProperty.rotation || uiComponentsAreDisabled
         }
