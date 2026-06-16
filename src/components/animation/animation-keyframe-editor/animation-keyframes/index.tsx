@@ -96,20 +96,20 @@ export default function AnimationPatternKeyFrames({
   const { palette } = useTheme();
 
   // Min/max of each property's keyframe values so the curve auto-fits the band.
-  const valueBounds = React.useMemo(() => {
-    const bounds: Record<string, { min: number; max: number }> = {};
-    const keyFrames = selectedAnimationPattern?.animationPatternKeyFrames ?? [];
-    keyFramesPropertiesPosition.forEach(({ property }) => {
-      const values = keyFrames
-        .filter((kf) => kf.propertyEdited === property)
-        .map((kf) => kf.propertyValue);
-      bounds[property] =
-        values.length > 0
-          ? { min: Math.min(...values), max: Math.max(...values) }
-          : { min: 0, max: 0 };
-    });
-    return bounds;
-  }, [selectedAnimationPattern]);
+  // Computed every render (not memoized) because keyframe values are mutated in
+  // place, which would not change a memo dependency reference and would leave
+  // the bounds stale while editing a value.
+  const valueBounds: Record<string, { min: number; max: number }> = {};
+  const patternKeyFrames = selectedAnimationPattern?.animationPatternKeyFrames ?? [];
+  keyFramesPropertiesPosition.forEach(({ property }) => {
+    const values = patternKeyFrames
+      .filter((kf) => kf.propertyEdited === property)
+      .map((kf) => kf.propertyValue);
+    valueBounds[property] =
+      values.length > 0
+        ? { min: Math.min(...values), max: Math.max(...values) }
+        : { min: 0, max: 0 };
+  });
 
   const getKeyFrameCanvasPosition = (keyFrame: AnimationPatternKeyFrame) => {
     const baseline =
@@ -123,7 +123,10 @@ export default function AnimationPatternKeyFrames({
       canvasPxSize,
     );
     const { min, max } = valueBounds[keyFrame.propertyEdited] ?? { min: 0, max: 0 };
-    const normalized = max === min ? 0 : mapNumber(keyFrame.propertyValue, min, max, -1, 1);
+    const rawNormalized = max === min ? 0 : mapNumber(keyFrame.propertyValue, min, max, -1, 1);
+    // Clamp so a keyframe can never leave its band (and the canvas), even while
+    // its value is being dragged past the current min/max.
+    const normalized = Math.max(-1, Math.min(1, rawNormalized));
     const y = baseline - normalized * keyFrameBandAmplitude;
     return { x, y };
   };
@@ -269,12 +272,12 @@ export default function AnimationPatternKeyFrames({
     drawPropertyCurves(canvas);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- captures the current draw helpers intentionally
   }, [
+    selectedAnimation,
     selectedAnimationPattern,
     timelinePositionMs,
     playAnimation,
     selectableStepsIndex,
     selectedKeyFrameUuid,
-    valueBounds,
   ]);
 
   useEffect(() => {
