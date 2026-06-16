@@ -108,12 +108,15 @@ export function SharedTimeline({
     drawTimelineItems();
   };
 
-  const handleResize = () => {
-    setScreenWidthPx(window.innerWidth);
-    setScreenHeightPx(window.innerHeight);
-  };
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidthPx(window.innerWidth);
+      setScreenHeightPx(window.innerHeight);
+    };
 
-  window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const drawTimeLines = (ctx: CanvasRenderingContext2D) => {
     const numberOfTimeLines = timelines.length;
@@ -227,13 +230,15 @@ export function SharedTimeline({
         ((canvasHeight - timelineNumbersHeight) / numberOfTimeLines) *
         (timelineItem?.timelineId ?? 0);
 
-      if (timelineItem.duration === 0) {
-        //to prevent the pattern from being to small to click on
-        timelineItem.duration = timelineItemWidthWhenDurationIsZero;
-      }
+      // Use a local minimum width so zero-duration items stay clickable
+      // without mutating the shared timeline item data.
+      const itemDuration =
+        timelineItem.duration === 0
+          ? timelineItemWidthWhenDurationIsZero
+          : timelineItem.duration;
 
       const widthToDisplay =
-        (canvasWidth / 10) * (timelineItem.duration / selectableSteps[selectableStepsIndex]);
+        (canvasWidth / 10) * (itemDuration / selectableSteps[selectableStepsIndex]);
       const xPosition =
         (canvasWidth / 10) *
         ((timelineItem.startTime - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
