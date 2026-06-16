@@ -1,7 +1,7 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import SaveIcon from "@mui/icons-material/Save";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { Grid, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
+import { Badge, Grid, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
 import { SharedTimeline } from "components/shared/shared-timeline";
 import TabSelector from "components/tabs";
@@ -12,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import { getAnimationDuration, getPointsToDrawFromAnimation } from "services/logic/animation-logic";
 import { getLasershowDuration, saveLasershow } from "services/logic/lasershow-logic";
 import { canvasPxSize, playbackFrameRateInFps, selectableSteps } from "services/shared/config";
+import { useUnsavedChanges } from "services/shared/use-unsaved-changes";
 import { numberIsBetweenOrEqual } from "services/shared/math";
 import LasershowAnimationProperties from "./lasershow-animation-properties";
 import LasershowExport from "./lasershow-export";
@@ -58,6 +59,10 @@ export default function LasershowEditorContent() {
     useState<LasershowAnimation | null>(null);
   const [playLasershow, setPlayLasershow] = useState<boolean>(false);
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
+  const { isDirty, markSaved } = useUnsavedChanges(
+    selectedLasershow,
+    selectedLasershow?.uuid ?? null,
+  );
 
   const timelinePositionMemo = React.useMemo(
     () => ({ timelinePositionMs, setTimelinePositionMs }),
@@ -136,8 +141,22 @@ export default function LasershowEditorContent() {
       }
 
       await saveLasershow(lasershowToUpdate);
+      markSaved();
     }
   };
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        saveLasershowOnApi();
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- rebind when the lasershow to save changes
+  }, [selectedLasershow]);
 
   const getPointsToDraw = (
     positionMs: number,
@@ -323,6 +342,7 @@ export default function LasershowEditorContent() {
           ariaLabel="SpeedDial basic example"
           sx={{ position: "fixed", bottom: 30, right: 30 }}
           icon={<SettingsIcon />}
+          FabProps={{ color: isDirty ? "warning" : "primary" }}
         >
           <SpeedDialAction
             key="sd-upload-clear"
@@ -337,9 +357,15 @@ export default function LasershowEditorContent() {
             tooltipTitle="Clear editor field"
           />
           <SpeedDialAction
-            icon={<SaveIcon />}
+            icon={
+              <Badge color="warning" variant="dot" invisible={!isDirty}>
+                <SaveIcon />
+              </Badge>
+            }
             onClick={saveLasershowOnApi}
-            tooltipTitle="Save lasershow (ctrl + s)"
+            tooltipTitle={
+              isDirty ? "Save lasershow — unsaved changes (ctrl + s)" : "Save lasershow (ctrl + s)"
+            }
           />
         </SpeedDial>
       </Grid>

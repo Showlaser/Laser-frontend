@@ -1,7 +1,7 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import SaveIcon from "@mui/icons-material/Save";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { Grid, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
+import { Badge, Grid, Paper, SpeedDial, SpeedDialAction } from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
 import { SharedTimeline } from "components/shared/shared-timeline";
 import TabSelector from "components/tabs";
@@ -25,6 +25,7 @@ import {
   saveAnimation,
 } from "services/logic/animation-logic";
 import { playbackFrameRateInFps, selectableSteps } from "services/shared/config";
+import { useUnsavedChanges } from "services/shared/use-unsaved-changes";
 import AnimationPatternKeyFrames from "./animation-keyframes";
 import AnimationManager from "./animation-manager";
 import AnimationPatternProperties from "./animation-pattern-properties";
@@ -80,6 +81,10 @@ export default function AnimationKeyFrameEditor() {
   const [selectedKeyFrameUuid, setSelectedKeyFrameUuid] = useState<string>("");
   const [playAnimation, setPlayAnimation] = useState<boolean>(false);
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
+  const { isDirty, markSaved } = useUnsavedChanges(
+    selectedAnimation,
+    selectedAnimation?.uuid ?? null,
+  );
 
   const stepsToDrawMaxRange = (timelinePositionMs + selectableSteps[selectableStepsIndex] * 10) | 0;
 
@@ -147,8 +152,22 @@ export default function AnimationKeyFrameEditor() {
   const saveAnimationOnApi = async () => {
     if (selectedAnimation !== null) {
       await saveAnimation(selectedAnimation);
+      markSaved();
     }
   };
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        saveAnimationOnApi();
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- rebind when the animation to save changes
+  }, [selectedAnimation]);
 
   const updatePatternProperty = (propertyName: string, value: unknown) => {
     if (selectedAnimation?.animationPatterns === undefined) {
@@ -343,6 +362,7 @@ export default function AnimationKeyFrameEditor() {
           ariaLabel="SpeedDial basic example"
           sx={{ position: "fixed", bottom: 30, right: 30 }}
           icon={<SettingsIcon />}
+          FabProps={{ color: isDirty ? "warning" : "primary" }}
         >
           <SpeedDialAction
             key="sd-upload-clear"
@@ -357,9 +377,15 @@ export default function AnimationKeyFrameEditor() {
             tooltipTitle="Clear editor field"
           />
           <SpeedDialAction
-            icon={<SaveIcon />}
+            icon={
+              <Badge color="warning" variant="dot" invisible={!isDirty}>
+                <SaveIcon />
+              </Badge>
+            }
             onClick={saveAnimationOnApi}
-            tooltipTitle="Save animation (ctrl + s)"
+            tooltipTitle={
+              isDirty ? "Save animation — unsaved changes (ctrl + s)" : "Save animation (ctrl + s)"
+            }
           />
         </SpeedDial>
       </Grid>
