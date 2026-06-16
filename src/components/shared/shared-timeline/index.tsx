@@ -1,16 +1,22 @@
+import DeleteIcon from "@mui/icons-material/Delete";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
+  Box,
   Grid,
   IconButton,
   Input,
   InputLabel,
   LinearProgress,
+  Menu,
   MenuItem,
   Paper,
+  Popover,
   Select,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import {
@@ -39,6 +45,15 @@ type DragState = {
   previewTimelineId: number;
   hasMoved: boolean;
 };
+
+const timelineShortcuts: [string, string][] = [
+  ["Drag", "Move an item in time or to another row"],
+  ["Click", "Select an item"],
+  ["Right-click", "Open the item menu"],
+  ["Middle-click", "Delete an item"],
+  ["Scroll", "Pan the timeline"],
+  ["← / →", "Nudge the selected item by 10ms"],
+];
 
 export type SharedTimelineProps = {
   selectedItemUuid: string;
@@ -95,6 +110,12 @@ export function SharedTimeline({
   const [screenWidthPx, setScreenWidthPx] = useState<number>(window.innerWidth);
   const [screenHeightPx, setScreenHeightPx] = useState<number>(window.innerHeight);
   const [dragState, setDragState] = useState<DragState | null>(null);
+  const [helpAnchorEl, setHelpAnchorEl] = useState<null | HTMLElement>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    mouseX: number;
+    mouseY: number;
+    uuid: string;
+  } | null>(null);
   const timelines = getTimelineData();
 
   const getMousePosition = (e: React.MouseEvent) => {
@@ -402,6 +423,19 @@ export function SharedTimeline({
     }
   };
 
+  const onCanvasContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const { x, y } = getMousePosition(e);
+    const clickedTimelineItem = getTimelineItemFromMouseClick(x, y);
+    if (clickedTimelineItem === undefined) {
+      setContextMenu(null);
+      return;
+    }
+
+    onTimelineItemClick(clickedTimelineItem.uuid);
+    setContextMenu({ mouseX: e.clientX, mouseY: e.clientY, uuid: clickedTimelineItem.uuid });
+  };
+
   const onScroll = (e: React.WheelEvent) => {
     if (e === undefined) {
       return;
@@ -475,6 +509,33 @@ export function SharedTimeline({
               </Tooltip>
             )}
           </span>
+          <Tooltip title="Timeline controls help">
+            <IconButton onClick={(e) => setHelpAnchorEl(e.currentTarget)}>
+              <HelpOutlineIcon />
+            </IconButton>
+          </Tooltip>
+          <Popover
+            open={Boolean(helpAnchorEl)}
+            anchorEl={helpAnchorEl}
+            onClose={() => setHelpAnchorEl(null)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+          >
+            <Box sx={{ p: 2, maxWidth: 300 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                Timeline controls
+              </Typography>
+              {timelineShortcuts.map(([key, description]) => (
+                <Box key={key} sx={{ display: "flex", gap: 1, mb: 0.5 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, minWidth: "92px" }}>
+                    {key}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {description}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Popover>
         </Grid>
       </Grid>
       <canvas
@@ -485,8 +546,29 @@ export function SharedTimeline({
         onMouseMove={onCanvasMouseMove}
         onMouseUp={onCanvasMouseUp}
         onMouseLeave={onCanvasMouseLeave}
+        onContextMenu={onCanvasContextMenu}
         tabIndex={0}
       />
+      <Menu
+        open={contextMenu !== null}
+        onClose={() => setContextMenu(null)}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined
+        }
+      >
+        <MenuItem
+          onClick={() => {
+            if (contextMenu !== null) {
+              onTimelineItemDelete?.(contextMenu.uuid);
+            }
+            setContextMenu(null);
+          }}
+        >
+          <DeleteIcon fontSize="small" style={{ marginRight: "8px" }} />
+          Delete
+        </MenuItem>
+      </Menu>
       <LinearProgress
         sx={{
           transition: "none",
