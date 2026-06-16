@@ -1,6 +1,6 @@
 /*
   This test case opens the pattern page. It then creates a new pattern. It adds one point and changes the xoffset value.
-  After this the test checks if the points element is disabled. It then clicks the dangerous elements button and checks if the points element is enabled.
+  After this the test checks if the points element is disabled. It then clicks the points lock button and checks if the points element is enabled.
   It ends the test by closing the pattern without saving.
 */
 describe("Open pattern page", () => {
@@ -30,13 +30,13 @@ describe("Open pattern page", () => {
     cy.get("#simple-tab-0").click({ force: true });
 
     cy.wait(50);
-    cy.get("#svg-xoffset-input").clear().type("100");
+    cy.get("#svg-xoffset").clear().type("100");
 
     cy.wait(50);
-    cy.get("#svg-points").should("have.css", "pointer-events", "none");
+    cy.get("#svg-points").should("be.disabled");
 
     cy.wait(50);
-    cy.get("#svg-toggle-dangerous-elements").click({ force: true });
+    cy.get("#svg-toggle-points-lock").click({ force: true });
 
     cy.wait(50);
     cy.get("#svg-points").should("not.be.disabled");

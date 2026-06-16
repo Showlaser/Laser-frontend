@@ -26,6 +26,8 @@ export type PropertyControlProps = {
   resetConfirmMessage?: string;
   /** Wraps the control in a tooltip (handy for explaining disabled state) */
   tooltip?: string;
+  /** Extra controls rendered in the label row, e.g. a lock toggle */
+  labelAdornment?: React.ReactNode;
   /** Extra controls rendered next to the input, e.g. keyframe navigation */
   endAdornment?: React.ReactNode;
   /** Tighter spacing for use in dense side panels */
@@ -52,6 +54,7 @@ export default function PropertyControl({
   onReset,
   resetConfirmMessage,
   tooltip,
+  labelAdornment,
   endAdornment,
   dense = false,
 }: PropertyControlProps) {
@@ -80,6 +83,7 @@ export default function PropertyControl({
             Reset
           </Button>
         ) : null}
+        {labelAdornment}
       </FormLabel>
       {showInput ? (
         <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
