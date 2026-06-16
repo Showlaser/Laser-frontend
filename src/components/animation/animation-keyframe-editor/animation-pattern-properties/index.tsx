@@ -28,6 +28,7 @@ import {
 } from "pages/animation-editor";
 import React from "react";
 import { numberOfTimeLines } from "services/shared/config";
+import PropertyControl from "components/shared/property-control";
 import {
   AnimationSelectedKeyFrameContext,
   AnimationSelectedKeyFrameContextType,
@@ -257,69 +258,62 @@ export default function AnimationPatternProperties({
         onChange={(e) => updatePatternProperty("name", e.target.value)}
       />
 
-      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-scale">
-        Scale
-      </InputLabel>
-      <Input
-        size="small"
+      <PropertyControl
+        label="Scale"
         id="animation-scale"
-        type="number"
-        inputProps={{ min: 0.1, max: 10, step: 0.1 }}
+        dense
         value={getPropertyValue(AnimationProperty.scale)}
-        onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
+        onChange={(value) => updateKeyframeProperty(value)}
+        min={0.1}
+        max={10}
+        step={0.1}
         disabled={
           selectedKeyFrame?.propertyEdited !== AnimationProperty.scale || uiComponentsAreDisabled
         }
+        endAdornment={nextKeyFrameButton(AnimationProperty.scale)}
       />
-      {nextKeyFrameButton(AnimationProperty.scale)}
 
-      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-xoffset">
-        X offset
-      </InputLabel>
-      <Input
-        size="small"
+      <PropertyControl
+        label="X offset"
         id="animation-xoffset"
-        type="number"
-        inputProps={{ min: -4000, max: 4000 }}
+        dense
         value={getPropertyValue(AnimationProperty.xOffset)}
-        onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
+        onChange={(value) => updateKeyframeProperty(value)}
+        min={-4000}
+        max={4000}
         disabled={
           selectedKeyFrame?.propertyEdited !== AnimationProperty.xOffset || uiComponentsAreDisabled
         }
+        endAdornment={nextKeyFrameButton(AnimationProperty.xOffset)}
       />
-      {nextKeyFrameButton(AnimationProperty.xOffset)}
 
-      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-yoffset">
-        Y offset
-      </InputLabel>
-      <Input
-        size="small"
+      <PropertyControl
+        label="Y offset"
         id="animation-yoffset"
-        type="number"
-        inputProps={{ min: -4000, max: 4000 }}
+        dense
         value={getPropertyValue(AnimationProperty.yOffset)}
-        onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
+        onChange={(value) => updateKeyframeProperty(value)}
+        min={-4000}
+        max={4000}
         disabled={
           selectedKeyFrame?.propertyEdited !== AnimationProperty.yOffset || uiComponentsAreDisabled
         }
+        endAdornment={nextKeyFrameButton(AnimationProperty.yOffset)}
       />
-      {nextKeyFrameButton(AnimationProperty.yOffset)}
 
-      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-rotation">
-        Rotation
-      </InputLabel>
-      <Input
-        size="small"
+      <PropertyControl
+        label="Rotation"
         id="animation-rotation"
-        type="number"
-        inputProps={{ min: -360, max: 360 }}
+        dense
         value={getPropertyValue(AnimationProperty.rotation)}
-        onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
+        onChange={(value) => updateKeyframeProperty(value)}
+        min={-360}
+        max={360}
         disabled={
           selectedKeyFrame?.propertyEdited !== AnimationProperty.rotation || uiComponentsAreDisabled
         }
+        endAdornment={nextKeyFrameButton(AnimationProperty.rotation)}
       />
-      {nextKeyFrameButton(AnimationProperty.rotation)}
 
       <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-starttime">
         Starttime in Ms

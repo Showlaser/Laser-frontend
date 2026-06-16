@@ -1,15 +1,11 @@
 import * as React from "react";
 import {
   Alert,
-  Button,
   Checkbox,
   Fade,
   FormControl,
   FormControlLabel,
   FormGroup,
-  FormLabel,
-  Input,
-  Slider,
   TextField,
   Tooltip,
 } from "@mui/material";
@@ -22,6 +18,9 @@ import {
 import { showWarning, toastSubject } from "services/shared/toast-messages";
 import { OnTrue } from "components/shared/on-true";
 import { emptyGuid } from "services/shared/math";
+import PropertyControl from "components/shared/property-control";
+
+const resetConfirmMessage = "Are you sure you want to reset this value?";
 
 export default function GeneralSection({
   patternNamesInUse,
@@ -144,184 +143,66 @@ export default function GeneralSection({
           }}
         />
       </FormControl>
-      <FormControl style={{ width: "100%" }}>
-        <FormLabel htmlFor="svg-scale">
-          Scale
-          <Button
-            style={{ marginLeft: "10px" }}
-            onClick={() =>
-              window.confirm("Are you sure you want to reset this value?")
-                ? updatePatternProperty("scale", 1)
-                : null
-            }
-          >
-            Reset
-          </Button>
-        </FormLabel>
-        <Slider
-          id="svg-scale"
-          size="small"
-          value={pattern.scale}
-          onChange={(e, value) => updatePatternProperty("scale", Number(value))}
-          min={0.1}
-          max={100}
-          step={0.1}
-          aria-label="Small"
-          valueLabelDisplay="auto"
-        />
-      </FormControl>
-      <br />
-      <Tooltip placement="right" title={getTooltipText()}>
-        <span>
-          <FormLabel htmlFor="svg-points" disabled={!dangerousElementsEnabled}>
-            Number of points
-            <Button
-              disabled={!dangerousElementsEnabled}
-              style={{ marginLeft: "10px" }}
-              onClick={() =>
-                window.confirm("Are you sure you want to reset this value?")
-                  ? setNumberOfPoints(200)
-                  : null
-              }
-            >
-              Reset
-            </Button>
-          </FormLabel>
-          <br />
-          <Input
-            type="number"
-            value={numberOfPoints}
-            onChange={(e) => setNumberOfPoints(Number(e.target.value))}
-            disabled={!dangerousElementsEnabled}
-          />
-          <br />
-          <FormControl style={{ width: "100%" }}>
-            <Slider
-              disabled={!dangerousElementsEnabled}
-              id="svg-points"
-              size="small"
-              value={numberOfPoints}
-              onChange={(e, value) => setNumberOfPoints(Number(value))}
-              min={1}
-              max={500}
-              aria-label="Small"
-              valueLabelDisplay="auto"
-            />
-          </FormControl>
-        </span>
-      </Tooltip>
-      <FormLabel htmlFor="svg-points">
-        X offset
-        <Button
-          style={{ marginLeft: "10px" }}
-          onClick={() =>
-            window.confirm("Are you sure you want to reset this value?")
-              ? updatePatternProperty("xOffset", 0)
-              : null
-          }
-        >
-          Reset
-        </Button>
-      </FormLabel>
-      <br />
-      <Input
-        id="svg-xoffset-input"
-        type="number"
+      <PropertyControl
+        label="Scale"
+        id="svg-scale"
+        value={pattern.scale}
+        onChange={(value) => updatePatternProperty("scale", value)}
+        min={0.1}
+        max={100}
+        step={0.1}
+        showInput={false}
+        showSlider
+        onReset={() => updatePatternProperty("scale", 1)}
+        resetConfirmMessage={resetConfirmMessage}
+      />
+      <PropertyControl
+        label="Number of points"
+        id="svg-points"
+        value={numberOfPoints}
+        onChange={(value) => setNumberOfPoints(value)}
+        min={1}
+        max={500}
+        showSlider
+        disabled={!dangerousElementsEnabled}
+        tooltip={getTooltipText()}
+        onReset={() => setNumberOfPoints(200)}
+        resetConfirmMessage={resetConfirmMessage}
+      />
+      <PropertyControl
+        label="X offset"
+        id="svg-xoffset"
         value={pattern.xOffset}
-        onChange={(e) =>
-          updatePatternProperty("xOffset", Number(e.target.value))
-        }
+        onChange={(value) => updatePatternProperty("xOffset", Math.round(value))}
+        min={-4000}
+        max={4000}
+        showSlider
+        onReset={() => updatePatternProperty("xOffset", 0)}
+        resetConfirmMessage={resetConfirmMessage}
       />
-      <br />
-      <FormControl style={{ width: "100%" }}>
-        <Slider
-          id="svg-xoffset"
-          size="small"
-          value={pattern.xOffset}
-          onChange={(e, value) =>
-            updatePatternProperty("xOffset", Math.round(Number(value)))
-          }
-          min={-4000}
-          max={4000}
-          aria-label="Small"
-          valueLabelDisplay="auto"
-        />
-      </FormControl>
-      <FormLabel htmlFor="svg-points">
-        Y offset
-        <Button
-          style={{ marginLeft: "10px" }}
-          onClick={() =>
-            window.confirm("Are you sure you want to reset this value?")
-              ? updatePatternProperty("yOffset", 0)
-              : null
-          }
-        >
-          Reset
-        </Button>
-      </FormLabel>
-      <br />
-      <Input
-        id="svg-yoffset-input"
-        type="number"
+      <PropertyControl
+        label="Y offset"
+        id="svg-yoffset"
         value={pattern.yOffset}
-        onChange={(e) =>
-          updatePatternProperty("yOffset", Number(e.target.value))
-        }
+        onChange={(value) => updatePatternProperty("yOffset", Math.round(value))}
+        min={-4000}
+        max={4000}
+        showSlider
+        sliderMarks={[{ value: 0, label: "0" }]}
+        onReset={() => updatePatternProperty("yOffset", 0)}
+        resetConfirmMessage={resetConfirmMessage}
       />
-      <br />
-      <FormControl style={{ width: "100%" }}>
-        <Slider
-          id="svg-yoffset"
-          size="small"
-          value={pattern.yOffset}
-          onChange={(e, value) =>
-            updatePatternProperty("yOffset", Math.round(Number(value)))
-          }
-          min={-4000}
-          max={4000}
-          aria-label="Small"
-          valueLabelDisplay="auto"
-          marks={[{ value: 0, label: "0" }]}
-        />
-      </FormControl>
-      <FormLabel htmlFor="svg-points">
-        Rotation
-        <Button
-          style={{ marginLeft: "10px" }}
-          onClick={() =>
-            window.confirm("Are you sure you want to reset this value?")
-              ? updatePatternProperty("rotation", 0)
-              : null
-          }
-        >
-          Reset
-        </Button>
-      </FormLabel>
-      <br />
-      <Input
-        id="svg-rotation-input"
-        type="number"
+      <PropertyControl
+        label="Rotation"
+        id="svg-rotation"
         value={pattern.rotation}
-        onChange={(e) =>
-          updatePatternProperty("rotation", Number(e.target.value))
-        }
+        onChange={(value) => updatePatternProperty("rotation", value)}
+        min={-360}
+        max={360}
+        showSlider
+        onReset={() => updatePatternProperty("rotation", 0)}
+        resetConfirmMessage={resetConfirmMessage}
       />
-      <br />
-      <FormControl style={{ width: "100%" }}>
-        <Slider
-          id="svg-rotation"
-          size="small"
-          value={pattern.rotation}
-          onChange={(e, value) =>
-            updatePatternProperty("rotation", Number(value))
-          }
-          min={-360}
-          max={360}
-          aria-label="Small"
-          valueLabelDisplay="auto"
-        />
-      </FormControl>
       <FormGroup>
         <Tooltip placement="right" title={getTooltipText()}>
           <FormControlLabel
