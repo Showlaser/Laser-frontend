@@ -16,6 +16,7 @@ import { numberIsBetweenOrEqual } from "services/shared/math";
 import LasershowAnimationProperties from "./lasershow-animation-properties";
 import LasershowExport from "./lasershow-export";
 import LasershowManager from "./lasershow-manager";
+import LasershowOverview from "./lasershow-overview";
 
 export type LasershowTimeLineContextType = {
   timelinePositionMs: number;
@@ -281,6 +282,14 @@ export default function LasershowEditorContent() {
         <Grid item xs>
           <PointsDrawer pointsToDraw={getPointsToDraw(timelinePositionMs, true)} />
         </Grid>
+        <Grid item xs={3}>
+          <LasershowOverview
+            lasershowAnimations={selectedLasershow?.lasershowAnimations ?? []}
+            timelinePositionMs={timelinePositionMs}
+            selectedUuid={selectedLasershowAnimation?.uuid ?? ""}
+            onSelect={onTimelineItemClick}
+          />
+        </Grid>
       </Grid>
       <Grid item xs={12}>
         {selectedLasershow !== null
@@ -330,7 +339,7 @@ export default function LasershowEditorContent() {
           <SpeedDialAction
             icon={<SaveIcon />}
             onClick={saveLasershowOnApi}
-            tooltipTitle="Save animation (ctrl + s)"
+            tooltipTitle="Save lasershow (ctrl + s)"
           />
         </SpeedDial>
       </Grid>
