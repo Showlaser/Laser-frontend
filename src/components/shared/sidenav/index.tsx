@@ -119,7 +119,7 @@ export default function SideNav({ pageName, children, unsavedChanges = false }: 
       <AppBar position="fixed" open={open}>
         <Toolbar variant="dense">
           <Grid container direction="row" spacing={2} alignItems="center">
-            <Grid item xs>
+            <Grid size="grow">
               <Grid display="flex" justifyContent="flex-start" alignItems="center">
                 <IconButton
                   color="inherit"
@@ -133,7 +133,7 @@ export default function SideNav({ pageName, children, unsavedChanges = false }: 
                 {pageName}
               </Grid>
             </Grid>
-            <Grid item xs container direction="column">
+            <Grid size="grow" container direction="column">
               <Grid display="flex" justifyContent="center">
                 <Button
                   startIcon={<ReportIcon />}
@@ -145,7 +145,7 @@ export default function SideNav({ pageName, children, unsavedChanges = false }: 
                 </Button>
               </Grid>
             </Grid>
-            <Grid item xs container direction="column">
+            <Grid size="grow" container direction="column">
               <Grid display="flex" justifyContent="flex-end" alignItems="center">
                 <LightMode />
                 <NotificationPopover />

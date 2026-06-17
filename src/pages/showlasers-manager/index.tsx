@@ -67,7 +67,7 @@ export default function ShowlaserManager() {
 
   return (
     <SideNav pageName="Showlaser manager">
-      <Grid item xs={4}>
+      <Grid size={4}>
         <Paper style={{ padding: "20px" }}>
           <FormLabel>Lasers to adopt</FormLabel>
           <SelectList

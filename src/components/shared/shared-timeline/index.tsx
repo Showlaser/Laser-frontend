@@ -453,7 +453,7 @@ export function SharedTimeline({
   return (
     <Paper style={{ marginTop: "25px" }}>
       <Grid container direction="row" sx={{ padding: "10px" }}>
-        <Grid item>
+        <Grid>
           <InputLabel id="timeline-position-ms">Timeline position (ms)</InputLabel>
           <Input
             id="timeline-position-ms"
@@ -468,7 +468,7 @@ export function SharedTimeline({
             }}
           />
         </Grid>
-        <Grid item ml={1.5}>
+        <Grid ml={1.5}>
           <InputLabel id="steps-select">Steps (ms)</InputLabel>
           <Select
             labelId="steps-select"

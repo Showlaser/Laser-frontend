@@ -332,7 +332,7 @@ export default function AnimationKeyFrameEditor() {
     <div>
       <Grid container direction="row" spacing={1} key={selectedKeyFrameUuid}>
         {getWrapperContext(
-          <Grid item xs={4}>
+          <Grid size={4}>
             <Paper>
               <TabSelector
                 data={[
@@ -357,16 +357,16 @@ export default function AnimationKeyFrameEditor() {
             </Paper>
           </Grid>,
         )}
-        <Grid item xs>
+        <Grid size="grow">
           {getWrapperContext(<AnimationPatternKeyFrames deleteKeyframe={deleteKeyframe} />)}
         </Grid>
-        <Grid item xs>
+        <Grid size="grow">
           <PointsDrawer
             pointsToDraw={getPointsToDrawFromAnimation(timelinePositionMs, selectedAnimation)}
           />
         </Grid>
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         {selectedAnimation !== null
           ? getWrapperContext(
               <SharedTimeline

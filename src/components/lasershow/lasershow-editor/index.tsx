@@ -299,7 +299,7 @@ export default function LasershowEditorContent() {
     <>
       <Grid container direction="row" spacing={1}>
         {getWrapperContext(
-          <Grid item>
+          <Grid>
             <Paper
               style={{
                 maxHeight: canvasPxSize,
@@ -333,10 +333,10 @@ export default function LasershowEditorContent() {
             </Paper>
           </Grid>,
         )}
-        <Grid item xs>
+        <Grid size="grow">
           <PointsDrawer pointsToDraw={getPointsToDraw(timelinePositionMs, true)} />
         </Grid>
-        <Grid item xs={3}>
+        <Grid size={3}>
           <LasershowOverview
             lasershowAnimations={selectedLasershow?.lasershowAnimations ?? []}
             timelinePositionMs={timelinePositionMs}
@@ -345,7 +345,7 @@ export default function LasershowEditorContent() {
           />
         </Grid>
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         {selectedLasershow !== null
           ? getWrapperContext(
               <SharedTimeline

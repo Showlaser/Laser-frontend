@@ -188,14 +188,14 @@ export default function PatternEditor({
       direction="row"
       spacing={2}
     >
-      <Grid item xs={6.5}>
+      <Grid size={6.5}>
         <TabSelector
           data={tabSelectorData}
           selectedTabId={selectedTabId}
           setSelectedTabId={setSelectedTabId}
         />
       </Grid>
-      <Grid item sx={{ marginLeft: "40px" }}>
+      <Grid sx={{ marginLeft: "40px" }}>
         <PointsDrawer
           selectedPointsUuid={selectedPointsUuid}
           showPointNumber={showPointNumber}

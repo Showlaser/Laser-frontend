@@ -39,7 +39,7 @@ export default function VersionHistoryModal({ open, pageName, onClose, onRestore
         ) : (
           <Grid container spacing={2} sx={{ mt: 0 }}>
             {sortedVersions.map((version) => (
-              <Grid item xs={6} sm={4} key={version.id}>
+              <Grid size={{ xs: 6, sm: 4 }} key={version.id}>
                 <Card variant="outlined">
                   {version.image ? (
                     <CardMedia

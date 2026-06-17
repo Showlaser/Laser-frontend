@@ -1,9 +1,5 @@
 import CssBaseline from "@mui/material/CssBaseline";
-import {
-  Experimental_CssVarsProvider as CssVarsProvider,
-  experimental_extendTheme as extendTheme,
-  useColorScheme,
-} from "@mui/material/styles";
+import { ThemeProvider, extendTheme, useColorScheme } from "@mui/material/styles";
 import type {} from "@mui/x-tree-view/themeAugmentation";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -112,10 +108,10 @@ function AppContent() {
 
 function App() {
   return (
-    <CssVarsProvider theme={theme} defaultMode="dark">
+    <ThemeProvider theme={theme} defaultMode="dark">
       <CssBaseline />
       <AppContent />
-    </CssVarsProvider>
+    </ThemeProvider>
   );
 }
 
