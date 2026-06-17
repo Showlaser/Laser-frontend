@@ -91,8 +91,31 @@ export const playPlaylist = (id: string, deviceToPlayId: string): Promise<void> 
     }),
   );
 
-export const getPlayerState = (): Promise<SpotifyApi.CurrentlyPlayingObject> =>
+export const getPlayerState = (): Promise<SpotifyApi.CurrentPlaybackResponse> =>
   executeRequest(() => Spotify.getMyCurrentPlaybackState().then((data) => data));
+
+export const seekToPosition = (positionMs: number): Promise<void> =>
+  executeRequest(() => Spotify.seek(positionMs));
+
+export const setPlayerVolume = (volumePercent: number): Promise<void> =>
+  executeRequest(() => Spotify.setVolume(volumePercent));
+
+export const setShuffle = (state: boolean): Promise<void> =>
+  executeRequest(() => Spotify.setShuffle(state));
+
+export const setRepeat = (state: "track" | "context" | "off"): Promise<void> =>
+  executeRequest(() => Spotify.setRepeat(state));
+
+export const saveSong = (trackId: string): Promise<SpotifyApi.SaveTracksForUserResponse> =>
+  executeRequest(() => Spotify.addToMySavedTracks([trackId]));
+
+export const removeSavedSong = (
+  trackId: string,
+): Promise<SpotifyApi.RemoveUsersSavedTracksResponse> =>
+  executeRequest(() => Spotify.removeFromMySavedTracks([trackId]));
+
+export const songsAreSaved = (trackIds: string[]): Promise<boolean[]> =>
+  executeRequest(() => Spotify.containsMySavedTracks(trackIds));
 
 export const startPlayer = (deviceId = null): Promise<void> =>
   executeRequest(() => Spotify.play(deviceId !== null ? { device_id: deviceId } : undefined));

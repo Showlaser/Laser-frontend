@@ -33,8 +33,8 @@ import { OnTrue } from "../on-true";
 
 export default function SpotifyController() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [player, setPlayer] = useState<SpotifyApi.CurrentlyPlayingObject>(
-    {} as SpotifyApi.CurrentlyPlayingObject,
+  const [player, setPlayer] = useState<SpotifyApi.CurrentPlaybackResponse>(
+    {} as SpotifyApi.CurrentPlaybackResponse,
   );
   const [noActiveDevice, setNoActiveDevice] = useState<boolean>(false);
   const [progressMs, setProgressMs] = useState<number>(0);
