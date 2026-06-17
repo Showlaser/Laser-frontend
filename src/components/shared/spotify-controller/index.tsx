@@ -1,3 +1,5 @@
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -10,12 +12,14 @@ import VolumeDownIcon from "@mui/icons-material/VolumeDown";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import {
   Alert,
+  Box,
   Button,
   Divider,
   Fade,
   FormControlLabel,
   Grid,
   IconButton,
+  Link,
   Menu,
   Skeleton,
   Slider,
@@ -24,16 +28,20 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { keyframes } from "@mui/system";
+import React, { useEffect, useRef, useState } from "react";
 import {
   getPlayerState,
   pausePlayer,
   previousSong,
+  removeSavedSong,
+  saveSong,
   seekToPosition,
   setPlayerVolume,
   setRepeat,
   setShuffle,
   skipSong,
+  songsAreSaved,
   startPlayer,
 } from "services/logic/spotify";
 import paths from "services/shared/router-paths";
@@ -47,6 +55,11 @@ const formatMsToTime = (ms: number): string => {
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 };
 
+const marquee = keyframes`
+  0%, 10% { transform: translateX(0); }
+  90%, 100% { transform: translateX(var(--marquee-shift)); }
+`;
+
 export default function SpotifyController() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [player, setPlayer] = useState<SpotifyApi.CurrentPlaybackResponse>(
@@ -57,6 +70,9 @@ export default function SpotifyController() {
   const [isSeeking, setIsSeeking] = useState<boolean>(false);
   const [volumePercent, setVolumePercent] = useState<number>(0);
   const [isAdjustingVolume, setIsAdjustingVolume] = useState<boolean>(false);
+  const [songIsSaved, setSongIsSaved] = useState<boolean>(false);
+  const [titleShift, setTitleShift] = useState<number>(0);
+  const titleRef = useRef<HTMLSpanElement>(null);
   const open = Boolean(anchorEl);
   const { palette } = useTheme();
 
@@ -101,6 +117,28 @@ export default function SpotifyController() {
 
     setVolumePercent(player?.device?.volume_percent ?? 0);
   }, [player, isAdjustingVolume]);
+
+  // Look up whether the current track is in the user's library.
+  useEffect(() => {
+    const trackId = player?.item?.id;
+    if (!open || trackId === undefined) {
+      return;
+    }
+
+    songsAreSaved([trackId]).then((results) => setSongIsSaved(results?.at(0) ?? false));
+  }, [open, player?.item?.id]);
+
+  // Measure whether the title overflows its container; only then scroll it.
+  useEffect(() => {
+    const element = titleRef.current;
+    if (element === null) {
+      setTitleShift(0);
+      return;
+    }
+
+    const overflow = element.scrollWidth - element.clientWidth;
+    setTitleShift(overflow > 0 ? -overflow : 0);
+  }, [player?.item?.id, open]);
 
   useEffect(() => {
     if (!open || !player?.is_playing || isSeeking) {
@@ -162,6 +200,21 @@ export default function SpotifyController() {
     setIsAdjustingVolume(false);
   };
 
+  const onToggleSaved = async () => {
+    const trackId = player?.item?.id;
+    if (trackId === undefined) {
+      return;
+    }
+
+    if (songIsSaved) {
+      await removeSavedSong(trackId);
+      setSongIsSaved(false);
+    } else {
+      await saveSong(trackId);
+      setSongIsSaved(true);
+    }
+  };
+
   const isLoading = player?.item === undefined;
   const durationMs = player?.item?.duration_ms ?? 0;
 
@@ -196,14 +249,63 @@ export default function SpotifyController() {
               </Fade>
             )}
             <br />
-            <label
-              style={{
-                fontSize: "90%",
-              }}
-            >
-              {`${player?.item?.artists[0]?.name ?? "loading"} / `}
-              {`${player?.item?.name ?? "loading"}`}
-            </label>
+            <Grid container alignItems="center" wrap="nowrap" spacing={1}>
+              <Grid item xs zeroMinWidth>
+                <Typography
+                  noWrap
+                  component="div"
+                  sx={{ overflow: "hidden", whiteSpace: "nowrap" }}
+                >
+                  <Box
+                    ref={titleRef}
+                    component="span"
+                    sx={{
+                      display: "inline-block",
+                      maxWidth: "100%",
+                      "--marquee-shift": `${titleShift}px`,
+                      animation:
+                        titleShift < 0 ? `${marquee} 8s ease-in-out infinite alternate` : "none",
+                    }}
+                  >
+                    <Link
+                      href={player?.item?.external_urls?.spotify}
+                      target="_blank"
+                      rel="noreferrer"
+                      underline="hover"
+                      color="inherit"
+                      fontWeight="bold"
+                    >
+                      {player?.item?.name ?? "loading"}
+                    </Link>
+                  </Box>
+                </Typography>
+                <Typography variant="body2" color="text.secondary" noWrap>
+                  <Link
+                    href={player?.item?.artists?.at(0)?.external_urls?.spotify}
+                    target="_blank"
+                    rel="noreferrer"
+                    underline="hover"
+                    color="inherit"
+                  >
+                    {player?.item?.artists?.at(0)?.name ?? "loading"}
+                  </Link>
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Tooltip title={songIsSaved ? "Remove from library" : "Save to library"}>
+                  <span>
+                    <IconButton
+                      disabled={isLoading}
+                      size="small"
+                      color={songIsSaved ? "error" : "default"}
+                      onClick={onToggleSaved}
+                    >
+                      {songIsSaved ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Grid>
+            </Grid>
             <Grid container justifyContent="center">
               <Grid>
                 <Tooltip title="Shuffle" placement="bottom-end">
