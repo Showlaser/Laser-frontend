@@ -11,11 +11,12 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
-  LinearProgress,
   Menu,
   Skeleton,
+  Slider,
   Switch,
   Tooltip,
+  Typography,
   useTheme,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -23,13 +24,20 @@ import {
   getPlayerState,
   pausePlayer,
   previousSong,
+  seekToPosition,
   skipSong,
   startPlayer,
 } from "services/logic/spotify";
-import { mapNumber } from "services/shared/math";
 import paths from "services/shared/router-paths";
 import { dataSavingIsEnabled } from "services/shared/user-settings";
 import { OnTrue } from "../on-true";
+
+const formatMsToTime = (ms: number): string => {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+};
 
 export default function SpotifyController() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -38,6 +46,7 @@ export default function SpotifyController() {
   );
   const [noActiveDevice, setNoActiveDevice] = useState<boolean>(false);
   const [progressMs, setProgressMs] = useState<number>(0);
+  const [isSeeking, setIsSeeking] = useState<boolean>(false);
   const open = Boolean(anchorEl);
   const { palette } = useTheme();
 
@@ -64,12 +73,17 @@ export default function SpotifyController() {
 
   // Keep the progress bar moving smoothly between the (throttled) API polls
   // by advancing a local counter, while each poll re-syncs it to Spotify.
+  // While the user is scrubbing, leave the local value alone.
   useEffect(() => {
+    if (isSeeking) {
+      return;
+    }
+
     setProgressMs(player?.progress_ms ?? 0);
-  }, [player]);
+  }, [player, isSeeking]);
 
   useEffect(() => {
-    if (!open || !player?.is_playing) {
+    if (!open || !player?.is_playing || isSeeking) {
       return;
     }
 
@@ -79,7 +93,7 @@ export default function SpotifyController() {
       500,
     );
     return () => clearInterval(interval);
-  }, [open, player?.is_playing, player?.item?.duration_ms]);
+  }, [open, player?.is_playing, player?.item?.duration_ms, isSeeking]);
 
   const getData = async () => {
     const playerResult = await getPlayerState();
@@ -100,7 +114,14 @@ export default function SpotifyController() {
     await pausePlayer();
   };
 
+  const onSeekCommitted = async (positionMs: number) => {
+    await seekToPosition(positionMs);
+    setProgressMs(positionMs);
+    setIsSeeking(false);
+  };
+
   const isLoading = player?.item === undefined;
+  const durationMs = player?.item?.duration_ms ?? 0;
 
   const getComponentsByLoginState = () => {
     if (!userIsLoggedIntoSpotify) {
@@ -167,10 +188,24 @@ export default function SpotifyController() {
             {isLoading ? (
               <Skeleton animation="wave" variant="rectangular" width={300} height={4} />
             ) : (
-              <LinearProgress
-                variant="determinate"
-                value={mapNumber(progressMs, 0, player?.item?.duration_ms ?? 0, 0, 100)}
-              />
+              <>
+                <Slider
+                  size="small"
+                  min={0}
+                  max={durationMs}
+                  value={Math.min(progressMs, durationMs)}
+                  onChange={(_, value) => {
+                    setIsSeeking(true);
+                    setProgressMs(value as number);
+                  }}
+                  onChangeCommitted={(_, value) => onSeekCommitted(value as number)}
+                  aria-label="Seek song position"
+                />
+                <Grid container justifyContent="space-between">
+                  <Typography variant="caption">{formatMsToTime(progressMs)}</Typography>
+                  <Typography variant="caption">{formatMsToTime(durationMs)}</Typography>
+                </Grid>
+              </>
             )}
             <br />
             <Divider />
