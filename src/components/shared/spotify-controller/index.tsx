@@ -34,9 +34,10 @@ import { OnTrue } from "../on-true";
 export default function SpotifyController() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [player, setPlayer] = useState<SpotifyApi.CurrentlyPlayingObject>(
-    {} as SpotifyApi.CurrentlyPlayingObject
+    {} as SpotifyApi.CurrentlyPlayingObject,
   );
   const [noActiveDevice, setNoActiveDevice] = useState<boolean>(false);
+  const [progressMs, setProgressMs] = useState<number>(0);
   const open = Boolean(anchorEl);
   const { palette } = useTheme();
 
@@ -52,20 +53,35 @@ export default function SpotifyController() {
     localStorage.getItem("SpotifyAccessToken") !== "undefined";
 
   useEffect(() => {
-    const interval = setInterval(
-      () => getData(),
-      dataSavingIsEnabled() ? 5000 : 2000
-    );
-    return () => clearInterval(interval);
-  }, [player]);
-
-  const getData = async () => {
-    const menuClosed =
-      document.getElementById("spotify-controller-menu") === null;
-    if (menuClosed) {
+    if (!open) {
       return;
     }
 
+    getData();
+    const interval = setInterval(() => getData(), dataSavingIsEnabled() ? 5000 : 2000);
+    return () => clearInterval(interval);
+  }, [open]);
+
+  // Keep the progress bar moving smoothly between the (throttled) API polls
+  // by advancing a local counter, while each poll re-syncs it to Spotify.
+  useEffect(() => {
+    setProgressMs(player?.progress_ms ?? 0);
+  }, [player]);
+
+  useEffect(() => {
+    if (!open || !player?.is_playing) {
+      return;
+    }
+
+    const duration = player?.item?.duration_ms ?? 0;
+    const interval = setInterval(
+      () => setProgressMs((previous) => Math.min(previous + 500, duration)),
+      500,
+    );
+    return () => clearInterval(interval);
+  }, [open, player?.is_playing, player?.item?.duration_ms]);
+
+  const getData = async () => {
     const playerResult = await getPlayerState();
     if (playerResult?.device === undefined) {
       setNoActiveDevice(true);
@@ -98,40 +114,27 @@ export default function SpotifyController() {
     if (noActiveDevice) {
       return (
         <div style={{ margin: "10px" }}>
-          <Alert severity="error">
-            Please open Spotify on a device and play a song
-          </Alert>
+          <Alert severity="error">Please open Spotify on a device and play a song</Alert>
         </div>
       );
     }
 
     const imageUrl =
-      player?.item?.album?.images?.at(1)?.url ??
-      player?.item?.album?.images?.at(0)?.url;
+      player?.item?.album?.images?.at(1)?.url ?? player?.item?.album?.images?.at(0)?.url;
     return (
       <div style={{ padding: "20px", width: "350px" }}>
         <Fade in={open} timeout={1000}>
           <span>
             {imageUrl === undefined ? (
-              <Skeleton
-                animation="wave"
-                variant="rectangular"
-                width={300}
-                height={282.5}
-              />
+              <Skeleton animation="wave" variant="rectangular" width={300} height={282.5} />
             ) : (
-              <Fade
-                style={{ width: 300, height: 300 }}
-                in={imageUrl !== undefined}
-                timeout={1000}
-              >
+              <Fade style={{ width: 300, height: 300 }} in={imageUrl !== undefined} timeout={1000}>
                 <img src={imageUrl} alt="Song image" />
               </Fade>
             )}
             <br />
             <label
               style={{
-                color: isLoading ? "gray" : "whitesmoke",
                 fontSize: "90%",
               }}
             >
@@ -141,11 +144,7 @@ export default function SpotifyController() {
             <Grid container justifyContent="center">
               <Grid>
                 <Tooltip title="Previous song" placement="bottom-end">
-                  <IconButton
-                    disabled={isLoading}
-                    onClick={previousSong}
-                    size="small"
-                  >
+                  <IconButton disabled={isLoading} onClick={previousSong} size="small">
                     <SkipPreviousIcon />
                   </IconButton>
                 </Tooltip>
@@ -159,33 +158,18 @@ export default function SpotifyController() {
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Next song" placement="bottom-start">
-                  <IconButton
-                    disabled={isLoading}
-                    size="small"
-                    onClick={skipSong}
-                  >
+                  <IconButton disabled={isLoading} size="small" onClick={skipSong}>
                     <SkipNextIcon />
                   </IconButton>
                 </Tooltip>
               </Grid>
             </Grid>
             {isLoading ? (
-              <Skeleton
-                animation="wave"
-                variant="rectangular"
-                width={300}
-                height={4}
-              />
+              <Skeleton animation="wave" variant="rectangular" width={300} height={4} />
             ) : (
               <LinearProgress
                 variant="determinate"
-                value={mapNumber(
-                  player?.progress_ms ?? 0,
-                  0,
-                  player?.item?.duration_ms ?? 0,
-                  0,
-                  100
-                )}
+                value={mapNumber(progressMs, 0, player?.item?.duration_ms ?? 0, 0, 100)}
               />
             )}
             <br />
@@ -209,11 +193,7 @@ export default function SpotifyController() {
   return (
     <>
       <Tooltip title="Spotify / lasershow generator controller">
-        <IconButton
-          onClick={handleClick}
-          area-haspopup="true"
-          id="spotify-controller-button"
-        >
+        <IconButton onClick={handleClick} area-haspopup="true" id="spotify-controller-button">
           <MusicNoteIcon />
         </IconButton>
       </Tooltip>
