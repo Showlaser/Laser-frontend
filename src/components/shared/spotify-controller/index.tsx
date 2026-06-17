@@ -1,8 +1,13 @@
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import RepeatIcon from "@mui/icons-material/Repeat";
+import RepeatOneIcon from "@mui/icons-material/RepeatOne";
+import ShuffleIcon from "@mui/icons-material/Shuffle";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
+import VolumeDownIcon from "@mui/icons-material/VolumeDown";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import {
   Alert,
   Button,
@@ -25,6 +30,9 @@ import {
   pausePlayer,
   previousSong,
   seekToPosition,
+  setPlayerVolume,
+  setRepeat,
+  setShuffle,
   skipSong,
   startPlayer,
 } from "services/logic/spotify";
@@ -47,6 +55,8 @@ export default function SpotifyController() {
   const [noActiveDevice, setNoActiveDevice] = useState<boolean>(false);
   const [progressMs, setProgressMs] = useState<number>(0);
   const [isSeeking, setIsSeeking] = useState<boolean>(false);
+  const [volumePercent, setVolumePercent] = useState<number>(0);
+  const [isAdjustingVolume, setIsAdjustingVolume] = useState<boolean>(false);
   const open = Boolean(anchorEl);
   const { palette } = useTheme();
 
@@ -81,6 +91,16 @@ export default function SpotifyController() {
 
     setProgressMs(player?.progress_ms ?? 0);
   }, [player, isSeeking]);
+
+  // Mirror the device volume locally so the slider can be dragged smoothly,
+  // unless the user is currently adjusting it.
+  useEffect(() => {
+    if (isAdjustingVolume) {
+      return;
+    }
+
+    setVolumePercent(player?.device?.volume_percent ?? 0);
+  }, [player, isAdjustingVolume]);
 
   useEffect(() => {
     if (!open || !player?.is_playing || isSeeking) {
@@ -118,6 +138,28 @@ export default function SpotifyController() {
     await seekToPosition(positionMs);
     setProgressMs(positionMs);
     setIsSeeking(false);
+  };
+
+  const onToggleShuffle = async () => {
+    await setShuffle(!player?.shuffle_state);
+    await getData();
+  };
+
+  const onCycleRepeat = async () => {
+    const nextState: SpotifyApi.PlaybackRepeatState =
+      player?.repeat_state === "off"
+        ? "context"
+        : player?.repeat_state === "context"
+          ? "track"
+          : "off";
+    await setRepeat(nextState);
+    await getData();
+  };
+
+  const onVolumeCommitted = async (nextVolumePercent: number) => {
+    await setPlayerVolume(nextVolumePercent);
+    setVolumePercent(nextVolumePercent);
+    setIsAdjustingVolume(false);
   };
 
   const isLoading = player?.item === undefined;
@@ -164,7 +206,17 @@ export default function SpotifyController() {
             </label>
             <Grid container justifyContent="center">
               <Grid>
-                <Tooltip title="Previous song" placement="bottom-end">
+                <Tooltip title="Shuffle" placement="bottom-end">
+                  <IconButton
+                    disabled={isLoading}
+                    size="small"
+                    color={player?.shuffle_state ? "primary" : "default"}
+                    onClick={onToggleShuffle}
+                  >
+                    <ShuffleIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Previous song" placement="bottom">
                   <IconButton disabled={isLoading} onClick={previousSong} size="small">
                     <SkipPreviousIcon />
                   </IconButton>
@@ -178,9 +230,22 @@ export default function SpotifyController() {
                     {player?.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
                   </IconButton>
                 </Tooltip>
-                <Tooltip title="Next song" placement="bottom-start">
+                <Tooltip title="Next song" placement="bottom">
                   <IconButton disabled={isLoading} size="small" onClick={skipSong}>
                     <SkipNextIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip
+                  title={player?.repeat_state === "track" ? "Repeat one" : "Repeat"}
+                  placement="bottom-start"
+                >
+                  <IconButton
+                    disabled={isLoading}
+                    size="small"
+                    color={player?.repeat_state !== "off" ? "primary" : "default"}
+                    onClick={onCycleRepeat}
+                  >
+                    {player?.repeat_state === "track" ? <RepeatOneIcon /> : <RepeatIcon />}
                   </IconButton>
                 </Tooltip>
               </Grid>
@@ -204,6 +269,28 @@ export default function SpotifyController() {
                 <Grid container justifyContent="space-between">
                   <Typography variant="caption">{formatMsToTime(progressMs)}</Typography>
                   <Typography variant="caption">{formatMsToTime(durationMs)}</Typography>
+                </Grid>
+                <Grid container alignItems="center" spacing={1}>
+                  <Grid item>
+                    <VolumeDownIcon fontSize="small" />
+                  </Grid>
+                  <Grid item xs>
+                    <Slider
+                      size="small"
+                      min={0}
+                      max={100}
+                      value={volumePercent}
+                      onChange={(_, value) => {
+                        setIsAdjustingVolume(true);
+                        setVolumePercent(value as number);
+                      }}
+                      onChangeCommitted={(_, value) => onVolumeCommitted(value as number)}
+                      aria-label="Volume"
+                    />
+                  </Grid>
+                  <Grid item>
+                    <VolumeUpIcon fontSize="small" />
+                  </Grid>
                 </Grid>
               </>
             )}
