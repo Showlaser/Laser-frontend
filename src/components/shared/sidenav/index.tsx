@@ -8,7 +8,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import MovieFilterIcon from "@mui/icons-material/MovieFilter";
 import PolylineIcon from "@mui/icons-material/Polyline";
 import ReportIcon from "@mui/icons-material/Report";
-import { Alert, Fade, Grid, ListItemButton } from "@mui/material";
+import { Alert, Fade, ListItemButton } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -118,42 +118,36 @@ export default function SideNav({ pageName, children, unsavedChanges = false }: 
     <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>
         <Toolbar variant="dense">
-          <Grid container direction="row" spacing={2} alignItems="center">
-            <Grid size="grow">
-              <Grid display="flex" justifyContent="flex-start" alignItems="center">
-                <IconButton
-                  color="inherit"
-                  aria-label="open drawer"
-                  onClick={() => handleDrawerOpen()}
-                  edge="start"
-                  sx={{ mr: 2, ...(open && { display: "none" }) }}
-                >
-                  <MenuIcon />
-                </IconButton>
-                {pageName}
-              </Grid>
-            </Grid>
-            <Grid size="grow" container direction="column">
-              <Grid display="flex" justifyContent="center">
-                <Button
-                  startIcon={<ReportIcon />}
-                  style={{ color: "whitesmoke" }}
-                  variant="contained"
-                  onClick={() => showError(toastSubject.notImplemented)}
-                >
-                  Emergency stop
-                </Button>
-              </Grid>
-            </Grid>
-            <Grid size="grow" container direction="column">
-              <Grid display="flex" justifyContent="flex-end" alignItems="center">
-                <LightMode />
-                <NotificationPopover />
-                <SpotifyController />
-                <AccountPopover />
-              </Grid>
-            </Grid>
-          </Grid>
+          <Box sx={{ display: "flex", alignItems: "center", width: "100%", gap: 2 }}>
+            <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={() => handleDrawerOpen()}
+                edge="start"
+                sx={{ mr: 2, ...(open && { display: "none" }) }}
+              >
+                <MenuIcon />
+              </IconButton>
+              {pageName}
+            </Box>
+            <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
+              <Button
+                startIcon={<ReportIcon />}
+                style={{ color: "whitesmoke" }}
+                variant="contained"
+                onClick={() => showError(toastSubject.notImplemented)}
+              >
+                Emergency stop
+              </Button>
+            </Box>
+            <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+              <LightMode />
+              <NotificationPopover />
+              <SpotifyController />
+              <AccountPopover />
+            </Box>
+          </Box>
         </Toolbar>
       </AppBar>
       <Drawer
