@@ -68,6 +68,50 @@ const equalize = keyframes`
 
 const LASERSHOW_GENERATION_KEY = "LasershowGenerationEnabled";
 
+// Sample the album cover on a small canvas and average its pixels to get a
+// dominant colour for the background gradient. Returns null when the image
+// cannot be read (e.g. a CORS failure).
+const extractDominantColor = (url: string): Promise<string | null> =>
+  new Promise((resolve) => {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.onload = () => {
+      const size = 16;
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const context = canvas.getContext("2d");
+      if (context === null) {
+        resolve(null);
+        return;
+      }
+
+      context.drawImage(image, 0, 0, size, size);
+      try {
+        const { data } = context.getImageData(0, 0, size, size);
+        let red = 0;
+        let green = 0;
+        let blue = 0;
+        const pixels = data.length / 4;
+        for (let i = 0; i < data.length; i += 4) {
+          red += data[i];
+          green += data[i + 1];
+          blue += data[i + 2];
+        }
+
+        resolve(
+          `rgb(${Math.round(red / pixels)}, ${Math.round(green / pixels)}, ${Math.round(
+            blue / pixels,
+          )})`,
+        );
+      } catch {
+        resolve(null);
+      }
+    };
+    image.onerror = () => resolve(null);
+    image.src = url;
+  });
+
 const EqualizerBars = ({ active, color }: { active: boolean; color: string }) => (
   <Box sx={{ display: "inline-flex", alignItems: "flex-end", gap: "2px", height: 16, width: 18 }}>
     {[0, 1, 2, 3].map((bar) => (
@@ -101,9 +145,13 @@ export default function SpotifyController() {
   const [lasershowEnabled, setLasershowEnabled] = useState<boolean>(
     localStorage.getItem(LASERSHOW_GENERATION_KEY) === "true",
   );
+  const [gradientColor, setGradientColor] = useState<string | null>(null);
   const titleRef = useRef<HTMLSpanElement>(null);
   const open = Boolean(anchorEl);
   const { palette } = useTheme();
+
+  const imageUrl =
+    player?.item?.album?.images?.at(1)?.url ?? player?.item?.album?.images?.at(0)?.url;
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -168,6 +216,24 @@ export default function SpotifyController() {
     const overflow = element.scrollWidth - element.clientWidth;
     setTitleShift(overflow > 0 ? -overflow : 0);
   }, [player?.item?.id, open]);
+
+  // Derive a background gradient colour from the current album cover.
+  useEffect(() => {
+    if (imageUrl === undefined) {
+      setGradientColor(null);
+      return;
+    }
+
+    let cancelled = false;
+    extractDominantColor(imageUrl).then((color) => {
+      if (!cancelled) {
+        setGradientColor(color);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [imageUrl]);
 
   useEffect(() => {
     if (!open || !player?.is_playing || isSeeking) {
@@ -269,10 +335,18 @@ export default function SpotifyController() {
       );
     }
 
-    const imageUrl =
-      player?.item?.album?.images?.at(1)?.url ?? player?.item?.album?.images?.at(0)?.url;
     return (
-      <div style={{ padding: "20px", width: "350px" }}>
+      <div
+        style={{
+          padding: "20px",
+          width: "350px",
+          background:
+            gradientColor !== null
+              ? `linear-gradient(to bottom, ${gradientColor} 0%, transparent 65%)`
+              : undefined,
+          transition: "background 1s ease",
+        }}
+      >
         <Fade in={open} timeout={1000}>
           <span>
             {imageUrl === undefined ? (
