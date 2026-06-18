@@ -33,6 +33,7 @@ import { keyframes } from "@mui/system";
 import React, { useEffect, useRef, useState } from "react";
 import {
   getPlayerState,
+  getSpotifyDevices,
   pausePlayer,
   previousSong,
   removeSavedSong,
@@ -256,19 +257,29 @@ export default function SpotifyController() {
 
   const getData = async () => {
     const playerResult = await getPlayerState();
-    if (playerResult?.device === undefined) {
-      noDeviceCountRef.current += 1;
-      // Only surface the error after a few misses in a row so a single empty
-      // response does not wipe the player while playback is still going.
-      if (noDeviceCountRef.current >= 3) {
-        setNoActiveDevice(true);
-      }
+    if (playerResult?.device !== undefined) {
+      noDeviceCountRef.current = 0;
+      setNoActiveDevice(false);
+      setPlayer(playerResult);
       return;
     }
 
-    noDeviceCountRef.current = 0;
-    setNoActiveDevice(false);
-    setPlayer(playerResult);
+    // Spotify's player endpoint returns an empty body intermittently while
+    // playback continues. Confirm against the (more reliable) devices list
+    // before showing the error, keeping the last known player meanwhile.
+    const devices = await getSpotifyDevices();
+    const activeDeviceExists = devices?.devices?.some((device) => device.is_active) ?? false;
+    if (activeDeviceExists) {
+      noDeviceCountRef.current = 0;
+      setNoActiveDevice(false);
+      return;
+    }
+
+    // Only surface the error after a few confirmed misses in a row.
+    noDeviceCountRef.current += 1;
+    if (noDeviceCountRef.current >= 3) {
+      setNoActiveDevice(true);
+    }
   };
 
   const onPlay = async () => {
