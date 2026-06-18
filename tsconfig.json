@@ -8,8 +8,10 @@
 
     /* Modules */
     "module": "ESNext",
-    "moduleResolution": "node",
-    "baseUrl": "src",
+    "moduleResolution": "bundler",
+    "paths": {
+      "*": ["./src/*"]
+    },
     "resolveJsonModule": true,
     "types": ["vite/client", "vitest/globals"],
 
