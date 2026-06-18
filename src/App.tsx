@@ -7,6 +7,9 @@ import "./App.css";
 import Routes from "./routes/Routes";
 
 const theme = extendTheme({
+  // Without an explicit selector, providing both light and dark schemes makes
+  // MUI v7 default to "media" (OS preference), which ignores the manual toggle.
+  colorSchemeSelector: "class",
   colorSchemes: {
     light: {
       palette: {
