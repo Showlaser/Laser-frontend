@@ -7,6 +7,12 @@ import SpotifyWebApi from "spotify-web-api-js";
 
 const Spotify = new SpotifyWebApi();
 
+const discardSpotifyTokens = () => {
+  localStorage.removeItem("SpotifyAccessToken");
+  localStorage.removeItem("SpotifyRefreshToken");
+  Spotify.setAccessToken("");
+};
+
 const onError = async (errorCode: unknown) => {
   const code = Number(errorCode);
   if (code === 401) {
@@ -17,6 +23,9 @@ const onError = async (errorCode: unknown) => {
 
     const tokens: SpotifyTokens | null = await refreshSpotifyAccessToken(refreshToken);
     if (tokens === null) {
+      // Refresh token verlopen of ongeldig (invalid_grant): tokens zijn al
+      // weggegooid in refreshSpotifyAccessToken. Niet opnieuw proberen; de
+      // gebruiker moet via de Spotify-login opnieuw inloggen.
       return;
     }
 
@@ -42,12 +51,27 @@ export const refreshSpotifyAccessToken = async (
 ): Promise<SpotifyTokens | null> => {
   const response = await sendRequest(
     () => Post(`${apiEndpoints.refreshSpotifyAccessToken}`, { refreshToken: refreshToken }),
-    [],
+    [401, 503],
     undefined,
     false,
   );
 
   if (response === undefined) {
+    return null;
+  }
+
+  // Een 401 betekent dat de refresh token verlopen/ongeldig is (invalid_grant).
+  // Gooi de opgeslagen tokens weg zodat we de mislukte refresh niet opnieuw
+  // proberen en de UI weer als uitgelogd toont.
+  if (response.status === 401) {
+    discardSpotifyTokens();
+    return null;
+  }
+
+  // Andere fouten (bv. 503: Spotify tijdelijk niet bereikbaar) zijn mogelijk
+  // van voorbijgaande aard. Laat de token staan zodat een latere poging kan
+  // slagen.
+  if (response.status !== 200) {
     return null;
   }
 

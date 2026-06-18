@@ -14,6 +14,7 @@ import {
   Alert,
   Box,
   Button,
+  Chip,
   Divider,
   Fade,
   FormControlLabel,
@@ -60,6 +61,31 @@ const marquee = keyframes`
   90%, 100% { transform: translateX(var(--marquee-shift)); }
 `;
 
+const equalize = keyframes`
+  0%, 100% { height: 30%; }
+  50% { height: 100%; }
+`;
+
+const LASERSHOW_GENERATION_KEY = "LasershowGenerationEnabled";
+
+const EqualizerBars = ({ active, color }: { active: boolean; color: string }) => (
+  <Box sx={{ display: "inline-flex", alignItems: "flex-end", gap: "2px", height: 16, width: 18 }}>
+    {[0, 1, 2, 3].map((bar) => (
+      <Box
+        key={bar}
+        sx={{
+          width: "3px",
+          height: "30%",
+          backgroundColor: color,
+          borderRadius: "1px",
+          animation: active ? `${equalize} 0.9s ease-in-out infinite` : "none",
+          animationDelay: `${bar * 0.15}s`,
+        }}
+      />
+    ))}
+  </Box>
+);
+
 export default function SpotifyController() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [player, setPlayer] = useState<SpotifyApi.CurrentPlaybackResponse>(
@@ -72,6 +98,9 @@ export default function SpotifyController() {
   const [isAdjustingVolume, setIsAdjustingVolume] = useState<boolean>(false);
   const [songIsSaved, setSongIsSaved] = useState<boolean>(false);
   const [titleShift, setTitleShift] = useState<number>(0);
+  const [lasershowEnabled, setLasershowEnabled] = useState<boolean>(
+    localStorage.getItem(LASERSHOW_GENERATION_KEY) === "true",
+  );
   const titleRef = useRef<HTMLSpanElement>(null);
   const open = Boolean(anchorEl);
   const { palette } = useTheme();
@@ -215,6 +244,11 @@ export default function SpotifyController() {
     }
   };
 
+  const onToggleLasershow = (enabled: boolean) => {
+    setLasershowEnabled(enabled);
+    localStorage.setItem(LASERSHOW_GENERATION_KEY, String(enabled));
+  };
+
   const isLoading = player?.item === undefined;
   const durationMs = player?.item?.duration_ms ?? 0;
 
@@ -249,8 +283,8 @@ export default function SpotifyController() {
               </Fade>
             )}
             <br />
-            <Grid container alignItems="center" wrap="nowrap" spacing={1}>
-              <Grid item xs zeroMinWidth>
+            <Grid container wrap="nowrap" spacing={1} sx={{ alignItems: "center" }}>
+              <Grid size="grow" sx={{ minWidth: 0 }}>
                 <Typography
                   noWrap
                   component="div"
@@ -273,7 +307,7 @@ export default function SpotifyController() {
                       rel="noreferrer"
                       underline="hover"
                       color="inherit"
-                      fontWeight="bold"
+                      sx={{ fontWeight: "bold" }}
                     >
                       {player?.item?.name ?? "loading"}
                     </Link>
@@ -291,7 +325,7 @@ export default function SpotifyController() {
                   </Link>
                 </Typography>
               </Grid>
-              <Grid item>
+              <Grid>
                 <Tooltip title={songIsSaved ? "Remove from library" : "Save to library"}>
                   <span>
                     <IconButton
@@ -306,7 +340,7 @@ export default function SpotifyController() {
                 </Tooltip>
               </Grid>
             </Grid>
-            <Grid container justifyContent="center">
+            <Grid container sx={{ justifyContent: "center" }}>
               <Grid>
                 <Tooltip title="Shuffle" placement="bottom-end">
                   <IconButton
@@ -368,15 +402,15 @@ export default function SpotifyController() {
                   onChangeCommitted={(_, value) => onSeekCommitted(value as number)}
                   aria-label="Seek song position"
                 />
-                <Grid container justifyContent="space-between">
+                <Grid container sx={{ justifyContent: "space-between" }}>
                   <Typography variant="caption">{formatMsToTime(progressMs)}</Typography>
                   <Typography variant="caption">{formatMsToTime(durationMs)}</Typography>
                 </Grid>
-                <Grid container alignItems="center" spacing={1}>
-                  <Grid item>
+                <Grid container spacing={1} sx={{ alignItems: "center" }}>
+                  <Grid>
                     <VolumeDownIcon fontSize="small" />
                   </Grid>
-                  <Grid item xs>
+                  <Grid size="grow">
                     <Slider
                       size="small"
                       min={0}
@@ -390,7 +424,7 @@ export default function SpotifyController() {
                       aria-label="Volume"
                     />
                   </Grid>
-                  <Grid item>
+                  <Grid>
                     <VolumeUpIcon fontSize="small" />
                   </Grid>
                 </Grid>
@@ -400,9 +434,30 @@ export default function SpotifyController() {
             <Divider />
             <FormControlLabel
               disabled={isLoading}
-              control={<Switch key="lgc-switch" />}
+              control={
+                <Switch
+                  key="lgc-switch"
+                  checked={lasershowEnabled}
+                  onChange={(event) => onToggleLasershow(event.target.checked)}
+                />
+              }
               label="Enable lasershow generation"
             />
+            <OnTrue onTrue={lasershowEnabled}>
+              <Grid container spacing={1} sx={{ mb: 1, alignItems: "center" }}>
+                <Grid>
+                  <EqualizerBars active={player?.is_playing ?? false} color={palette.primary.main} />
+                </Grid>
+                <Grid>
+                  <Chip
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    label={player?.is_playing ? "Generating lasershow…" : "Lasershow ready"}
+                  />
+                </Grid>
+              </Grid>
+            </OnTrue>
             <OnTrue onTrue={dataSavingIsEnabled()}>
               <small style={{ color: palette.warning.main }}>
                 Data saving enabled. Updating every 5 seconds
