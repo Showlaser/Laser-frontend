@@ -296,8 +296,10 @@ export default function AnimationPatternKeyFrames({
   const prepareCanvas = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
     canvas.width = canvasPxSize;
     canvas.height = canvasPxSize;
-    canvas.style.width = canvasPxSize.toString();
-    canvas.style.height = canvasPxSize.toString();
+    // Keep the drawing buffer at canvasPxSize but let the displayed canvas shrink
+    // to fit its column on smaller screens (height auto preserves the square ratio).
+    canvas.style.maxWidth = "100%";
+    canvas.style.height = "auto";
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -313,8 +315,10 @@ export default function AnimationPatternKeyFrames({
 
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
 
     const keyFrame = getKeyFrameNearMouse(mouseX, mouseY);
     if (keyFrame === undefined) {
@@ -340,8 +344,10 @@ export default function AnimationPatternKeyFrames({
     }
 
     const rect = canvas.getBoundingClientRect();
-    const mouseXPosition = event.clientX - rect.left;
-    const mouseYPosition = event.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mouseXPosition = (event.clientX - rect.left) * scaleX;
+    const mouseYPosition = (event.clientY - rect.top) * scaleY;
     if (mouseXPosition < 80 || mouseXPosition > canvasPxSize) {
       return;
     }
@@ -376,8 +382,10 @@ export default function AnimationPatternKeyFrames({
   const onCanvasClick = (event: React.MouseEvent) => {
     const canvas = document.getElementById("svg-keyframe-canvas") as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mouseX = (event.clientX - rect.left) * scaleX;
+    const mouseY = (event.clientY - rect.top) * scaleY;
 
     const clickedKeyFrame = getKeyFrameNearMouse(mouseX, mouseY);
     if (clickedKeyFrame !== undefined) {

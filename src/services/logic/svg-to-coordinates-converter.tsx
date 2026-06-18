@@ -113,8 +113,10 @@ export const prepareCanvas = (
 ): CanvasRenderingContext2D | null => {
   canvas.width = canvasPxSize;
   canvas.height = canvasPxSize;
-  canvas.style.width = canvasPxSize.toString();
-  canvas.style.height = canvasPxSize.toString();
+  // Keep the drawing buffer at canvasPxSize but let the displayed canvas shrink
+  // to fit its column on smaller screens (height auto preserves the square ratio).
+  canvas.style.maxWidth = "100%";
+  canvas.style.height = "auto";
   const ctx = canvas.getContext("2d");
   if (ctx === null) {
     return null;
