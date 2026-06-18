@@ -1,4 +1,4 @@
-import { Button, CircularProgress, FormControl, Grid, TextField } from "@mui/material";
+import { Button, FormControl, Grid, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { login } from "services/logic/login-logic";
 import { getFormDataObject, getUrlCode, stringIsEmpty } from "services/shared/general";
@@ -58,15 +58,7 @@ export default function Login() {
           <br />
           <TextField required label="Password" defaultValue="123" type="password" name="password" />
           <br />
-          <Button
-            disabled={submitInProgress}
-            variant="contained"
-            type="submit"
-            fullWidth
-            startIcon={
-              submitInProgress ? <CircularProgress size={16} color="inherit" /> : undefined
-            }
-          >
+          <Button loading={submitInProgress} variant="contained" type="submit" fullWidth>
             Login
           </Button>
           <br />

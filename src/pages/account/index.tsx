@@ -1,7 +1,6 @@
 import {
   Alert,
   Button,
-  CircularProgress,
   Divider,
   Fade,
   Paper,
@@ -138,15 +137,7 @@ export default function Account() {
                   </Alert>
                 </Fade>
                 <br />
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={submitInProgress}
-                  fullWidth
-                  startIcon={
-                    submitInProgress ? <CircularProgress size={16} color="inherit" /> : undefined
-                  }
-                >
+                <Button type="submit" variant="contained" loading={submitInProgress} fullWidth>
                   Update account
                 </Button>
                 <Button

@@ -1,4 +1,4 @@
-import { Button, CircularProgress, FormControl, Grid, Paper, TextField } from "@mui/material";
+import { Button, FormControl, Grid, Paper, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { addUser } from "services/logic/user-logic";
 import { getFormDataFromEvent } from "services/shared/form-data-helper";
@@ -59,15 +59,7 @@ export default function Registration() {
               required
             />
             <br />
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={buttonDisabled}
-              fullWidth
-              startIcon={
-                buttonDisabled ? <CircularProgress size={16} color="inherit" /> : undefined
-              }
-            >
+            <Button type="submit" variant="contained" loading={buttonDisabled} fullWidth>
               Register
             </Button>
           </FormControl>
