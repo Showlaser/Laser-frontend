@@ -2,7 +2,7 @@ import paths from "../router-paths";
 import { showError, toastSubject, showSuccess, ToastSubjectObject } from "../toast-messages";
 import { Post } from "./api-actions";
 import apiEndpoints from "./api-endpoints";
-import Cookies from "universal-cookie";
+import Cookies from "services/shared/cookies";
 
 const handleErrorMessage = (statusCode: number, ignoredStatusCodes: number[]) => {
   if (ignoredStatusCodes.includes(statusCode)) {
@@ -26,7 +26,7 @@ const handleErrorMessage = (statusCode: number, ignoredStatusCodes: number[]) =>
 
 const refreshUserTokensIfExpired = async () => {
   const cookie = new Cookies();
-  const loginCookie = cookie.get("logged-in");
+  const loginCookie = cookie.get<{ loginTime: number }>("logged-in");
   const loginTime = Number(loginCookie?.loginTime);
   const currentTime = Date.now();
   const jwtExpirationTimeMs = 300000;

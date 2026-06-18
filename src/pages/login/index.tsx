@@ -4,7 +4,7 @@ import { login } from "services/logic/login-logic";
 import { getFormDataObject, getUrlCode, stringIsEmpty } from "services/shared/general";
 import paths from "services/shared/router-paths";
 import { showError, toastSubject } from "services/shared/toast-messages";
-import Cookies from "universal-cookie";
+import Cookies from "services/shared/cookies";
 import "./index.css";
 
 export default function Login() {

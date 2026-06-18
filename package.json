@@ -17,8 +17,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.5",
     "react-toastify": "^9.1.1",
-    "spotify-web-api-js": "^1.5.2",
-    "universal-cookie": "^4.0.4"
+    "spotify-web-api-js": "^1.5.2"
   },
   "scripts": {
     "start": "vite",

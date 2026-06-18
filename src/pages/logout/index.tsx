@@ -1,6 +1,6 @@
 import { logout } from "services/logic/user-logic";
 import paths from "services/shared/router-paths";
-import Cookies from "universal-cookie";
+import Cookies from "services/shared/cookies";
 import React, { useEffect, useState } from "react";
 import { Box, LinearProgress } from "@mui/material";
 import "./index.css";
