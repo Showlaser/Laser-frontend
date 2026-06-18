@@ -147,6 +147,9 @@ export default function SpotifyController() {
   );
   const [gradientColor, setGradientColor] = useState<string | null>(null);
   const titleRef = useRef<HTMLSpanElement>(null);
+  // Ignore poll-driven progress syncs until this timestamp, giving Spotify
+  // time to register a seek so the slider does not snap back to the old spot.
+  const seekSettleUntilRef = useRef<number>(0);
   const open = Boolean(anchorEl);
   const { palette } = useTheme();
 
@@ -178,7 +181,7 @@ export default function SpotifyController() {
   // by advancing a local counter, while each poll re-syncs it to Spotify.
   // While the user is scrubbing, leave the local value alone.
   useEffect(() => {
-    if (isSeeking) {
+    if (isSeeking || Date.now() < seekSettleUntilRef.current) {
       return;
     }
 
@@ -268,9 +271,12 @@ export default function SpotifyController() {
   };
 
   const onSeekCommitted = async (positionMs: number) => {
-    await seekToPosition(positionMs);
+    // Suppress poll syncs for a little over one poll cycle so an in-flight
+    // (pre-seek) response cannot snap the slider back.
+    seekSettleUntilRef.current = Date.now() + (dataSavingIsEnabled() ? 5000 : 2000) + 1000;
     setProgressMs(positionMs);
     setIsSeeking(false);
+    await seekToPosition(positionMs);
   };
 
   const onToggleShuffle = async () => {
