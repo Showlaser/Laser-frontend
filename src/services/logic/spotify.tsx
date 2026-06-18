@@ -85,12 +85,13 @@ const executeRequest = async <T,>(request: () => Promise<T>): Promise<T> => {
   }
 
   Spotify.setAccessToken(accessToken);
-  return request()
-    .then((data) => data)
-    .catch(async (error: { status?: number }) => {
-      await onError(error.status);
-      return request().then((data) => data);
-    });
+  return request().catch(async (error: { status?: number }) => {
+    await onError(error.status);
+    // Resolve to undefined on a persistent failure instead of rejecting, so a
+    // transient Spotify error (e.g. no active device, which returns a non-JSON
+    // body) cannot surface as an uncaught promise rejection in callers.
+    return request().catch(() => undefined as T);
+  });
 };
 
 export const getUserPlaylists = (): Promise<
