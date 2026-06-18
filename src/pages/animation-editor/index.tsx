@@ -138,7 +138,7 @@ export default function AnimationPage() {
       <SpeedDialAction
         onClick={() => setConvertPatternModalOpen(true)}
         key="sd-pattern-to-animation"
-        tooltipTitle="Convert saved pattern to animation"
+        title="Convert saved pattern to animation"
         icon={
           <label htmlFor="raised-button-file" style={{ cursor: "pointer", padding: "25px" }}>
             <AllInclusiveIcon style={{ marginTop: "8px" }} />
@@ -153,7 +153,7 @@ export default function AnimationPage() {
             <CloudDownloadIcon style={{ marginTop: "8px" }} />
           </label>
         }
-        tooltipTitle="Get saved animation"
+        title="Get saved animation"
       />
     </SpeedDial>
   );

@@ -2,7 +2,7 @@ import { logout } from "services/logic/user-logic";
 import paths from "services/shared/router-paths";
 import Cookies from "universal-cookie";
 import React, { useEffect, useState } from "react";
-import { Grid, LinearProgress } from "@mui/material";
+import { Box, LinearProgress } from "@mui/material";
 import "./index.css";
 
 export default function Logout() {
@@ -26,7 +26,10 @@ export default function Logout() {
   };
 
   return (
-    <Grid id="logout-wrapper" container spacing={0} direction="column" alignItems="center">
+    <Box
+      id="logout-wrapper"
+      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
       <div id="logout">
         <h1>{logoutPending ? "Logout pending" : "Logout complete"}</h1>
         {logoutPending ? (
@@ -35,6 +38,6 @@ export default function Logout() {
           <b style={{ paddingLeft: "10px" }}>Redirecting to login</b>
         )}
       </div>
-    </Grid>
+    </Box>
   );
 }

@@ -217,7 +217,7 @@ export default function PatternEditor({
               ? clearEditor()
               : null
           }
-          tooltipTitle="Clear editor field"
+          title="Clear editor field"
         />
         <SpeedDialAction
           icon={
@@ -226,7 +226,7 @@ export default function PatternEditor({
             </Badge>
           }
           onClick={() => onSave()}
-          tooltipTitle={
+          title={
             isDirty ? "Save pattern — unsaved changes (ctrl + s)" : "Save pattern (ctrl + s)"
           }
         />
@@ -234,7 +234,7 @@ export default function PatternEditor({
           key="sd-version-history"
           icon={<HistoryIcon />}
           onClick={() => setVersionHistoryOpen(true)}
-          tooltipTitle="Version history"
+          title="Version history"
         />
       </SpeedDial>
       <VersionHistoryModal

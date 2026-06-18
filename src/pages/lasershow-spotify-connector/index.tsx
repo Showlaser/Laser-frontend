@@ -198,8 +198,8 @@ export default function LasershowSpotifyConnector() {
                       checked={selectedSpotifySongIds?.some((spsi) => spsi === searchResult.id)}
                       tabIndex={-1}
                       disableRipple
-                      inputProps={{
-                        "aria-labelledby": `checkbox-list-label-${index}`,
+                      slotProps={{
+                        input: { "aria-labelledby": `checkbox-list-label-${index}` },
                       }}
                     />
                   </ListItemIcon>

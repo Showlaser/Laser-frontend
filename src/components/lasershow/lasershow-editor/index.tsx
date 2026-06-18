@@ -389,7 +389,7 @@ export default function LasershowEditorContent() {
                 ? setSelectedLasershow(null)
                 : null
             }
-            tooltipTitle="Clear editor field"
+            title="Clear editor field"
           />
           <SpeedDialAction
             icon={
@@ -398,7 +398,7 @@ export default function LasershowEditorContent() {
               </Badge>
             }
             onClick={saveLasershowOnApi}
-            tooltipTitle={
+            title={
               isDirty ? "Save lasershow — unsaved changes (ctrl + s)" : "Save lasershow (ctrl + s)"
             }
           />
@@ -406,7 +406,7 @@ export default function LasershowEditorContent() {
             key="sd-version-history"
             icon={<HistoryIcon />}
             onClick={() => setVersionHistoryOpen(true)}
-            tooltipTitle="Version history"
+            title="Version history"
           />
         </SpeedDial>
       </Grid>

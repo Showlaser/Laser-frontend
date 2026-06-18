@@ -1,4 +1,4 @@
-import { Button, FormControl, Grid, Paper, TextField } from "@mui/material";
+import { Box, Button, FormControl, Paper, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { addUser } from "services/logic/user-logic";
 import { getFormDataFromEvent } from "services/shared/form-data-helper";
@@ -36,13 +36,14 @@ export default function Registration() {
   };
 
   return (
-    <Grid
-      container
-      spacing={0}
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      style={{ minHeight: "70vh" }}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "70vh",
+      }}
     >
       <Paper sx={{ p: 2, textAlign: "center" }}>
         <h1>Register</h1>
@@ -65,6 +66,6 @@ export default function Registration() {
           </FormControl>
         </form>
       </Paper>
-    </Grid>
+    </Box>
   );
 }

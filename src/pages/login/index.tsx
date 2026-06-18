@@ -1,4 +1,4 @@
-import { Button, FormControl, Grid, TextField } from "@mui/material";
+import { Box, Button, FormControl, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { login } from "services/logic/login-logic";
 import { getFormDataObject, getUrlCode, stringIsEmpty } from "services/shared/general";
@@ -44,7 +44,7 @@ export default function Login() {
   };
 
   return (
-    <Grid id="login-wrapper" container spacing={0} direction="column" alignItems="center">
+    <Box id="login-wrapper" sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <form id="login" onSubmit={onSubmit}>
         <FormControl>
           <h1>Login</h1>
@@ -70,6 +70,6 @@ export default function Login() {
           </a>
         </FormControl>
       </form>
-    </Grid>
+    </Box>
   );
 }

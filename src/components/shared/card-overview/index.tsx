@@ -7,7 +7,6 @@ import {
   CardActionArea,
   CardContent,
   CardMedia,
-  Grid,
   Grow,
   IconButton,
   InputBase,
@@ -58,7 +57,14 @@ export default function CardOverview({
         <IconButton style={{ marginLeft: "95%" }} onClick={closeOverview}>
           <CloseIcon />
         </IconButton>
-        <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <OnTrue onTrue={items?.length > 0}>
             <Paper
               sx={{
@@ -85,7 +91,7 @@ export default function CardOverview({
               </IconButton>
             </Paper>
           </OnTrue>
-        </Grid>
+        </Box>
         {items.length === 0 ? (
           <div>
             <h1 style={{ marginTop: "80px" }}>{onEmptyMessageTitle}</h1>

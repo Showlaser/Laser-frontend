@@ -60,7 +60,7 @@ export default function LightMode() {
     <MaterialUISwitch
       checked={isDark}
       onChange={(event) => setMode(event.target.checked ? "dark" : "light")}
-      inputProps={{ "aria-label": "Toggle dark mode" }}
+      slotProps={{ input: { "aria-label": "Toggle dark mode" } }}
     />
   );
 }

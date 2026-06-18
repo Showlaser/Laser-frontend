@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import ResetPassword from "components/password-reset";
 import RequestPasswordReset from "components/password-reset/request-password-reset";
 import React from "react";
@@ -16,15 +16,16 @@ export default function PasswordReset() {
   }, []);
 
   return (
-    <Grid
-      container
-      spacing={0}
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      style={{ minHeight: "70vh" }}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "70vh",
+      }}
     >
       {stringIsEmpty(resetCode) ? <RequestPasswordReset /> : <ResetPassword code={resetCode} />}
-    </Grid>
+    </Box>
   );
 }

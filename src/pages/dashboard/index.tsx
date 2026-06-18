@@ -58,7 +58,7 @@ export const sharedTestLasers: LaserInfo[] = [
 export default function Dashboard() {
   return (
     <SideNav pageName="Dashboard">
-      <Grid container justifyContent="center">
+      <Grid container sx={{ justifyContent: "center" }}>
         <LaserStatusTable lasers={sharedTestLasers} />
       </Grid>
     </SideNav>

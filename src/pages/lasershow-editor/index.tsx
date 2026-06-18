@@ -85,7 +85,7 @@ export default function LasershowEditor() {
     >
       <SpeedDialAction
         key="sd-new-file"
-        tooltipTitle="Create a new lasershow"
+        title="Create a new lasershow"
         onClick={() => setSelectedLasershow(getLasershowPlaceholder())}
         icon={
           <label style={{ cursor: "pointer", padding: "25px" }}>
@@ -101,7 +101,7 @@ export default function LasershowEditor() {
             <CloudDownloadIcon style={{ marginTop: "8px" }} />
           </label>
         }
-        tooltipTitle="Edit saved lasershow"
+        title="Edit saved lasershow"
       />
     </SpeedDial>
   );

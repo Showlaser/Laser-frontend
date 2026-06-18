@@ -69,7 +69,7 @@ export default function PatternPage() {
       <SpeedDialAction
         id="pattern-new-file"
         key="sd-new-file"
-        tooltipTitle="Create a new pattern"
+        title="Create a new pattern"
         onClick={() => setSelectedPattern(getPatternPlaceHolder())}
         icon={
           <label style={{ cursor: "pointer", padding: "25px" }}>
@@ -79,7 +79,7 @@ export default function PatternPage() {
       ></SpeedDialAction>
       <SpeedDialAction
         key="sd-upload"
-        tooltipTitle="Upload local file"
+        title="Upload local file"
         icon={
           <label htmlFor="raised-button-file" style={{ cursor: "pointer", padding: "25px" }}>
             <AttachFileIcon style={{ marginTop: "8px" }} />
@@ -88,7 +88,7 @@ export default function PatternPage() {
       />
       <SpeedDialAction
         key="sd-saved-file"
-        tooltipTitle="Get saved pattern"
+        title="Get saved pattern"
         onClick={() => setConvertPatternModalOpen(true)}
         icon={
           <label style={{ cursor: "pointer", padding: "25px" }}>

@@ -1,5 +1,5 @@
 import DeleteIcon from "@mui/icons-material/Delete";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutlineOutlined";
 import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -468,7 +468,7 @@ export function SharedTimeline({
             }}
           />
         </Grid>
-        <Grid ml={1.5}>
+        <Grid sx={{ ml: 1.5 }}>
           <InputLabel id="steps-select">Steps (ms)</InputLabel>
           <Select
             labelId="steps-select"

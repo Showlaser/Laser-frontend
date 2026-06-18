@@ -236,7 +236,7 @@ export default function PointsSection({
                   checked={selectedPointsUuid.some((sp) => sp === point.uuid)}
                   tabIndex={-1}
                   disableRipple
-                  inputProps={{ "aria-labelledby": `points-label-${index}` }}
+                  slotProps={{ input: { "aria-labelledby": `points-label-${index}` } }}
                 />
               </ListItemIcon>
               <FormControl style={{ width: "125px" }}>
@@ -262,7 +262,7 @@ export default function PointsSection({
                 onChange={(e) => onXUpdate(point, e.target.value)}
                 placeholder="x"
                 type="number"
-                inputProps={{ min: -4000, max: 4000 }}
+                slotProps={{ htmlInput: { min: -4000, max: 4000 } }}
                 label="X"
               />
               <TextField
@@ -271,7 +271,7 @@ export default function PointsSection({
                 onChange={(e) => onYUpdate(point, e.target.value)}
                 placeholder="y"
                 type="number"
-                inputProps={{ min: -4000, max: 4000 }}
+                slotProps={{ htmlInput: { min: -4000, max: 4000 } }}
                 label="Y"
               />
               <FormControl style={{ marginLeft: "35px", width: "125px" }}>

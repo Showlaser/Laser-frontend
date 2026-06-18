@@ -165,7 +165,7 @@ export default function AnimationManager() {
                       checked={checkedUuidsToAdd.some((u) => u === ap.uuid)}
                       tabIndex={-1}
                       disableRipple
-                      inputProps={{ "aria-labelledby": `ap-am-ip-${ap.uuid}` }}
+                      slotProps={{ input: { "aria-labelledby": `ap-am-ip-${ap.uuid}` } }}
                     />
                   </ListItemIcon>
                   <ListItemText id={`ap-am-ip-${ap.uuid}`} primary={ap.name} />
@@ -195,7 +195,7 @@ export default function AnimationManager() {
                       checked={checkedUuidsToRemove.some((u) => u === ap.uuid)}
                       tabIndex={-1}
                       disableRipple
-                      inputProps={{ "aria-labelledby": `ap-am-ip-${ap.uuid}` }}
+                      slotProps={{ input: { "aria-labelledby": `ap-am-ip-${ap.uuid}` } }}
                     />
                   </ListItemIcon>
                   <ListItemText id={`ap-am-ip-${ap.uuid}`} primary={ap.name} />

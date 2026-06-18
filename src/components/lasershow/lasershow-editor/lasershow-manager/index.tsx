@@ -218,7 +218,7 @@ export default function LasershowManager() {
                       checked={checkedUuidsToAdd.some((u) => u === aa.uuid)}
                       tabIndex={-1}
                       disableRipple
-                      inputProps={{ "aria-labelledby": `lsm-aa-ip-${aa.uuid}` }}
+                      slotProps={{ input: { "aria-labelledby": `lsm-aa-ip-${aa.uuid}` } }}
                     />
                   </ListItemIcon>
                   <ListItemText id={`lsm-aa-ip-${aa.uuid}`} primary={aa.name} />
@@ -258,7 +258,7 @@ export default function LasershowManager() {
                       checked={checkedUuidsToRemove.some((u) => u === la.uuid)}
                       tabIndex={-1}
                       disableRipple
-                      inputProps={{ "aria-labelledby": `la-tr-ip-${la.uuid}` }}
+                      slotProps={{ input: { "aria-labelledby": `la-tr-ip-${la.uuid}` } }}
                     />
                   </ListItemIcon>
                   <ListItemText id={`la-tr-ip-${la.uuid}`} primary={la.name} />

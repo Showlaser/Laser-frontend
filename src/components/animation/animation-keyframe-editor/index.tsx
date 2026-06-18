@@ -410,7 +410,7 @@ export default function AnimationKeyFrameEditor() {
                 ? setSelectedAnimation(null)
                 : null
             }
-            tooltipTitle="Clear editor field"
+            title="Clear editor field"
           />
           <SpeedDialAction
             icon={
@@ -419,7 +419,7 @@ export default function AnimationKeyFrameEditor() {
               </Badge>
             }
             onClick={saveAnimationOnApi}
-            tooltipTitle={
+            title={
               isDirty ? "Save animation — unsaved changes (ctrl + s)" : "Save animation (ctrl + s)"
             }
           />
@@ -427,7 +427,7 @@ export default function AnimationKeyFrameEditor() {
             key="sd-version-history"
             icon={<HistoryIcon />}
             onClick={() => setVersionHistoryOpen(true)}
-            tooltipTitle="Version history"
+            title="Version history"
           />
         </SpeedDial>
       </Grid>

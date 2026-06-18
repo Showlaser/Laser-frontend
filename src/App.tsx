@@ -48,7 +48,7 @@ const theme = extendTheme({
     MuiTooltip: {
       defaultProps: {
         enterDelay: 750,
-        TransitionProps: { timeout: 250 },
+        slotProps: { transition: { timeout: 250 } },
       },
     },
     MuiRichTreeView: {
@@ -66,13 +66,17 @@ const theme = extendTheme({
     MuiButton: {
       styleOverrides: {
         // Static neon glow on primary buttons to match the sidenav accent
-        // (#485cdb = rgb(72, 92, 219)). No animation.
-        containedPrimary: {
-          boxShadow: "0 0 12px rgba(72, 92, 219, 0.55)",
-          "&:hover": {
-            boxShadow: "0 0 18px rgba(72, 92, 219, 0.75)",
-          },
-        },
+        // (#485cdb = rgb(72, 92, 219)). No animation. In v9 the containedPrimary
+        // slot was removed, so target the variant/color via ownerState.
+        root: ({ ownerState }) =>
+          ownerState.variant === "contained" && ownerState.color === "primary"
+            ? {
+                boxShadow: "0 0 12px rgba(72, 92, 219, 0.55)",
+                "&:hover": {
+                  boxShadow: "0 0 18px rgba(72, 92, 219, 0.75)",
+                },
+              }
+            : {},
       },
     },
     MuiFormControlLabel: {

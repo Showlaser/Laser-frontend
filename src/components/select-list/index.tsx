@@ -76,8 +76,8 @@ export default function SelectList({
                 checked={checked.some((c) => c === item.uuid)}
                 tabIndex={-1}
                 disableRipple
-                inputProps={{
-                  "aria-labelledby": `checkbox-list-label-${item.uuid}`,
+                slotProps={{
+                  input: { "aria-labelledby": `checkbox-list-label-${item.uuid}` },
                 }}
               />
             </ListItemIcon>

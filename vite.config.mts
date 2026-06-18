@@ -33,5 +33,13 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: "./src/setupTests.js",
+    server: {
+      // MUI v9's Transition.mjs does a directory import of
+      // react-transition-group/TransitionGroupContext, which Node's native ESM
+      // resolver rejects. Inlining lets Vite transform and resolve it.
+      deps: {
+        inline: ["@mui/material"],
+      },
+    },
   },
 });
