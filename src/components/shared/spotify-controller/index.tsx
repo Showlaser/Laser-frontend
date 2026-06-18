@@ -150,6 +150,9 @@ export default function SpotifyController() {
   // Ignore poll-driven progress syncs until this timestamp, giving Spotify
   // time to register a seek so the slider does not snap back to the old spot.
   const seekSettleUntilRef = useRef<number>(0);
+  // Count consecutive empty player responses; Spotify's endpoint returns these
+  // intermittently while playback continues, so we only act on repeated misses.
+  const noDeviceCountRef = useRef<number>(0);
   const open = Boolean(anchorEl);
   const { palette } = useTheme();
 
@@ -254,10 +257,16 @@ export default function SpotifyController() {
   const getData = async () => {
     const playerResult = await getPlayerState();
     if (playerResult?.device === undefined) {
-      setNoActiveDevice(true);
+      noDeviceCountRef.current += 1;
+      // Only surface the error after a few misses in a row so a single empty
+      // response does not wipe the player while playback is still going.
+      if (noDeviceCountRef.current >= 3) {
+        setNoActiveDevice(true);
+      }
       return;
     }
 
+    noDeviceCountRef.current = 0;
     setNoActiveDevice(false);
     setPlayer(playerResult);
   };
