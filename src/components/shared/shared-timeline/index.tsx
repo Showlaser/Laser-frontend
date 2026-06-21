@@ -208,8 +208,7 @@ export function SharedTimeline({
     );
     return timelineItems.find((ti) => {
       const endTime =
-        ti.startTime +
-        (ti.duration === 0 ? timelineItemWidthWhenDurationIsZero : ti.duration);
+        ti.startTime + (ti.duration === 0 ? timelineItemWidthWhenDurationIsZero : ti.duration);
       return (
         numberIsBetweenOrEqual(xMappedToTimelinePosition, ti.startTime, endTime) &&
         ti.timelineId === timelineIdPressed
@@ -274,9 +273,7 @@ export function SharedTimeline({
       // Use a local minimum width so zero-duration items stay clickable
       // without mutating the shared timeline item data.
       const itemDuration =
-        timelineItem.duration === 0
-          ? timelineItemWidthWhenDurationIsZero
-          : timelineItem.duration;
+        timelineItem.duration === 0 ? timelineItemWidthWhenDurationIsZero : timelineItem.duration;
 
       const widthToDisplay =
         (canvasWidth / 10) * (itemDuration / selectableSteps[selectableStepsIndex]);
@@ -284,8 +281,7 @@ export function SharedTimeline({
         (canvasWidth / 10) *
         ((itemStartTime - timelinePositionMs) / selectableSteps[selectableStepsIndex]);
 
-      const rectangleColor =
-        selectedItemUuid === timelineItem.uuid || isDragged ? "#6370c2" : "#485cdb";
+      const rectangleColor = "#485cdb";
       drawRoundedRectangleWithText(
         xPosition,
         y + 5,
@@ -369,8 +365,7 @@ export function SharedTimeline({
     const { x, y } = getMousePosition(e);
 
     if (dragState === null) {
-      canvas.style.cursor =
-        getTimelineItemFromMouseClick(x, y) !== undefined ? "grab" : "default";
+      canvas.style.cursor = getTimelineItemFromMouseClick(x, y) !== undefined ? "grab" : "default";
       return;
     }
 

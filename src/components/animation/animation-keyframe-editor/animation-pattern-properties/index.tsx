@@ -18,6 +18,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import PropertyControl from "components/shared/property-control";
 import { Animation, AnimationProperty } from "models/components/shared/animation";
 import {
   SelectedAnimationContext,
@@ -27,9 +28,8 @@ import {
   SelectedAnimationPatternIndexContext,
 } from "pages/animation-editor";
 import React from "react";
-import { numberOfTimeLines } from "services/shared/config";
-import PropertyControl from "components/shared/property-control";
 import { getAnimationPropertyColor } from "services/logic/animation-logic";
+import { numberOfTimeLines } from "services/shared/config";
 import {
   AnimationSelectedKeyFrameContext,
   AnimationSelectedKeyFrameContextType,
@@ -266,7 +266,7 @@ export default function AnimationPatternProperties({
         value={getPropertyValue(AnimationProperty.scale)}
         onChange={(value) => updateKeyframeProperty(value)}
         min={0.1}
-        max={10}
+        max={5}
         step={0.1}
         showSlider
         disabled={

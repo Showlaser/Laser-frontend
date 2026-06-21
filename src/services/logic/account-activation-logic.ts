@@ -5,7 +5,7 @@ import { toastSubject } from "services/shared/toast-messages";
 
 export const activateAccount = (code: string) => {
   return sendRequest(
-    () => Post(`${apiEndpoints.activateAccount}`, code),
+    () => Post(`${apiEndpoints.activateAccount}`, { code }),
     [404],
     toastSubject.activationSuccessful,
   );

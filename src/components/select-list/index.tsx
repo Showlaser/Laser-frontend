@@ -73,7 +73,7 @@ export default function SelectList({
                 icon={unCheckedCustomIcon ?? <CheckBoxOutlineBlankIcon />}
                 checkedIcon={checkedCustomIcon ?? <CheckBoxIcon />}
                 edge="start"
-                checked={checked.some((c) => c === item.uuid)}
+                checked={checked.some((c) => c === (item.uuid ?? ""))}
                 tabIndex={-1}
                 disableRipple
                 slotProps={{

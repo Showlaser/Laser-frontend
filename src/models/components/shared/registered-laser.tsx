@@ -17,6 +17,11 @@ export type RegisteredLaser = {
   modelType?: LaserModel;
   status?: LaserStatus;
   ipAddress?: string;
+  maxPowerPerlaserInPercentage?: number;
+  projectionTopInPercentage?: number;
+  projectionBottomInPercentage?: number;
+  projectionLeftInPercentage?: number;
+  projectionRightInPercentage?: number;
 };
 
 export const getRegisteredLaserPlaceholder = (): RegisteredLaser => {

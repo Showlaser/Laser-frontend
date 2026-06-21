@@ -79,7 +79,12 @@ export default function PropertyControl({
       <FormLabel htmlFor={id} disabled={disabled} style={labelStyle}>
         {label}
         {onReset !== undefined ? (
-          <Button size="small" disabled={disabled} style={{ marginLeft: "10px" }} onClick={handleReset}>
+          <Button
+            size="small"
+            disabled={disabled}
+            style={{ marginLeft: "10px" }}
+            onClick={handleReset}
+          >
             Reset
           </Button>
         ) : null}
