@@ -18,6 +18,7 @@ import { getLasershows } from "services/logic/lasershow-logic";
 import { getPatterns } from "services/logic/pattern-logic";
 import { convertPatternToAnimation } from "services/shared/converters";
 import { createGuid } from "services/shared/math";
+import paths from "services/shared/router-paths";
 import "./index.css";
 
 export type SelectedAnimationContextType = {
@@ -41,12 +42,12 @@ export type SelectedAnimationPatternContextType = {
 };
 
 export const SelectedAnimationContext = React.createContext<SelectedAnimationContextType | null>(
-  null
+  null,
 );
 export const AvailableAnimationsContext =
   React.createContext<AvailableAnimationsContextType | null>(null);
 export const AvailablePatternsContext = React.createContext<AvailablePatternsContextType | null>(
-  null
+  null,
 );
 export const SelectedAnimationPatternContext =
   React.createContext<SelectedAnimationPatternContextType | null>(null);
@@ -60,29 +61,29 @@ export default function AnimationPage() {
   const [convertPatternModalOpen, setConvertPatternModalOpen] = useState<boolean>(false);
   const [animationsModalOpen, setAnimationsModalOpen] = useState<boolean>(false);
   const [selectedAnimationPattern, setSelectedAnimationPattern] = useState<AnimationPattern | null>(
-    null
+    null,
   );
   const [patternToRemove, setPatternToRemove] = useState<Pattern>();
   const [animationToRemove, setAnimationToRemove] = useState<Animation>();
 
   const selectedAnimationMemo = React.useMemo(
     () => ({ selectedAnimation, setSelectedAnimation }),
-    [selectedAnimation]
+    [selectedAnimation],
   );
 
   const availableAnimationsMemo = React.useMemo(
     () => ({ availableAnimations, setAvailableAnimations }),
-    [availableAnimations]
+    [availableAnimations],
   );
 
   const availablePatternsMemo = React.useMemo(
     () => ({ availablePatterns, setAvailablePatterns }),
-    [availablePatterns]
+    [availablePatterns],
   );
 
   const selectedAnimationPatternMemo = React.useMemo(
     () => ({ selectedAnimationPattern, setSelectedAnimationPattern }),
-    [selectedAnimationPattern]
+    [selectedAnimationPattern],
   );
 
   useEffect(() => {
@@ -117,7 +118,7 @@ export default function AnimationPage() {
             <SelectedAnimationPatternIndexContext.Provider
               value={
                 selectedAnimation?.animationPatterns.findIndex(
-                  (ap) => ap.uuid === selectedAnimationPattern?.uuid
+                  (ap) => ap.uuid === selectedAnimationPattern?.uuid,
                 ) ?? 0
               }
             >
@@ -236,8 +237,13 @@ export default function AnimationPage() {
         <CardOverview
           closeOverview={() => setConvertPatternModalOpen(false)}
           show={convertPatternModalOpen}
-          onNoItemsMessageTitle="No patterns saved"
-          onNoItemsDescription="Create a new pattern in the pattern editor"
+          noItemsProps={{
+            onNoItemsMessageTitle: "No patterns saved",
+            onNoItemsDescription: "Create a pattern first!",
+            onNoItemsCreateCallback: () => {
+              document.location.href = paths.PatternEditor;
+            },
+          }}
           onDeleteClick={(uuid) =>
             setPatternToRemove(availablePatterns?.find((p) => p.uuid === uuid))
           }
@@ -263,8 +269,14 @@ export default function AnimationPage() {
         <CardOverview
           closeOverview={() => setAnimationsModalOpen(false)}
           show={animationsModalOpen}
-          onNoItemsMessageTitle="No animations saved"
-          onNoItemsDescription="Create a new animation first"
+          noItemsProps={{
+            onNoItemsMessageTitle: "No animations saved",
+            onNoItemsDescription: "Create a animation first by converting a pattern!",
+            onNoItemsCreateCallback: () => {
+              setAnimationsModalOpen(false);
+              setConvertPatternModalOpen(true);
+            },
+          }}
           onDeleteClick={(uuid) =>
             setAnimationToRemove(availableAnimations?.find((a) => a.uuid === uuid))
           }

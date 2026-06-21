@@ -12,7 +12,7 @@ import SideNav from "components/shared/sidenav";
 import { Animation } from "models/components/shared/animation";
 import { Lasershow } from "models/components/shared/lasershow";
 import { getPatternPlaceHolder, Pattern } from "models/components/shared/pattern";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getAnimations } from "services/logic/animation-logic";
 import { getLasershows } from "services/logic/lasershow-logic";
 import { getPatterns, savePattern } from "services/logic/pattern-logic";
@@ -122,7 +122,7 @@ export default function PatternPage() {
       patternToDuplicate.points[index].patternUuid = patternToDuplicate.uuid;
       const ppUuid = createGuid();
       const patternPointsToUpdate = patternToDuplicate.points.filter(
-        (pp) => pp.connectedToPointUuid === patternToDuplicate.points[index].uuid
+        (pp) => pp.connectedToPointUuid === patternToDuplicate.points[index].uuid,
       );
 
       for (let pptuIndex = 0; pptuIndex < patternPointsToUpdate.length; pptuIndex++) {
@@ -157,7 +157,7 @@ export default function PatternPage() {
         <PatternEditor
           patternNamesInUse={
             availablePatterns?.map((pattern) =>
-              pattern.uuid !== selectedPattern?.uuid ? pattern.name : ""
+              pattern.uuid !== selectedPattern?.uuid ? pattern.name : "",
             ) ?? []
           }
           uploadedFile={uploadedFile}
@@ -169,8 +169,14 @@ export default function PatternPage() {
       <CardOverview
         closeOverview={() => setConvertPatternModalOpen(false)}
         show={convertPatternModalOpen}
-        onNoItemsMessageTitle="No patterns saved"
-        onNoItemsDescription="Create a new pattern in the pattern editor"
+        noItemsProps={{
+          onNoItemsMessageTitle: "No patterns saved",
+          onNoItemsDescription: "Create a pattern first!",
+          onNoItemsCreateCallback: () => {
+            setSelectedPattern(getPatternPlaceHolder());
+            setConvertPatternModalOpen(false);
+          },
+        }}
         onDeleteClick={(uuid) =>
           setPatternToRemove(availablePatterns?.find((p) => p.uuid === uuid))
         }

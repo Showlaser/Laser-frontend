@@ -28,7 +28,7 @@ export type SelectedLasershowContextType = {
 export const AvailableAnimationsContext =
   React.createContext<AvailableAnimationsContextType | null>(null);
 export const SelectedLasershowContext = React.createContext<SelectedLasershowContextType | null>(
-  null
+  null,
 );
 
 export default function LasershowEditor() {
@@ -43,12 +43,12 @@ export default function LasershowEditor() {
 
   const selectedLasershowMemo = React.useMemo(
     () => ({ selectedLasershow, setSelectedLasershow }),
-    [selectedLasershow]
+    [selectedLasershow],
   );
 
   const availableAnimationsMemo = React.useMemo(
     () => ({ availableAnimations, setAvailableAnimations }),
-    [availableAnimations]
+    [availableAnimations],
   );
 
   useEffect(() => {
@@ -151,8 +151,14 @@ export default function LasershowEditor() {
         <CardOverview
           closeOverview={() => setLaserShowModalOpen(false)}
           show={lasershowModalOpen}
-          onNoItemsMessageTitle="No lasershows saved"
-          onNoItemsDescription="Create a new lasershow first!"
+          noItemsProps={{
+            onNoItemsMessageTitle: "No lasershows saved",
+            onNoItemsDescription: "Create a lasershow first!",
+            onNoItemsCreateCallback: () => {
+              setSelectedLasershow(getLasershowPlaceholder());
+              setLaserShowModalOpen(false);
+            },
+          }}
           onDeleteClick={(uuid) =>
             setModalOptions({
               show: true,
