@@ -1,9 +1,11 @@
 import ClearIcon from "@mui/icons-material/Clear";
+import HistoryIcon from "@mui/icons-material/History";
 import SaveIcon from "@mui/icons-material/Save";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { Grid, SpeedDial, SpeedDialAction } from "@mui/material";
+import { Badge, Grid, SpeedDial, SpeedDialAction } from "@mui/material";
 import PointsDrawer from "components/shared/points-drawer";
 import ToLaserProjector from "components/shared/to-laser-projector";
+import VersionHistoryModal from "components/shared/version-history-modal";
 import TabSelector, { TabSelectorData } from "components/tabs";
 import { Pattern, getPatternPlaceHolder } from "models/components/shared/pattern";
 import { Point } from "models/components/shared/point";
@@ -14,13 +16,15 @@ import { svgToPoints } from "services/logic/svg-to-coordinates-converter";
 import { applyParametersToPointsForCanvasByPattern } from "services/shared/converters";
 import { showError, showSuccess, toastSubject } from "services/shared/toast-messages";
 import { addItemToVersionHistory } from "services/shared/version-history";
+import { useUnsavedChanges } from "services/shared/use-unsaved-changes";
+import { useUndoRedo } from "services/shared/use-undo-redo";
 import GeneralSection from "./sections/general-section";
 import PointsSection from "./sections/points-section";
 
 type Props = {
   patternNamesInUse: string[];
-  uploadedFile: File;
-  setUploadedFile: (file: any) => void;
+  uploadedFile: File | undefined;
+  setUploadedFile: (file: File | undefined) => void;
   patternFromServer: Pattern | null;
   clearServerPattern: () => void;
 };
@@ -43,11 +47,10 @@ export default function PatternEditor({
   const [patternNameIsInUse, setPatternNameIsInUse] = React.useState<boolean>(false);
   const [pointsToDraw, setPointToDraw] = React.useState<Point[]>([]);
   const [selectedTabId, setSelectedTabId] = React.useState<number>(0);
+  const [versionHistoryOpen, setVersionHistoryOpen] = React.useState<boolean>(false);
 
-  const alertUser = (e: BeforeUnloadEvent) => {
-    e.preventDefault();
-    e.returnValue = "Are you sure you want to leave the page?";
-  };
+  const { isDirty, markSaved } = useUnsavedChanges(pattern, pattern.uuid);
+  const { undo, redo } = useUndoRedo(pattern, setPattern, pattern.uuid);
 
   useEffect(() => {
     if (uploadedFile === undefined) {
@@ -55,10 +58,7 @@ export default function PatternEditor({
     }
 
     onFileUpload(uploadedFile);
-    window.addEventListener("beforeunload", alertUser);
-    return () => {
-      window.removeEventListener("beforeunload", alertUser);
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run when the uploaded file/point count changes
   }, [uploadedFile, numberOfPoints]);
 
   useEffect(() => {
@@ -76,9 +76,9 @@ export default function PatternEditor({
     clearServerPattern();
   };
 
-  const updatePatternProperty = (property: string, value: any) => {
-    let updatedPattern: any = { ...pattern };
-    updatedPattern[property] = value;
+  const updatePatternProperty = (property: string, value: unknown) => {
+    const updatedPattern = { ...pattern };
+    (updatedPattern as Record<string, unknown>)[property] = value;
     setPattern(updatedPattern);
   };
 
@@ -91,6 +91,10 @@ export default function PatternEditor({
     const reader = new FileReader();
     reader.onload = function () {
       const result = reader.result;
+      if (typeof result !== "string") {
+        onInvalidFile();
+        return;
+      }
       const convertedPoints = svgToPoints(result, numberOfPoints, pattern.uuid);
       if (convertedPoints.length === 0) {
         onInvalidFile();
@@ -112,7 +116,7 @@ export default function PatternEditor({
     const canvas: HTMLCanvasElement | null = document.getElementById(
       "points-drawer-canvas"
     ) as HTMLCanvasElement;
-    let patternToUpdate = { ...pattern };
+    const patternToUpdate = { ...pattern };
     if (canvas !== null) {
       patternToUpdate.image = canvas.toDataURL("image/webp", 0.4);
       setPattern(patternToUpdate);
@@ -120,9 +124,13 @@ export default function PatternEditor({
 
     await savePattern(patternToUpdate);
     localStorage.setItem("pattern", JSON.stringify(patternToUpdate));
-    addItemToVersionHistory("Pattern editor", patternToUpdate);
+    addItemToVersionHistory("Pattern editor", patternToUpdate, {
+      name: patternToUpdate.name,
+      image: patternToUpdate.image,
+    });
     showSuccess(toastSubject.changesSaved);
     setPattern(patternToUpdate);
+    markSaved(patternToUpdate);
   };
 
   const sectionProps = {
@@ -155,9 +163,19 @@ export default function PatternEditor({
   ];
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.ctrlKey && e.key === "s") {
+    if (!e.ctrlKey) {
+      return;
+    }
+
+    if (e.key === "s") {
       e.preventDefault();
       onSave();
+    } else if (e.key === "z") {
+      e.preventDefault();
+      undo();
+    } else if (e.key === "y") {
+      e.preventDefault();
+      redo();
     }
   };
 
@@ -170,14 +188,14 @@ export default function PatternEditor({
       direction="row"
       spacing={2}
     >
-      <Grid item xs={6.5}>
+      <Grid size={6.5}>
         <TabSelector
           data={tabSelectorData}
           selectedTabId={selectedTabId}
           setSelectedTabId={setSelectedTabId}
         />
       </Grid>
-      <Grid item sx={{ marginLeft: "40px" }}>
+      <Grid sx={{ marginLeft: "40px" }}>
         <PointsDrawer
           selectedPointsUuid={selectedPointsUuid}
           showPointNumber={showPointNumber}
@@ -189,6 +207,7 @@ export default function PatternEditor({
         id="svg-to-coordinates-converter-speeddial"
         sx={{ position: "fixed", bottom: 30, right: 30 }}
         icon={<SettingsIcon />}
+        FabProps={{ color: isDirty ? "warning" : "primary" }}
       >
         <SpeedDialAction
           key="sd-upload-clear"
@@ -198,14 +217,32 @@ export default function PatternEditor({
               ? clearEditor()
               : null
           }
-          tooltipTitle="Clear editor field"
+          title="Clear editor field"
         />
         <SpeedDialAction
-          icon={<SaveIcon />}
+          icon={
+            <Badge color="warning" variant="dot" invisible={!isDirty}>
+              <SaveIcon />
+            </Badge>
+          }
           onClick={() => onSave()}
-          tooltipTitle="Save pattern (ctrl + s)"
+          title={
+            isDirty ? "Save pattern — unsaved changes (ctrl + s)" : "Save pattern (ctrl + s)"
+          }
+        />
+        <SpeedDialAction
+          key="sd-version-history"
+          icon={<HistoryIcon />}
+          onClick={() => setVersionHistoryOpen(true)}
+          title="Version history"
         />
       </SpeedDial>
+      <VersionHistoryModal
+        open={versionHistoryOpen}
+        pageName="Pattern editor"
+        onClose={() => setVersionHistoryOpen(false)}
+        onRestore={(state) => setPattern(state as Pattern)}
+      />
     </Grid>
   );
 }

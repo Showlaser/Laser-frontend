@@ -31,7 +31,7 @@ import {
 import { convertAnimationToLasershowAnimation } from "services/shared/converters";
 
 export default function LasershowManager() {
-  const { availableAnimations, setAvailableAnimations } = React.useContext(
+  const { availableAnimations } = React.useContext(
     AvailableAnimationsContext
   ) as AvailableAnimationsContextType;
 
@@ -51,7 +51,7 @@ export default function LasershowManager() {
       return;
     }
 
-    let updatedLasershow = { ...selectedLasershow } as Lasershow;
+    const updatedLasershow = { ...selectedLasershow } as Lasershow;
     const animationsToKeep = updatedLasershow.lasershowAnimations?.filter(
       (a) => !checkedUuidsToRemove.some((uuid) => uuid === a.uuid)
     );
@@ -81,7 +81,11 @@ export default function LasershowManager() {
     const uuidIndex = arrayToUpdate.findIndex((u) => u === uuid);
     const newChecked = [...arrayToUpdate];
 
-    uuidIndex === -1 ? newChecked.push(uuid) : newChecked.splice(uuidIndex, 1);
+    if (uuidIndex === -1) {
+      newChecked.push(uuid);
+    } else {
+      newChecked.splice(uuidIndex, 1);
+    }
     updateArray(newChecked);
   };
 
@@ -90,7 +94,7 @@ export default function LasershowManager() {
       return;
     }
 
-    let updatedLasershow: Lasershow = { ...selectedLasershow };
+    const updatedLasershow: Lasershow = { ...selectedLasershow };
     const animationsToAdd = availableAnimations?.filter((aa) =>
       checkedUuidsToAdd.some((cu) => cu === aa.uuid)
     );
@@ -122,7 +126,7 @@ export default function LasershowManager() {
   };
 
   const getAvailableTimelinePositionSpot = (
-    lasershowAnimation: LasershowAnimation
+    _lasershowAnimation: LasershowAnimation
   ) => {
     if (selectedLasershow === null) {
       return { timelineId: 0, timeMs: 0 };
@@ -138,7 +142,7 @@ export default function LasershowManager() {
       }
     }
 
-    let lastLasershowAnimationOnTimelines: LasershowAnimation[] = [];
+    const lastLasershowAnimationOnTimelines: LasershowAnimation[] = [];
     for (let i = 0; i < 3; i++) {
       const lastLasershowAnimationOnTimeline =
         selectedLasershow.lasershowAnimations
@@ -189,7 +193,7 @@ export default function LasershowManager() {
             id="lasershow-name"
             value={selectedLasershow?.name}
             onChange={(e) => {
-              let lasershowToUpdate = { ...selectedLasershow } as Lasershow;
+              const lasershowToUpdate = { ...selectedLasershow } as Lasershow;
               lasershowToUpdate.name = e.target.value;
               setSelectedLasershow(lasershowToUpdate);
             }}
@@ -214,7 +218,7 @@ export default function LasershowManager() {
                       checked={checkedUuidsToAdd.some((u) => u === aa.uuid)}
                       tabIndex={-1}
                       disableRipple
-                      inputProps={{ "aria-labelledby": `lsm-aa-ip-${aa.uuid}` }}
+                      slotProps={{ input: { "aria-labelledby": `lsm-aa-ip-${aa.uuid}` } }}
                     />
                   </ListItemIcon>
                   <ListItemText id={`lsm-aa-ip-${aa.uuid}`} primary={aa.name} />
@@ -254,7 +258,7 @@ export default function LasershowManager() {
                       checked={checkedUuidsToRemove.some((u) => u === la.uuid)}
                       tabIndex={-1}
                       disableRipple
-                      inputProps={{ "aria-labelledby": `la-tr-ip-${la.uuid}` }}
+                      slotProps={{ input: { "aria-labelledby": `la-tr-ip-${la.uuid}` } }}
                     />
                   </ListItemIcon>
                   <ListItemText id={`la-tr-ip-${la.uuid}`} primary={la.name} />
@@ -268,7 +272,7 @@ export default function LasershowManager() {
               color="error"
               style={{ marginTop: "10px" }}
               onClick={() => {
-                let updateModalOptions = { ...modalOptions };
+                const updateModalOptions = { ...modalOptions };
                 updateModalOptions.show = true;
                 updateModalOptions.onDelete = deleteSelectedLasershowAnimations;
                 setModalOptions(updateModalOptions);

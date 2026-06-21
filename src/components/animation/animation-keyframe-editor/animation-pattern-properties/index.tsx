@@ -14,9 +14,11 @@ import {
   Tooltip,
 } from "@mui/material";
 
+import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import PropertyControl from "components/shared/property-control";
 import { Animation, AnimationProperty } from "models/components/shared/animation";
 import {
   SelectedAnimationContext,
@@ -26,10 +28,9 @@ import {
   SelectedAnimationPatternIndexContext,
 } from "pages/animation-editor";
 import React from "react";
+import { getAnimationPropertyColor } from "services/logic/animation-logic";
 import { numberOfTimeLines } from "services/shared/config";
 import {
-  AnimationSelectableStepsIndexContext,
-  AnimationSelectableStepsIndexContextType,
   AnimationSelectedKeyFrameContext,
   AnimationSelectedKeyFrameContextType,
   AnimationTimeLineContextType,
@@ -37,44 +38,43 @@ import {
 } from "..";
 
 export type AnimationPatternProps = {
-  updatePatternProperty: (propertyName: string, value: any) => void;
+  updatePatternProperty: (propertyName: string, value: unknown) => void;
+  deleteKeyframe: (property: string) => void;
 };
 
 export default function AnimationPatternProperties({
   updatePatternProperty,
+  deleteKeyframe,
 }: AnimationPatternProps) {
   const { selectedAnimation, setSelectedAnimation } = React.useContext(
-    SelectedAnimationContext
+    SelectedAnimationContext,
   ) as SelectedAnimationContextType;
   const { selectedAnimationPattern } = React.useContext(
-    SelectedAnimationPatternContext
+    SelectedAnimationPatternContext,
   ) as SelectedAnimationPatternContextType;
   const { setTimelinePositionMs } = React.useContext(
-    AnimationTimeLinePositionContext
+    AnimationTimeLinePositionContext,
   ) as AnimationTimeLineContextType;
-  const { selectableStepsIndex } = React.useContext(
-    AnimationSelectableStepsIndexContext
-  ) as AnimationSelectableStepsIndexContextType;
   const { selectedKeyFrameUuid, setSelectedKeyFrameUuid } = React.useContext(
-    AnimationSelectedKeyFrameContext
+    AnimationSelectedKeyFrameContext,
   ) as AnimationSelectedKeyFrameContextType;
 
   const selectedAnimationPatternIndex = React.useContext(SelectedAnimationPatternIndexContext);
 
   const selectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames?.find(
-    (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
+    (kf) => kf.uuid === selectedKeyFrameUuid,
   );
   const uiComponentsAreDisabled = selectedAnimationPattern === null;
 
   const updateKeyframeProperty = (value: number) => {
     const selectedKeyFrameIndex = selectedAnimationPattern?.animationPatternKeyFrames.findIndex(
-      (kf: { uuid: any }) => kf.uuid === selectedKeyFrameUuid
+      (kf) => kf.uuid === selectedKeyFrameUuid,
     );
     if (selectedAnimation === null) {
       return;
     }
 
-    let updatedAnimation: Animation = { ...selectedAnimation };
+    const updatedAnimation: Animation = { ...selectedAnimation };
     if (
       updatedAnimation === undefined ||
       selectedKeyFrameIndex === undefined ||
@@ -92,8 +92,7 @@ export default function AnimationPatternProperties({
 
   const getPropertyValue = (property: string) => {
     const selectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames.find(
-      (kf: { uuid: any; propertyEdited: string }) =>
-        kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property
+      (kf) => kf.uuid === selectedKeyFrameUuid && kf.propertyEdited === property,
     );
 
     return selectedKeyFrame?.propertyValue;
@@ -101,7 +100,7 @@ export default function AnimationPatternProperties({
 
   const getNextOrPreviousKeyframe = (getPrevious: boolean, property: string) => {
     const currentSelectedKeyFrame = selectedAnimationPattern?.animationPatternKeyFrames.find(
-      (ak: { uuid: any }) => ak.uuid === selectedKeyFrameUuid
+      (ak) => ak.uuid === selectedKeyFrameUuid,
     );
     if (currentSelectedKeyFrame === undefined) {
       onGetNextOrPreviousKeyframeError(property);
@@ -124,7 +123,7 @@ export default function AnimationPatternProperties({
     }
 
     const currentPositionInArray = keyFrames?.findIndex(
-      (ak: { uuid: any }) => ak.uuid === currentSelectedKeyFrame.uuid
+      (ak) => ak.uuid === currentSelectedKeyFrame.uuid,
     );
     if (currentPositionInArray === -1) {
       onGetNextOrPreviousKeyframeError(property);
@@ -211,11 +210,21 @@ export default function AnimationPatternProperties({
           </IconButton>
         </span>
       </Tooltip>
+      <Tooltip title={`Delete ${property} keyframe`}>
+        <span>
+          <IconButton
+            disabled={uiComponentsAreDisabled || selectedKeyFrame?.propertyEdited !== property}
+            onClick={() => deleteKeyframe(property)}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
     </span>
   );
 
   const getTimelineMenuItems = () => {
-    let items = [];
+    const items = [];
     for (let i = 0; i < numberOfTimeLines; i++) {
       items.push(
         <MenuItem
@@ -224,7 +233,7 @@ export default function AnimationPatternProperties({
           value={i}
         >
           {i + 1}
-        </MenuItem>
+        </MenuItem>,
       );
     }
 
@@ -250,69 +259,66 @@ export default function AnimationPatternProperties({
         onChange={(e) => updatePatternProperty("name", e.target.value)}
       />
 
-      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-scale">
-        Scale
-      </InputLabel>
-      <Input
-        size="small"
+      <PropertyControl
+        label="Scale"
         id="animation-scale"
-        type="number"
-        inputProps={{ min: 0.1, max: 10, step: 0.1 }}
+        dense
         value={getPropertyValue(AnimationProperty.scale)}
-        onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
+        onChange={(value) => updateKeyframeProperty(value)}
+        min={0.1}
+        max={5}
+        step={0.1}
+        showSlider
         disabled={
           selectedKeyFrame?.propertyEdited !== AnimationProperty.scale || uiComponentsAreDisabled
         }
+        endAdornment={nextKeyFrameButton(AnimationProperty.scale)}
       />
-      {nextKeyFrameButton(AnimationProperty.scale)}
 
-      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-xoffset">
-        X offset
-      </InputLabel>
-      <Input
-        size="small"
+      <PropertyControl
+        label="X offset"
         id="animation-xoffset"
-        type="number"
-        inputProps={{ min: -4000, max: 4000 }}
+        dense
         value={getPropertyValue(AnimationProperty.xOffset)}
-        onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
+        onChange={(value) => updateKeyframeProperty(value)}
+        min={-4000}
+        max={4000}
+        showSlider
         disabled={
           selectedKeyFrame?.propertyEdited !== AnimationProperty.xOffset || uiComponentsAreDisabled
         }
+        endAdornment={nextKeyFrameButton(AnimationProperty.xOffset)}
       />
-      {nextKeyFrameButton(AnimationProperty.xOffset)}
 
-      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-yoffset">
-        Y offset
-      </InputLabel>
-      <Input
-        size="small"
+      <PropertyControl
+        label="Y offset"
         id="animation-yoffset"
-        type="number"
-        inputProps={{ min: -4000, max: 4000 }}
+        dense
         value={getPropertyValue(AnimationProperty.yOffset)}
-        onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
+        onChange={(value) => updateKeyframeProperty(value)}
+        min={-4000}
+        max={4000}
+        showSlider
         disabled={
           selectedKeyFrame?.propertyEdited !== AnimationProperty.yOffset || uiComponentsAreDisabled
         }
+        endAdornment={nextKeyFrameButton(AnimationProperty.yOffset)}
       />
-      {nextKeyFrameButton(AnimationProperty.yOffset)}
 
-      <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-rotation">
-        Rotation
-      </InputLabel>
-      <Input
-        size="small"
+      <PropertyControl
+        label="Rotation"
         id="animation-rotation"
-        type="number"
-        inputProps={{ min: -360, max: 360 }}
+        dense
         value={getPropertyValue(AnimationProperty.rotation)}
-        onChange={(e) => updateKeyframeProperty(Number(e.target.value))}
+        onChange={(value) => updateKeyframeProperty(value)}
+        min={-360}
+        max={360}
+        showSlider
         disabled={
           selectedKeyFrame?.propertyEdited !== AnimationProperty.rotation || uiComponentsAreDisabled
         }
+        endAdornment={nextKeyFrameButton(AnimationProperty.rotation)}
       />
-      {nextKeyFrameButton(AnimationProperty.rotation)}
 
       <InputLabel shrink style={labelStyle} size="small" htmlFor="animation-starttime">
         Starttime in Ms
@@ -348,29 +354,30 @@ export default function AnimationPatternProperties({
             <List dense={true}>
               {selectedAnimationPattern?.animationPatternKeyFrames
                 .sort((a, b) => a.timeMs - b.timeMs)
-                ?.map(
-                  (keyFrame: {
-                    uuid: any;
-                    timeMs: number;
-                    propertyEdited: any;
-                    propertyValue: any;
-                  }) => (
-                    <ListItemButton
-                      key={`${keyFrame.uuid}-points`}
-                      onClick={() => {
-                        setTimelinePositionMs(
-                          keyFrame.timeMs + selectedAnimationPattern.startTimeMs
-                        );
-                        setSelectedKeyFrameUuid(keyFrame.uuid);
+                ?.map((keyFrame) => (
+                  <ListItemButton
+                    key={`${keyFrame.uuid}-points`}
+                    onClick={() => {
+                      setTimelinePositionMs(keyFrame.timeMs + selectedAnimationPattern.startTimeMs);
+                      setSelectedKeyFrameUuid(keyFrame.uuid);
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: "10px",
+                        height: "10px",
+                        borderRadius: "50%",
+                        marginRight: "8px",
+                        flexShrink: 0,
+                        backgroundColor: getAnimationPropertyColor(keyFrame.propertyEdited),
                       }}
-                    >
-                      <ListItemText
-                        primary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
-                        secondary={`${keyFrame.timeMs} ms`}
-                      />
-                    </ListItemButton>
-                  )
-                )}
+                    />
+                    <ListItemText
+                      primary={`${keyFrame.propertyEdited}: ${keyFrame.propertyValue}`}
+                      secondary={`${keyFrame.timeMs} ms`}
+                    />
+                  </ListItemButton>
+                ))}
             </List>
           </AccordionDetails>
         </Accordion>

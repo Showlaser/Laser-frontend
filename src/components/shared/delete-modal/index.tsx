@@ -1,4 +1,4 @@
-import { Modal, Grid, Paper, Divider, Button, Fade } from "@mui/material";
+import { Modal, Box, Paper, Divider, Button, Fade } from "@mui/material";
 import React from "react";
 
 export type ModalOptions = {
@@ -16,7 +16,7 @@ type Props = {
 
 export default function DeleteModal({ setModalOptions, modalOptions, onCancelClick }: Props) {
   const onModalClose = () => {
-    let updatedModalOptions = { ...modalOptions };
+    const updatedModalOptions = { ...modalOptions };
     updatedModalOptions.show = false;
     setModalOptions(updatedModalOptions);
     if (onCancelClick !== undefined) {
@@ -27,13 +27,14 @@ export default function DeleteModal({ setModalOptions, modalOptions, onCancelCli
   return (
     <Modal open={modalOptions.show}>
       <Fade in={modalOptions.show}>
-        <Grid
-          container
-          spacing={0}
-          direction="column"
-          alignItems="center"
-          justifyContent="center"
-          style={{ minHeight: "100vh" }}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "100vh",
+          }}
         >
           <Paper sx={{ textAlign: "left", width: "60%", padding: "5px 20px 5px 20px" }}>
             <h3>{modalOptions?.title ?? "Are you sure you want to delete this item?"}</h3>
@@ -57,7 +58,7 @@ export default function DeleteModal({ setModalOptions, modalOptions, onCancelCli
               </Button>
             </div>
           </Paper>
-        </Grid>
+        </Box>
       </Fade>
     </Modal>
   );

@@ -5,6 +5,6 @@ type Props = {
   laserInfo: LaserInfo;
 };
 
-export default function LaserInsights({ laserInfo }: Props) {
+export default function LaserInsights(_props: Props) {
   return <></>;
 }

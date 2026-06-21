@@ -54,7 +54,7 @@ export const rotatePoints = (
   centerY: number
 ) => {
   const angleInRadians = ((360 - angleInDegrees) * Math.PI) / 180;
-  let updatedPoints = [];
+  const updatedPoints = [];
 
   const pointsLength = points.length;
   for (let i = 0; i < pointsLength; i++) {

@@ -12,7 +12,6 @@ import PasswordReset from "pages/password-reset";
 import PatternEditor from "pages/pattern-editor";
 import Registration from "pages/registration";
 import ShowlasersManager from "pages/showlasers-manager";
-import SpotifyVote from "pages/spotify-vote";
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import routerPaths from "services/shared/router-paths";
@@ -24,24 +23,14 @@ function routes() {
       <Route path={routerPaths.Dashboard} element={<Dashboard />} />
       <Route path={routerPaths.PatternEditor} element={<PatternEditor />} />
       <Route path={routerPaths.Installation} element={<Installation />} />
-      <Route path={routerPaths.SpotifyVote} element={<SpotifyVote />} />
       <Route path={routerPaths.ResetPassword} element={<PasswordReset />} />
       <Route path={routerPaths.Disclaimer} element={<Disclaimer />} />
       <Route path={routerPaths.Account} element={<Account />} />
       <Route path={routerPaths.Registration} element={<Registration />} />
-      <Route
-        path={routerPaths.ShowlaserManager}
-        element={<ShowlasersManager />}
-      />
+      <Route path={routerPaths.ShowlaserManager} element={<ShowlasersManager />} />
       <Route path={routerPaths.Logout} element={<Logout />} />
-      <Route
-        path={routerPaths.LasershowSpotifyConnector}
-        element={<LasershowSpotifyConnector />}
-      />
-      <Route
-        path={routerPaths.ActivateAccount}
-        element={<AccountActivation />}
-      />
+      <Route path={routerPaths.LasershowSpotifyConnector} element={<LasershowSpotifyConnector />} />
+      <Route path={routerPaths.ActivateAccount} element={<AccountActivation />} />
       <Route path={routerPaths.AnimationEditor} element={<AnimationEditor />} />
       <Route path={routerPaths.LasershowEditor} element={<LasershowEditor />} />
     </Routes>

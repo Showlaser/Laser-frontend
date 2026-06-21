@@ -61,7 +61,7 @@ export const generatePointsTestSet = (coordinates: { x: number; y: number }[]): 
 export const getTestAnimationPatternKeyFrames = (
   keyframesStartTimes: number[]
 ): AnimationPatternKeyFrame[] => {
-  let keyFrames: AnimationPatternKeyFrame[] = [];
+  const keyFrames: AnimationPatternKeyFrame[] = [];
   keyframesStartTimes.forEach((kfst) => {
     const kf = propertiesSettings.map((propertySetting) => ({
       uuid: createGuid(),
@@ -93,7 +93,7 @@ export const testAnimationPattern = (
   keyframesStartTimes: number[],
   animationDuration: number
 ): AnimationPattern => {
-  let animationPattern: AnimationPattern = {
+  const animationPattern: AnimationPattern = {
     uuid: "4145ab82-6a79-48d1-8425-747a464a4940",
     patternUuid: testPattern.uuid,
     animationUuid: "cdef5b05-e8aa-44e3-8261-7619e90b0ef0",

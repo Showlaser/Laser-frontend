@@ -38,7 +38,7 @@ export default function AnimationManager() {
       return;
     }
 
-    let updatedAnimation = { ...selectedAnimation } as Animation;
+    const updatedAnimation = { ...selectedAnimation } as Animation;
     const animationPatternsToKeep: AnimationPattern[] = updatedAnimation.animationPatterns.filter(
       (ap) => !checkedUuidsToRemove.some((uuid) => uuid === ap.uuid)
     );
@@ -64,7 +64,11 @@ export default function AnimationManager() {
     const uuidIndex = arrayToUpdate.findIndex((u) => u === uuid);
     const newChecked = [...arrayToUpdate];
 
-    uuidIndex === -1 ? newChecked.push(uuid) : newChecked.splice(uuidIndex, 1);
+    if (uuidIndex === -1) {
+      newChecked.push(uuid);
+    } else {
+      newChecked.splice(uuidIndex, 1);
+    }
     updateArray(newChecked);
   };
 
@@ -76,7 +80,7 @@ export default function AnimationManager() {
       }
     }
 
-    let lastAnimationPatternsOnTimelines: AnimationPattern[] = [];
+    const lastAnimationPatternsOnTimelines: AnimationPattern[] = [];
     for (let i = 0; i < 3; i++) {
       const lastAnimationPatternOnTimeline = animation.animationPatterns.filter((ap) => ap.timelineId === i)?.at(-1);
       if (lastAnimationPatternOnTimeline !== undefined) {
@@ -108,14 +112,14 @@ export default function AnimationManager() {
       return;
     }
 
-    let updatedAnimation: Animation = { ...selectedAnimation };
+    const updatedAnimation: Animation = { ...selectedAnimation };
     const patternsToAdd = availablePatterns?.filter((ap) => checkedUuidsToAdd.some((cu) => cu === ap.uuid));
     if (patternsToAdd === undefined) {
       return;
     }
 
     patternsToAdd.forEach((pta) => {
-      let convertedPattern = convertPatternToAnimationPattern(pta, selectedAnimation);
+      const convertedPattern = convertPatternToAnimationPattern(pta, selectedAnimation);
       const { timelineId, timeMs } = getAvailableTimelinePositionSpot(updatedAnimation);
       if (timelineId === null || timeMs === null || convertedPattern === undefined) {
         return;
@@ -141,7 +145,7 @@ export default function AnimationManager() {
             id="animation-name"
             value={selectedAnimation?.name}
             onChange={(e) => {
-              let animationToUpdate = { ...selectedAnimation } as Animation;
+              const animationToUpdate = { ...selectedAnimation } as Animation;
               animationToUpdate.name = e.target.value;
               setSelectedAnimation(animationToUpdate);
             }}
@@ -161,7 +165,7 @@ export default function AnimationManager() {
                       checked={checkedUuidsToAdd.some((u) => u === ap.uuid)}
                       tabIndex={-1}
                       disableRipple
-                      inputProps={{ "aria-labelledby": `ap-am-ip-${ap.uuid}` }}
+                      slotProps={{ input: { "aria-labelledby": `ap-am-ip-${ap.uuid}` } }}
                     />
                   </ListItemIcon>
                   <ListItemText id={`ap-am-ip-${ap.uuid}`} primary={ap.name} />
@@ -191,7 +195,7 @@ export default function AnimationManager() {
                       checked={checkedUuidsToRemove.some((u) => u === ap.uuid)}
                       tabIndex={-1}
                       disableRipple
-                      inputProps={{ "aria-labelledby": `ap-am-ip-${ap.uuid}` }}
+                      slotProps={{ input: { "aria-labelledby": `ap-am-ip-${ap.uuid}` } }}
                     />
                   </ListItemIcon>
                   <ListItemText id={`ap-am-ip-${ap.uuid}`} primary={ap.name} />
@@ -205,7 +209,7 @@ export default function AnimationManager() {
               color="error"
               style={{ marginTop: "10px" }}
               onClick={() => {
-                let updateModalOptions = { ...modalOptions };
+                const updateModalOptions = { ...modalOptions };
                 updateModalOptions.show = true;
                 updateModalOptions.onDelete = deleteSelectedAnimationPatterns;
                 setModalOptions(updateModalOptions);

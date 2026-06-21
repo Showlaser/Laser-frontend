@@ -4,12 +4,12 @@ import apiEndpoints from "services/shared/api/api-endpoints";
 import paths from "services/shared/router-paths";
 import { toastSubject } from "services/shared/toast-messages";
 
-export const addUser = async (data: any) => sendRequest(() => Post(apiEndpoints.user, data), [409]);
+export const addUser = async (data: unknown) => sendRequest(() => Post(apiEndpoints.user, data), [409]);
 
 export const getCurrentUser = async () =>
-  sendRequest(() => Get(apiEndpoints.user), [], null, true).then((value: any) => value.json());
+  sendRequest(() => Get(apiEndpoints.user), [], null, true).then((value) => value?.json());
 
-export const updateUser = async (user: any) =>
+export const updateUser = async (user: unknown) =>
   sendRequest(() => Put(apiEndpoints.user, user), [401], toastSubject.changesSaved);
 
 export const logout = async () => sendRequest(() => Post(apiEndpoints.logout), [401]);

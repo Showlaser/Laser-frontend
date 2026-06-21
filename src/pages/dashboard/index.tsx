@@ -7,7 +7,7 @@ import React from "react";
 import { subtractMinutesFromCurrentDate } from "services/shared/dateHelper";
 import { getRandomNumber } from "services/shared/math";
 
-const randomProperty = (obj: any) => {
+const randomProperty = <T,>(obj: Record<string, T>): T => {
   const keys = Object.keys(obj);
   return obj[keys[(keys.length * Math.random()) << 0]];
 };
@@ -58,7 +58,7 @@ export const sharedTestLasers: LaserInfo[] = [
 export default function Dashboard() {
   return (
     <SideNav pageName="Dashboard">
-      <Grid container justifyContent="center">
+      <Grid container sx={{ justifyContent: "center" }}>
         <LaserStatusTable lasers={sharedTestLasers} />
       </Grid>
     </SideNav>

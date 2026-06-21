@@ -1,18 +1,15 @@
 import * as React from "react";
 import {
-  Alert,
-  Button,
   Checkbox,
-  Fade,
   FormControl,
   FormControlLabel,
   FormGroup,
-  FormLabel,
-  Input,
-  Slider,
+  IconButton,
   TextField,
   Tooltip,
 } from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { PatternSectionProps } from "models/components/shared/pattern";
 import {
   getHexColorStringFromPoint,
@@ -20,8 +17,8 @@ import {
   setLaserPowerFromHexString,
 } from "services/shared/converters";
 import { showWarning, toastSubject } from "services/shared/toast-messages";
-import { OnTrue } from "components/shared/on-true";
 import { emptyGuid } from "services/shared/math";
+import PropertyControl from "components/shared/property-control";
 
 export default function GeneralSection({
   patternNamesInUse,
@@ -33,16 +30,16 @@ export default function GeneralSection({
   showPointNumber,
   setShowPointNumber,
 }: PatternSectionProps) {
-  const [dangerousElementsEnabled, setDangerousElementsEnabled] =
+  const [numberOfPointsUnlocked, setNumberOfPointsUnlocked] =
     React.useState<boolean>(false);
-  const [showColorWarning, setShowColorWarning] =
+  const [connectDotsUnlocked, setConnectDotsUnlocked] =
     React.useState<boolean>(false);
 
-  const toggleAllDots = (e: any) =>
+  const toggleAllDots = (e: React.ChangeEvent<HTMLInputElement>) =>
     e.target.checked ? connectAllDots() : disconnectAllDots();
 
   const disconnectAllDots = () => {
-    let updatedPoints = [...pattern.points];
+    const updatedPoints = [...pattern.points];
     const pointsLength = pattern.points.length;
 
     for (let i = 0; i < pointsLength; i++) {
@@ -53,7 +50,7 @@ export default function GeneralSection({
   };
 
   const connectAllDots = () => {
-    let updatedPoints = [...pattern.points].sort(
+    const updatedPoints = [...pattern.points].sort(
       (a, b) => a.orderNr - b.orderNr
     );
     const pointsLength = pattern.points.length;
@@ -71,11 +68,6 @@ export default function GeneralSection({
     updatePatternProperty("points", updatedPoints);
   };
 
-  const getTooltipText = () =>
-    dangerousElementsEnabled
-      ? "Warning changing this value will reset the made changes!"
-      : 'Enable this element by checking the "Enabled dangerous elements" checkbox';
-
   const allPointsHaveTheSameColor = (): boolean => {
     if (pattern?.points?.length === 0) {
       return false;
@@ -86,6 +78,36 @@ export default function GeneralSection({
       (p) => getRgbColorStringFromPoint(p) === firstColor
     );
   };
+
+  const applyColorToAllPoints = (hexColor: string) => {
+    const updatedPoints = pattern.points.map((point) =>
+      setLaserPowerFromHexString(hexColor, { ...point })
+    );
+    updatePatternProperty("points", updatedPoints);
+  };
+
+  const lockToggle = (
+    unlocked: boolean,
+    setUnlocked: (value: boolean) => void,
+    id?: string
+  ) => (
+    <Tooltip
+      placement="right"
+      title={
+        unlocked
+          ? "Lock to prevent accidental changes"
+          : "Unlock — changing this resets your manual point edits"
+      }
+    >
+      <IconButton id={id} size="small" onClick={() => setUnlocked(!unlocked)}>
+        {unlocked ? (
+          <LockOpenIcon fontSize="small" />
+        ) : (
+          <LockIcon fontSize="small" />
+        )}
+      </IconButton>
+    </Tooltip>
+  );
 
   return (
     <div tabIndex={0}>
@@ -109,235 +131,105 @@ export default function GeneralSection({
           }}
         />
       </FormControl>
-      <OnTrue onTrue={showColorWarning}>
-        <Fade in={showColorWarning} timeout={1000}>
-          <Alert severity="warning">
-            Warning! The color changes are only applied when closing the color
-            picker!
-          </Alert>
-        </Fade>
-      </OnTrue>
       <FormControl
         style={{ width: "100%", marginBottom: "10px", marginTop: "10px" }}
       >
         <TextField
-          onClick={() => setShowColorWarning(true)}
           label="Color"
           type="color"
-          defaultValue={
+          value={
             allPointsHaveTheSameColor()
               ? getHexColorStringFromPoint(pattern?.points[0])
-              : "#fffff"
+              : "#ffffff"
           }
-          onBlur={(e) => {
-            let updatedPoints = [...pattern.points];
-            const length = updatedPoints.length;
-
-            for (let i = 0; i < length; i++) {
-              updatedPoints[i] = setLaserPowerFromHexString(e.target.value, {
-                ...updatedPoints[i],
-              });
-            }
-
-            setShowColorWarning(false);
-            updatePatternProperty("points", updatedPoints);
-          }}
+          onChange={(e) => applyColorToAllPoints(e.target.value)}
         />
       </FormControl>
-      <FormControl style={{ width: "100%" }}>
-        <FormLabel htmlFor="svg-scale">
-          Scale
-          <Button
-            style={{ marginLeft: "10px" }}
-            onClick={() =>
-              window.confirm("Are you sure you want to reset this value?")
-                ? updatePatternProperty("scale", 1)
-                : null
-            }
-          >
-            Reset
-          </Button>
-        </FormLabel>
-        <Slider
-          id="svg-scale"
-          size="small"
-          value={pattern.scale}
-          onChange={(e, value) => updatePatternProperty("scale", Number(value))}
-          min={0.1}
-          max={100}
-          step={0.1}
-          aria-label="Small"
-          valueLabelDisplay="auto"
-        />
-      </FormControl>
-      <br />
-      <Tooltip placement="right" title={getTooltipText()}>
-        <span>
-          <FormLabel htmlFor="svg-points" disabled={!dangerousElementsEnabled}>
-            Number of points
-            <Button
-              disabled={!dangerousElementsEnabled}
-              style={{ marginLeft: "10px" }}
-              onClick={() =>
-                window.confirm("Are you sure you want to reset this value?")
-                  ? setNumberOfPoints(200)
-                  : null
-              }
-            >
-              Reset
-            </Button>
-          </FormLabel>
-          <br />
-          <Input
-            type="number"
-            value={numberOfPoints}
-            onChange={(e) => setNumberOfPoints(Number(e.target.value))}
-            disabled={!dangerousElementsEnabled}
-          />
-          <br />
-          <FormControl style={{ width: "100%" }}>
-            <Slider
-              disabled={!dangerousElementsEnabled}
-              id="svg-points"
-              size="small"
-              value={numberOfPoints}
-              onChange={(e, value) => setNumberOfPoints(Number(value))}
-              min={1}
-              max={500}
-              aria-label="Small"
-              valueLabelDisplay="auto"
-            />
-          </FormControl>
-        </span>
-      </Tooltip>
-      <FormLabel htmlFor="svg-points">
-        X offset
-        <Button
-          style={{ marginLeft: "10px" }}
-          onClick={() =>
-            window.confirm("Are you sure you want to reset this value?")
-              ? updatePatternProperty("xOffset", 0)
-              : null
-          }
-        >
-          Reset
-        </Button>
-      </FormLabel>
-      <br />
-      <Input
-        id="svg-xoffset-input"
-        type="number"
+      <PropertyControl
+        label="Scale"
+        id="svg-scale"
+        value={pattern.scale}
+        onChange={(value) => updatePatternProperty("scale", value)}
+        min={0.1}
+        max={100}
+        step={0.1}
+        showInput={false}
+        showSlider
+        onReset={() => updatePatternProperty("scale", 1)}
+      />
+      <PropertyControl
+        label="Number of points"
+        id="svg-points"
+        value={numberOfPoints}
+        onChange={(value) => setNumberOfPoints(value)}
+        min={1}
+        max={500}
+        showSlider
+        disabled={!numberOfPointsUnlocked}
+        labelAdornment={lockToggle(
+          numberOfPointsUnlocked,
+          setNumberOfPointsUnlocked,
+          "svg-toggle-points-lock"
+        )}
+        onReset={() => setNumberOfPoints(200)}
+      />
+      <PropertyControl
+        label="X offset"
+        id="svg-xoffset"
         value={pattern.xOffset}
-        onChange={(e) =>
-          updatePatternProperty("xOffset", Number(e.target.value))
-        }
+        onChange={(value) => updatePatternProperty("xOffset", Math.round(value))}
+        min={-4000}
+        max={4000}
+        showSlider
+        onReset={() => updatePatternProperty("xOffset", 0)}
       />
-      <br />
-      <FormControl style={{ width: "100%" }}>
-        <Slider
-          id="svg-xoffset"
-          size="small"
-          value={pattern.xOffset}
-          onChange={(e, value) =>
-            updatePatternProperty("xOffset", Math.round(Number(value)))
-          }
-          min={-4000}
-          max={4000}
-          aria-label="Small"
-          valueLabelDisplay="auto"
-        />
-      </FormControl>
-      <FormLabel htmlFor="svg-points">
-        Y offset
-        <Button
-          style={{ marginLeft: "10px" }}
-          onClick={() =>
-            window.confirm("Are you sure you want to reset this value?")
-              ? updatePatternProperty("yOffset", 0)
-              : null
-          }
-        >
-          Reset
-        </Button>
-      </FormLabel>
-      <br />
-      <Input
-        id="svg-yoffset-input"
-        type="number"
+      <PropertyControl
+        label="Y offset"
+        id="svg-yoffset"
         value={pattern.yOffset}
-        onChange={(e) =>
-          updatePatternProperty("yOffset", Number(e.target.value))
-        }
+        onChange={(value) => updatePatternProperty("yOffset", Math.round(value))}
+        min={-4000}
+        max={4000}
+        showSlider
+        sliderMarks={[{ value: 0, label: "0" }]}
+        onReset={() => updatePatternProperty("yOffset", 0)}
       />
-      <br />
-      <FormControl style={{ width: "100%" }}>
-        <Slider
-          id="svg-yoffset"
-          size="small"
-          value={pattern.yOffset}
-          onChange={(e, value) =>
-            updatePatternProperty("yOffset", Math.round(Number(value)))
-          }
-          min={-4000}
-          max={4000}
-          aria-label="Small"
-          valueLabelDisplay="auto"
-          marks={[{ value: 0, label: "0" }]}
-        />
-      </FormControl>
-      <FormLabel htmlFor="svg-points">
-        Rotation
-        <Button
-          style={{ marginLeft: "10px" }}
-          onClick={() =>
-            window.confirm("Are you sure you want to reset this value?")
-              ? updatePatternProperty("rotation", 0)
-              : null
-          }
-        >
-          Reset
-        </Button>
-      </FormLabel>
-      <br />
-      <Input
-        id="svg-rotation-input"
-        type="number"
+      <PropertyControl
+        label="Rotation"
+        id="svg-rotation"
         value={pattern.rotation}
-        onChange={(e) =>
-          updatePatternProperty("rotation", Number(e.target.value))
-        }
+        onChange={(value) => updatePatternProperty("rotation", value)}
+        min={-360}
+        max={360}
+        showSlider
+        onReset={() => updatePatternProperty("rotation", 0)}
       />
-      <br />
-      <FormControl style={{ width: "100%" }}>
-        <Slider
-          id="svg-rotation"
-          size="small"
-          value={pattern.rotation}
-          onChange={(e, value) =>
-            updatePatternProperty("rotation", Number(value))
-          }
-          min={-360}
-          max={360}
-          aria-label="Small"
-          valueLabelDisplay="auto"
-        />
-      </FormControl>
       <FormGroup>
-        <Tooltip placement="right" title={getTooltipText()}>
-          <FormControlLabel
-            disabled={!dangerousElementsEnabled}
-            control={
-              <Checkbox
-                id="svg-toggle-all-dots"
-                checked={pattern.points.every(
-                  (p) => p.connectedToPointUuid !== emptyGuid
-                )}
-                onChange={(e) => toggleAllDots(e)}
-              />
-            }
-            label="Connect all dots"
-          />
-        </Tooltip>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Tooltip
+            placement="right"
+            title="Connecting or disconnecting all dots overwrites manual connections"
+          >
+            <FormControlLabel
+              disabled={!connectDotsUnlocked}
+              control={
+                <Checkbox
+                  id="svg-toggle-all-dots"
+                  checked={pattern.points.every(
+                    (p) => p.connectedToPointUuid !== emptyGuid
+                  )}
+                  onChange={(e) => toggleAllDots(e)}
+                />
+              }
+              label="Connect all dots"
+            />
+          </Tooltip>
+          {lockToggle(
+            connectDotsUnlocked,
+            setConnectDotsUnlocked,
+            "svg-toggle-dots-lock"
+          )}
+        </div>
         <FormControlLabel
           control={
             <Checkbox
@@ -346,16 +238,6 @@ export default function GeneralSection({
             />
           }
           label="Show point numbers"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              id="svg-toggle-dangerous-elements"
-              checked={dangerousElementsEnabled}
-              onChange={(e) => setDangerousElementsEnabled(e.target.checked)}
-            />
-          }
-          label="Enable dangerous elements"
         />
       </FormGroup>
     </div>

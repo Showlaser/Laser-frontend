@@ -6,7 +6,11 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { LaserCommandModel } from "models/components/shared/laser-command";
+import {
+  ExportedLasershow,
+  LaserCommandModel,
+  LaserCommandModelCluster,
+} from "models/components/shared/laser-command";
 import { Lasershow } from "models/components/shared/lasershow";
 import { Point } from "models/components/shared/point";
 import React from "react";
@@ -28,19 +32,23 @@ export default function LasershowExport({
     setGalvoSpeed(Number(event.target.value));
   };
 
-  const generateLasershow = (): LaserCommandModel[][] => {
-    let laserCommands: LaserCommandModel[][] = [];
+  const generateLasershow = (): ExportedLasershow => {
+    const laserCommands: ExportedLasershow = [];
     for (let timelinePosition = 0; timelinePosition < lasershowDuration; timelinePosition += 10) {
       const lasershowPointsAtTimelinePosition = getPointsToDraw(timelinePosition, false);
-      let lasershowAnimationCommands: LaserCommandModel[] = [];
+      const laserCommandModelCluster: LaserCommandModelCluster = {
+        timeMs: timelinePosition,
+        commands: [],
+      };
 
       for (
         let lasershowAnimationIndex = 0;
         lasershowAnimationIndex < lasershowPointsAtTimelinePosition.length;
         lasershowAnimationIndex++
       ) {
-        const lasershowAnimationPointsToDraw = lasershowPointsAtTimelinePosition[
-          lasershowAnimationIndex
+        const animationPatternCommands: LaserCommandModel[] = [];
+        const lasershowAnimationPointsToDraw = [
+          ...lasershowPointsAtTimelinePosition[lasershowAnimationIndex],
         ].sort((a, b) => a.orderNr - b.orderNr);
 
         lasershowAnimationPointsToDraw.forEach((ptd, index) => {
@@ -50,10 +58,7 @@ export default function LasershowExport({
           const x: number = Math.ceil(ptd.x);
           const y: number = Math.ceil(ptd.y);
 
-          lasershowAnimationCommands.push({
-            orderNr: ptd.orderNr,
-            time: timelinePosition,
-            patternUuid: ptd.patternUuid,
+          animationPatternCommands.push({
             r: ptd.redLaserPowerPwm,
             g: ptd.greenLaserPowerPwm,
             b: ptd.blueLaserPowerPwm,
@@ -63,10 +68,7 @@ export default function LasershowExport({
 
           if (pointToConnectTo === undefined) {
             // If not connected to another point, add a dummy point with turned off lasers, so no line is drawn.
-            lasershowAnimationCommands.push({
-              orderNr: ptd.orderNr,
-              time: timelinePosition,
-              patternUuid: ptd.patternUuid,
+            animationPatternCommands.push({
               r: 0,
               g: 0,
               b: 0,
@@ -75,10 +77,7 @@ export default function LasershowExport({
             });
           } else if (index === lasershowAnimationPointsToDraw.length - 1) {
             // Display a line to the connected point
-            lasershowAnimationCommands.push({
-              orderNr: index + 1,
-              time: timelinePosition,
-              patternUuid: pointToConnectTo.patternUuid,
+            animationPatternCommands.push({
               r: ptd.redLaserPowerPwm,
               g: ptd.greenLaserPowerPwm,
               b: ptd.blueLaserPowerPwm,
@@ -88,14 +87,16 @@ export default function LasershowExport({
           }
         });
 
-        laserCommands.push(lasershowAnimationCommands);
+        laserCommandModelCluster.commands.push(animationPatternCommands);
       }
+
+      laserCommands.push(laserCommandModelCluster);
     }
 
     return laserCommands;
   };
 
-  const downloadLaserShow = (laserCommands: LaserCommandModel[][]) => {
+  const downloadLaserShow = (laserCommands: ExportedLasershow) => {
     const jsonModel = {
       kpps: galvoSpeed,
       laserCommands: laserCommands,
@@ -114,7 +115,7 @@ export default function LasershowExport({
   };
 
   const onClick = () => {
-    let generatedLasershow: LaserCommandModel[][] = generateLasershow();
+    const generatedLasershow: ExportedLasershow = generateLasershow();
     downloadLaserShow(generatedLasershow);
   };
 

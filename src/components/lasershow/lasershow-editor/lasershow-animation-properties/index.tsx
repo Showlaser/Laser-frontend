@@ -5,7 +5,7 @@ import { numberOfTimeLines } from "services/shared/config";
 import { SelectedLasershowAnimationContext, SelectedLasershowAnimationContextType } from "..";
 
 export default function LasershowAnimationProperties() {
-  const { selectedLasershowAnimation, setSelectedLasershowAnimation } = React.useContext(
+  const { selectedLasershowAnimation } = React.useContext(
     SelectedLasershowAnimationContext
   ) as SelectedLasershowAnimationContextType;
 
@@ -13,7 +13,7 @@ export default function LasershowAnimationProperties() {
     SelectedLasershowContext
   ) as SelectedLasershowContextType;
 
-  const updateLasershowAnimationProperty = (propertyName: string, value: any) => {
+  const updateLasershowAnimationProperty = (propertyName: string, value: unknown) => {
     if (selectedLasershowAnimation === null) {
       return;
     }
@@ -25,13 +25,14 @@ export default function LasershowAnimationProperties() {
       return;
     }
 
-    let updatedLasershow = { ...selectedLasershow } as any;
-    updatedLasershow.lasershowAnimations[selectedLasershowAnimationIndex][propertyName] = value;
+    const updatedLasershow = { ...selectedLasershow } as NonNullable<typeof selectedLasershow>;
+    (updatedLasershow.lasershowAnimations[selectedLasershowAnimationIndex] as Record<string, unknown>)[propertyName] =
+      value;
     setSelectedLasershow(updatedLasershow);
   };
 
   const getTimelineMenuItems = () => {
-    let items = [];
+    const items = [];
     for (let i = 0; i < numberOfTimeLines; i++) {
       items.push(
         <MenuItem

@@ -6,7 +6,6 @@ const paths = {
   Installation: "/installation",
   Login: "/login",
   Register: "/registration",
-  SpotifyVote: "/vote",
   ResetPassword: "/reset-password",
   Account: "/account",
   ActivateAccount: "/account-activation",

@@ -13,6 +13,7 @@ type Props = {
 export default function PointsDrawer({ selectedPointsUuid, showPointNumber, pointsToDraw }: Props) {
   useEffect(() => {
     drawOnCanvas(pointsToDraw);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- redraw only when pointsToDraw changes
   }, [pointsToDraw]);
 
   const drawOnCanvas = (dotsToDraw: Point[][] | null) => {
@@ -44,7 +45,7 @@ export default function PointsDrawer({ selectedPointsUuid, showPointNumber, poin
     screenScale: number
   ) => {
     let dotThickness: number = 3;
-    let color: string = getRgbColorStringFromPoint(point);
+    const color: string = getRgbColorStringFromPoint(point);
     if (pointIsHighlighted) {
       dotThickness = 6;
     }

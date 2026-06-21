@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { activateAccount } from "services/logic/account-activation-logic";
 import { getUrlCode, stringIsEmpty } from "services/shared/general";
+import paths from "services/shared/router-paths";
 import { showError, toastSubject } from "services/shared/toast-messages";
 
 export default function AccountActivation() {
@@ -10,6 +11,8 @@ export default function AccountActivation() {
       activateAccount(code).then((result) => {
         if (result?.status !== 200) {
           showError(toastSubject.invalidCode);
+        } else if (result.status === 200) {
+          window.location.href = paths.Login;
         }
       });
     }

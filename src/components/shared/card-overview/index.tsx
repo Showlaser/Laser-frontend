@@ -1,53 +1,55 @@
 import CloseIcon from "@mui/icons-material/Close";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import DeleteIcon from "@mui/icons-material/Delete";
 import {
+  Box,
+  Button,
   Card,
   CardActionArea,
   CardContent,
   CardMedia,
-  Grid,
   Grow,
   IconButton,
   InputBase,
   Modal,
   Paper,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import { Box } from "@mui/system";
 import React, { useState } from "react";
 import { OnTrue } from "../on-true";
 type CardOverviewItems = {
   uuid: string | null;
   name: string | null;
   image: string | null;
-  onCardClick: (item: any) => void;
+  onCardClick: (item: CardOverviewItems) => void;
+};
+
+type CardNoItemsProps = {
+  onNoItemsMessageTitle: string;
+  onNoItemsDescription: string;
+  onNoItemsCreateCallback: () => void;
 };
 
 type CardOverviewProps = {
+  noItemsProps: CardNoItemsProps;
   show: boolean;
   closeOverview: () => void;
   items: CardOverviewItems[];
-  onNoItemsMessageTitle: string;
-  onNoItemsDescription: string;
+
   onDeleteClick: (uuid: string | null) => void;
   onDuplicateClick?: (uuid: string | null) => void;
 };
 
 export default function CardOverview({
+  noItemsProps,
   show,
   closeOverview,
   items,
-  onNoItemsMessageTitle: onEmptyMessageTitle,
-  onNoItemsDescription: onEmptyMessageDescription,
   onDeleteClick,
   onDuplicateClick,
 }: CardOverviewProps) {
   const [searchValue, setSearchValue] = useState<string>("");
 
-  const onKeyDown = (e: any) => {
-    if (e.kkey === "Escape") {
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
       closeOverview();
     }
   };
@@ -58,7 +60,14 @@ export default function CardOverview({
         <IconButton style={{ marginLeft: "95%" }} onClick={closeOverview}>
           <CloseIcon />
         </IconButton>
-        <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <OnTrue onTrue={items?.length > 0}>
             <Paper
               sx={{
@@ -85,11 +94,12 @@ export default function CardOverview({
               </IconButton>
             </Paper>
           </OnTrue>
-        </Grid>
+        </Box>
         {items.length === 0 ? (
           <div>
-            <h1 style={{ marginTop: "80px" }}>{onEmptyMessageTitle}</h1>
-            <p>{onEmptyMessageDescription}</p>
+            <h1 style={{ marginTop: "80px" }}>{noItemsProps.onNoItemsMessageTitle}</h1>
+            <p>{noItemsProps.onNoItemsDescription}</p>
+            <Button onClick={noItemsProps.onNoItemsCreateCallback}>Create</Button>
           </div>
         ) : (
           <Box
@@ -104,7 +114,7 @@ export default function CardOverview({
           >
             {items
               .filter((item) =>
-                searchValue.length > 0 ? item?.name?.toLowerCase().includes(searchValue) : true
+                searchValue.length > 0 ? item?.name?.toLowerCase().includes(searchValue) : true,
               )
               .map((item, index) => (
                 <Grow
@@ -129,25 +139,27 @@ export default function CardOverview({
                         </Typography>
                       </CardContent>
                     </CardActionArea>
-                    <Tooltip title={`Delete ${item.name}`}>
-                      <IconButton
+                    <OnTrue onTrue={onDuplicateClick !== undefined}>
+                      <Button
+                        style={{ marginTop: "10px" }}
+                        size="large"
+                        variant="contained"
+                        aria-label="delete"
+                        onClick={() => onDuplicateClick?.(item?.uuid)}
+                        color="primary"
+                      >
+                        Duplicate
+                      </Button>
+                      <br />
+                      <Button
+                        style={{ marginTop: "10px" }}
+                        size="small"
                         aria-label="delete"
                         onClick={() => onDeleteClick(item?.uuid)}
                         color="error"
                       >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <OnTrue onTrue={onDuplicateClick !== undefined}>
-                      <Tooltip title={`Duplicate ${item.name}`}>
-                        <IconButton
-                          aria-label="delete"
-                          onClick={() => onDuplicateClick?.(item?.uuid)}
-                          color="primary"
-                        >
-                          <ContentCopyIcon />
-                        </IconButton>
-                      </Tooltip>
+                        Delete
+                      </Button>
                     </OnTrue>
                   </Card>
                 </Grow>

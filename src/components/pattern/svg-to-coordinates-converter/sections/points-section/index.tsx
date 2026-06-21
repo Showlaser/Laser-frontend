@@ -39,7 +39,7 @@ export default function PointsSection({
   const [showColorWarning, setShowColorWarning] = React.useState<boolean>(false);
 
   const getDataToUpdate = (pointToUpdate: Point) => {
-    let updatedPoints: Point[] = [...pattern.points];
+    const updatedPoints: Point[] = [...pattern.points];
     const pointToUpdateIndex: number = updatedPoints.findIndex(
       (p: Point) => p.uuid === pointToUpdate.uuid
     );
@@ -139,7 +139,7 @@ export default function PointsSection({
   };
 
   const onToggle = (pointUuid: string, checked: boolean) => {
-    let selectedPoints = [...selectedPointsUuid];
+    const selectedPoints = [...selectedPointsUuid];
 
     if (!checked) {
       const pointIndex = selectedPoints.findIndex((sp) => sp === pointUuid);
@@ -161,14 +161,14 @@ export default function PointsSection({
       ? pattern?.points.length
       : currentPage * itemsPerPage + itemsPerPage - 1;
 
-  const pointsToRender = [...pattern?.points]
+  const pointsToRender = [...(pattern?.points ?? [])]
     .sort((a, b) => a.orderNr - b.orderNr)
     .filter((p) =>
       numberIsBetweenOrEqual(p.orderNr, currentPage * itemsPerPage, getItemsEndIndex())
     );
 
   const addPoint = () => {
-    let updatedPattern = { ...pattern };
+    const updatedPattern = { ...pattern };
     const newPoint = getPointsPlaceHolder(updatedPattern.uuid, updatedPattern.points.length);
     updatedPattern.points.push(newPoint);
 
@@ -181,7 +181,7 @@ export default function PointsSection({
     checked ? setSelectedPointsUuid(pattern.points.map((p) => p.uuid)) : setSelectedPointsUuid([]);
 
   const getConnectablePoints = () => {
-    let points = [...pattern?.points]
+    const points = [...(pattern?.points ?? [])]
       .sort((a, b) => a.orderNr - b.orderNr)
       .map((p) => ({ label: `Point ${p.orderNr + 1}` }));
 
@@ -204,7 +204,7 @@ export default function PointsSection({
             checked={
               selectedPointsUuid.length === pattern.points.length && pattern.points.length > 0
             }
-            onClick={(e: any) => toggleAllPoints(e.target.checked)}
+            onClick={(e) => toggleAllPoints((e.target as HTMLInputElement).checked)}
           />
         </Tooltip>
         <Tooltip title="Add point">
@@ -230,13 +230,13 @@ export default function PointsSection({
         <List dense>
           {pointsToRender.map((point, index) => (
             <ListItem key={`points-section-${point.uuid}`}>
-              <ListItemIcon onClick={(e: any) => onToggle(point.uuid, e.target.checked)}>
+              <ListItemIcon onClick={(e) => onToggle(point.uuid, (e.target as HTMLInputElement).checked)}>
                 <Checkbox
                   edge="start"
                   checked={selectedPointsUuid.some((sp) => sp === point.uuid)}
                   tabIndex={-1}
                   disableRipple
-                  inputProps={{ "aria-labelledby": `points-label-${index}` }}
+                  slotProps={{ input: { "aria-labelledby": `points-label-${index}` } }}
                 />
               </ListItemIcon>
               <FormControl style={{ width: "125px" }}>
@@ -262,7 +262,7 @@ export default function PointsSection({
                 onChange={(e) => onXUpdate(point, e.target.value)}
                 placeholder="x"
                 type="number"
-                inputProps={{ min: -4000, max: 4000 }}
+                slotProps={{ htmlInput: { min: -4000, max: 4000 } }}
                 label="X"
               />
               <TextField
@@ -271,7 +271,7 @@ export default function PointsSection({
                 onChange={(e) => onYUpdate(point, e.target.value)}
                 placeholder="y"
                 type="number"
-                inputProps={{ min: -4000, max: 4000 }}
+                slotProps={{ htmlInput: { min: -4000, max: 4000 } }}
                 label="Y"
               />
               <FormControl style={{ marginLeft: "35px", width: "125px" }}>
@@ -315,8 +315,8 @@ export default function PointsSection({
         component="div"
         count={pattern?.points.length}
         page={currentPage}
-        onPageChange={(e: any, page: number) => setCurrentPage(page)}
-        onRowsPerPageChange={(e: any) => onRowsPerPageChange(Number(e.target.value))}
+        onPageChange={(_e, page) => setCurrentPage(page)}
+        onRowsPerPageChange={(e) => onRowsPerPageChange(Number(e.target.value))}
         rowsPerPage={itemsPerPage}
         rowsPerPageOptions={[25, 50]}
       />

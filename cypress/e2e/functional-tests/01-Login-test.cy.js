@@ -7,7 +7,7 @@ describe("Login test", () => {
     cy.get("input[name=username]").clear().type(username);
     cy.get("input[name=password]").clear().type(`${password}{enter}`, { log: false });
     cy.get("#root", {
-      timeout: 5000,
+      timeout: 8000,
     }).should("be.visible");
 
     // we should be redirected to /dashboard

@@ -18,6 +18,7 @@ import { getLasershows } from "services/logic/lasershow-logic";
 import { getPatterns } from "services/logic/pattern-logic";
 import { convertPatternToAnimation } from "services/shared/converters";
 import { createGuid } from "services/shared/math";
+import paths from "services/shared/router-paths";
 import "./index.css";
 
 export type SelectedAnimationContextType = {
@@ -41,12 +42,12 @@ export type SelectedAnimationPatternContextType = {
 };
 
 export const SelectedAnimationContext = React.createContext<SelectedAnimationContextType | null>(
-  null
+  null,
 );
 export const AvailableAnimationsContext =
   React.createContext<AvailableAnimationsContextType | null>(null);
 export const AvailablePatternsContext = React.createContext<AvailablePatternsContextType | null>(
-  null
+  null,
 );
 export const SelectedAnimationPatternContext =
   React.createContext<SelectedAnimationPatternContextType | null>(null);
@@ -60,29 +61,29 @@ export default function AnimationPage() {
   const [convertPatternModalOpen, setConvertPatternModalOpen] = useState<boolean>(false);
   const [animationsModalOpen, setAnimationsModalOpen] = useState<boolean>(false);
   const [selectedAnimationPattern, setSelectedAnimationPattern] = useState<AnimationPattern | null>(
-    null
+    null,
   );
   const [patternToRemove, setPatternToRemove] = useState<Pattern>();
   const [animationToRemove, setAnimationToRemove] = useState<Animation>();
 
   const selectedAnimationMemo = React.useMemo(
     () => ({ selectedAnimation, setSelectedAnimation }),
-    [selectedAnimation]
+    [selectedAnimation],
   );
 
   const availableAnimationsMemo = React.useMemo(
     () => ({ availableAnimations, setAvailableAnimations }),
-    [availableAnimations]
+    [availableAnimations],
   );
 
   const availablePatternsMemo = React.useMemo(
     () => ({ availablePatterns, setAvailablePatterns }),
-    [availablePatterns]
+    [availablePatterns],
   );
 
   const selectedAnimationPatternMemo = React.useMemo(
     () => ({ selectedAnimationPattern, setSelectedAnimationPattern }),
-    [selectedAnimationPattern]
+    [selectedAnimationPattern],
   );
 
   useEffect(() => {
@@ -117,7 +118,7 @@ export default function AnimationPage() {
             <SelectedAnimationPatternIndexContext.Provider
               value={
                 selectedAnimation?.animationPatterns.findIndex(
-                  (ap) => ap.uuid === selectedAnimationPattern?.uuid
+                  (ap) => ap.uuid === selectedAnimationPattern?.uuid,
                 ) ?? 0
               }
             >
@@ -138,7 +139,7 @@ export default function AnimationPage() {
       <SpeedDialAction
         onClick={() => setConvertPatternModalOpen(true)}
         key="sd-pattern-to-animation"
-        tooltipTitle="Convert saved pattern to animation"
+        title="Convert saved pattern to animation"
         icon={
           <label htmlFor="raised-button-file" style={{ cursor: "pointer", padding: "25px" }}>
             <AllInclusiveIcon style={{ marginTop: "8px" }} />
@@ -153,7 +154,7 @@ export default function AnimationPage() {
             <CloudDownloadIcon style={{ marginTop: "8px" }} />
           </label>
         }
-        tooltipTitle="Get saved animation"
+        title="Get saved animation"
       />
     </SpeedDial>
   );
@@ -161,7 +162,7 @@ export default function AnimationPage() {
   const onAnimationDelete = (uuid: string) => {
     const animationToRemoveIndex = availableAnimations?.findIndex((aa) => aa.uuid === uuid) ?? -1;
     if (animationToRemoveIndex !== -1) {
-      let updatedAnimations = [...(availableAnimations ?? [])];
+      const updatedAnimations = [...(availableAnimations ?? [])];
       updatedAnimations.splice(animationToRemoveIndex, 1);
       setAvailableAnimations(updatedAnimations);
     }
@@ -170,14 +171,14 @@ export default function AnimationPage() {
   const onPatternDelete = (uuid: string) => {
     const patternToRemoveIndex = availablePatterns?.findIndex((p) => p.uuid === uuid) ?? -1;
     if (patternToRemoveIndex !== -1) {
-      let updatedPatterns = [...(availablePatterns ?? [])];
+      const updatedPatterns = [...(availablePatterns ?? [])];
       updatedPatterns.splice(patternToRemoveIndex, 1);
       setAvailablePatterns(updatedPatterns);
     }
   };
 
   const onDuplicateAnimationClick = (uuid: string | null) => {
-    let animationToDuplicate = {
+    const animationToDuplicate = {
       ...availableAnimations?.find((a) => a.uuid === uuid),
     } as Animation;
     if (animationToDuplicate === undefined) {
@@ -202,7 +203,7 @@ export default function AnimationPage() {
       }
     }
 
-    let animationsToUpdate = [...(availableAnimations ?? [])];
+    const animationsToUpdate = [...(availableAnimations ?? [])];
     animationsToUpdate.push(animationToDuplicate);
     setAvailableAnimations(animationsToUpdate);
     saveAnimation(animationToDuplicate);
@@ -236,8 +237,13 @@ export default function AnimationPage() {
         <CardOverview
           closeOverview={() => setConvertPatternModalOpen(false)}
           show={convertPatternModalOpen}
-          onNoItemsMessageTitle="No patterns saved"
-          onNoItemsDescription="Create a new pattern in the pattern editor"
+          noItemsProps={{
+            onNoItemsMessageTitle: "No patterns saved",
+            onNoItemsDescription: "Create a pattern first!",
+            onNoItemsCreateCallback: () => {
+              document.location.href = paths.PatternEditor;
+            },
+          }}
           onDeleteClick={(uuid) =>
             setPatternToRemove(availablePatterns?.find((p) => p.uuid === uuid))
           }
@@ -248,7 +254,7 @@ export default function AnimationPage() {
               image: pattern.image,
               onCardClick: () => {
                 setConvertPatternModalOpen(false);
-                let availableAnimationsToUpdate = availableAnimations ?? [];
+                const availableAnimationsToUpdate = availableAnimations ?? [];
                 const convertedAnimation = convertPatternToAnimation(pattern);
                 setSelectedAnimationPattern(convertedAnimation.animationPatterns[0]);
                 availableAnimations?.push(convertedAnimation);
@@ -263,8 +269,14 @@ export default function AnimationPage() {
         <CardOverview
           closeOverview={() => setAnimationsModalOpen(false)}
           show={animationsModalOpen}
-          onNoItemsMessageTitle="No animations saved"
-          onNoItemsDescription="Create a new animation first"
+          noItemsProps={{
+            onNoItemsMessageTitle: "No animations saved",
+            onNoItemsDescription: "Create a animation first by converting a pattern!",
+            onNoItemsCreateCallback: () => {
+              setAnimationsModalOpen(false);
+              setConvertPatternModalOpen(true);
+            },
+          }}
           onDeleteClick={(uuid) =>
             setAnimationToRemove(availableAnimations?.find((a) => a.uuid === uuid))
           }

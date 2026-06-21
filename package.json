@@ -5,44 +5,29 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@mui/icons-material": "^5.10.16",
-    "@mui/material": "^5.10.17",
-    "@mui/x-tree-view": "^7.5.0",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^14.4.3",
-    "@types/jest": "^29.2.4",
-    "@types/node": "^18.11.13",
-    "@types/react": "^18.0.26",
-    "@types/react-dom": "^18.0.9",
-    "concurrently": "^7.6.0",
-    "cross-env": "^7.0.3",
+    "@mui/icons-material": "^9.1.1",
+    "@mui/material": "^9.1.1",
+    "@mui/x-tree-view": "^9.4.0",
+    "chart.js": "^4.5.1",
     "d3-array": "^3.1.6",
     "flatten-svg": "^0.3.0",
-    "react": "^18.2.0",
-    "react-chartjs-2": "^5.2.0",
-    "react-dom": "^18.2.0",
-    "react-rnd": "^10.3.4",
-    "react-router-dom": "^6.4.5",
-    "react-scripts": "^5.0.1",
-    "react-toastify": "^9.1.1",
-    "react-transition-group": "^4.4.5",
-    "spotify-web-api-js": "^1.5.2",
-    "typescript": "^4.9.4",
-    "universal-cookie": "^4.0.4"
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.0",
+    "react-toastify": "^11.1.0",
+    "spotify-web-api-js": "^1.5.2"
   },
-  "main": "public/electron.js",
   "scripts": {
-    "start": "set HTTPS=false&&react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "vite",
+    "build": "vite build",
+    "build:api": "vite build && node scripts/copy-to-wwwroot.mjs",
+    "serve": "vite preview",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "engines": {
+    "node": ">=22.12.0"
   },
   "browserslist": {
     "production": [
@@ -57,11 +42,22 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@eslint/js": "^10.0.1",
+    "@testing-library/jest-dom": "^6.9.1",
     "@types/d3-array": "^3.0.2",
-    "@types/react-router-dom": "^5.3.3",
-    "electron": "^22.0.0",
-    "electron-is-dev": "^2.0.0",
-    "jest": "^27.5.1"
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "@vitejs/plugin-react": "^6.0.2",
+    "@vitest/coverage-v8": "^4.1.9",
+    "eslint": "^10.5.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.6.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.9"
   }
 }

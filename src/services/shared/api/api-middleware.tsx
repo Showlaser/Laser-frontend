@@ -2,14 +2,14 @@ import paths from "../router-paths";
 import { showError, toastSubject, showSuccess, ToastSubjectObject } from "../toast-messages";
 import { Post } from "./api-actions";
 import apiEndpoints from "./api-endpoints";
-import Cookies from "universal-cookie";
+import Cookies from "services/shared/cookies";
 
 const handleErrorMessage = (statusCode: number, ignoredStatusCodes: number[]) => {
   if (ignoredStatusCodes.includes(statusCode)) {
     return;
   }
 
-  const statusCodes: any = {
+  const statusCodes: Record<number, ToastSubjectObject> = {
     400: toastSubject.apiBadRequest,
     401: toastSubject.unauthorized,
     404: toastSubject.apiNotFound,
@@ -26,7 +26,7 @@ const handleErrorMessage = (statusCode: number, ignoredStatusCodes: number[]) =>
 
 const refreshUserTokensIfExpired = async () => {
   const cookie = new Cookies();
-  const loginCookie = cookie.get("logged-in");
+  const loginCookie = cookie.get<{ loginTime: number }>("logged-in");
   const loginTime = Number(loginCookie?.loginTime);
   const currentTime = Date.now();
   const jwtExpirationTimeMs = 300000;
@@ -34,7 +34,7 @@ const refreshUserTokensIfExpired = async () => {
   const loginTimeIsNotValid = isNaN(loginTime);
   const jwtExpired = currentTime - loginTime > jwtExpirationTimeMs || loginTimeIsNotValid;
   if (jwtExpired) {
-    const refreshResponse: any = await Post(apiEndpoints.refreshToken, null);
+    const refreshResponse = await Post(apiEndpoints.refreshToken, null);
     if (refreshResponse.status !== 200) {
       return false;
     }
@@ -73,7 +73,7 @@ export async function sendRequest(
       return response;
     }
     return response;
-  } catch (error) {
+  } catch {
     showError(toastSubject.apiUnavailable);
   }
 }

@@ -12,7 +12,7 @@ import SideNav from "components/shared/sidenav";
 import { Animation } from "models/components/shared/animation";
 import { Lasershow } from "models/components/shared/lasershow";
 import { getPatternPlaceHolder, Pattern } from "models/components/shared/pattern";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getAnimations } from "services/logic/animation-logic";
 import { getLasershows } from "services/logic/lasershow-logic";
 import { getPatterns, savePattern } from "services/logic/pattern-logic";
@@ -20,7 +20,7 @@ import { createGuid } from "services/shared/math";
 import "./index.css";
 
 export default function PatternPage() {
-  const [uploadedFile, setUploadedFile] = useState<any>();
+  const [uploadedFile, setUploadedFile] = useState<File | undefined>();
   const [availableLasershows, setAvailableLasershows] = useState<Lasershow[] | null>(null);
   const [availableAnimations, setAvailableAnimations] = useState<Animation[] | null>(null);
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[] | null>(null);
@@ -69,7 +69,7 @@ export default function PatternPage() {
       <SpeedDialAction
         id="pattern-new-file"
         key="sd-new-file"
-        tooltipTitle="Create a new pattern"
+        title="Create a new pattern"
         onClick={() => setSelectedPattern(getPatternPlaceHolder())}
         icon={
           <label style={{ cursor: "pointer", padding: "25px" }}>
@@ -79,7 +79,7 @@ export default function PatternPage() {
       ></SpeedDialAction>
       <SpeedDialAction
         key="sd-upload"
-        tooltipTitle="Upload local file"
+        title="Upload local file"
         icon={
           <label htmlFor="raised-button-file" style={{ cursor: "pointer", padding: "25px" }}>
             <AttachFileIcon style={{ marginTop: "8px" }} />
@@ -88,7 +88,7 @@ export default function PatternPage() {
       />
       <SpeedDialAction
         key="sd-saved-file"
-        tooltipTitle="Get saved pattern"
+        title="Get saved pattern"
         onClick={() => setConvertPatternModalOpen(true)}
         icon={
           <label style={{ cursor: "pointer", padding: "25px" }}>
@@ -102,14 +102,14 @@ export default function PatternPage() {
   const onPatternDelete = (uuid: string) => {
     const patternToRemoveIndex = availablePatterns?.findIndex((p) => p.uuid === uuid) ?? -1;
     if (patternToRemoveIndex !== -1) {
-      let updatedPatterns = [...(availablePatterns ?? [])];
+      const updatedPatterns = [...(availablePatterns ?? [])];
       updatedPatterns.splice(patternToRemoveIndex, 1);
       setAvailablePatterns(updatedPatterns);
     }
   };
 
   const onDuplicatePatternClick = (uuid: string | null) => {
-    let patternToDuplicate = {
+    const patternToDuplicate = {
       ...availablePatterns?.find((p) => p.uuid === uuid),
     } as Pattern;
     if (patternToDuplicate === undefined) {
@@ -122,7 +122,7 @@ export default function PatternPage() {
       patternToDuplicate.points[index].patternUuid = patternToDuplicate.uuid;
       const ppUuid = createGuid();
       const patternPointsToUpdate = patternToDuplicate.points.filter(
-        (pp) => pp.connectedToPointUuid === patternToDuplicate.points[index].uuid
+        (pp) => pp.connectedToPointUuid === patternToDuplicate.points[index].uuid,
       );
 
       for (let pptuIndex = 0; pptuIndex < patternPointsToUpdate.length; pptuIndex++) {
@@ -132,7 +132,7 @@ export default function PatternPage() {
       patternToDuplicate.points[index].uuid = ppUuid;
     }
 
-    let patternsToUpdate = [...(availablePatterns ?? [])];
+    const patternsToUpdate = [...(availablePatterns ?? [])];
     patternsToUpdate.push(patternToDuplicate);
     setAvailablePatterns(patternsToUpdate);
     savePattern(patternToDuplicate);
@@ -157,7 +157,7 @@ export default function PatternPage() {
         <PatternEditor
           patternNamesInUse={
             availablePatterns?.map((pattern) =>
-              pattern.uuid !== selectedPattern?.uuid ? pattern.name : ""
+              pattern.uuid !== selectedPattern?.uuid ? pattern.name : "",
             ) ?? []
           }
           uploadedFile={uploadedFile}
@@ -169,8 +169,14 @@ export default function PatternPage() {
       <CardOverview
         closeOverview={() => setConvertPatternModalOpen(false)}
         show={convertPatternModalOpen}
-        onNoItemsMessageTitle="No patterns saved"
-        onNoItemsDescription="Create a new pattern in the pattern editor"
+        noItemsProps={{
+          onNoItemsMessageTitle: "No patterns saved",
+          onNoItemsDescription: "Create a pattern first!",
+          onNoItemsCreateCallback: () => {
+            setSelectedPattern(getPatternPlaceHolder());
+            setConvertPatternModalOpen(false);
+          },
+        }}
         onDeleteClick={(uuid) =>
           setPatternToRemove(availablePatterns?.find((p) => p.uuid === uuid))
         }

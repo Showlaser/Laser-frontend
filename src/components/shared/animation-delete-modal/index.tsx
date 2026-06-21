@@ -1,11 +1,10 @@
-import { Animation } from "models/components/shared/animation";
-import { Lasershow } from "models/components/shared/lasershow";
-import React from "react";
-import { useState } from "react";
-import { removeAnimation } from "services/logic/animation-logic";
 import { List, ListItem, ListItemText } from "@mui/material";
 import DeleteModal, { ModalOptions } from "components/shared/delete-modal";
 import { OnTrue } from "components/shared/on-true";
+import { Animation } from "models/components/shared/animation";
+import { Lasershow } from "models/components/shared/lasershow";
+import React, { useState } from "react";
+import { removeAnimation } from "services/logic/animation-logic";
 
 export type AnimationDeleteModalProps = {
   availableLasershows: Lasershow[];
@@ -22,7 +21,7 @@ export default function AnimationDeleteModal({
 }: AnimationDeleteModalProps) {
   const getAnimationTreeView = () => {
     const lasershowsAnimationIsUsedIn = availableLasershows.filter((ls) =>
-      ls.lasershowAnimations.some((la) => la.animation.uuid === animation.uuid)
+      ls.lasershowAnimations.some((la) => la.animation.uuid === animation.uuid),
     );
 
     const lasershowAnimationList = (
@@ -40,9 +39,9 @@ export default function AnimationDeleteModal({
         <img style={{ maxWidth: "25vh" }} src={animation.image ?? ""} />
         <br />
         <div>
-          <p>Warning the animation will be removed from the following lasershows:</p>
           <OnTrue onTrue={(lasershowsAnimationIsUsedIn?.length ?? 0) > 0}>
             <>
+              <p>Warning the animation will be removed from the following lasershows:</p>
               <b>Lasershows</b>
               {lasershowAnimationList}
             </>

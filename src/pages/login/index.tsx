@@ -1,10 +1,10 @@
-import { Button, FormControl, Grid, LinearProgress, TextField } from "@mui/material";
+import { Box, Button, FormControl, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { login } from "services/logic/login-logic";
 import { getFormDataObject, getUrlCode, stringIsEmpty } from "services/shared/general";
 import paths from "services/shared/router-paths";
 import { showError, toastSubject } from "services/shared/toast-messages";
-import Cookies from "universal-cookie";
+import Cookies from "services/shared/cookies";
 import "./index.css";
 
 export default function Login() {
@@ -24,7 +24,7 @@ export default function Login() {
         {
           path: "/",
           sameSite: true,
-        }
+        },
       );
 
       let redirectUrl = getUrlCode();
@@ -44,7 +44,7 @@ export default function Login() {
   };
 
   return (
-    <Grid id="login-wrapper" container spacing={0} direction="column" alignItems="center">
+    <Box id="login-wrapper" sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <form id="login" onSubmit={onSubmit}>
         <FormControl>
           <h1>Login</h1>
@@ -58,10 +58,9 @@ export default function Login() {
           <br />
           <TextField required label="Password" defaultValue="123" type="password" name="password" />
           <br />
-          <Button disabled={submitInProgress} variant="contained" type="submit" fullWidth>
+          <Button loading={submitInProgress} variant="contained" type="submit" fullWidth>
             Login
           </Button>
-          {submitInProgress ? <LinearProgress /> : null}
           <br />
           <a className="link-btn" href={paths.Register}>
             Register
@@ -71,6 +70,6 @@ export default function Login() {
           </a>
         </FormControl>
       </form>
-    </Grid>
+    </Box>
   );
 }

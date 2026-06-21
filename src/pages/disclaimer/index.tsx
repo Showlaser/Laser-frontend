@@ -1,7 +1,6 @@
 import { Button, FormControlLabel, FormGroup } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import React from "react";
-import { useEffect } from "react";
 import { useState } from "react";
 import paths from "services/shared/router-paths";
 

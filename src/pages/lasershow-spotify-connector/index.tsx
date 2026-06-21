@@ -19,25 +19,34 @@ import {
 import SideNav from "components/shared/sidenav";
 import React, { useEffect, useState } from "react";
 import { getAnimations } from "services/logic/animation-logic";
+import { Animation } from "models/components/shared/animation";
 import { addLasershowToSpotifyConnector, getAllConnectors } from "services/logic/lasershow-spotify-connector";
 import { getCurrentTracksData, searchSpotify } from "services/logic/spotify";
 import { createGuid } from "services/shared/math";
 import HelpIcon from "@mui/icons-material/Help";
 
+type SongSearchResult = { artist?: string; songName: string; id: string };
+type SpotifyConnector = {
+  uuid: string;
+  lasershowUuid: string | undefined;
+  spotifySongs: { uuid: string; lasershowSpotifyConnectorUuid: string; spotifySongId: string }[];
+};
+
 export default function LasershowSpotifyConnector() {
-  const [searchResults, setSearchResults] = useState<any>([]);
-  const [lasershows, setLasershows] = useState<any>([]);
+  const [searchResults, setSearchResults] = useState<SongSearchResult[]>([]);
+  const [lasershows, setLasershows] = useState<Animation[]>([]);
   const [selectedLasershowUuid, setSelectedLasershowUuid] = useState<string | undefined>(undefined);
-  const [existingConnectors, setExistingConnectors] = useState<any>([]);
+  const [existingConnectors, setExistingConnectors] = useState<SpotifyConnector[]>([]);
   const [selectedSpotifySongIds, setSelectedSpotifySongIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (lasershows.length === 0) {
-      getAnimations().then((animations) => setLasershows(animations));
+      getAnimations().then((animations) => setLasershows(animations ?? []));
     }
     if (existingConnectors.length === 0) {
       getAllConnectors().then((data) => setExistingConnectors(data));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch once on mount (length-guarded)
   }, [setSearchResults]);
 
   const onSearchInput = (searchValue: string) => {
@@ -46,7 +55,7 @@ export default function LasershowSpotifyConnector() {
     }
     searchSpotify(searchValue, 20).then((searchResult) =>
       setSearchResults(
-        searchResult?.tracks?.items.map((track: any) => ({
+        (searchResult?.tracks?.items ?? []).map((track) => ({
           artist: track.artists[0]?.name,
           songName: track.name,
           id: track.id,
@@ -68,7 +77,7 @@ export default function LasershowSpotifyConnector() {
     };
 
     addLasershowToSpotifyConnector(connector);
-    let newExistingConnectors = [...existingConnectors];
+    const newExistingConnectors = [...existingConnectors];
     newExistingConnectors.push(connector);
     setExistingConnectors(newExistingConnectors);
   };
@@ -88,15 +97,15 @@ export default function LasershowSpotifyConnector() {
 
   const onLasershowSelect = (lasershowUuid: string) => {
     setSelectedLasershowUuid(lasershowUuid);
-    const lasershowConnector = existingConnectors.find((c: any) => c.lasershowUuid === lasershowUuid);
+    const lasershowConnector = existingConnectors.find((c) => c.lasershowUuid === lasershowUuid);
     if (lasershowConnector === undefined) {
       setSearchResults([]);
       setSelectedSpotifySongIds([]);
       return;
     }
 
-    getCurrentTracksData(lasershowConnector.spotifySongs.map((ss: any) => ss.spotifySongId)).then((data) => {
-      const newValues = data.tracks.map((track: any) => ({
+    getCurrentTracksData(lasershowConnector.spotifySongs.map((ss) => ss.spotifySongId)).then((data) => {
+      const newValues: SongSearchResult[] = data.tracks.map((track) => ({
         artist: track.artists[0]?.name,
         songName: track.name,
         id: track.id,
@@ -104,7 +113,7 @@ export default function LasershowSpotifyConnector() {
 
       const combinedSearchResults = newValues.concat(searchResults);
       setSearchResults(combinedSearchResults);
-      setSelectedSpotifySongIds(newValues.map((track: any) => track.id));
+      setSelectedSpotifySongIds(newValues.map((track) => track.id));
     });
   };
 
@@ -118,7 +127,7 @@ export default function LasershowSpotifyConnector() {
               <FormControl style={{ minWidth: "250px" }}>
                 <InputLabel>Lasershow to connect songs to</InputLabel>
                 <Select defaultValue="">
-                  {lasershows.map((lasershow: any) => (
+                  {lasershows.map((lasershow) => (
                     <MenuItem
                       onClick={() => onLasershowSelect(lasershow.uuid)}
                       value={lasershow.name}
@@ -168,10 +177,10 @@ export default function LasershowSpotifyConnector() {
           </Tooltip>
         </Paper>
         <List sx={{ width: "100%" }} disablePadding>
-          {searchResults.map((searchResult: any, index: number) => {
+          {searchResults.map((searchResult, index: number) => {
             const songIsAlreadyConnected = existingConnectors.some(
-              (ex: any) =>
-                ex.spotifySongs.some((ss: any) => ss.spotifySongId === searchResult?.id) &&
+              (ex) =>
+                ex.spotifySongs.some((ss) => ss.spotifySongId === searchResult?.id) &&
                 ex.lasershowUuid !== selectedLasershowUuid
             );
 
@@ -189,8 +198,8 @@ export default function LasershowSpotifyConnector() {
                       checked={selectedSpotifySongIds?.some((spsi) => spsi === searchResult.id)}
                       tabIndex={-1}
                       disableRipple
-                      inputProps={{
-                        "aria-labelledby": `checkbox-list-label-${index}`,
+                      slotProps={{
+                        input: { "aria-labelledby": `checkbox-list-label-${index}` },
                       }}
                     />
                   </ListItemIcon>

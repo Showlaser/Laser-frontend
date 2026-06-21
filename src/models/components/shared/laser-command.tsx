@@ -1,9 +1,11 @@
-// The numbers corresponds to red   green   blue    xGalvo  yGalvo
-export type LaserCommand = [number, string, number, number, number, number, number];
+export type ExportedLasershow = LaserCommandModelCluster[];
+
+export type LaserCommandModelCluster = {
+  timeMs: number;
+  commands: LaserCommandModel[][];
+};
+
 export type LaserCommandModel = {
-  orderNr: number;
-  time: number;
-  patternUuid: string;
   r: number;
   g: number;
   b: number;

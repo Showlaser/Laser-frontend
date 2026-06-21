@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx eslint *)",
+      "Bash(node -e ' *)",
+      "Bash(npm run *)",
+      "Bash(echo \"--- total tsc errors: $\\(npm run typecheck 2>&1)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('version:', p.version\\); console.log\\('react-scripts:', p.dependencies['react-scripts']||p.devDependencies&&p.devDependencies['react-scripts']\\); console.log\\('vite:', \\(p.devDependencies&&p.devDependencies.vite\\)||p.dependencies.vite\\)\")",
+      "Bash(node -e \"const t=require\\('./tsconfig.json'\\); console.log\\('resolveJsonModule:', t.compilerOptions && t.compilerOptions.resolveJsonModule\\)\")",
+      "Bash(ls vite.config.*)",
+      "Bash(npx vitest *)",
+      "PowerShell(npm run typecheck 2>&1)",
+      "Read(//d/Deze Pc/Documenten/Projecten/Laser projector/Versie 4/Software/Pc software/Docker api's/Auth_API/**)",
+      "PowerShell(npm install -D typescript-eslint@8.61.1 2>&1)",
+      "PowerShell(npm run lint 2>&1)",
+      "PowerShell(npm outdated 2>&1)",
+      "PowerShell(\"=== clean ===\")",
+      "Read(//d/Deze Pc/Documenten/Projecten/Laser projector/Versie 4/Software/Pc software/LaserAPI/LaserAPI/**)",
+      "Read(//d/Deze Pc/Documenten/Projecten/Laser projector/Versie 4/Software/Pc software/LaserAPI/**)",
+      "Bash(dotnet nuget *)",
+      "Bash(dotnet package *)",
+      "Bash(dotnet restore *)",
+      "Bash(dotnet list *)"
+    ],
+    "additionalDirectories": [
+      "D:\\Deze Pc\\Documenten\\Projecten\\Laser projector\\Versie 4\\Software\\Pc software\\Docker api's\\Auth_API\\Models\\Helper",
+      "D:\\Deze Pc\\Documenten\\Projecten\\Laser projector\\Versie 4\\Software\\Pc software\\Docker api's\\Auth_API\\Tests\\UnitTests\\TestModels",
+      "D:\\Deze Pc\\Documenten\\Projecten\\Laser projector\\Versie 4\\Software\\Pc software\\Docker api's\\Auth_API\\Tests\\UnitTests\\LogicTest",
+      "D:\\Deze Pc\\Documenten\\Projecten\\Laser projector\\Versie 4\\Software\\Pc software\\LaserAPI\\LaserAPI"
+    ]
+  }
+}
