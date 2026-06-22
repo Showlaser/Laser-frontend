@@ -1,14 +1,15 @@
-export enum LaserStatus {
-  Emitting,
-  Standby,
-  PoweredOff,
-  EmergencyButtonPressed,
-  PendingConnection,
-  ConnectionLost,
-}
-
 export enum LaserModel {
   Version5,
+}
+
+export enum LaserStatus {
+  Emitting = "Emitting",
+  Standby = "Standby",
+  EmergencyButtonPressed = "EmergencyButtonPressed",
+  PendingConnection = "PendingConnection",
+  ConnectionLost = "ConnectionLost",
+  Defect = "Defect",
+  NotConfigured = "NotConfigured",
 }
 
 export type RegisteredLaser = {

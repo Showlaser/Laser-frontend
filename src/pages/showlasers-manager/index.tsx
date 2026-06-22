@@ -1,9 +1,18 @@
-import { Button, Divider, FormControl, FormLabel, Grid, Paper, TextField } from "@mui/material";
+import {
+  Alert,
+  Button,
+  Divider,
+  FormControl,
+  FormLabel,
+  Grid,
+  Paper,
+  TextField,
+} from "@mui/material";
 import SelectList from "components/select-list";
 import { OnTrue } from "components/shared/on-true";
 import PropertyControl from "components/shared/property-control";
 import SideNav from "components/shared/sidenav";
-import { RegisteredLaser } from "models/components/shared/registered-laser";
+import { LaserStatus, RegisteredLaser } from "models/components/shared/registered-laser";
 import { UDPBroadcast } from "models/components/shared/UPDBroadcast";
 import { useEffect, useState } from "react";
 import {
@@ -25,9 +34,14 @@ export default function ShowlaserManager() {
   const [selectedRegisteredLasers, setSelectedRegisteredLasers] = useState<string[]>([]);
 
   const [laserToAdopt, setLaserToAdopt] = useState<RegisteredLaser | null>(null);
+
   const _registeredLaser = registeredLasers?.find(
     (laser) => laser.uuid === selectedRegisteredLasers[0],
   );
+
+  const _registeredLaserInModifyableState =
+    _registeredLaser?.status === LaserStatus.Standby ||
+    _registeredLaser?.status === LaserStatus.Emitting;
 
   useEffect(() => {
     if (pendingAdoptions === null) {
@@ -287,13 +301,19 @@ export default function ShowlaserManager() {
               registeredLasers?.map((laser: RegisteredLaser) => ({
                 uuid: laser.uuid,
                 name: laser?.name ?? "",
-                description: "",
+                description: "Status: " + laser?.status,
               })) ?? []
             }
           />
           <OnTrue onTrue={selectedRegisteredLasers.length > 0}>
             <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
-              <FormControl>
+              <FormControl disabled={!_registeredLaserInModifyableState}>
+                <OnTrue onTrue={!_registeredLaserInModifyableState}>
+                  <Alert severity="error">
+                    The showlaser is not connected to the controller and therefore no changes can be
+                    made.
+                  </Alert>
+                </OnTrue>
                 <FormLabel htmlFor="showlaser-name">Showlaser name</FormLabel>
                 <TextField
                   style={{ marginBottom: "5px" }}
@@ -307,6 +327,7 @@ export default function ShowlaserManager() {
                 <small>ModelType: {_registeredLaser?.modelType}</small>
                 <small>Status: {_registeredLaser?.status}</small>
                 <PropertyControl
+                  disabled={!_registeredLaserInModifyableState}
                   label="Max power per laser %"
                   id="maxPowerPerlaserInPercentage"
                   value={_registeredLaser?.maxPowerPerlaserInPercentage ?? 0}
@@ -319,6 +340,7 @@ export default function ShowlaserManager() {
                   sliderMarks={[{ value: 0, label: "0" }]}
                 />
                 <PropertyControl
+                  disabled={!_registeredLaserInModifyableState}
                   label="Projection range to top %"
                   id="svg-yoffset"
                   value={_registeredLaser?.projectionTopInPercentage ?? 0}
@@ -331,6 +353,7 @@ export default function ShowlaserManager() {
                   sliderMarks={[{ value: 0, label: "0" }]}
                 />
                 <PropertyControl
+                  disabled={!_registeredLaserInModifyableState}
                   label="Projection range to bottom %"
                   id="svg-yoffset"
                   value={_registeredLaser?.projectionBottomInPercentage ?? 0}
@@ -343,6 +366,7 @@ export default function ShowlaserManager() {
                   sliderMarks={[{ value: 0, label: "0" }]}
                 />
                 <PropertyControl
+                  disabled={!_registeredLaserInModifyableState}
                   label="Projection range to left %"
                   id="svg-yoffset"
                   value={_registeredLaser?.projectionLeftInPercentage ?? 0}
@@ -355,6 +379,7 @@ export default function ShowlaserManager() {
                   sliderMarks={[{ value: 0, label: "0" }]}
                 />
                 <PropertyControl
+                  disabled={!_registeredLaserInModifyableState}
                   label="Projection range to right %"
                   id="svg-yoffset"
                   value={_registeredLaser?.projectionRightInPercentage ?? 0}
@@ -367,6 +392,7 @@ export default function ShowlaserManager() {
                   sliderMarks={[{ value: 0, label: "0" }]}
                 />
                 <Button
+                  disabled={!_registeredLaserInModifyableState}
                   variant="contained"
                   onClick={onSaveRegisteredLaser}
                   style={{ marginTop: "10px" }}
@@ -375,6 +401,7 @@ export default function ShowlaserManager() {
                 </Button>
                 <Divider />
                 <Button
+                  disabled={!_registeredLaserInModifyableState}
                   color="error"
                   size="small"
                   variant="text"
