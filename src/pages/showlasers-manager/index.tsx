@@ -12,6 +12,7 @@ import SelectList from "components/select-list";
 import { OnTrue } from "components/shared/on-true";
 import PropertyControl from "components/shared/property-control";
 import SideNav from "components/shared/sidenav";
+import ShowlaserSDCard from "components/showlaser-manager/showlaser-sdcard";
 import { LaserStatus, RegisteredLaser } from "models/components/shared/registered-laser";
 import { UDPBroadcast } from "models/components/shared/UPDBroadcast";
 import { useEffect, useState } from "react";
@@ -305,8 +306,8 @@ export default function ShowlaserManager() {
               })) ?? []
             }
           />
-          <OnTrue onTrue={selectedRegisteredLasers.length > 0}>
-            <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+          <OnTrue onTrue={_registeredLaser !== undefined}>
+            <div>
               <FormControl disabled={!_registeredLaserInModifyableState}>
                 <OnTrue onTrue={!_registeredLaserInModifyableState}>
                   <Alert severity="error">
@@ -411,7 +412,9 @@ export default function ShowlaserManager() {
                   Remove selected showlasers
                 </Button>
               </FormControl>
-              <canvas id="showlaser-settings-preview" />
+              <canvas id="showlaser-settings-preview" style={{ marginLeft: "100px" }} />
+              <Divider />
+              <ShowlaserSDCard selectedRegisteredShowlaser={_registeredLaser} />
             </div>
           </OnTrue>
         </Paper>

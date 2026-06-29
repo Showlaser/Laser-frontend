@@ -25,6 +25,7 @@ const apiEndpoints = {
   currentComDevice: `${laserApiUrl}settings/current-com-device`,
   adoption: `${laserApiUrl}adoption`,
   showlaser: `${laserApiUrl}showlaser`,
+  showlaserSDCard: `${laserApiUrl}showlaser/sd-card`,
 };
 
 export default apiEndpoints;

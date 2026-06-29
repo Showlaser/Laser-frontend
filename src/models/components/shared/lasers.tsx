@@ -20,12 +20,3 @@ export type LaserLog = {
   temperature: number;
   health: valueof<typeof LaserHealth>;
 };
-
-export type LaserInfo = {
-  uuid: string;
-  name: string;
-  specs: string;
-  status: LaserStatus;
-  online: boolean;
-  logs: LaserLog[];
-};

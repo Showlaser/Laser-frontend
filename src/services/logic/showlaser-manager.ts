@@ -1,4 +1,5 @@
 import { RegisteredLaser } from "models/components/shared/registered-laser";
+import { SDCardFile } from "models/components/shared/sd-card-file";
 import { UDPBroadcast } from "models/components/shared/UPDBroadcast";
 import { Delete, Get, Post, Put } from "services/shared/api/api-actions";
 import apiEndpoints from "services/shared/api/api-endpoints";
@@ -9,6 +10,27 @@ export const getPendingAdoptions = async (): Promise<UDPBroadcast[] | undefined>
   const result = await sendRequest(() => Get(apiEndpoints.adoption), []);
   if (result?.status === 200) {
     return (await result?.json()) as UDPBroadcast[];
+  }
+
+  return undefined;
+};
+
+export const getSDCardFiles = async (uuid: string): Promise<SDCardFile[] | undefined> => {
+  const result = await sendRequest(() => Get(`${apiEndpoints.showlaserSDCard}?uuid=${uuid}`), []);
+  if (result?.status === 200) {
+    return (await result?.json()) as SDCardFile[];
+  }
+
+  return undefined;
+};
+
+export const deleteSDCardFile = async (uuid: string, filename: string) => {
+  const result = await sendRequest(
+    () => Delete(`${apiEndpoints.showlaserSDCard}?uuid=${uuid}&filename=${filename}`),
+    [],
+  );
+  if (result?.status === 200) {
+    return (await result?.json()) as SDCardFile[];
   }
 
   return undefined;
